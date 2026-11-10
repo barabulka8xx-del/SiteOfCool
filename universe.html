@@ -25,7 +25,7 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА (Улица) --- */
+    /* --- КАТСЦЕНА --- */
     #cutscene {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(to bottom, #000000 0%, #050a1a 40%, #1a1a3a 100%);
@@ -42,7 +42,7 @@
     #cutscene.active { display: flex; opacity: 1; }
 
     .cutscene-text {
-      position: absolute; top: 20%; font-size: 28px; font-weight: 700;
+      position: absolute; top: 20%; font-size: 24px; font-weight: 700;
       text-align: center; opacity: 0; animation: fadeInOut 3s forwards; z-index: 10;
       text-shadow: 0 0 20px rgba(255,255,255,0.5);
     }
@@ -70,18 +70,25 @@
       background-size: 100% 100%; background-repeat: no-repeat;
       clip-path: polygon(0 100%, 0 40%, 10% 40%, 10% 70%, 20% 70%, 20% 20%, 35% 20%, 35% 60%, 50% 60%, 50% 30%, 60% 30%, 60% 80%, 75% 80%, 75% 10%, 85% 10%, 85% 50%, 100% 50%, 100% 100%);
     }
-    .lamp-post { position: absolute; bottom: 40%; width: 4px; height: 80px; background: #222; }
-    .lamp-light { position: absolute; top: -10px; left: -8px; width: 20px; height: 20px; background: #ffcc00; border-radius: 50%; box-shadow: 0 0 30px 10px rgba(255, 204, 0, 0.4); }
     .fog { position: absolute; bottom: 40%; width: 100%; height: 50%; background: linear-gradient(to top, rgba(26,26,58,1) 0%, rgba(26,26,58,0) 100%); z-index: 4; pointer-events: none; }
 
-    /* Коты в катсцене */
-    .cutscene-cats-container { position: absolute; bottom: 15%; display: flex; gap: 40px; z-index: 5; }
-    .cutscene-cat-wrapper { animation: walkIntoFog 3s ease-in forwards; }
+    /* Контейнер для катсцены */
+    .cutscene-items-container { position: absolute; bottom: 15%; width: 100%; z-index: 5; }
+
+    /* Анимация для котов в катсцене (просто пробегают) */
+    .cutscene-cat-wrapper { position: absolute; animation: runAcrossCutscene linear forwards; }
     
-    @keyframes walkIntoFog {
-      0% { transform: scale(1.2); opacity: 1; }
-      80% { opacity: 1; }
-      100% { transform: scale(0.2); opacity: 0; }
+    @keyframes runAcrossCutscene {
+      0% { transform: translateX(-100px) scale(1); opacity: 1; }
+      100% { transform: translateX(100vw) scale(1); opacity: 1; }
+    }
+
+    /* Анимация для пиццы в катсцене (падает) */
+    .cutscene-pizza-wrapper { position: absolute; font-size: 60px; animation: fallDownCutscene linear forwards; }
+
+    @keyframes fallDownCutscene {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 1; }
     }
 
     /* --- ИНТЕРФЕЙС --- */
@@ -137,42 +144,48 @@
     .cat-body { position: absolute; top: 40px; left: 5px; width: 35px; height: 20px; background-color: #ff9900; border-radius: 4px; }
     .cat-tail { position: absolute; top: 45px; left: 40px; width: 20px; height: 8px; background-color: #ff9900; border-radius: 4px; }
     
-    /* АНИМАЦИЯ ЛАПОК */
     .cat-paw-l, .cat-paw-r { position: absolute; bottom: 0; width: 10px; height: 10px; background-color: #cc7a00; border-radius: 2px; }
     .cat-paw-l { left: 10px; }
     .cat-paw-r { right: 15px; }
 
-    /* Добавляем анимацию ТОЛЬКО когда кот бежит */
+    /* Пицца */
+    .flying-pizza { position: absolute; font-size: 45px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
+
+    /* Анимации для пульта */
+    /* Коты просто пробегают слева направо без разворота */
+    .run-anim { animation: runAcross linear forwards; }
+    @keyframes runAcross {
+      0% { transform: translateX(-100px); }
+      100% { transform: translateX(100vw); }
+    }
+    
+    /* Анимация перебирания лапками */
     .run-anim .cat-paw-l { animation: step 0.2s infinite alternate; }
     .run-anim .cat-paw-r { animation: step 0.2s infinite alternate-reverse; }
-
     @keyframes step {
       0% { transform: translateY(0); }
       100% { transform: translateY(-6px); }
     }
 
-    .flying-pizza { position: absolute; font-size: 45px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
-
-    /* Анимации для пульта (БЕГ) */
-    /* Убираем steps, чтобы было плавнее */
-    .run-anim { animation: runAcross linear infinite; }
-    @keyframes runAcross {
-      0% { transform: translateX(-100px) scaleX(1); }
-      49% { transform: translateX(100vw) scaleX(1); }
-      50% { transform: translateX(100vw) scaleX(-1); }
-      100% { transform: translateX(-100px) scaleX(-1); }
-    }
-
+    /* Левитация для котов (когда нет гравитации) */
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover {
       0% { transform: translateY(0) rotate(-15deg); }
       100% { transform: translateY(-30px) rotate(15deg); }
     }
 
+    /* Падение пиццы (когда гравитация есть) */
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown {
       0% { transform: translateY(0) rotate(0deg); }
       100% { transform: translateY(120vh) rotate(360deg); }
+    }
+
+    /* Улет пиццы (когда гравитации нет) */
+    .fly-up-anim { animation: flyUp linear forwards; }
+    @keyframes flyUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(-360deg); opacity: 1; }
     }
 
     .reality-inverted { filter: invert(1) hue-rotate(180deg); }
@@ -182,23 +195,19 @@
 
   <!-- Катсцена -->
   <div id="cutscene">
-    <div class="cutscene-text">Пробуждение...</div>
+    <div class="cutscene-text" id="cutscene-text">Загрузка...</div>
     
-    <div class="street-scene">
+    <!-- Улица (появляется только если включены коты) -->
+    <div class="street-scene" id="cutscene-street" style="display: none;">
       <div class="buildings"></div>
-      <div class="lamp-post" style="left: 20%;"><div class="lamp-light"></div></div>
-      <div class="lamp-post" style="left: 80%;"><div class="lamp-light"></div></div>
       <div class="road-surface"></div>
       <div class="road-lines"></div>
       <div class="fog"></div>
     </div>
 
-    <!-- Коты в катсцене -->
-    <div class="cutscene-cats-container">
-      <!-- Добавил класс run-anim внутрь катсцены для движения лапок -->
-      <div class="cutscene-cat-wrapper"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
-      <div class="cutscene-cat-wrapper" style="animation-delay: 0.3s;"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
-      <div class="cutscene-cat-wrapper" style="animation-delay: 0.6s;"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+    <!-- Контейнер для объектов катсцены -->
+    <div class="cutscene-items-container" id="cutscene-items">
+      <!-- Сюда будут добавляться объекты через JS -->
     </div>
   </div>
 
@@ -246,28 +255,61 @@
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
     const realityToggle = document.getElementById('toggle-reality');
+    
     const cutscene = document.getElementById('cutscene');
+    const cutsceneText = document.getElementById('cutscene-text');
+    const cutsceneStreet = document.getElementById('cutscene-street');
+    const cutsceneItems = document.getElementById('cutscene-items');
 
     let catInterval = null;
     let pizzaInterval = null;
-    let isCutscenePlayed = false;
+    
+    // Флаги, чтобы катсцены показывались только при первом включении
+    let playedCats = false;
+    let playedPizza = false;
+    let playedGravity = false;
 
     const catHTML = `
       <div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div>
       <div class="cat-body"></div><div class="cat-tail"></div>
-      <div class="cat-paw-l"></div>
-      <div class="cat-paw-r"></div>
+      <div class="cat-paw-l"></div><div class="cat-paw-r"></div>
     `;
 
+    // --- ФУНКЦИЯ ЗАПУСКА КАТСЦЕНЫ ---
+    function playCutscene(text, showStreet, spawnObjects) {
+      cutscene.classList.add('active');
+      cutsceneText.textContent = text;
+      cutsceneItems.innerHTML = '';
+      cutsceneStreet.style.display = showStreet ? 'block' : 'none';
+
+      // Спавним объекты для катсцены
+      if (spawnObjects) spawnObjects();
+
+      setTimeout(() => {
+        cutscene.classList.remove('active');
+        // Очищаем катсцену после завершения
+        setTimeout(() => { cutsceneItems.innerHTML = ''; }, 1000);
+      }, 3000); 
+    }
+
+    // --- КОТЫ ---
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
-        if (!isCutscenePlayed) {
-          isCutscenePlayed = true; 
-          cutscene.classList.add('active');
-          setTimeout(() => {
-            cutscene.classList.remove('active');
-            startCats();
-          }, 3000); 
+        if (!playedCats) {
+          playedCats = true;
+          playCutscene("Квадратные коты выходят на связь...", true, () => {
+            // Спавним 3 котов, которые пробегают
+            for(let i=0; i<3; i++) {
+               const wrapper = document.createElement('div');
+               wrapper.className = 'cutscene-cat-wrapper';
+               wrapper.style.bottom = (Math.random() * 20 + 10) + '%';
+               wrapper.style.animationDuration = (Math.random() * 1.5 + 2) + 's';
+               wrapper.style.animationDelay = i * 0.3 + 's';
+               wrapper.innerHTML = `<div class="modern-cat run-anim" style="position:relative; animation:none;">${catHTML}</div>`;
+               cutsceneItems.appendChild(wrapper);
+            }
+          });
+          setTimeout(startCats, 3000);
         } else {
           startCats();
         }
@@ -285,11 +327,10 @@
       const cat = document.createElement('div');
       cat.className = 'modern-cat';
       cat.innerHTML = catHTML;
-      const startY = Math.random() * 60 + 20; 
-      cat.style.top = startY + 'vh';
       
-      // Задаем случайную скорость бега
-      const duration = Math.random() * 2 + 3; // от 3 до 5 секунд
+      cat.style.top = (Math.random() * 60 + 20) + 'vh';
+      // Скорость пробега
+      const duration = Math.random() * 2 + 3; 
       cat.style.animationDuration = duration + 's';
 
       if (!gravityToggle.checked) {
@@ -297,50 +338,136 @@
       } else {
         cat.classList.add('run-anim');
       }
+      
+      // Удаляем кота после того, как он убежал за экран
+      cat.addEventListener('animationend', () => cat.remove());
+      
       layer.appendChild(cat);
     }
 
+    // --- ПИЦЦА ---
+    pizzaToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!playedPizza) {
+          playedPizza = true;
+          playCutscene("Пицца вызывается на ковёр...", false, () => {
+            // Спавним пиццу, которая падает (или улетает, если нет гравитации)
+            for(let i=0; i<5; i++) {
+               const pizza = document.createElement('div');
+               pizza.className = 'cutscene-pizza-wrapper';
+               pizza.textContent = '🍕';
+               pizza.style.left = (Math.random() * 80 + 10) + '%';
+               
+               if (gravityToggle.checked) {
+                 pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+                 pizza.style.animationDelay = i * 0.2 + 's';
+               } else {
+                 // Если гравитации нет, она улетает вверх
+                 pizza.style.bottom = '10%'; // Ставим внизу
+                 pizza.style.animation = `flyUp ${Math.random() * 1.5 + 1}s linear forwards`;
+                 pizza.style.animationDelay = i * 0.2 + 's';
+               }
+               cutsceneItems.appendChild(pizza);
+            }
+          });
+          setTimeout(startPizza, 3000);
+        } else {
+          startPizza();
+        }
+      } else {
+        clearInterval(pizzaInterval);
+        // Удаляем все пиццы с экрана, если выключили
+        document.querySelectorAll('.flying-pizza').forEach(p => p.remove());
+      }
+    });
+
+    function startPizza() {
+      spawnPizza();
+      pizzaInterval = setInterval(spawnPizza, 500);
+    }
+
+    function spawnPizza() {
+      const pizza = document.createElement('div');
+      pizza.className = 'flying-pizza';
+      pizza.textContent = '🍕';
+      pizza.style.left = (Math.random() * 85 + 5) + 'vw';
+      
+      if (gravityToggle.checked) {
+        // Падает
+        pizza.style.top = '-60px';
+        pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+        pizza.classList.add('fall-anim');
+      } else {
+        // Улетает вверх (если гравитации нет)
+        pizza.style.top = '100vh'; // начинаем снизу
+        pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+        pizza.classList.add('fly-up-anim');
+      }
+
+      pizza.addEventListener('animationend', () => pizza.remove());
+      layer.appendChild(pizza);
+    }
+
+    // --- ГРАВИТАЦИЯ ---
     gravityToggle.addEventListener('change', (e) => {
       const cats = document.querySelectorAll('.modern-cat');
+      const pizzas = document.querySelectorAll('.flying-pizza');
+      
       if (!e.target.checked) {
+        // ГРАВИТАЦИЯ ВЫКЛ
+        if (!playedGravity) {
+          playedGravity = true;
+          playCutscene("Гравитация отключена...", true, () => {
+            // В катсцене все коты улетают
+            for(let i=0; i<4; i++) {
+               const wrapper = document.createElement('div');
+               wrapper.className = 'cutscene-cat-wrapper';
+               wrapper.style.bottom = '15%';
+               wrapper.style.animation = `flyUp ${Math.random() * 1.5 + 1}s linear forwards`;
+               wrapper.innerHTML = `<div class="modern-cat" style="position:relative;">${catHTML}</div>`;
+               cutsceneItems.appendChild(wrapper);
+            }
+          });
+        }
+
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
           cat.style.animation = 'none'; 
           cat.style.top = (Math.random() * 20 + 5) + 'vh'; 
           setTimeout(() => cat.classList.add('float-anim'), 1000);
         });
+        
+        // Пицца теперь тоже улетает вверх!
+        pizzas.forEach(pizza => {
+          const currentLeft = pizza.style.left;
+          pizza.className = 'flying-pizza fly-up-anim';
+          pizza.style.top = '100vh'; // Сбрасываем вниз
+          pizza.style.left = currentLeft;
+          pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+        });
+
       } else {
+        // ГРАВИТАЦИЯ ВКЛ
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
           setTimeout(() => {
-            // Задаем новую скорость при падении
-            const duration = Math.random() * 2 + 3;
-            cat.style.animationDuration = duration + 's';
             cat.classList.add('run-anim');
           }, 1000);
+        });
+
+        // Пицца снова начинает падать
+        pizzas.forEach(pizza => {
+           const currentLeft = pizza.style.left;
+           pizza.className = 'flying-pizza fall-anim';
+           pizza.style.top = '-60px';
+           pizza.style.left = currentLeft;
+           pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
         });
       }
     });
 
-    pizzaToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        pizzaInterval = setInterval(() => {
-          const pizza = document.createElement('div');
-          pizza.className = 'flying-pizza';
-          pizza.textContent = '🍕';
-          pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-          pizza.style.top = '-60px';
-          pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-          pizza.classList.add('fall-anim');
-          pizza.addEventListener('animationend', () => pizza.remove());
-          layer.appendChild(pizza);
-        }, 500);
-      } else {
-        clearInterval(pizzaInterval);
-      }
-    });
-
+    // --- РЕАЛЬНОСТЬ ---
     realityToggle.addEventListener('change', (e) => {
       document.body.classList.toggle('reality-inverted', e.target.checked);
     });
