@@ -11,30 +11,40 @@
       background-color: #050510;
       color: white;
       font-family: system-ui, -apple-system, sans-serif;
-      overflow: hidden; /* Скрываем скролл, игра на весь экран */
+      overflow: hidden;
       height: 100vh;
       width: 100vw;
+      transition: transform 0.1s;
     }
 
-    canvas {
-      display: block;
-      cursor: crosshair;
+    /* Тряска для режима Хаоса */
+    body.shake { animation: shake 0.3s infinite; }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      10% { transform: translate(-1px, -2px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(3px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      70% { transform: translate(2px, 1px) rotate(-1deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      90% { transform: translate(2px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
     }
 
-    /* Интерфейс поверх игры */
-    .ui {
+    canvas { display: block; cursor: crosshair; }
+
+    /* Интерфейс */
+    .ui-top {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 15px;
+      left: 15px;
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      pointer-events: none; /* Чтобы клики проходили сквозь пустое место */
-    }
-
-    .ui > * {
-      pointer-events: auto; /* Кнопки должны нажиматься */
+      gap: 10px;
+      pointer-events: none;
     }
 
     h1 {
@@ -48,28 +58,41 @@
       color: #aaa;
       max-width: 250px;
       line-height: 1.4;
-      margin-bottom: 10px;
     }
 
-    .btn-reset {
-      background: rgba(255, 0, 85, 0.2);
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      pointer-events: auto;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      border: 1px solid #ff0055;
-      padding: 10px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 12px;
       border-radius: 8px;
       font-weight: bold;
+      font-size: 12px;
       cursor: pointer;
       backdrop-filter: blur(5px);
       transition: 0.2s;
-      width: fit-content;
     }
 
-    .btn-reset:active {
-      background: #ff0055;
-      transform: scale(0.95);
-    }
+    button:active { transform: scale(0.95); }
+    
+    .btn-reset { border-color: #ff0055; color: #ff0055; }
+    .btn-reset:active { background: #ff0055; color: #fff; }
+    
+    .btn-meteor { border-color: #ff4500; color: #ff4500; }
+    .btn-meteor:active { background: #ff4500; color: #fff; }
 
-    /* Панель выбора цвета */
+    .btn-chaos { border-color: #9d4edd; color: #9d4edd; }
+    .btn-chaos.active { background: #9d4edd; color: #fff; box-shadow: 0 0 15px #9d4edd; }
+
+    /* Палитра */
     .color-picker {
       position: absolute;
       bottom: 20px;
@@ -78,7 +101,7 @@
       display: flex;
       gap: 15px;
       z-index: 10;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.6);
       padding: 10px 20px;
       border-radius: 30px;
       backdrop-filter: blur(10px);
@@ -86,8 +109,7 @@
     }
 
     .color-dot {
-      width: 35px;
-      height: 35px;
+      width: 30px; height: 30px;
       border-radius: 50%;
       cursor: pointer;
       transition: 0.2s;
@@ -101,12 +123,17 @@
     }
   </style>
 </head>
-<body>
+<body id="main-body">
 
-  <div class="ui">
+  <div class="ui-top">
     <h1>🌌 Гравитация</h1>
-    <div class="subtitle">Тапай по экрану, чтобы создавать планеты. Они будут притягиваться друг к другу.</div>
-    <button class="btn-reset" id="btn-reset">Сбросить всё 💥</button>
+    <div class="subtitle">Тапай по экрану — создаешь планеты. Зажми палец — включаешь магнит.</div>
+    
+    <div class="controls">
+      <button class="btn-reset" id="btn-reset">Сброс 💥</button>
+      <button class="btn-meteor" id="btn-meteor">Метеорит ☄️</button>
+      <button class="btn-chaos" id="btn-chaos">Хаос 🌪️</button>
+    </div>
   </div>
 
   <div class="color-picker">
@@ -122,20 +149,27 @@
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const body = document.getElementById('main-body');
+    
     const btnReset = document.getElementById('btn-reset');
+    const btnMeteor = document.getElementById('btn-meteor');
+    const btnChaos = document.getElementById('btn-chaos');
     const colorDots = document.querySelectorAll('.color-dot');
 
     let width, height;
     let planets = [];
     let currentColor = '#4facfe';
+    
+    // Состояния
+    let isChaos = false;
+    let gravityMultiplier = 1;
+    let flashAlpha = 0; // Для вспышки при столкновении
+    let mouse = { x: null, y: null, isDown: false }; // Для магнита
 
-    // Настройки физики
-    const G = 0.5; // Гравитационная постоянная
-    const MAX_PLANETS = 40; // Ограничение, чтобы не завис телефон
-    const MIN_RADIUS = 5;
-    const MAX_RADIUS = 20;
+    // Настройки
+    const BASE_G = 0.5;
+    const MAX_PLANETS = 50;
 
-    // Изменение размера холста
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
@@ -152,24 +186,31 @@
       });
     });
 
-    // Класс Планеты
     class Planet {
       constructor(x, y, color, isBlackHole = false) {
         this.x = x;
         this.y = y;
-        this.vx = (Math.random() - 0.5) * 2; // Начальная скорость по X
-        this.vy = (Math.random() - 0.5) * 2; // Начальная скорость по Y
+        
+        // Если это спутник (спавнится с боку) - даем ему орбитальную скорость
+        const isOrbit = Math.random() > 0.7;
+        if (isOrbit) {
+          this.vx = (Math.random() - 0.5) * 8;
+          this.vy = (Math.random() - 0.5) * 8;
+        } else {
+          this.vx = (Math.random() - 0.5) * 2;
+          this.vy = (Math.random() - 0.5) * 2;
+        }
+
         this.color = color;
         this.isBlackHole = isBlackHole;
         
-        // Если это черная дыра - она огромная
         if (isBlackHole) {
           this.r = 40;
-          this.mass = 500; // Огромная масса
+          this.mass = 1000; 
           this.color = '#000';
         } else {
-          this.r = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
-          this.mass = this.r * this.r; // Масса зависит от размера
+          this.r = Math.random() * 15 + 5;
+          this.mass = this.r * this.r;
         }
       }
 
@@ -178,31 +219,27 @@
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
         
         if (this.isBlackHole) {
-          // Отрисовка черной дыры с аккреционным диском
           const gradient = ctx.createRadialGradient(this.x, this.y, this.r * 0.5, this.x, this.y, this.r * 1.5);
           gradient.addColorStop(0, '#000');
-          gradient.addColorStop(0.7, '#8a2be2');
+          gradient.addColorStop(0.7, '#9d4edd');
           gradient.addColorStop(1, 'transparent');
           ctx.fillStyle = gradient;
           ctx.arc(this.x, this.y, this.r * 1.5, 0, Math.PI * 2);
         } else {
-          // Обычная планета с бликом
           const gradient = ctx.createRadialGradient(this.x - this.r/3, this.y - this.r/3, this.r/10, this.x, this.y, this.r);
           gradient.addColorStop(0, '#fff');
           gradient.addColorStop(0.3, this.color);
           gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
           ctx.fillStyle = gradient;
         }
-        
         ctx.fill();
       }
 
       update() {
-        // Движение по инерции
         this.x += this.vx;
         this.y += this.vy;
 
-        // Отскок от стенок экрана
+        // Отскок от краев
         if (this.x - this.r < 0) { this.x = this.r; this.vx *= -0.8; }
         if (this.x + this.r > width) { this.x = width - this.r; this.vx *= -0.8; }
         if (this.y - this.r < 0) { this.y = this.r; this.vy *= -0.8; }
@@ -210,34 +247,79 @@
       }
     }
 
-    // Добавление планеты по клику
+    // --- УПРАВЛЕНИЕ МАГНИТОМ (Притяжение к пальцу) ---
     canvas.addEventListener('pointerdown', (e) => {
-      if (planets.length >= MAX_PLANETS) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      planets.push(new Planet(x, y, currentColor));
+      mouse.isDown = true;
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      
+      // Если клик короткий - создаем планету
+      if (planets.length < MAX_PLANETS) {
+        planets.push(new Planet(mouse.x, mouse.y, currentColor));
+      }
     });
 
-    // Сброс
+    canvas.addEventListener('pointermove', (e) => {
+      if (mouse.isDown) {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      }
+    });
+
+    canvas.addEventListener('pointerup', () => {
+      mouse.isDown = false;
+    });
+    canvas.addEventListener('pointerleave', () => {
+      mouse.isDown = false;
+    });
+
+    // --- КНОПКИ ---
     btnReset.addEventListener('click', () => {
       planets = [];
-      // Создаем пару планет для старта
+      flashAlpha = 0;
       planets.push(new Planet(width / 2 - 100, height / 2, '#4facfe'));
       planets.push(new Planet(width / 2 + 100, height / 2, '#ff0055'));
+    });
+
+    btnMeteor.addEventListener('click', () => {
+      // Создаем огромный метеорит в случайном месте сверху
+      const meteor = new Planet(Math.random() * width, -50, '#ff4500');
+      meteor.r = 30;
+      meteor.mass = 900;
+      meteor.vy = 10; // Летит вниз быстро
+      planets.push(meteor);
+    });
+
+    btnChaos.addEventListener('click', () => {
+      isChaos = !isChaos;
+      btnChaos.classList.toggle('active');
+      
+      if (isChaos) {
+        gravityMultiplier = 3;
+        body.classList.add('shake');
+      } else {
+        gravityMultiplier = 1;
+        body.classList.remove('shake');
+      }
     });
 
     // Начальные планеты
     planets.push(new Planet(width / 2 - 100, height / 2, '#4facfe'));
     planets.push(new Planet(width / 2 + 100, height / 2, '#ff0055'));
 
-    // Главный цикл анимации
+    // --- ФИЗИКА ---
     function animate() {
-      // Очистка экрана с небольшим шлейфом (эффект движения)
+      // Очистка с легким шлейфом
       ctx.fillStyle = 'rgba(5, 5, 16, 0.3)';
       ctx.fillRect(0, 0, width, height);
 
-      // 1. Расчет гравитации
+      // Вспышка при столкновении
+      if (flashAlpha > 0) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
+        ctx.fillRect(0, 0, width, height);
+        flashAlpha -= 0.05;
+      }
+
       for (let i = 0; i < planets.length; i++) {
         for (let j = i + 1; j < planets.length; j++) {
           const p1 = planets[i];
@@ -247,24 +329,25 @@
           const dy = p2.y - p1.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          // Если планеты столкнулись (слияние)
+          // Столкновение (слияние)
           if (distance < p1.r + p2.r) {
-            // Планета с большей массой поглощает меньшую
             const bigger = p1.mass > p2.mass ? p1 : p2;
             const smaller = p1.mass > p2.mass ? p2 : p1;
             
             bigger.mass += smaller.mass;
-            bigger.r = Math.sqrt(bigger.mass); // Радиус увеличивается
+            bigger.r = Math.sqrt(bigger.mass);
             
-            // Удаляем меньшую планету
+            // Если столкнулись крупные - вспышка
+            if (bigger.r > 25) flashAlpha = 0.5;
+
             planets.splice(planets.indexOf(smaller), 1);
-            i--; // Корректируем индекс, так как массив уменьшился
+            i--; 
             break; 
           }
 
-          // Если не столкнулись, но находимся близко - притягиваемся
+          // Гравитация
           if (distance > 0) {
-            const force = (G * p1.mass * p2.mass) / (distance * distance);
+            const force = (BASE_G * gravityMultiplier * p1.mass * p2.mass) / (distance * distance);
             const ax = (dx / distance) * force / p1.mass;
             const ay = (dy / distance) * force / p1.mass;
             const bx = (dx / distance) * force / p2.mass;
@@ -278,16 +361,29 @@
         }
       }
 
-      // 2. Обновление и отрисовка
+      // Притяжение к пальцу (Магнит)
+      if (mouse.isDown && mouse.x !== null) {
+        planets.forEach(p => {
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 10) {
+            // Сила магнита
+            p.vx += (dx / dist) * 0.5;
+            p.vy += (dy / dist) * 0.5;
+          }
+        });
+      }
+
       planets.forEach(p => {
-        // Ограничиваем скорость, чтобы не улетали за экран
-        p.vx = Math.max(-5, Math.min(5, p.vx));
-        p.vy = Math.max(-5, Math.min(5, p.vy));
+        // Ограничиваем макс скорость
+        p.vx = Math.max(-10, Math.min(10, p.vx));
+        p.vy = Math.max(-10, Math.min(10, p.vy));
         
         p.update();
         p.draw(ctx);
 
-        // Превращение в черную дыру, если планета стала слишком огромной
+        // Превращение в черную дыру
         if (p.mass > 3000 && !p.isBlackHole) {
           p.isBlackHole = true;
           p.color = '#000';
