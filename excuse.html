@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Генератор Отмазок 🗣️</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+    body {
+      font-family: 'Courier New', Courier, monospace; /* Шрифт под старую печатную машинку */
+      background-color: #f4ecd8; /* Цвет старой бумаги */
+      background-image: 
+        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+      background-size: 20px 20px; /* Клетчатый фон как в тетради */
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      box-shadow: 5px 5px 0px #333; /* Жесткая тень */
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Печать в углу */
+    .stamp {
+      position: absolute;
+      top: 10px; right: 10px;
+      border: 3px solid #d32f2f;
+      color: #d32f2f;
+      padding: 5px 10px;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      transform: rotate(15deg);
+      opacity: 0.7;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      border-bottom: 2px dashed #333;
+      padding-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    /* Кнопки выбора категорий */
+    .categories {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cat-btn {
+      background: none;
+      border: 2px solid #333;
+      padding: 8px 12px;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      border-radius: 4px;
+    }
+
+    .cat-btn.active {
+      background: #333;
+      color: #fff;
+    }
+
+    /* Блок с текстом отмазки */
+    .excuse-box {
+      background: #fdfcf9;
+      border: 2px dashed #555;
+      padding: 20px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    /* Главная кнопка генерации */
+    .generate-btn {
+      background: #ffeb3b;
+      border: 2px solid #333;
+      padding: 15px 20px;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 3px 3px 0px #333;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .generate-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0px 0px 0px #333;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      text-decoration: underline;
+      color: #555;
+      margin-top: 15px;
+      cursor: pointer;
+      font-family: inherit;
+      display: none; /* Появится после генерации */
+    }
+
+    /* Анимация печати */
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="stamp">Официально</div>
+    <h1>Генератор Отмазок</h1>
+    <div class="subtitle">Спасаем твою репутацию с 2026 года</div>
+
+    <div class="categories">
+      <button class="cat-btn active" data-cat="work">💼 Работа</button>
+      <button class="cat-btn" data-cat="study">📚 Учеба</button>
+      <button class="cat-btn" data-cat="friends">🍻 Друзья</button>
+    </div>
+
+    <div class="excuse-box" id="excuse-text">
+      Нажми на кнопку ниже, чтобы получить железобетонную отмазку...
+    </div>
+
+    <button class="generate-btn" id="gen-btn">Сгенерировать отмазку 🎲</button>
+    <button class="copy-btn" id="copy-btn">📋 Скопировать текст</button>
+  </div>
+
+  <script>
+    const excuses = {
+      work: [
+        "Я не опоздал, я просто прибыл в параллельную временную линию, и там сейчас только утро.",
+        "Мой интернет был захвачен пришельцами, они просили передать вам привет.",
+        "Я не могу выйти из дома, мой кот заблокировал дверь и требует паштет.",
+        "Я работал из дома, но мой стул внезапно решил, что он теперь повелитель гравитации.",
+        "Мой будильник перешел на темную сторону и отключился.",
+        "Я наступил на лего по дороге на работу, и мне пришлось лечиться пиццей 2 часа.",
+        "Птицы украли мой ключ от офиса, когда я кормил их хлебом.",
+        "Я застрял в лифте с соседом, который рассказывал мне про свой гороскоп.",
+        "Моя машина превратилась в тыкву, но я не знал заклинания обратно.",
+        "Я случайно отправил резюме в NASA и ждал ответа."
+      ],
+      study: [
+        "Собака съела не только домашку, но и мой учебник, тетрадь и ручку.",
+        "Мой компьютер завис на самом важном слайде, а перезагружать было нельзя.",
+        "Я готовился всю ночь, но в итоге забыл, кто я и где нахожусь.",
+        "Ветер унес мою тетрадь в открытое окно, и она улетела в неизвестном направлении.",
+        "Я пытался открыть файл с домашкой, но он потребовал обновления Windows.",
+        "Мой кот лег на клавиатуру и случайно удалил весь мой проект.",
+        "Я не спал 48 часов, и мой мозг решил уйти в отпуск без меня.",
+        "Я перепутал расписание, и весь день просидел в кабинете химии, изучая магию.",
+        "У меня сломался карандаш, и я пошел за новым, но заблудился в магазине.",
+        "Я так старался быть хорошим студентом, что уснул от перенапряжения."
+      ],
+      friends: [
+        "Я уже выходил, но мой холодильник посмотрел на меня с такой укоризной, что я остался.",
+        "Я потерял ключи, потом нашел, но потерял телефон, а потом и себя.",
+        "Мне позвонили из другого измерения и попросили срочно помочь.",
+        "Я ждал доставку пиццы 3 часа, не мог же я уйти голодным.",
+        "У меня внезапно началась серия матчей в любимой игре, я не мог выйти.",
+        "Я пытался собраться, но моя одежда решила устроить забастовку.",
+        "Кот сел на меня и заснул, я не мог его потревожить.",
+        "Я забыл, как дышать, и мне пришлось срочно вспоминать.",
+        "Я решил пойти пешком, но забыл, что живу на 25 этаже без лифта.",
+        "Мне пришло уведомление о конце света, я решил проверить, правда ли это."
+      ]
+    };
+
+    let currentCategory = 'work';
+    const excuseText = document.getElementById('excuse-text');
+    const genBtn = document.getElementById('gen-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const catBtns = document.querySelectorAll('.cat-btn');
+
+    // Переключение категорий
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCategory = btn.dataset.cat;
+      });
+    });
+
+    // Генерация
+    genBtn.addEventListener('click', () => {
+      const list = excuses[currentCategory];
+      const randomExcuse = list[Math.floor(Math.random() * list.length)];
+      
+      excuseText.textContent = randomExcuse;
+      excuseText.style.animation = 'none';
+      excuseText.offsetHeight; // Триггер перезапуска анимации
+      excuseText.style.animation = 'typing 1s steps(40, end)';
+      
+      copyBtn.style.display = 'inline-block';
+    });
+
+    // Копирование
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(excuseText.textContent).then(() => {
+        copyBtn.textContent = "✅ Скопировано!";
+        setTimeout(() => { copyBtn.textContent = "📋 Скопировать текст"; }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
