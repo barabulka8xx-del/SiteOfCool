@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Кнопка Апокалипсиса 💣</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #111;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: background 0.5s ease;
+    }
+
+    /* Тряска экрана */
+    .shake { animation: shake 0.3s infinite; }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px) rotate(0deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+
+    h1 {
+      font-size: 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: color 0.3s;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    .status {
+      font-size: 20px;
+      margin-bottom: 40px;
+      font-weight: bold;
+      font-family: monospace;
+      color: #00ff00;
+      transition: color 0.3s;
+    }
+
+    .btn-container {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Главная кнопка */
+    .apocalypse-btn {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff4b1f, #8b0000);
+      border: 10px solid #333;
+      box-shadow: 0 15px 0 #222, inset 0 -10px 20px rgba(0,0,0,0.5);
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 2px 2px 0px #000;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .apocalypse-btn:active {
+      transform: translateY(15px);
+      box-shadow: 0 0 0 #222, inset 0 5px 20px rgba(0,0,0,0.8);
+    }
+
+    /* Экран после взрыва */
+    .end-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .end-screen.active { display: flex; }
+
+    .end-screen h2 { font-size: 40px; margin-bottom: 20px; color: #ff0055; text-shadow: 0 0 20px #ff0055;}
+    .end-screen p { font-size: 16px; margin-bottom: 30px; color: #aaa; }
+
+    .restart-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Летающие объекты */
+    .flying-obj {
+      position: absolute;
+      font-size: 40px;
+      pointer-events: none;
+      z-index: 5;
+      animation: fly linear forwards;
+    }
+
+    @keyframes fly {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body id="body">
+
+  <h1 id="title">Кнопка Апокалипсиса</h1>
+  <div class="status" id="status">Стабильность: 100%</div>
+
+  <div class="btn-container" id="btn-container">
+    <button class="apocalypse-btn" id="apoc-btn">НЕ НАЖИМАТЬ</button>
+  </div>
+
+  <div class="end-screen" id="end-screen">
+    <h2>💥 БУМ 💥</h2>
+    <p>Ты уничтожил этот мир. Надеюсь, тебе было весело.</p>
+    <button class="restart-btn" id="restart-btn">Создать новый мир</button>
+  </div>
+
+  <script>
+    const body = document.getElementById('body');
+    const apocBtn = document.getElementById('apoc-btn');
+    const statusEl = document.getElementById('status');
+    const titleEl = document.getElementById('title');
+    const endScreen = document.getElementById('end-screen');
+    const restartBtn = document.getElementById('restart-btn');
+    const btnContainer = document.getElementById('btn-container');
+
+    let stability = 100;
+    let clicks = 0;
+
+    // Список того, что будет происходить
+    const events = [
+      { min: 90, text: "Ой...", color: "#ffeb3b" },
+      { min: 70, text: "Ты уверен?", color: "#ff9800" },
+      { min: 50, text: "Остановись!", color: "#ff4500" },
+      { min: 30, text: "ЧТО ТЫ ДЕЛАЕШЬ?!", color: "#ff0000" },
+      { min: 10, text: "СИСТЕМА ПАДАЕТ...", color: "#8b0000" }
+    ];
+
+    function spawnObject(emoji) {
+      const obj = document.createElement('div');
+      obj.className = 'flying-obj';
+      obj.textContent = emoji;
+      obj.style.left = Math.random() * 90 + 'vw';
+      obj.style.animationDuration = (Math.random() * 1 + 1) + 's';
+      body.appendChild(obj);
+      setTimeout(() => obj.remove(), 2000);
+    }
+
+    apocBtn.addEventListener('click', () => {
+      if (stability <= 0) return;
+
+      clicks++;
+      stability -= Math.floor(Math.random() * 8) + 5; // Падает на 5-12%
+      if (stability < 0) stability = 0;
+
+      statusEl.textContent = `Стабильность: ${stability}%`;
+
+      // Меняем цвет текста и фона в зависимости от стабильности
+      const currentEvent = events.find(e => stability >= e.min);
+      if (currentEvent) {
+        titleEl.textContent = currentEvent.text;
+        titleEl.style.color = currentEvent.color;
+        statusEl.style.color = currentEvent.color;
+      }
+
+      // Тряска
+      body.classList.add('shake');
+      setTimeout(() => body.classList.remove('shake'), 300);
+
+      // Спавним хаос
+      if (clicks > 2) spawnObject('☄️');
+      if (clicks > 5) spawnObject('🐸');
+      if (clicks > 8) spawnObject('👽');
+      if (clicks > 10) spawnObject('💩');
+
+      // Меняем фон
+      if (stability < 70) body.style.background = '#1a0000';
+      if (stability < 40) body.style.background = '#330000';
+      if (stability < 15) body.style.background = '#550000';
+
+      // Кнопка начинает меняться
+      if (stability < 50) apocBtn.textContent = "ЖМИ";
+      if (stability < 25) apocBtn.textContent = "ПОСЛЕДНИЙ ШАНС";
+
+      // КОНЕЦ
+      if (stability <= 0) {
+        apocBtn.style.display = 'none';
+        endScreen.classList.add('active');
+        body.style.background = '#000';
+        statusEl.style.display = 'none';
+        titleEl.style.display = 'none';
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      // Перезагрузка страницы (самый простой способ вернуть всё)
+      location.reload();
+    });
+  </script>
+</body>
+</html>
