@@ -75,8 +75,8 @@
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2; transition: background 1s; }
 
-    /* ОПУСТИЛИ ДЕРЕВЬЯ НА ЗЕМЛЮ */
-    .trees-container { position: absolute; bottom: 20%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; pointer-events: none; }
+    /* ДЕРЕВЬЯ ТЕПЕРЬ ТОЧНО НА ЗЕМЛЕ (внутри дороги) */
+    .trees-container { position: absolute; bottom: 5%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; align-items: flex-end; pointer-events: none; }
     .tree { font-size: 50px; transform: scale(0); transform-origin: bottom center; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .trees-container.active .tree { transform: scale(1); }
 
@@ -429,7 +429,7 @@
       }, duration); 
     }
 
-    // --- СПАВНЕРЫ (С ФЛАГОМ ДЛЯ ЧЕРНОЙ ДЫРЫ) ---
+    // --- СПАВНЕРЫ ---
     function startCats() {
       intervals.cats = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
@@ -525,7 +525,7 @@
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА (НЕ ТРОГАЕТ НОВЫЕ ОБЪЕКТЫ) ---
+    // --- ЧЕРНАЯ ДЫРА (ИСПРАВЛЕНА) ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
       const centerX = window.innerWidth / 2;
@@ -537,7 +537,8 @@
         const spawnTime = parseInt(obj.dataset.spawnTime || 0);
         const age = Date.now() - spawnTime;
         
-        if (age < 500) return; // Даем объекту 0.5 сек, чтобы вылететь
+        // Ждем 600мс, чтобы объект успел появиться на экране, прежде чем его засосет
+        if (age < 600) return; 
 
         const rect = obj.getBoundingClientRect();
         const objX = rect.left + rect.width / 2;
@@ -548,9 +549,12 @@
         obj.classList.add('sucked');
         obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim', 'fall-smooth-anim');
         
-        obj.style.transition = 'transform 1.5s ease-in, opacity 1.5s ease-in';
+        // Летят точно в центр дыры
+        obj.style.transition = 'transform 1.5s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 1.5s ease-in';
         obj.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0) rotate(720deg)`;
         obj.style.opacity = '0';
+        
+        // Удаляем после завершения полета
         setTimeout(() => obj.remove(), 1500);
       });
     }
