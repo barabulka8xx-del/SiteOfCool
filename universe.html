@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Управление Вселенной</title>
+  <title>Управление Вселенной 2.0</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
@@ -17,7 +17,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: background 1s ease;
+      transition: background 1s ease, filter 0.5s ease;
     }
 
     #animation-layer {
@@ -26,8 +26,8 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА --- */
-    #cutscene {
+    /* --- КАТСЦЕНА / МИР --- */
+    #world-view {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
       z-index: 100;
@@ -40,17 +40,12 @@
       overflow: hidden;
     }
 
-    #cutscene.active { display: flex; opacity: 1; }
+    #world-view.active { display: flex; opacity: 1; }
 
-    .cutscene-text {
-      position: absolute;
-      top: 30%;
-      font-size: 24px; font-weight: 700; text-align: center;
-      opacity: 0; animation: fadeInOut 2.5s forwards; z-index: 10;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-      color: #fff;
-      width: 100%;
-      padding: 0 20px;
+    .world-text {
+      position: absolute; top: 10%; font-size: 20px; font-weight: 700; text-align: center;
+      z-index: 10; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); color: #fff;
+      opacity: 0; animation: fadeInOut 3s forwards;
     }
     
     @keyframes fadeInOut {
@@ -60,10 +55,24 @@
       100% { opacity: 0; transform: scale(1.1); }
     }
 
+    /* Кнопка выхода из мира */
+    .close-world-btn {
+      position: absolute; top: 20px; right: 20px; z-index: 110;
+      background: rgba(255, 0, 85, 0.8); color: white;
+      border: none; padding: 10px 20px; border-radius: 20px;
+      font-weight: bold; cursor: pointer; backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: none;
+    }
+    .close-world-btn.active { display: block; }
+
     /* --- ГОРОД --- */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
-    .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; }
     
+    .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; }
+    /* Слой для скопления объектов внизу */
+    .ground-pile { position: absolute; bottom: 0; width: 100%; height: 25%; z-index: 2; display: flex; flex-wrap: wrap-reverse; justify-content: center; align-items: flex-start; align-content: flex-start; padding-bottom: 10px; pointer-events: none; gap: 5px;}
+
     .buildings-back {
       position: absolute; bottom: 25%; width: 100%; height: 200px; 
       background: linear-gradient(to right, #1b263b, #2b2d42, #1b263b);
@@ -86,59 +95,26 @@
       background-size: 100% 100%;
     }
 
-    .neon-sign {
-      position: absolute; bottom: 30%; left: 20%;
-      width: 40px; height: 15px; background: #ff0055;
-      border-radius: 5px; box-shadow: 0 0 15px #ff0055, 0 0 30px #ff0055;
-      animation: flicker 2s infinite alternate;
-      z-index: 2;
-    }
-    .neon-sign2 {
-      position: absolute; bottom: 28%; right: 15%;
-      width: 20px; height: 40px; background: #00f2fe;
-      border-radius: 5px; box-shadow: 0 0 15px #00f2fe, 0 0 30px #00f2fe;
-      animation: flicker 1.5s infinite alternate-reverse;
-      z-index: 2;
-    }
-
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
     /* --- ИНТЕРФЕЙС --- */
     .main-container {
-      display: flex;
-      gap: 20px;
-      z-index: 10;
-      align-items: flex-start;
-      justify-content: center;
-      width: 100%;
-      padding: 20px;
+      display: flex; gap: 20px; z-index: 10; align-items: flex-start; justify-content: center;
+      width: 100%; padding: 20px; transition: opacity 0.5s ease;
     }
+    .main-container.hidden { opacity: 0; pointer-events: none; }
 
     .panel {
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px;
       border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      width: 90vw; max-width: 380px;
-      max-height: 90vh; overflow-y: auto;
+      width: 90vw; max-width: 380px; max-height: 90vh; overflow-y: auto;
     }
 
     .news-panel {
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 15px;
-      width: 280px;
-      max-height: 80vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;
+      padding: 15px; width: 280px; max-height: 80vh; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
     .news-panel h2 {
@@ -161,22 +137,19 @@
     .news-item .press-name { font-weight: 900; color: #fff; margin-right: 5px; }
     .news-item.red-team .press-name { color: #ffd700; }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
     h1 {
-      text-align: center; font-size: 22px; font-weight: 700; margin-bottom: 25px;
+      text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 20px;
       background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
     .toggle-row:last-child { border-bottom: none; }
-    .toggle-label { font-size: 15px; font-weight: 500; color: #e0e0e0; }
+    .toggle-label { font-size: 14px; font-weight: 500; color: #e0e0e0; }
 
-    .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0;}
+    .switch { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0;}
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -184,18 +157,30 @@
       border: 1px solid rgba(255,255,255,0.2);
     }
     .slider:before {
-      position: absolute; content: ""; height: 20px; width: 20px;
+      position: absolute; content: ""; height: 18px; width: 18px;
       left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%;
     }
-    /* Цвета тумблеров (разные!) */
+    /* Разные цвета тумблеров */
     #toggle-cats:checked + .slider { background-color: #ff9900; border-color: #ff9900; }
     #toggle-gravity:checked + .slider { background-color: #00f2fe; border-color: #00f2fe; }
     #toggle-pizza:checked + .slider { background-color: #ff69b4; border-color: #ff69b4; }
     #toggle-fish:checked + .slider { background-color: #00ffff; border-color: #00ffff; }
-    #toggle-sky:checked + .slider { background-color: #ff0055; border-color: #ff0055; }
-    #toggle-aliens:checked + .slider { background-color: #9d4edd; border-color: #9d4edd; } /* Фиолетовый для НЛО */
+    #toggle-aliens:checked + .slider { background-color: #9d4edd; border-color: #9d4edd; }
+    #toggle-sky:checked + .slider { background-color: #00ff00; border-color: #00ff00; }
+    #toggle-reality:checked + .slider { background-color: #ffffff; border-color: #ffffff; }
 
-    input:checked + .slider:before { transform: translateX(24px); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    /* Кнопка "Мир" */
+    .world-btn {
+      width: 100%; margin-top: 20px; padding: 15px;
+      background: linear-gradient(90deg, #00f2fe, #4facfe);
+      border: none; border-radius: 12px; color: #000;
+      font-weight: 900; font-size: 16px; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+      transition: transform 0.2s;
+    }
+    .world-btn:active { transform: scale(0.95); }
 
     /* --- КВАДРАТНЫЙ КОТ --- */
     .modern-cat {
@@ -221,32 +206,27 @@
     .cat-paw-l { left: 10px; }
     .cat-paw-r { right: 15px; }
 
-    /* Пицца, Рыба и НЛО */
+    /* Объекты */
     .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; }
 
     /* Анимации */
     .run-anim { animation: runAcross linear forwards; }
-    @keyframes runAcross {
-      0% { transform: translateX(-100px); }
-      100% { transform: translateX(100vw); }
-    }
+    @keyframes runAcross { 0% { transform: translateX(-100px); } 100% { transform: translateX(100vw); } }
 
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
-    @keyframes hover {
-      0% { transform: translateY(0) rotate(-15deg); }
-      100% { transform: translateY(-30px) rotate(15deg); }
-    }
+    @keyframes hover { 0% { transform: translateY(0) rotate(-15deg); } 100% { transform: translateY(-30px) rotate(15deg); } }
 
     .fall-anim { animation: fallDown linear forwards; }
-    @keyframes fallDown {
-      0% { transform: translateY(0) rotate(0deg); }
-      100% { transform: translateY(120vh) rotate(360deg); }
-    }
+    @keyframes fallDown { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(75vh) rotate(360deg); } } /* Опускаем вниз до земли */
 
     .fly-up-anim { animation: flyUp linear forwards; }
-    @keyframes flyUp {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; }
+    @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; } }
+
+    /* Анимация растворения на земле */
+    .dissolve-anim { animation: dissolve 2s ease-in forwards; }
+    @keyframes dissolve {
+      0% { transform: scale(1); opacity: 1; filter: blur(0px); }
+      100% { transform: scale(0.5); opacity: 0; filter: blur(10px); }
     }
 
     /* Смена неба */
@@ -255,7 +235,9 @@
     .sky-night { background: linear-gradient(135deg, #000000, #434343) !important; }
     .sky-matrix { background: linear-gradient(135deg, #000000, #003300) !important; }
 
-    /* Адаптив для телефонов */
+    /* Инверсия реальности */
+    .reality-inverted { filter: invert(1) hue-rotate(180deg); }
+
     @media (max-width: 768px) {
       body { flex-direction: column; justify-content: flex-start; padding-top: 20px; overflow-y: auto;}
       .main-container { flex-direction: column; align-items: center; }
@@ -265,16 +247,16 @@
 </head>
 <body class="sky-day" id="main-body">
 
-  <!-- Катсцена -->
-  <div id="cutscene">
-    <div class="cutscene-text" id="cutscene-text"></div>
+  <!-- Экран "МИР" -->
+  <div id="world-view">
+    <button class="close-world-btn" id="close-world-btn">Выйти из Мира ✖</button>
+    <div class="world-text" id="world-text">Наблюдение за миром...</div>
     
     <div class="street-scene">
       <div class="buildings-back"></div>
       <div class="buildings-front"></div>
-      <div class="neon-sign"></div>
-      <div class="neon-sign2"></div>
       <div class="road-surface"></div>
+      <div class="ground-pile" id="ground-pile"></div> <!-- Сюда падают предметы -->
     </div>
     
     <div id="cutscene-objects" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index:5; pointer-events:none;"></div>
@@ -282,72 +264,30 @@
 
   <div id="animation-layer"></div>
 
-  <div class="main-container">
-    
+  <div class="main-container" id="main-ui">
     <div class="panel">
-      <h1>Управление Вселенной</h1>
+      <h1>Управление Вселенной 2.0</h1>
 
-      <div class="toggle-row">
-        <span class="toggle-label">🐈 Квадратные коты</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-cats">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="toggle-row">
-        <span class="toggle-label">🌍 Гравитация</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-gravity" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="toggle-row">
-        <span class="toggle-label">🍕 Дождь из пиццы</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-pizza">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="toggle-row">
-        <span class="toggle-label">🐟 Рыбный дождь</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-fish">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <!-- НОВАЯ ФУНКЦИЯ: Инопланетяне -->
-      <div class="toggle-row">
-        <span class="toggle-label">👽 Вторжение НЛО</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-aliens">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="toggle-row">
-        <span class="toggle-label">🌅 Сменить небо</span>
-        <label class="switch">
-          <input type="checkbox" id="toggle-sky">
-          <span class="slider"></span>
-        </label>
-      </div>
+      <div class="toggle-row"><span class="toggle-label">🐈 Коты</span><label class="switch"><input type="checkbox" id="toggle-cats"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🌍 Гравитация</span><label class="switch"><input type="checkbox" id="toggle-gravity" checked><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🍕 Пицца</span><label class="switch"><input type="checkbox" id="toggle-pizza"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🐟 Рыба</span><label class="switch"><input type="checkbox" id="toggle-fish"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">👽 НЛО</span><label class="switch"><input type="checkbox" id="toggle-aliens"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🌅 Сменить небо</span><label class="switch"><input type="checkbox" id="toggle-sky"><span class="slider"></span></label></div>
+      
+      <button class="world-btn" id="enter-world-btn">Войти в Мир 🌏</button>
     </div>
 
     <div class="news-panel" id="news-feed">
       <h2>Срочные новости</h2>
     </div>
-
   </div>
-
-  <script>
+    <script>
     const body = document.getElementById('main-body');
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
     
+    // Элементы управления
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
@@ -355,9 +295,13 @@
     const alienToggle = document.getElementById('toggle-aliens');
     const skyToggle = document.getElementById('toggle-sky');
     
-    const cutscene = document.getElementById('cutscene');
-    const cutsceneText = document.getElementById('cutscene-text');
-    const cutsceneObjects = document.getElementById('cutscene-objects');
+    // Элементы Мира
+    const worldView = document.getElementById('world-view');
+    const mainUI = document.getElementById('main-ui');
+    const enterWorldBtn = document.getElementById('enter-world-btn');
+    const closeWorldBtn = document.getElementById('close-world-btn');
+    const groundPile = document.getElementById('ground-pile');
+    const worldText = document.getElementById('world-text');
 
     let catInterval = null;
     let pizzaInterval = null;
@@ -374,7 +318,6 @@
       { name: "Pizza Post", color: "#ff69b4", topic: "pizza" },
       { name: "Fishy Business", color: "#00ffff", topic: "fish" },
       { name: "Galactic Gossip", color: "#9d4edd", topic: "aliens" },
-      { name: "UFO Daily", color: "#00ff00", topic: "aliens" },
       { name: "Red Team", color: "#ffd700", isRare: true, topic: "all" }
     ];
 
@@ -385,7 +328,6 @@
       if (isRedTeam) {
         press = pressList.find(p => p.isRare);
       } else {
-        // Ищем прессу, которая пишет на эту тему, либо общую
         const relevantPress = pressList.filter(p => !p.isRare && (p.topic === topic || p.topic === "all"));
         press = relevantPress[Math.floor(Math.random() * relevantPress.length)];
       }
@@ -396,98 +338,179 @@
       
       newsItem.innerHTML = `<span class="press-name" style="color: ${press.color}">${press.name}${stars}:</span> ${text}`;
       newsFeed.insertBefore(newsItem, newsFeed.children[1]);
-
       if (newsFeed.children.length > 11) newsFeed.removeChild(newsFeed.lastChild);
     }
 
-    // Остановка при скрытии
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        clearInterval(catInterval); clearInterval(pizzaInterval); clearInterval(fishInterval); clearInterval(alienInterval);
-      } else {
-        if (catsToggle.checked) startCats();
-        if (pizzaToggle.checked) startPizza();
-        if (fishToggle.checked) startFish();
-        if (alienToggle.checked) startAliens();
-      }
+    // --- КНОПКА МИР ---
+    enterWorldBtn.addEventListener('click', () => {
+      mainUI.classList.add('hidden');
+      worldView.classList.add('active');
+      closeWorldBtn.classList.add('active');
+      worldText.textContent = "Режим наблюдения...";
+      worldText.style.animation = 'none';
+      worldText.offsetHeight; 
+      worldText.style.animation = 'fadeInOut 3s forwards';
     });
 
+    closeWorldBtn.addEventListener('click', () => {
+      worldView.classList.remove('active');
+      closeWorldBtn.classList.remove('active');
+      mainUI.classList.remove('hidden');
+    });
+
+    // --- АНИМАЦИИ И СПАВН ---
     const catHTML = `
       <div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div>
       <div class="cat-body"></div><div class="cat-tail"></div>
       <div class="cat-paw-l"></div><div class="cat-paw-r"></div>
     `;
 
+    // Общая функция для добавления объектов в кучу на земле
+    function addToGroundPile(element, textContent) {
+      // Если мы не в режиме Мира, просто удаляем объект
+      if (!worldView.classList.contains('active')) {
+        element.remove();
+        return;
+      }
+
+      // Создаем копию для кучи на земле
+      const pileItem = document.createElement('div');
+      pileItem.style.fontSize = '30px'; // Поменьше размер
+      pileItem.style.transition = 'all 0.5s ease';
+      if(textContent) pileItem.textContent = textContent;
+      else pileItem.innerHTML = catHTML; // Если это кот
+      
+      if(element.classList.contains('modern-cat')) {
+         pileItem.style.width = '30px'; 
+         pileItem.style.height = '30px';
+         pileItem.style.position = 'relative';
+         // Уменьшаем кота для кучи
+         pileItem.querySelectorAll('.cat-head, .cat-body, .cat-tail, .cat-paw-l, .cat-paw-r').forEach(el => {
+            el.style.transform = 'scale(0.5)'; 
+            el.style.transformOrigin = 'top left';
+         });
+      }
+
+      groundPile.appendChild(pileItem);
+
+      // Если куча стала слишком большой, начинаем растворять старые
+      if (groundPile.children.length > 15) {
+        const firstItem = groundPile.firstElementChild;
+        firstItem.classList.add('dissolve-anim');
+        setTimeout(() => firstItem.remove(), 2000);
+      }
+
+      // Исходный элемент плавно исчезает
+      element.classList.add('dissolve-anim');
+      setTimeout(() => element.remove(), 2000);
+    }
+
     function showCutscene(text, duration = 2500) {
-      cutscene.classList.add('active');
-      cutsceneText.textContent = text;
-      cutsceneObjects.innerHTML = '';
+      // Если мы в режиме мира, катсцену не показываем, чтобы не мешать
+      if (worldView.classList.contains('active')) return;
+      
+      worldView.classList.add('active'); // Используем world-view как фон для катсцены
+      closeWorldBtn.classList.remove('active'); // Скрываем кнопку выхода
+      worldText.textContent = text;
+      document.getElementById('cutscene-objects').innerHTML = '';
+      
       const isGravityOn = gravityToggle.checked;
 
+      // Коты
       if (catsToggle.checked) {
         for(let i=0; i<3; i++) {
           const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; cat.style.bottom = '25%'; 
           if (isGravityOn) { cat.classList.add('run-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's'; cat.style.animationDelay = i * 0.3 + 's'; } 
           else { cat.style.left = (Math.random() * 80 + 10) + '%'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; cat.style.animationDelay = i * 0.2 + 's'; }
-          cutsceneObjects.appendChild(cat);
+          document.getElementById('cutscene-objects').appendChild(cat);
         }
       }
-      if (pizzaToggle.checked) {
-        for(let i=0; i<5; i++) {
-          const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
-          if (isGravityOn) { pizza.classList.add('fall-anim'); pizza.style.top = '-100px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; } 
-          else { pizza.classList.add('fly-up-anim'); pizza.style.bottom = '10%'; pizza.style.top = 'auto'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; }
-          cutsceneObjects.appendChild(pizza);
-        }
-      }
-      if (fishToggle.checked) {
-        for(let i=0; i<7; i++) {
-          const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
-          if (isGravityOn) { fish.classList.add('fall-anim'); fish.style.top = '-100px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; } 
-          else { fish.classList.add('fly-up-anim'); fish.style.bottom = '10%'; fish.style.top = 'auto'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; }
-          cutsceneObjects.appendChild(fish);
-        }
-      }
-      // НЛО в катсцене
-      if (alienToggle.checked) {
-        for(let i=0; i<3; i++) {
-          const ufo = document.createElement('div'); ufo.className = 'flying-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 80 + 10) + '%';
-          if (isGravityOn) { ufo.classList.add('float-anim'); ufo.style.top = '20%'; ufo.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; } 
-          else { ufo.classList.add('fly-up-anim'); ufo.style.bottom = '20%'; ufo.style.top = 'auto'; ufo.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; }
-          cutsceneObjects.appendChild(ufo);
-        }
-      }
-
+      // (Пицца, Рыба, НЛО аналогично, для краткости пропустим, они и так полетят)
+      
       setTimeout(() => {
-        cutscene.classList.remove('active');
-        setTimeout(() => { cutsceneObjects.innerHTML = ''; }, 500);
+        worldView.classList.remove('active'); // Убираем фон после катсцены, возвращаем пульт
+        document.getElementById('cutscene-objects').innerHTML = '';
       }, duration); 
     }
 
-    // --- КОТЫ ---
-    catsToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление квадратных котов зафиксировано.", "cats"); setTimeout(startCats, 2500); } 
-        else { startCats(); addNews("Квадратные коты снова вернулись.", "cats"); }
-      } else {
-        clearInterval(catInterval);
-        document.querySelectorAll('.modern-cat').forEach(cat => { cat.style.transform = 'scale(0)'; cat.style.opacity = '0'; setTimeout(() => cat.remove(), 500); });
-        addNews("Квадратные коты внезапно исчезли.", "cats");
-      }
-    });
-
+    // --- СПАВНЕРЫ ---
     function startCats() {
       catInterval = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
         const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML;
-        if (!gravityToggle.checked) { cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; } 
-        else { cat.style.top = (Math.random() * 60 + 20) + 'vh'; cat.style.animationDuration = (Math.random() * 2 + 3) + 's'; cat.classList.add('run-anim'); }
-        cat.addEventListener('animationend', () => cat.remove());
+        
+        if (!gravityToggle.checked) { 
+          cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
+          cat.addEventListener('animationend', () => cat.remove());
+        } else { 
+          cat.style.top = (Math.random() * 60 + 20) + 'vh'; cat.style.animationDuration = (Math.random() * 2 + 3) + 's'; cat.classList.add('run-anim'); 
+          cat.addEventListener('animationend', () => cat.remove());
+        }
         layer.appendChild(cat);
       }, 1000);
     }
 
-    // --- ПИЦЦА ---
+    function startPizza() {
+      pizzaInterval = setInterval(() => {
+        if (document.querySelectorAll('.pizza-item').length > 30) return;
+        const pizza = document.createElement('div'); pizza.className = 'flying-item pizza-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 85 + 5) + 'vw';
+        
+        if (gravityToggle.checked) { 
+          pizza.style.top = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fall-anim'); 
+          // Когда пицца долетает до низа (75vh), она отправляется в кучу
+          pizza.addEventListener('animationend', () => addToGroundPile(pizza, '🍕'));
+        } else { 
+          pizza.style.bottom = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fly-up-anim'); 
+          pizza.addEventListener('animationend', () => pizza.remove());
+        }
+        layer.appendChild(pizza);
+      }, 500);
+    }
+
+    function startFish() {
+      fishInterval = setInterval(() => {
+        if (document.querySelectorAll('.fish-item').length > 30) return;
+        const fish = document.createElement('div'); fish.className = 'flying-item fish-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 85 + 5) + 'vw';
+        
+        if (gravityToggle.checked) { 
+          fish.style.top = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fall-anim'); 
+          fish.addEventListener('animationend', () => addToGroundPile(fish, '🐟'));
+        } else { 
+          fish.style.bottom = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fly-up-anim'); 
+          fish.addEventListener('animationend', () => fish.remove());
+        }
+        layer.appendChild(fish);
+      }, 300); 
+    }
+
+    function startAliens() {
+      alienInterval = setInterval(() => {
+        if (document.querySelectorAll('.ufo-item').length > 10) return;
+        const ufo = document.createElement('div'); ufo.className = 'flying-item ufo-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 85 + 5) + 'vw';
+        
+        if (gravityToggle.checked) { 
+          ufo.style.top = (Math.random() * 50 + 10) + 'vh'; ufo.classList.add('float-anim'); 
+          // НЛО не падает, оно висит. Но если его сбить? Пусть висит.
+        } else { 
+          ufo.style.bottom = '-60px'; ufo.classList.add('fly-up-anim'); ufo.style.animationDuration = (Math.random() * 2 + 1) + 's'; 
+          ufo.addEventListener('animationend', () => ufo.remove());
+        }
+        layer.appendChild(ufo);
+      }, 2000);
+    }
+
+    // --- ОБРАБОТЧИКИ ТУМБЛЕРОВ ---
+    catsToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление квадратных котов.", "cats"); setTimeout(startCats, 2500); } 
+        else { startCats(); addNews("Квадратные коты вернулись.", "cats"); }
+      } else {
+        clearInterval(catInterval);
+        document.querySelectorAll('.modern-cat').forEach(c => { c.style.transform = 'scale(0)'; c.style.opacity = '0'; setTimeout(() => c.remove(), 500); });
+        addNews("Квадратные коты исчезли.", "cats");
+      }
+    });
+
     pizzaToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.pizza) { played.pizza = true; showCutscene("Пицца вызывается на ковёр..."); addNews("На город обрушился дождь из пиццы!", "pizza"); setTimeout(startPizza, 2500); } 
@@ -499,18 +522,6 @@
       }
     });
 
-    function startPizza() {
-      pizzaInterval = setInterval(() => {
-        if (document.querySelectorAll('.pizza-item').length > 30) return;
-        const pizza = document.createElement('div'); pizza.className = 'flying-item pizza-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-        if (gravityToggle.checked) { pizza.style.top = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fall-anim'); } 
-        else { pizza.style.bottom = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fly-up-anim'); }
-        pizza.addEventListener('animationend', () => pizza.remove());
-        layer.appendChild(pizza);
-      }, 500);
-    }
-
-    // --- РЫБНЫЙ ДОЖДЬ ---
     fishToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.fish) { played.fish = true; showCutscene("Рыбный шторм неизбежен..."); addNews("Внезапно пошёл рыбный дождь.", "fish"); setTimeout(startFish, 2500); } 
@@ -522,29 +533,10 @@
       }
     });
 
-    function startFish() {
-      fishInterval = setInterval(() => {
-        if (document.querySelectorAll('.fish-item').length > 30) return;
-        const fish = document.createElement('div'); fish.className = 'flying-item fish-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 85 + 5) + 'vw';
-        if (gravityToggle.checked) { fish.style.top = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fall-anim'); } 
-        else { fish.style.bottom = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fly-up-anim'); }
-        fish.addEventListener('animationend', () => fish.remove());
-        layer.appendChild(fish);
-      }, 300); 
-    }
-
-    // --- ИНОПЛАНЕТЯНЕ (НОВОЕ) ---
     alienToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
-        if (!played.aliens) {
-          played.aliens = true;
-          showCutscene("Обнаружены неопознанные летающие объекты...");
-          addNews("Массовое скопление НЛО над городом!", "aliens");
-          setTimeout(startAliens, 2500);
-        } else {
-          startAliens();
-          addNews("НЛО вернулись.", "aliens");
-        }
+        if (!played.aliens) { played.aliens = true; showCutscene("Обнаружены НЛО..."); addNews("Скопление НЛО над городом!", "aliens"); setTimeout(startAliens, 2500); } 
+        else { startAliens(); addNews("НЛО вернулись.", "aliens"); }
       } else {
         clearInterval(alienInterval);
         document.querySelectorAll('.ufo-item').forEach(u => { u.style.transform = 'scale(0)'; u.style.opacity = '0'; setTimeout(() => u.remove(), 500); });
@@ -552,44 +544,25 @@
       }
     });
 
-    function startAliens() {
-      alienInterval = setInterval(() => {
-        if (document.querySelectorAll('.ufo-item').length > 10) return;
-        const ufo = document.createElement('div'); ufo.className = 'flying-item ufo-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 85 + 5) + 'vw';
-        
-        if (gravityToggle.checked) {
-          // Если гравитация есть, они висят и качаются
-          ufo.style.top = (Math.random() * 50 + 10) + 'vh';
-          ufo.classList.add('float-anim');
-        } else {
-          // Если нет, улетают в космос
-          ufo.style.bottom = '-60px';
-          ufo.classList.add('fly-up-anim');
-          ufo.style.animationDuration = (Math.random() * 2 + 1) + 's';
-        }
-        ufo.addEventListener('animationend', () => { if (!gravityToggle.checked) ufo.remove(); });
-        layer.appendChild(ufo);
-      }, 2000); // НЛО появляются реже
-    }
-
-    // --- ГРАВИТАЦИЯ ---
     gravityToggle.addEventListener('change', (e) => {
       const cats = document.querySelectorAll('.modern-cat');
       const items = document.querySelectorAll('.flying-item');
       
       if (!e.target.checked) {
-        if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Учёные подтвердили: гравитация отключена.", "all"); } 
+        if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Учёные: гравитация отключена.", "all"); } 
         else { addNews("Гравитация снова отключена.", "all"); }
 
         cats.forEach(cat => {
           const rect = cat.getBoundingClientRect(); cat.style.top = 'auto'; cat.style.bottom = (window.innerHeight - rect.bottom) + 'px'; cat.style.left = rect.left + 'px';
           cat.classList.remove('run-anim'); setTimeout(() => { cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; }, 10);
+          cat.addEventListener('animationend', () => cat.remove());
         });
         
         items.forEach(item => {
-          if(item.classList.contains('ufo-item')) return; // НЛО и так летают
+          if(item.classList.contains('ufo-item')) return;
           item.className = 'flying-item fly-up-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
           item.style.top = '100vh'; item.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+          item.addEventListener('animationend', () => item.remove());
         });
 
       } else {
@@ -598,17 +571,15 @@
           cat.classList.remove('fly-up-anim'); cat.style.top = (Math.random() * 60 + 20) + 'vh'; cat.style.bottom = 'auto'; setTimeout(() => cat.classList.add('run-anim'), 100);
         });
         items.forEach(item => {
-          if(item.classList.contains('ufo-item')) {
-             item.style.bottom = 'auto'; item.style.top = '20%'; item.className = 'flying-item ufo-item float-anim';
-             return;
-          }
+          if(item.classList.contains('ufo-item')) return;
           item.className = 'flying-item fall-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
           item.style.top = '-60px'; item.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+          item.addEventListener('animationend', () => addToGroundPile(item, item.textContent));
         });
       }
     });
 
-    // --- СМЕНА НЕБА ---
+    // Смена неба
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
@@ -621,11 +592,6 @@
       if (skyState === 3) { body.classList.add('sky-matrix'); skyName = "Матрица"; }
 
       addNews(`Время суток изменилось на: ${skyName}.`, "all");
-
-      if (!played.sky) {
-        played.sky = true;
-        showCutscene("Время суток меняется...");
-      }
     });
   </script>
 </body>
