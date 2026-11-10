@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Пульт Управления Вселенной 🎛️</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel-bg: #1e293b;
+      --text: #e2e8f0;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: filter 0.5s ease;
+    }
+
+    /* Слой для анимаций (коты, пицца) */
+    #animation-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; /* Пропускает клики к пульту */
+      z-index: 1;
+    }
+
+    /* Пульт */
+    .panel {
+      position: relative;
+      z-index: 10;
+      background: var(--panel-bg);
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.1);
+      width: min(400px, 90vw);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+
+    .toggle-label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Стилизация тумблера */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .4s;
+      border-radius: 34px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px; width: 26px;
+      left: 4px; bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    input:checked + .slider {
+      background-color: var(--accent);
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.2), 0 0 15px var(--accent-glow);
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* КВАДРАТНЫЙ КОТ */
+    .cat {
+      position: absolute;
+      font-size: 40px;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fca5a5;
+      border: 3px solid #ef4444;
+      border-radius: 0; /* Квадратный */
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+      /* Прячем эмодзи, чтобы он был квадратным :) Шутка, оставим эмодзи внутри */
+    }
+
+    /* Анимация бега */
+    .run-anim {
+      animation: runAcross linear forwards;
+    }
+    @keyframes runAcross {
+      0% { transform: translateX(-100px) scaleX(1); }
+      49% { transform: translateX(100vw) scaleX(1); }
+      50% { transform: translateX(100vw) scaleX(-1); } /* Разворачиваем */
+      100% { transform: translateX(-100px) scaleX(-1); }
+    }
+
+    /* Анимация полета при нулевой гравитации */
+    .float-anim {
+      animation: floatUp linear forwards !important;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ПИЦЦА */
+    .pizza {
+      position: absolute;
+      font-size: 40px;
+      top: -50px;
+    }
+    .fall-anim {
+      animation: fallDown linear forwards;
+    }
+    @keyframes fallDown {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(120vh) rotate(360deg); }
+    }
+
+    /* Инверсия цветов */
+    .reality-inverted {
+      filter: invert(1) hue-rotate(180deg);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="animation-layer"></div>
+
+  <div class="panel">
+    <h1>Пульт Вселенной 🎛️</h1>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Квадратные коты 🐈</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-cats">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Гравитация 🌍</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-gravity" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Дождь из пиццы 🍕</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-pizza">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">Сменить реальность 🌀</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-reality">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <script>
+    const layer = document.getElementById('animation-layer');
+    
+    const catsToggle = document.getElementById('toggle-cats');
+    const gravityToggle = document.getElementById('toggle-gravity');
+    const pizzaToggle = document.getElementById('toggle-pizza');
+    const realityToggle = document.getElementById('toggle-reality');
+
+    let catInterval = null;
+    let pizzaInterval = null;
+
+    // --- 1. КВАДРАТНЫЕ КОТЫ ---
+    catsToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        // Запускаем спавн котов
+        spawnCat(); // Первый сразу
+        catInterval = setInterval(spawnCat, 800); // Потом каждые 0.8 сек
+      } else {
+        clearInterval(catInterval);
+      }
+    });
+
+    function spawnCat() {
+      const cat = document.createElement('div');
+      cat.className = 'cat';
+      cat.textContent = '🐱'; // Мордочка внутри
+      
+      // Стартовая позиция по вертикали
+      cat.style.top = (Math.random() * 80 + 10) + 'vh';
+      // Скорость бега
+      const duration = Math.random() * 3 + 3; // от 3 до 6 секунд
+      cat.style.animationDuration = duration + 's';
+
+      // Если гравитация выключена, кот улетает, а не бежит
+      if (!gravityToggle.checked) {
+        applyFloat(cat);
+      } else {
+        cat.classList.add('run-anim');
+      }
+
+      // Удаляем кота, когда анимация закончится
+      cat.addEventListener('animationend', () => cat.remove());
+      
+      layer.appendChild(cat);
+    }
+
+    // --- 2. ГРАВИТАЦИЯ ---
+    gravityToggle.addEventListener('change', (e) => {
+      const cats = document.querySelectorAll('.cat');
+      
+      if (!e.target.checked) {
+        // Гравитация ВЫКЛ (улетают)
+        cats.forEach(cat => {
+          // Сбрасываем бег, включаем полет
+          cat.classList.remove('run-anim');
+          applyFloat(cat);
+        });
+      } else {
+        // Гравитация ВКЛ (падают и бегут)
+        cats.forEach(cat => {
+          cat.classList.remove('float-anim');
+          // Сбрасываем анимацию бега, чтобы она началась заново
+          cat.style.animation = 'none';
+          cat.offsetHeight; // Триггер рефлоу
+          cat.style.animation = '';
+          cat.classList.add('run-anim');
+        });
+      }
+    });
+
+    function applyFloat(cat) {
+      // Случайная скорость полета
+      const floatDuration = Math.random() * 2 + 2; 
+      cat.style.animationDuration = floatDuration + 's';
+      cat.classList.add('float-anim');
+    }
+
+    // --- 3. ДОЖДЬ ИЗ ПИЦЦЫ ---
+    pizzaToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        pizzaInterval = setInterval(spawnPizza, 300);
+      } else {
+        clearInterval(pizzaInterval);
+      }
+    });
+
+    function spawnPizza() {
+      const pizza = document.createElement('div');
+      pizza.className = 'pizza';
+      pizza.textContent = '🍕';
+      
+      pizza.style.left = (Math.random() * 90 + 5) + 'vw';
+      const duration = Math.random() * 1.5 + 1; // Быстрое падение
+      pizza.style.animationDuration = duration + 's';
+      
+      pizza.classList.add('fall-anim');
+      pizza.addEventListener('animationend', () => pizza.remove());
+      
+      layer.appendChild(pizza);
+    }
+
+    // --- 4. СМЕНА РЕАЛЬНОСТИ ---
+    realityToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.body.classList.add('reality-inverted');
+      } else {
+        document.body.classList.remove('reality-inverted');
+      }
+    });
+
+  </script>
+</body>
+</html>
