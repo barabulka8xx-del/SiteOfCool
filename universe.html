@@ -86,16 +86,15 @@
       background-size: 100% 100%;
     }
 
-    /* Неоновые вывески (ТЕПЕРЬ ПРИВЯЗАНЫ К КАТСЦЕНЕ, А НЕ ЛЕТАЮТ) */
     .neon-sign {
-      position: absolute; bottom: 35%; left: 20%;
+      position: absolute; bottom: 30%; left: 20%;
       width: 40px; height: 15px; background: #ff0055;
       border-radius: 5px; box-shadow: 0 0 15px #ff0055, 0 0 30px #ff0055;
       animation: flicker 2s infinite alternate;
       z-index: 2;
     }
     .neon-sign2 {
-      position: absolute; bottom: 45%; right: 15%;
+      position: absolute; bottom: 28%; right: 15%;
       width: 20px; height: 40px; background: #00f2fe;
       border-radius: 5px; box-shadow: 0 0 15px #00f2fe, 0 0 30px #00f2fe;
       animation: flicker 1.5s infinite alternate-reverse;
@@ -145,7 +144,7 @@
     .modern-cat {
       position: absolute; width: 60px; height: 60px;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
-      transition: all 0.5s ease;
+      transition: transform 0.5s ease, opacity 0.5s ease; /* Плавные переходы */
     }
     
     .cat-head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
@@ -166,7 +165,7 @@
     .cat-paw-r { right: 15px; }
 
     /* Пицца и Рыба */
-    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: all 0.5s ease; }
+    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; }
 
     /* Анимации */
     .run-anim { animation: runAcross linear forwards; }
@@ -175,12 +174,14 @@
       100% { transform: translateX(100vw); }
     }
 
+    /* Левитация котов (просто зависают на месте) */
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover {
       0% { transform: translateY(0) rotate(-15deg); }
       100% { transform: translateY(-30px) rotate(15deg); }
     }
 
+    /* Падение и Улет */
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown {
       0% { transform: translateY(0) rotate(0deg); }
@@ -190,7 +191,7 @@
     .fly-up-anim { animation: flyUp linear forwards; }
     @keyframes flyUp {
       0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-120vh) rotate(-360deg); opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; }
     }
 
     /* Смена неба */
@@ -208,7 +209,6 @@
   <div id="cutscene">
     <div class="cutscene-text" id="cutscene-text"></div>
     
-    <!-- Город (Вывески теперь внутри street-scene, они не летают) -->
     <div class="street-scene">
       <div class="buildings-back"></div>
       <div class="buildings-front"></div>
@@ -321,6 +321,7 @@
              cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
              cat.style.animationDelay = i * 0.3 + 's';
           } else {
+             // Коты улетают вверх с разных точек
              cat.style.left = (Math.random() * 80 + 10) + '%';
              cat.classList.add('fly-up-anim');
              cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
@@ -404,14 +405,21 @@
         const cat = document.createElement('div');
         cat.className = 'modern-cat';
         cat.innerHTML = catHTML;
-        cat.style.top = (Math.random() * 60 + 20) + 'vh';
-        cat.style.animationDuration = (Math.random() * 2 + 3) + 's';
         
+        // Если гравитации нет, они спавнятся внизу и улетают вверх
         if (!gravityToggle.checked) {
-          cat.classList.add('float-anim');
+          cat.style.bottom = '-60px'; 
+          cat.style.left = (Math.random() * 90) + 'vw'; 
+          cat.classList.add('fly-up-anim');
+          // Задаем случайную скорость
+          cat.style.animationDuration = (Math.random() * 2 + 2) + 's';
         } else {
+          // Если гравитация есть, они бегут по горизонтали
+          cat.style.top = (Math.random() * 60 + 20) + 'vh';
+          cat.style.animationDuration = (Math.random() * 2 + 3) + 's';
           cat.classList.add('run-anim');
         }
+        
         cat.addEventListener('animationend', () => cat.remove());
         layer.appendChild(cat);
       }, 1000);
@@ -445,7 +453,7 @@
           pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           pizza.classList.add('fall-anim');
         } else {
-          pizza.style.top = '100vh';
+          pizza.style.bottom = '-60px';
           pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           pizza.classList.add('fly-up-anim');
         }
@@ -482,7 +490,7 @@
           fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           fish.classList.add('fall-anim');
         } else {
-          fish.style.top = '100vh';
+          fish.style.bottom = '-60px';
           fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           fish.classList.add('fly-up-anim');
         }
@@ -502,10 +510,22 @@
           showCutscene("Гравитация отключена...");
         }
 
+        // Все коты на экране начинают улетать вверх
         cats.forEach(cat => {
+          const rect = cat.getBoundingClientRect();
+          cat.style.top = 'auto';
+          cat.style.bottom = (window.innerHeight - rect.bottom) + 'px'; // Фиксируем текущую позицию
+          cat.style.left = rect.left + 'px';
+          
           cat.classList.remove('run-anim');
-          setTimeout(() => cat.classList.add('float-anim'), 100);
+          // Через микро-задержку включаем анимацию полета
+          setTimeout(() => {
+            cat.classList.add('fly-up-anim');
+            cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+          }, 10);
         });
+        
+        // Предметы улетают вверх
         items.forEach(item => {
           item.className = 'flying-item fly-up-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
           item.style.top = '100vh';
@@ -513,8 +533,11 @@
         });
 
       } else {
+        // Включаем гравитацию обратно
         cats.forEach(cat => {
-          cat.classList.remove('float-anim');
+          cat.classList.remove('fly-up-anim');
+          cat.style.top = (Math.random() * 60 + 20) + 'vh';
+          cat.style.bottom = 'auto';
           setTimeout(() => cat.classList.add('run-anim'), 100);
         });
         items.forEach(item => {
