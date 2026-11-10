@@ -25,7 +25,7 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА --- */
+    /* --- КАТСЦЕНА (Улица) --- */
     #cutscene {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(to bottom, #000000 0%, #050a1a 40%, #1a1a3a 100%);
@@ -42,8 +42,9 @@
     #cutscene.active { display: flex; opacity: 1; }
 
     .cutscene-text {
-      position: absolute; top: 20%; font-size: 28px; font-weight: 700; text-align: center;
-      opacity: 0; animation: fadeInOut 3s forwards; z-index: 10; text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      position: absolute; top: 20%; font-size: 28px; font-weight: 700;
+      text-align: center; opacity: 0; animation: fadeInOut 3s forwards; z-index: 10;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
     }
     
     @keyframes fadeInOut {
@@ -53,7 +54,7 @@
       100% { opacity: 0; transform: scale(1.1); }
     }
 
-    /* --- УЛИЦА --- */
+    /* Улица */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 60%; overflow: hidden; }
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 40%; background: #1a1a24; border-top: 4px solid #333; }
     .road-lines {
@@ -65,15 +66,8 @@
     }
     .buildings {
       position: absolute; bottom: 40%; width: 100%; height: 150px; background: #0a0a12;
-      background-image: 
-        linear-gradient(#050510 50%, transparent 50%),
-        radial-gradient(circle at 20% 80%, #ffcc00 2px, transparent 3px),
-        radial-gradient(circle at 30% 60%, #ffcc00 2px, transparent 3px),
-        radial-gradient(circle at 80% 70%, #ffcc00 2px, transparent 3px),
-        radial-gradient(circle at 60% 50%, #ffcc00 2px, transparent 3px),
-        radial-gradient(circle at 90% 90%, #ffcc00 2px, transparent 3px);
-      background-size: 100px 100px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-      background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; background-repeat: no-repeat;
+      background-image: radial-gradient(circle at 20% 80%, #ffcc00 2px, transparent 3px), radial-gradient(circle at 30% 60%, #ffcc00 2px, transparent 3px), radial-gradient(circle at 80% 70%, #ffcc00 2px, transparent 3px), radial-gradient(circle at 60% 50%, #ffcc00 2px, transparent 3px), radial-gradient(circle at 90% 90%, #ffcc00 2px, transparent 3px);
+      background-size: 100% 100%; background-repeat: no-repeat;
       clip-path: polygon(0 100%, 0 40%, 10% 40%, 10% 70%, 20% 70%, 20% 20%, 35% 20%, 35% 60%, 50% 60%, 50% 30%, 60% 30%, 60% 80%, 75% 80%, 75% 10%, 85% 10%, 85% 50%, 100% 50%, 100% 100%);
     }
     .lamp-post { position: absolute; bottom: 40%; width: 4px; height: 80px; background: #222; }
@@ -82,19 +76,12 @@
 
     /* Коты в катсцене */
     .cutscene-cats-container { position: absolute; bottom: 15%; display: flex; gap: 40px; z-index: 5; }
-    .cutscene-cat-wrapper { animation: walkAway 3s ease-in forwards; }
+    .cutscene-cat-wrapper { animation: walkIntoFog 3s ease-in forwards; }
     
-    @keyframes walkAway {
-      0% { transform: translateY(0) scale(1.2); opacity: 1; }
-      60% { opacity: 1; }
-      100% { transform: translateY(-15vh) scale(0.1); opacity: 0; }
-    }
-
-    /* --- АНИМАЦИЯ ХОДЬБЫ (ЛАПКИ) --- */
-    .cat-paw-anim { animation: walkPaws 0.3s infinite alternate; }
-    @keyframes walkPaws {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-6px); }
+    @keyframes walkIntoFog {
+      0% { transform: scale(1.2); opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: scale(0.2); opacity: 0; }
     }
 
     /* --- ИНТЕРФЕЙС --- */
@@ -150,15 +137,25 @@
     .cat-body { position: absolute; top: 40px; left: 5px; width: 35px; height: 20px; background-color: #ff9900; border-radius: 4px; }
     .cat-tail { position: absolute; top: 45px; left: 40px; width: 20px; height: 8px; background-color: #ff9900; border-radius: 4px; }
     
-    /* Лапки, которые будут двигаться */
+    /* АНИМАЦИЯ ЛАПОК */
     .cat-paw-l, .cat-paw-r { position: absolute; bottom: 0; width: 10px; height: 10px; background-color: #cc7a00; border-radius: 2px; }
     .cat-paw-l { left: 10px; }
     .cat-paw-r { right: 15px; }
 
+    /* Добавляем анимацию ТОЛЬКО когда кот бежит */
+    .run-anim .cat-paw-l { animation: step 0.2s infinite alternate; }
+    .run-anim .cat-paw-r { animation: step 0.2s infinite alternate-reverse; }
+
+    @keyframes step {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-6px); }
+    }
+
     .flying-pizza { position: absolute; font-size: 45px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
 
-    /* Анимации для пульта */
-    .run-anim { animation: runAcross steps(20) infinite; }
+    /* Анимации для пульта (БЕГ) */
+    /* Убираем steps, чтобы было плавнее */
+    .run-anim { animation: runAcross linear infinite; }
     @keyframes runAcross {
       0% { transform: translateX(-100px) scaleX(1); }
       49% { transform: translateX(100vw) scaleX(1); }
@@ -187,7 +184,6 @@
   <div id="cutscene">
     <div class="cutscene-text">Пробуждение...</div>
     
-    <!-- Улица -->
     <div class="street-scene">
       <div class="buildings"></div>
       <div class="lamp-post" style="left: 20%;"><div class="lamp-light"></div></div>
@@ -197,11 +193,12 @@
       <div class="fog"></div>
     </div>
 
-    <!-- Коты идут по улице (ДОБАВЛЕН КЛАСС cat-paw-anim) -->
+    <!-- Коты в катсцене -->
     <div class="cutscene-cats-container">
-      <div class="cutscene-cat-wrapper"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l cat-paw-anim"></div><div class="cat-paw-r cat-paw-anim" style="animation-delay: 0.15s;"></div></div></div>
-      <div class="cutscene-cat-wrapper" style="animation-delay: 0.3s;"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l cat-paw-anim"></div><div class="cat-paw-r cat-paw-anim" style="animation-delay: 0.15s;"></div></div></div>
-      <div class="cutscene-cat-wrapper" style="animation-delay: 0.6s;"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l cat-paw-anim"></div><div class="cat-paw-r cat-paw-anim" style="animation-delay: 0.15s;"></div></div></div>
+      <!-- Добавил класс run-anim внутрь катсцены для движения лапок -->
+      <div class="cutscene-cat-wrapper"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+      <div class="cutscene-cat-wrapper" style="animation-delay: 0.3s;"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+      <div class="cutscene-cat-wrapper" style="animation-delay: 0.6s;"><div class="modern-cat run-anim" style="position:relative; animation:none;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
     </div>
   </div>
 
@@ -255,12 +252,11 @@
     let pizzaInterval = null;
     let isCutscenePlayed = false;
 
-    // ТЕПЕРЬ ЛАПКИ В ИГРЕ ТОЖЕ ДВИГАЮТСЯ (добавлен класс cat-paw-anim)
     const catHTML = `
       <div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div>
       <div class="cat-body"></div><div class="cat-tail"></div>
-      <div class="cat-paw-l cat-paw-anim"></div>
-      <div class="cat-paw-r cat-paw-anim" style="animation-delay: 0.15s;"></div>
+      <div class="cat-paw-l"></div>
+      <div class="cat-paw-r"></div>
     `;
 
     catsToggle.addEventListener('change', (e) => {
@@ -291,6 +287,10 @@
       cat.innerHTML = catHTML;
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
+      
+      // Задаем случайную скорость бега
+      const duration = Math.random() * 2 + 3; // от 3 до 5 секунд
+      cat.style.animationDuration = duration + 's';
 
       if (!gravityToggle.checked) {
         cat.classList.add('float-anim');
@@ -313,7 +313,12 @@
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
-          setTimeout(() => cat.classList.add('run-anim'), 1000);
+          setTimeout(() => {
+            // Задаем новую скорость при падении
+            const duration = Math.random() * 2 + 3;
+            cat.style.animationDuration = duration + 's';
+            cat.classList.add('run-anim');
+          }, 1000);
         });
       }
     });
