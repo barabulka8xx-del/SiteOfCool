@@ -25,17 +25,18 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА --- */
+    /* --- КАТСЦЕНА С УЛИЦЕЙ --- */
     #cutscene {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: black;
+      background: linear-gradient(to bottom, #000000 0%, #111122 50%, #222233 100%);
       z-index: 100;
       display: none; 
       flex-direction: column;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 1s ease;
+      overflow: hidden;
     }
 
     #cutscene.active {
@@ -44,12 +45,16 @@
     }
 
     .cutscene-text {
-      font-size: 24px;
+      position: absolute;
+      top: 20%;
+      font-size: 28px;
       font-weight: 700;
       text-align: center;
       line-height: 1.5;
       opacity: 0;
       animation: fadeInOut 3s forwards;
+      z-index: 10;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
     }
     
     @keyframes fadeInOut {
@@ -59,26 +64,63 @@
       100% { opacity: 0; transform: scale(1.1); }
     }
 
-    /* Коты в катсцене */
-    .cutscene-cat {
+    /* --- ДОРОГА (Перспектива) --- */
+    .road-container {
       position: absolute;
-      bottom: 30%;
-      width: 40px; height: 40px;
-      background-color: #ff9900;
-      border-radius: 4px;
-      opacity: 0;
-      animation: spawnCatCutscene 3s ease forwards;
+      bottom: 0;
+      width: 100%;
+      height: 60%;
+      perspective: 400px; /* Эффект 3D глубины */
+      overflow: hidden;
     }
-    .cutscene-cat::before, .cutscene-cat::after {
-      content: ''; position: absolute; top: -8px; width: 12px; height: 12px; background-color: #ff9900; border-radius: 2px;
-    }
-    .cutscene-cat::before { left: 0; }
-    .cutscene-cat::after { right: 0; }
 
-    @keyframes spawnCatCutscene {
-      0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+    .road {
+      position: absolute;
+      bottom: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        /* Разметка */
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 45px,
+          #ffcc00 45px,
+          #ffcc00 55px,
+          transparent 55px,
+          transparent 100px
+        );
+      background-size: 100px 100%;
+      transform: rotateX(75deg); /* Наклоняем дорогу */
+      animation: moveRoad 1s linear infinite;
+      opacity: 0.4;
+      z-index: 1;
+    }
+
+    @keyframes moveRoad {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100px; }
+    }
+
+    /* Коты в катсцене */
+    .cutscene-cats-container {
+      position: absolute;
+      bottom: 35%;
+      display: flex;
+      gap: 30px;
+      z-index: 5;
+    }
+
+    .cutscene-cat-wrapper {
+      animation: walkAway 3s ease-in forwards;
+    }
+    
+    /* Анимация ухода по дороге вдаль */
+    @keyframes walkAway {
+      0% { transform: translateY(0) scale(1.5); opacity: 1; }
       50% { opacity: 1; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-20vh) scale(0.1); opacity: 0; }
     }
 
     /* --- ИНТЕРФЕЙС --- */
@@ -122,7 +164,7 @@
     input:checked + .slider { background-color: #4facfe; border-color: #4facfe; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- КВАДРАТНЫЙ КОТ --- */
+    /* --- КВАДРАТНЫЙ КОТ (Стильный) --- */
     .modern-cat {
       position: absolute;
       width: 60px; height: 60px;
@@ -130,25 +172,25 @@
       transition: top 1s ease-in-out;
     }
     
-    .modern-cat .head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
-    .modern-cat .head::before, .modern-cat .head::after { content: ''; position: absolute; top: -10px; width: 15px; height: 15px; background-color: #ff9900; border-radius: 2px; }
-    .modern-cat .head::before { left: 0; }
-    .modern-cat .head::after { right: 0; }
+    .cat-head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
+    .cat-head::before, .cat-head::after { content: ''; position: absolute; top: -10px; width: 15px; height: 15px; background-color: #ff9900; border-radius: 2px; }
+    .cat-head::before { left: 0; }
+    .cat-head::after { right: 0; }
     
-    .modern-cat .eye-l, .modern-cat .eye-r { position: absolute; top: 15px; width: 8px; height: 8px; background-color: #222; border-radius: 50%; }
-    .modern-cat .eye-l { left: 8px; }
-    .modern-cat .eye-r { right: 8px; }
-    .modern-cat .nose { position: absolute; top: 25px; left: 17px; width: 6px; height: 4px; background-color: #ff69b4; border-radius: 2px; }
+    .cat-eye-l, .cat-eye-r { position: absolute; top: 15px; width: 8px; height: 8px; background-color: #222; border-radius: 50%; }
+    .cat-eye-l { left: 8px; }
+    .cat-eye-r { right: 8px; }
+    .cat-nose { position: absolute; top: 25px; left: 17px; width: 6px; height: 4px; background-color: #ff69b4; border-radius: 2px; }
 
-    .modern-cat .body { position: absolute; top: 40px; left: 5px; width: 35px; height: 20px; background-color: #ff9900; border-radius: 4px; }
-    .modern-cat .tail { position: absolute; top: 45px; left: 40px; width: 20px; height: 8px; background-color: #ff9900; border-radius: 4px; }
-    .modern-cat .paw-l, .modern-cat .paw-r { position: absolute; bottom: 0; width: 10px; height: 10px; background-color: #cc7a00; border-radius: 2px; }
-    .modern-cat .paw-l { left: 10px; }
-    .modern-cat .paw-r { right: 15px; }
+    .cat-body { position: absolute; top: 40px; left: 5px; width: 35px; height: 20px; background-color: #ff9900; border-radius: 4px; }
+    .cat-tail { position: absolute; top: 45px; left: 40px; width: 20px; height: 8px; background-color: #ff9900; border-radius: 4px; }
+    .cat-paw-l, .cat-paw-r { position: absolute; bottom: 0; width: 10px; height: 10px; background-color: #cc7a00; border-radius: 2px; }
+    .cat-paw-l { left: 10px; }
+    .cat-paw-r { right: 15px; }
 
     .flying-pizza { position: absolute; font-size: 45px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
 
-    /* Анимации */
+    /* Анимации для пульта */
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
       0% { transform: translateX(-100px) scaleX(1); }
@@ -177,9 +219,18 @@
   <!-- Катсцена -->
   <div id="cutscene">
     <div class="cutscene-text">Пробуждение...</div>
-    <div class="cutscene-cat" style="left: 30%;"></div>
-    <div class="cutscene-cat" style="left: 50%; width: 30px; height: 30px;"></div>
-    <div class="cutscene-cat" style="left: 70%; width: 50px; height: 50px;"></div>
+    
+    <!-- Дорога -->
+    <div class="road-container">
+      <div class="road"></div>
+    </div>
+
+    <!-- Коты идут по дороге -->
+    <div class="cutscene-cats-container">
+      <div class="cutscene-cat-wrapper"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+      <div class="cutscene-cat-wrapper" style="animation-delay: 0.2s;"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+      <div class="cutscene-cat-wrapper" style="animation-delay: 0.4s;"><div class="modern-cat" style="position:relative;"><div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div></div></div>
+    </div>
   </div>
 
   <div id="animation-layer"></div>
@@ -230,25 +281,28 @@
 
     let catInterval = null;
     let pizzaInterval = null;
-    let isCutscenePlayed = false; // Флаг, чтобы катсцена не повторялась
+    let isCutscenePlayed = false;
+
+    const catHTML = `
+      <div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div>
+      <div class="cat-body"></div><div class="cat-tail"></div>
+      <div class="cat-paw-l"></div><div class="cat-paw-r"></div>
+    `;
 
     // --- ЛОГИКА КАТСЦЕНЫ ПРИ ВКЛЮЧЕНИИ КОТОВ ---
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         
-        // Если катсцена еще не была показана
         if (!isCutscenePlayed) {
           isCutscenePlayed = true; 
           cutscene.classList.add('active');
           
-          // Ждем 3 секунды, пока идет катсцена, и запускаем котов
           setTimeout(() => {
             cutscene.classList.remove('active');
             startCats();
-          }, 3000);
+          }, 3000); 
           
         } else {
-          // Если уже видели катсцену, просто запускаем
           startCats();
         }
         
@@ -265,11 +319,7 @@
     function spawnCat() {
       const cat = document.createElement('div');
       cat.className = 'modern-cat';
-      cat.innerHTML = `
-        <div class="head"><div class="eye-l"></div><div class="eye-r"></div><div class="nose"></div></div>
-        <div class="body"></div><div class="tail"></div>
-        <div class="paw-l"></div><div class="paw-r"></div>
-      `;
+      cat.innerHTML = catHTML;
       
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
