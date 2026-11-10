@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>НЕ НАЖИМАЙ!</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #1a1a1a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      transition: background-color 0.3s ease;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: clamp(24px, 5vw, 36px);
+      margin-bottom: 40px;
+      transition: transform 0.2s;
+    }
+    .btn {
+      padding: 24px 48px;
+      font-size: 24px;
+      font-weight: 900;
+      color: white;
+      background: #e63946;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 8px 0 #9b2226;
+      transition: all 0.1s ease;
+      text-transform: uppercase;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active {
+      transform: translateY(8px);
+      box-shadow: 0 0 0 #9b2226;
+    }
+    /* Класс для тряски */
+    .shake {
+      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+      40%, 60% { transform: translate3d(8px, 0, 0); }
+    }
+    /* Глитч-эффект для финала */
+    .glitch {
+      animation: glitch-anim 0.2s infinite;
+    }
+    @keyframes glitch-anim {
+      0% { transform: translate(0); }
+      20% { transform: translate(-5px, 5px); }
+      40% { transform: translate(-5px, -5px); }
+      60% { transform: translate(5px, 5px); }
+      80% { transform: translate(5px, -5px); }
+      100% { transform: translate(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="warning-text">Пожалуйста, не нажимай эту кнопку.</h1>
+  <button class="btn" id="danger-btn">НЕ НАЖИМАТЬ</button>
+
+  <script>
+    const btn = document.getElementById('danger-btn');
+    const text = document.getElementById('warning-text');
+    const body = document.body;
+    
+    let count = 0;
+
+    const messages = [
+      "Пожалуйста, не нажимай эту кнопку.",
+      "Я же попросил по-хорошему.",
+      "Ты уверен, что тебе это нужно?",
+      "Ладно, ты сам напросился...",
+      "Ой-ой. Кажется, мы что-то сломали.",
+      "ОСТАНОВИСЬ! У меня семья!",
+      "ЧТО ТЫ НАДЕЛАЛ?!",
+      "ПРОБУЖДЕНИЕ СИСТЕМЫ...",
+      "💥 СИСТЕМА УНИЧТОЖЕНА 💥"
+    ];
+
+    const colors = [
+      "#1a1a1a", "#2a1a1a", "#3a1a1a", "#4a1010", "#5c0000", "#8b0000", "#ff0000", "#000000", "#ffffff"
+    ];
+
+    btn.addEventListener('click', () => {
+      // Вибрация на телефоне (если поддерживается)
+      if (navigator.vibrate) {
+        navigator.vibrate(count > 5 ? [100, 50, 100, 50, 200] : 50);
+      }
+
+      // Трясем экран
+      body.classList.add('shake');
+      setTimeout(() => body.classList.remove('shake'), 400);
+
+      count++;
+
+      if (count < messages.length) {
+        text.textContent = messages[count];
+        
+        // Меняем цвет фона
+        if (colors[count]) {
+          body.style.backgroundColor = colors[count];
+        }
+
+        // Меняем текст на самой кнопке
+        if (count === 1) btn.textContent = "Всё ещё не жми";
+        if (count === 3) btn.textContent = "Точно?";
+        if (count === 5) btn.textContent = "ПОСЛЕДНЕЕ КИМАНО";
+        if (count === 7) btn.textContent = "ЖМИ ЕСЛИ СМЕЛЫЙ";
+        
+        // Кнопка начинает убегать в стороны на поздних этапах
+        if (count > 4) {
+           btn.style.transform = `translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px)`;
+        }
+      }
+
+      // Финальный босс
+      if (count >= messages.length) {
+        btn.style.display = 'none'; // Прячем кнопку
+        text.textContent = "Ты сломал интернет. Поздравляю! 🏆";
+        text.style.color = "#000";
+        body.style.backgroundColor = "#fff";
+        body.classList.add('glitch');
+        
+        setTimeout(() => {
+            body.classList.remove('glitch');
+            text.style.color = "red";
+            text.textContent = "Шутка. Обнови страницу (F5), чтобы всё починить. 😉";
+        }, 2000);
+      }
+    });
+  </script>
+</body>
+</html>
