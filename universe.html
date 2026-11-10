@@ -3,161 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Пиксельный Пульт 🕹️</title>
-  <!-- Подключаем ретро-шрифт -->
+  <title>Пиксельный Пульт</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   
   <style>
-    :root {
-      --bg: #1a1a1a;
-      --panel-bg: #333333;
-      --text: #ffffff;
-      --accent: #55ff55; /* Кислотно-зеленый */
-      --accent-dark: #228822;
-      --pixel-border: 4px solid #ffffff;
-    }
-
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
     body {
-      font-family: 'Press Start 2P', monospace;
-      background-color: var(--bg);
-      background-image: 
-        linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px);
-      background-size: 20px 20px; /* Легкий пиксельный фон */
-      color: var(--text);
+      font-family: 'Press Start 2P', monospace; /* Пиксельный шрифт */
+      background-color: #111;
+      background-image: linear-gradient(rgba(0,0,0,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.7) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: white;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: filter 0.2s;
+      transition: filter 0.1s;
     }
 
     #animation-layer {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      pointer-events: none;
-      z-index: 1;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 1;
     }
 
-    /* Пульт */
+    /* Пульт в стиле 8-бит */
     .panel {
-      position: relative;
-      z-index: 10;
-      background: var(--panel-bg);
+      position: relative; z-index: 10;
+      background: #333;
       padding: 30px 20px;
-      border: var(--pixel-border);
-      box-shadow: 
-        8px 8px 0px #000,
-        inset -4px -4px 0px rgba(0,0,0,0.5),
-        inset 4px 4px 0px rgba(255,255,255,0.2);
+      border: 4px solid #fff;
+      box-shadow: 8px 8px 0px #000;
       width: min(400px, 90vw);
     }
 
     h1 {
-      text-align: center;
-      font-size: 16px;
-      line-height: 1.5;
-      margin-bottom: 30px;
-      color: var(--accent);
-      text-shadow: 3px 3px 0px #000;
+      text-align: center; font-size: 14px; line-height: 1.5; margin-bottom: 30px;
+      color: #55ff55; text-shadow: 2px 2px 0px #000;
     }
 
     .toggle-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 4px dashed #555;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 0; border-bottom: 4px dashed #555;
     }
     .toggle-row:last-child { border-bottom: none; }
 
-    .toggle-label {
-      font-size: 10px;
-      line-height: 1.4;
-    }
+    .toggle-label { font-size: 10px; line-height: 1.4; }
 
-    /* Пиксельный тумблер */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 30px;
-    }
+    /* Квадратный тумблер */
+    .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    
     .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #222;
-      border: 4px solid #fff;
-      box-shadow: inset 4px 4px 0 rgba(0,0,0,0.5);
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #222; border: 4px solid #fff; box-shadow: inset 4px 4px 0 rgba(0,0,0,0.5);
     }
-    
     .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px; width: 18px;
-      left: 2px; bottom: 2px;
-      background-color: #fff;
-      transition: .1s steps(2); /* Рывком */
+      position: absolute; content: ""; height: 14px; width: 14px;
+      left: 4px; bottom: 4px; background-color: #fff; transition: .1s steps(2);
     }
-    
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(30px);
-    }
+    input:checked + .slider { background-color: #55ff55; }
+    input:checked + .slider:before { transform: translateX(30px); }
 
-    /* --- ПИКСЕЛЬНЫЙ КОТ (нарисован через box-shadow) --- */
+    /* ПИКСЕЛЬНЫЙ КОТ (Огромный и яркий) */
     .pixel-cat {
       position: absolute;
-      width: 10px;
-      height: 10px;
-      background: transparent;
-      /* Оранжевый кот с черными глазами */
+      width: 12px; height: 12px;
+      /* Рисуем пиксельного кота через тени */
       box-shadow: 
-        10px 0 0 #ff9900, 20px 0 0 #ff9900, 30px 0 0 #ff9900, 40px 0 0 #ff9900, 50px 0 0 #ff9900,
-        0 10px 0 #ff9900, 10px 10px 0 #ff9900, 20px 10px 0 #ff9900, 30px 10px 0 #ff9900, 40px 10px 0 #ff9900, 50px 10px 0 #ff9900, 60px 10px 0 #ff9900,
-        0 20px 0 #ff9900, 10px 20px 0 #000, 20px 20px 0 #ff9900, 30px 20px 0 #ff9900, 40px 20px 0 #ff9900, 50px 20px 0 #000, 60px 20px 0 #ff9900,
-        10px 30px 0 #ff9900, 20px 30px 0 #ff9900, 30px 30px 0 #ff9900, 40px 30px 0 #ff9900, 50px 30px 0 #ff9900,
-        10px 40px 0 #ff9900, 20px 40px 0 #ff9900, 40px 40px 0 #ff9900, 50px 40px 0 #ff9900,
-        10px 50px 0 #ff9900, 50px 50px 0 #ff9900;
+        12px 0 0 #ffaa00, 24px 0 0 #ffaa00, 36px 0 0 #ffaa00, 48px 0 0 #ffaa00,
+        0 12px 0 #ffaa00, 12px 12px 0 #ffaa00, 24px 12px 0 #ffaa00, 36px 12px 0 #ffaa00, 48px 12px 0 #ffaa00, 60px 12px 0 #ffaa00,
+        0 24px 0 #ffaa00, 12px 24px 0 #000, 24px 24px 0 #ffaa00, 36px 24px 0 #ffaa00, 48px 24px 0 #000, 60px 24px 0 #ffaa00,
+        12px 36px 0 #ffaa00, 24px 36px 0 #ffaa00, 36px 36px 0 #ffaa00, 48px 36px 0 #ffaa00,
+        12px 48px 0 #ffaa00, 48px 48px 0 #ffaa00;
     }
 
-    /* --- ПИКСЕЛЬНАЯ ПИЦЦА --- */
+    /* ПИКСЕЛЬНАЯ ПИЦЦА */
     .pixel-pizza {
       position: absolute;
-      width: 10px;
-      height: 10px;
-      background: transparent;
-      /* Треугольник пиццы */
+      width: 12px; height: 12px;
       box-shadow: 
-        20px 0 0 #ffcc00,
-        10px 10px 0 #ffcc00, 20px 10px 0 #ff3333, 30px 10px 0 #ffcc00,
-        0 20px 0 #ffcc00, 10px 20px 0 #ffcc00, 20px 20px 0 #ffcc00, 30px 20px 0 #ff3333, 40px 20px 0 #ffcc00;
+        24px 0 0 #ffcc00,
+        12px 12px 0 #ffcc00, 24px 12px 0 #ff0000, 36px 12px 0 #ffcc00,
+        0 24px 0 #ffcc00, 12px 24px 0 #ffcc00, 24px 24px 0 #ffcc00, 36px 24px 0 #ffcc00, 48px 24px 0 #ffcc00;
     }
 
     /* Анимации */
     .run-anim { animation: runAcross steps(15) infinite; }
     @keyframes runAcross {
-      0% { transform: translateX(-100px); }
-      100% { transform: translateX(100vw); }
+      0% { transform: translateX(-100px) scaleX(1); }
+      49% { transform: translateX(100vw) scaleX(1); }
+      50% { transform: translateX(100vw) scaleX(-1); } /* Поворот */
+      100% { transform: translateX(-100px) scaleX(-1); }
     }
 
-    .float-anim {
-      animation: floatUp steps(20) forwards !important;
-    }
+    .float-anim { animation: floatUp steps(20) forwards !important; }
     @keyframes floatUp {
       0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+      100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
     }
 
     .fall-anim { animation: fallDown steps(15) forwards; }
@@ -166,9 +110,7 @@
       100% { transform: translateY(120vh) rotate(180deg); }
     }
 
-    .reality-inverted {
-      filter: invert(1) hue-rotate(90deg);
-    }
+    .reality-inverted { filter: invert(1) hue-rotate(90deg); }
   </style>
 </head>
 <body>
@@ -176,7 +118,7 @@
   <div id="animation-layer"></div>
 
   <div class="panel">
-    <h1>ПИКСЕЛЬНЫЙ ПУЛЬТ</h1>
+    <h1>ПУЛЬТ ВСЕЛЕННОЙ</h1>
 
     <div class="toggle-row">
       <span class="toggle-label">Квадратные<br>коты</span>
@@ -213,7 +155,6 @@
 
   <script>
     const layer = document.getElementById('animation-layer');
-    
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
@@ -222,11 +163,10 @@
     let catInterval = null;
     let pizzaInterval = null;
 
-    // КОТЫ
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         spawnCat();
-        catInterval = setInterval(spawnCat, 1200);
+        catInterval = setInterval(spawnCat, 1500);
       } else {
         clearInterval(catInterval);
       }
@@ -235,26 +175,20 @@
     function spawnCat() {
       const cat = document.createElement('div');
       cat.className = 'pixel-cat';
-      
-      // Позиция и скорость
-      cat.style.top = (Math.random() * 70 + 15) + 'vh';
-      const duration = Math.random() * 2 + 2; // 2-4 секунды
-      cat.style.animationDuration = duration + 's';
+      cat.style.top = (Math.random() * 60 + 20) + 'vh';
+      cat.style.animationDuration = (Math.random() * 2 + 2) + 's';
 
       if (!gravityToggle.checked) {
         applyFloat(cat);
       } else {
         cat.classList.add('run-anim');
       }
-
       cat.addEventListener('animationend', () => cat.remove());
       layer.appendChild(cat);
     }
 
-    // ГРАВИТАЦИЯ
     gravityToggle.addEventListener('change', (e) => {
       const cats = document.querySelectorAll('.pixel-cat');
-      
       if (!e.target.checked) {
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
@@ -272,43 +206,29 @@
     });
 
     function applyFloat(cat) {
-      const floatDuration = Math.random() * 2 + 2; 
-      cat.style.animationDuration = floatDuration + 's';
+      cat.style.animationDuration = (Math.random() * 2 + 2) + 's';
       cat.classList.add('float-anim');
     }
 
-    // ПИЦЦА
     pizzaToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
-        pizzaInterval = setInterval(spawnPizza, 500);
+        pizzaInterval = setInterval(() => {
+          const pizza = document.createElement('div');
+          pizza.className = 'pixel-pizza';
+          pizza.style.left = (Math.random() * 85 + 5) + 'vw';
+          pizza.style.animationDuration = (Math.random() * 1 + 1) + 's';
+          pizza.classList.add('fall-anim');
+          pizza.addEventListener('animationend', () => pizza.remove());
+          layer.appendChild(pizza);
+        }, 600);
       } else {
         clearInterval(pizzaInterval);
       }
     });
 
-    function spawnPizza() {
-      const pizza = document.createElement('div');
-      pizza.className = 'pixel-pizza';
-      
-      pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-      const duration = Math.random() * 1 + 1.5; // Быстрое падение
-      pizza.style.animationDuration = duration + 's';
-      
-      pizza.classList.add('fall-anim');
-      pizza.addEventListener('animationend', () => pizza.remove());
-      
-      layer.appendChild(pizza);
-    }
-
-    // РЕАЛЬНОСТЬ
     realityToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        document.body.classList.add('reality-inverted');
-      } else {
-        document.body.classList.remove('reality-inverted');
-      }
+      document.body.classList.toggle('reality-inverted', e.target.checked);
     });
-
   </script>
 </body>
 </html>
