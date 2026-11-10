@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Пульт Вселенной HD</title>
+  <title>Управление Вселенной</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
@@ -76,46 +76,89 @@
     input:checked + .slider { background-color: #4facfe; border-color: #4facfe; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- HD ПИКСЕЛЬНЫЙ КОТ --- */
-    .pixel-cat {
+    /* --- КВАДРАТНЫЙ КОТ (Стильный минимализм) --- */
+    .modern-cat {
       position: absolute;
-      width: 6px; /* Размер пикселя (сделал меньше, чтобы влезло больше деталей) */
-      height: 6px;
-      /* Детализированный спрайт кота (тело, уши, глаза, нос, лапы) */
-      box-shadow: 
-        18px 0 0 #f4a460, 24px 0 0 #f4a460, 48px 0 0 #f4a460, 54px 0 0 #f4a460,
-        12px 6px 0 #f4a460, 18px 6px 0 #f4a460, 24px 6px 0 #f4a460, 30px 6px 0 #f4a460, 42px 6px 0 #f4a460, 48px 6px 0 #f4a460, 54px 6px 0 #f4a460, 60px 6px 0 #f4a460,
-        6px 12px 0 #f4a460, 12px 12px 0 #f4a460, 18px 12px 0 #f4a460, 24px 12px 0 #f4a460, 30px 12px 0 #f4a460, 36px 12px 0 #f4a460, 42px 12px 0 #f4a460, 48px 12px 0 #f4a460, 54px 12px 0 #f4a460, 60px 12px 0 #f4a460, 66px 12px 0 #f4a460,
-        6px 18px 0 #f4a460, 12px 18px 0 #000000, 18px 18px 0 #000000, 24px 18px 0 #f4a460, 30px 18px 0 #f4a460, 36px 18px 0 #f4a460, 42px 18px 0 #000000, 48px 18px 0 #000000, 54px 18px 0 #f4a460, 60px 18px 0 #f4a460, 66px 18px 0 #f4a460,
-        6px 24px 0 #f4a460, 12px 24px 0 #f4a460, 18px 24px 0 #f4a460, 24px 24px 0 #f4a460, 30px 24px 0 #ff69b4, 36px 24px 0 #f4a460, 42px 24px 0 #f4a460, 48px 24px 0 #f4a460, 54px 24px 0 #f4a460, 60px 24px 0 #f4a460, 66px 24px 0 #f4a460,
-        6px 30px 0 #f4a460, 12px 30px 0 #f4a460, 18px 30px 0 #f4a460, 24px 30px 0 #f4a460, 30px 30px 0 #f4a460, 36px 30px 0 #f4a460, 42px 30px 0 #f4a460, 48px 30px 0 #f4a460, 54px 30px 0 #f4a460, 60px 30px 0 #f4a460, 66px 30px 0 #f4a460,
-        12px 36px 0 #f4a460, 18px 36px 0 #f4a460, 24px 36px 0 #f4a460, 30px 36px 0 #f4a460, 36px 36px 0 #f4a460, 42px 36px 0 #f4a460, 48px 36px 0 #f4a460, 54px 36px 0 #f4a460, 60px 36px 0 #f4a460,
-        18px 42px 0 #f4a460, 24px 42px 0 #f4a460, 30px 42px 0 #f4a460, 36px 42px 0 #f4a460, 42px 42px 0 #f4a460, 48px 42px 0 #f4a460, 54px 42px 0 #f4a460,
-        18px 48px 0 #f4a460, 24px 48px 0 #000000, 30px 48px 0 #f4a460, 42px 48px 0 #f4a460, 48px 48px 0 #000000, 54px 48px 0 #f4a460,
-        66px 36px 0 #f4a460, 72px 30px 0 #f4a460, 72px 24px 0 #f4a460;
-      
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
-      transition: top 1s ease-in-out, transform 1s ease-in-out;
+      width: 60px;
+      height: 60px;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+      transition: top 1s ease-in-out;
+    }
+    
+    /* Голова */
+    .modern-cat .head {
+      position: absolute;
+      top: 0; left: 0;
+      width: 40px; height: 40px;
+      background-color: #ff9900;
+      border-radius: 4px; /* Чуть скругляем углы для стиля */
+    }
+    /* Ушки */
+    .modern-cat .head::before, .modern-cat .head::after {
+      content: ''; position: absolute; top: -10px;
+      width: 15px; height: 15px; background-color: #ff9900;
+      border-radius: 2px;
+    }
+    .modern-cat .head::before { left: 0; }
+    .modern-cat .head::after { right: 0; }
+    
+    /* Глаза и нос */
+    .modern-cat .eye-l, .modern-cat .eye-r {
+      position: absolute; top: 15px; width: 8px; height: 8px;
+      background-color: #222; border-radius: 50%;
+    }
+    .modern-cat .eye-l { left: 8px; }
+    .modern-cat .eye-r { right: 8px; }
+    .modern-cat .nose {
+      position: absolute; top: 25px; left: 17px;
+      width: 6px; height: 4px; background-color: #ff69b4; border-radius: 2px;
     }
 
-    .pixel-pizza {
+    /* Тело */
+    .modern-cat .body {
       position: absolute;
-      font-size: 40px;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+      top: 40px; left: 5px;
+      width: 35px; height: 20px;
+      background-color: #ff9900;
+      border-radius: 4px;
+    }
+    /* Хвост */
+    .modern-cat .tail {
+      position: absolute;
+      top: 45px; left: 40px;
+      width: 20px; height: 8px;
+      background-color: #ff9900;
+      border-radius: 4px;
     }
 
+    /* Лапки */
+    .modern-cat .paw-l, .modern-cat .paw-r {
+      position: absolute; bottom: 0; width: 10px; height: 10px;
+      background-color: #cc7a00; border-radius: 2px;
+    }
+    .modern-cat .paw-l { left: 10px; }
+    .modern-cat .paw-r { right: 15px; }
+
+    /* --- ПИЦЦА --- */
+    .flying-pizza {
+      position: absolute;
+      font-size: 45px;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+    }
+
+    /* Анимации */
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
-      0% { transform: translateX(-150px) scaleX(1); }
+      0% { transform: translateX(-100px) scaleX(1); }
       49% { transform: translateX(100vw) scaleX(1); }
       50% { transform: translateX(100vw) scaleX(-1); }
-      100% { transform: translateX(-150px) scaleX(-1); }
+      100% { transform: translateX(-100px) scaleX(-1); }
     }
 
     .float-anim { animation: hover steps(10) infinite alternate; }
     @keyframes hover {
-      0% { transform: translateY(0) rotate(-15deg); }
-      100% { transform: translateY(-30px) rotate(15deg); }
+      0% { transform: translateY(0) rotate(-10deg); }
+      100% { transform: translateY(-30px) rotate(10deg); }
     }
 
     .fall-anim { animation: fallDown linear forwards; }
@@ -180,7 +223,7 @@
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         spawnCat();
-        catInterval = setInterval(spawnCat, 2000); // Коты появляются чуть реже, так как они большие
+        catInterval = setInterval(spawnCat, 1500);
       } else {
         clearInterval(catInterval);
       }
@@ -188,7 +231,20 @@
 
     function spawnCat() {
       const cat = document.createElement('div');
-      cat.className = 'pixel-cat';
+      cat.className = 'modern-cat';
+      
+      // Собираем кота из частей
+      cat.innerHTML = `
+        <div class="head">
+          <div class="eye-l"></div>
+          <div class="eye-r"></div>
+          <div class="nose"></div>
+        </div>
+        <div class="body"></div>
+        <div class="tail"></div>
+        <div class="paw-l"></div>
+        <div class="paw-r"></div>
+      `;
       
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
@@ -204,7 +260,7 @@
     }
 
     gravityToggle.addEventListener('change', (e) => {
-      const cats = document.querySelectorAll('.pixel-cat');
+      const cats = document.querySelectorAll('.modern-cat');
       
       if (!e.target.checked) {
         cats.forEach(cat => {
@@ -226,10 +282,10 @@
       if (e.target.checked) {
         pizzaInterval = setInterval(() => {
           const pizza = document.createElement('div');
-          pizza.className = 'pixel-pizza';
+          pizza.className = 'flying-pizza';
           pizza.textContent = '🍕';
           pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-          pizza.style.top = '-50px';
+          pizza.style.top = '-60px';
           pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           pizza.classList.add('fall-anim');
           pizza.addEventListener('animationend', () => pizza.remove());
