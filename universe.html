@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Пульт Вселенной</title>
+  <title>Пульт Вселенной HD</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
@@ -17,7 +17,6 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: filter 0.3s ease;
     }
 
     #animation-layer {
@@ -44,7 +43,6 @@
       font-size: 22px; 
       font-weight: 700;
       margin-bottom: 25px;
-      letter-spacing: 1px;
       background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -74,31 +72,27 @@
       background-color: #fff; 
       transition: .4s;
       border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
-    input:checked + .slider {
-      background-color: #4facfe;
-      border-color: #4facfe;
-    }
+    input:checked + .slider { background-color: #4facfe; border-color: #4facfe; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- НАСТОЯЩИЙ КВАДРАТНЫЙ КОТ (Увеличенный) --- */
+    /* --- HD ПИКСЕЛЬНЫЙ КОТ --- */
     .pixel-cat {
       position: absolute;
-      width: 10px; /* Размер одного пикселя */
-      height: 10px;
-      /* Огромный массив теней для прорисовки */
+      width: 6px; /* Размер пикселя (сделал меньше, чтобы влезло больше деталей) */
+      height: 6px;
+      /* Детализированный спрайт кота (тело, уши, глаза, нос, лапы) */
       box-shadow: 
-        20px 0 0 #f4a460, 60px 0 0 #f4a460,
-        10px 10px 0 #f4a460, 20px 10px 0 #f4a460, 30px 10px 0 #f4a460, 50px 10px 0 #f4a460, 60px 10px 0 #f4a460, 70px 10px 0 #f4a460,
-        0 20px 0 #f4a460, 10px 20px 0 #f4a460, 20px 20px 0 #f4a460, 30px 20px 0 #f4a460, 40px 20px 0 #f4a460, 50px 20px 0 #f4a460, 60px 20px 0 #f4a460, 70px 20px 0 #f4a460, 80px 20px 0 #f4a460,
-        0 30px 0 #f4a460, 10px 30px 0 #000000, 20px 30px 0 #000000, 30px 30px 0 #f4a460, 40px 30px 0 #f4a460, 50px 30px 0 #000000, 60px 30px 0 #000000, 70px 30px 0 #f4a460, 80px 30px 0 #f4a460,
-        0 40px 0 #f4a460, 10px 40px 0 #f4a460, 20px 40px 0 #f4a460, 30px 40px 0 #f4a460, 40px 40px 0 #ff69b4, 50px 40px 0 #f4a460, 60px 40px 0 #f4a460, 70px 40px 0 #f4a460, 80px 40px 0 #f4a460,
-        0 50px 0 #f4a460, 10px 50px 0 #f4a460, 20px 50px 0 #f4a460, 30px 50px 0 #f4a460, 40px 50px 0 #f4a460, 50px 50px 0 #f4a460, 60px 50px 0 #f4a460, 70px 50px 0 #f4a460, 80px 50px 0 #f4a460,
-        10px 60px 0 #f4a460, 20px 60px 0 #f4a460, 30px 60px 0 #f4a460, 40px 60px 0 #f4a460, 50px 60px 0 #f4a460, 60px 60px 0 #f4a460, 70px 60px 0 #f4a460,
-        10px 70px 0 #f4a460, 20px 70px 0 #f4a460, 30px 70px 0 #f4a460, 40px 70px 0 #f4a460, 50px 70px 0 #f4a460, 60px 70px 0 #f4a460, 70px 70px 0 #f4a460,
-        10px 80px 0 #f4a460, 20px 80px 0 #000000, 30px 80px 0 #f4a460, 50px 80px 0 #f4a460, 60px 80px 0 #000000, 70px 80px 0 #f4a460,
-        80px 60px 0 #f4a460, 90px 50px 0 #f4a460, 90px 40px 0 #f4a460;
+        18px 0 0 #f4a460, 24px 0 0 #f4a460, 48px 0 0 #f4a460, 54px 0 0 #f4a460,
+        12px 6px 0 #f4a460, 18px 6px 0 #f4a460, 24px 6px 0 #f4a460, 30px 6px 0 #f4a460, 42px 6px 0 #f4a460, 48px 6px 0 #f4a460, 54px 6px 0 #f4a460, 60px 6px 0 #f4a460,
+        6px 12px 0 #f4a460, 12px 12px 0 #f4a460, 18px 12px 0 #f4a460, 24px 12px 0 #f4a460, 30px 12px 0 #f4a460, 36px 12px 0 #f4a460, 42px 12px 0 #f4a460, 48px 12px 0 #f4a460, 54px 12px 0 #f4a460, 60px 12px 0 #f4a460, 66px 12px 0 #f4a460,
+        6px 18px 0 #f4a460, 12px 18px 0 #000000, 18px 18px 0 #000000, 24px 18px 0 #f4a460, 30px 18px 0 #f4a460, 36px 18px 0 #f4a460, 42px 18px 0 #000000, 48px 18px 0 #000000, 54px 18px 0 #f4a460, 60px 18px 0 #f4a460, 66px 18px 0 #f4a460,
+        6px 24px 0 #f4a460, 12px 24px 0 #f4a460, 18px 24px 0 #f4a460, 24px 24px 0 #f4a460, 30px 24px 0 #ff69b4, 36px 24px 0 #f4a460, 42px 24px 0 #f4a460, 48px 24px 0 #f4a460, 54px 24px 0 #f4a460, 60px 24px 0 #f4a460, 66px 24px 0 #f4a460,
+        6px 30px 0 #f4a460, 12px 30px 0 #f4a460, 18px 30px 0 #f4a460, 24px 30px 0 #f4a460, 30px 30px 0 #f4a460, 36px 30px 0 #f4a460, 42px 30px 0 #f4a460, 48px 30px 0 #f4a460, 54px 30px 0 #f4a460, 60px 30px 0 #f4a460, 66px 30px 0 #f4a460,
+        12px 36px 0 #f4a460, 18px 36px 0 #f4a460, 24px 36px 0 #f4a460, 30px 36px 0 #f4a460, 36px 36px 0 #f4a460, 42px 36px 0 #f4a460, 48px 36px 0 #f4a460, 54px 36px 0 #f4a460, 60px 36px 0 #f4a460,
+        18px 42px 0 #f4a460, 24px 42px 0 #f4a460, 30px 42px 0 #f4a460, 36px 42px 0 #f4a460, 42px 42px 0 #f4a460, 48px 42px 0 #f4a460, 54px 42px 0 #f4a460,
+        18px 48px 0 #f4a460, 24px 48px 0 #000000, 30px 48px 0 #f4a460, 42px 48px 0 #f4a460, 48px 48px 0 #000000, 54px 48px 0 #f4a460,
+        66px 36px 0 #f4a460, 72px 30px 0 #f4a460, 72px 24px 0 #f4a460;
       
       filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
       transition: top 1s ease-in-out, transform 1s ease-in-out;
@@ -112,10 +106,10 @@
 
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
-      0% { transform: translateX(-100px) scaleX(1); }
+      0% { transform: translateX(-150px) scaleX(1); }
       49% { transform: translateX(100vw) scaleX(1); }
       50% { transform: translateX(100vw) scaleX(-1); }
-      100% { transform: translateX(-100px) scaleX(-1); }
+      100% { transform: translateX(-150px) scaleX(-1); }
     }
 
     .float-anim { animation: hover steps(10) infinite alternate; }
@@ -186,7 +180,7 @@
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         spawnCat();
-        catInterval = setInterval(spawnCat, 1500);
+        catInterval = setInterval(spawnCat, 2000); // Коты появляются чуть реже, так как они большие
       } else {
         clearInterval(catInterval);
       }
