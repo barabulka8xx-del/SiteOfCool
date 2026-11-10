@@ -25,10 +25,9 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА (ДЕНЬ + ГОРОД) --- */
+    /* --- КАТСЦЕНА --- */
     #cutscene {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      /* Дневное небо */
       background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
       z-index: 100;
       display: none; 
@@ -43,10 +42,14 @@
     #cutscene.active { display: flex; opacity: 1; }
 
     .cutscene-text {
+      position: absolute;
+      top: 40%;
       font-size: 24px; font-weight: 700; text-align: center;
       opacity: 0; animation: fadeInOut 2.5s forwards; z-index: 10;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.5); /* Тень, чтобы текст читался на светлом фоне */
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
       color: #fff;
+      width: 100%;
+      padding: 0 20px;
     }
     
     @keyframes fadeInOut {
@@ -56,25 +59,30 @@
       100% { opacity: 0; transform: scale(1.1); }
     }
 
-    /* --- УЛИЦА С ГОРОДОМ --- */
-    .street-scene { position: absolute; bottom: 0; width: 100%; height: 50%; overflow: hidden; display: none; }
+    /* --- ГОРОД (ВСЕГДА ВИДЕН) --- */
+    .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; }
     
-    /* Дорога */
-    .road-surface { position: absolute; bottom: 0; width: 100%; height: 30%; background: #2a2a35; border-top: 4px solid #555; }
+    /* Асфальт */
+    .road-surface { 
+      position: absolute; bottom: 0; width: 100%; height: 25%; 
+      background: #2a2a35; border-top: 4px solid #444; 
+    }
     
-    /* Дома */
-    .buildings {
-      position: absolute; bottom: 30%; width: 100%; height: 150px; background: #1a1a24;
+    /* Красивые дома (3 слоя для глубины) */
+    .buildings-back {
+      position: absolute; bottom: 25%; width: 100%; height: 200px; background: #151b26;
+      clip-path: polygon(0 100%, 0 30%, 5% 30%, 5% 60%, 15% 60%, 15% 10%, 25% 10%, 25% 80%, 40% 80%, 40% 20%, 55% 20%, 55% 50%, 65% 50%, 65% 40%, 80% 40%, 80% 90%, 90% 90%, 90% 30%, 100% 30%, 100% 100%);
+    }
+    .buildings-front {
+      position: absolute; bottom: 25%; width: 100%; height: 120px; background: #0b1017;
+      clip-path: polygon(0 100%, 0 50%, 10% 50%, 10% 20%, 20% 20%, 20% 60%, 35% 60%, 35% 40%, 50% 40%, 50% 90%, 70% 90%, 70% 10%, 85% 10%, 85% 70%, 100% 70%, 100% 100%);
+      /* Светящиеся окна */
       background-image: 
-        /* Окна */
-        radial-gradient(circle at 20% 80%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 30% 60%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 80% 70%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 60% 50%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 90% 90%, #ffcc00 3px, transparent 4px);
-      background-size: 100% 100%; background-repeat: no-repeat;
-      /* Силуэт домов */
-      clip-path: polygon(0 100%, 0 40%, 10% 40%, 10% 70%, 20% 70%, 20% 20%, 35% 20%, 35% 60%, 50% 60%, 50% 30%, 60% 30%, 60% 80%, 75% 80%, 75% 10%, 85% 10%, 85% 50%, 100% 50%, 100% 100%);
+        radial-gradient(circle at 12% 70%, #ffcc00 3px, transparent 4px),
+        radial-gradient(circle at 40% 80%, #ffcc00 3px, transparent 4px),
+        radial-gradient(circle at 75% 50%, #ffcc00 3px, transparent 4px),
+        radial-gradient(circle at 92% 85%, #ffcc00 3px, transparent 4px);
+      background-size: 100% 100%;
     }
 
     /* --- ИНТЕРФЕЙС --- */
@@ -170,9 +178,10 @@
   <div id="cutscene">
     <div class="cutscene-text" id="cutscene-text"></div>
     
-    <!-- Город и дорога -->
-    <div class="street-scene" id="cutscene-street">
-      <div class="buildings"></div>
+    <!-- Город (теперь он есть всегда) -->
+    <div class="street-scene">
+      <div class="buildings-back"></div>
+      <div class="buildings-front"></div>
       <div class="road-surface"></div>
     </div>
 
@@ -226,7 +235,6 @@
     
     const cutscene = document.getElementById('cutscene');
     const cutsceneText = document.getElementById('cutscene-text');
-    const cutsceneStreet = document.getElementById('cutscene-street');
     const cutsceneObjects = document.getElementById('cutscene-objects');
 
     let catInterval = null;
@@ -240,11 +248,10 @@
       <div class="cat-paw-l"></div><div class="cat-paw-r"></div>
     `;
 
-    function showCutscene(text, isStreet, duration = 2500) {
+    function showCutscene(text, duration = 2500) {
       cutscene.classList.add('active');
       cutsceneText.textContent = text;
       cutsceneObjects.innerHTML = '';
-      cutsceneStreet.style.display = isStreet ? 'block' : 'none';
 
       setTimeout(() => {
         cutscene.classList.remove('active');
@@ -257,13 +264,12 @@
       if (e.target.checked) {
         if (!played.cats) {
           played.cats = true;
-          showCutscene("Квадратные коты выходят на связь...", true);
+          showCutscene("Квадратные коты выходят на связь...");
           
-          // Спавним котов для пробега в катсцене
           for(let i=0; i<3; i++) {
             const cat = document.createElement('div');
             cat.className = 'modern-cat run-anim';
-            cat.style.bottom = '15%';
+            cat.style.bottom = '20%'; // Чуть выше асфальта
             cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
             cat.style.animationDelay = i * 0.4 + 's';
             cat.innerHTML = catHTML;
@@ -301,7 +307,7 @@
       if (e.target.checked) {
         if (!played.pizza) {
           played.pizza = true;
-          showCutscene("Пицца вызывается на ковёр...", false);
+          showCutscene("Пицца вызывается на ковёр...");
 
           for(let i=0; i<5; i++) {
             const pizza = document.createElement('div');
@@ -350,16 +356,14 @@
       const pizzas = document.querySelectorAll('.flying-pizza');
       
       if (!e.target.checked) {
-        // Гравитация ВЫКЛ
         if (!played.gravity) {
           played.gravity = true;
-          // Для гравитации тоже показываем город (день), чтобы было видно, как все улетает
-          showCutscene("Гравитация отключена...", true);
+          showCutscene("Гравитация отключена...");
           
           for(let i=0; i<3; i++) {
             const cat = document.createElement('div');
             cat.className = 'modern-cat fly-up-anim';
-            cat.style.bottom = '10%';
+            cat.style.bottom = '20%';
             cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
             cat.style.animationDelay = i * 0.2 + 's';
             cat.innerHTML = catHTML;
@@ -380,7 +384,6 @@
         });
 
       } else {
-        // Гравитация ВКЛ
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
           setTimeout(() => cat.classList.add('run-anim'), 100);
