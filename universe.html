@@ -9,7 +9,6 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      /* Современный градиентный фон */
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
       min-height: 100vh;
@@ -27,7 +26,6 @@
       overflow: hidden; 
     }
 
-    /* Пульт в стиле Glassmorphism (матовое стекло) */
     .panel {
       position: relative; z-index: 10;
       background: rgba(255, 255, 255, 0.05);
@@ -61,7 +59,6 @@
 
     .toggle-label { font-size: 15px; font-weight: 500; color: #e0e0e0; }
 
-    /* Современный тумблер */
     .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0;}
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
@@ -85,15 +82,18 @@
     }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- КОТЫ И ПИЦЦА (Эмодзи) --- */
     .emoji-item {
       position: absolute;
-      font-size: 40px; /* Размер эмодзи */
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+      font-size: 40px; 
       transition: top 1s ease-in-out, transform 1s ease-in-out;
     }
 
-    /* Анимация бега */
+    /* Эффект "Квадратности" для эмодзи */
+    .blocky-cat {
+      /* Делаем его квадратным, плоским и с черным контуром */
+      filter: contrast(2) saturate(1.5) drop-shadow(2px 2px 0px #000) drop-shadow(-2px -2px 0px #000);
+    }
+
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
       0% { transform: translateX(-100px) scaleX(1); }
@@ -102,21 +102,18 @@
       100% { transform: translateX(-100px) scaleX(-1); }
     }
 
-    /* Анимация парения в невесомости */
     .float-anim { animation: hover steps(10) infinite alternate; }
     @keyframes hover {
       0% { transform: translateY(0) rotate(-15deg); }
       100% { transform: translateY(-30px) rotate(15deg); }
     }
 
-    /* Анимация падения пиццы */
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown {
       0% { transform: translateY(0) rotate(0deg); }
       100% { transform: translateY(120vh) rotate(360deg); }
     }
 
-    /* Инверсия цветов */
     .reality-inverted { filter: invert(1) hue-rotate(180deg); }
   </style>
 </head>
@@ -181,8 +178,8 @@
 
     function spawnCat() {
       const cat = document.createElement('div');
-      cat.className = 'emoji-item';
-      cat.textContent = '🐈'; // Используем эмодзи кота
+      cat.className = 'emoji-item blocky-cat'; // Добавили класс blocky-cat
+      cat.textContent = '🐈'; 
       
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
@@ -198,10 +195,9 @@
     }
 
     gravityToggle.addEventListener('change', (e) => {
-      const cats = document.querySelectorAll('.emoji-item');
+      const cats = document.querySelectorAll('.blocky-cat');
       
       if (!e.target.checked) {
-        // Гравитация ВЫКЛ
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
           cat.style.animation = 'none'; 
@@ -209,7 +205,6 @@
           setTimeout(() => cat.classList.add('float-anim'), 1000);
         });
       } else {
-        // Гравитация ВКЛ
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
