@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Битва Мемов 🃏</title>
+  <title>Битва Мемов 2.5D 🃏</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #000;
+      background-color: #050505;
       color: white;
       height: 100vh;
       overflow: hidden;
@@ -17,11 +17,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      /* 3D ПЕРСПЕКТИВА */
-      perspective: 1000px; 
+      perspective: 1200px; /* Сильная перспектива */
+      perspective-origin: 50% 40%;
     }
 
-    /* --- ГЛАВНОЕ МЕНЮ --- */
     #menu {
       position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
       background: radial-gradient(circle at center, #1a1a24 0%, #000 100%);
@@ -37,7 +36,6 @@
     }
     .menu-btn:hover { background: #4facfe; color: #000; box-shadow: 0 0 20px #4facfe; transform: scale(1.05); }
 
-    /* --- ИГРОВОЕ ПОЛЕ --- */
     #game-container {
       width: 100vw; height: 100vh;
       display: none; 
@@ -45,196 +43,239 @@
       transform-style: preserve-3d;
     }
 
-    /* ЛАМПА */
+    /* ЛАМПА (Висит над столом) */
     .lamp-container {
-      position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: -20px; left: 50%; transform: translateX(-50%) translateZ(100px);
       display: flex; flex-direction: column; align-items: center; z-index: 10;
     }
-    .lamp-wire { width: 2px; height: 60px; background: #333; }
-    .lamp-shade { width: 80px; height: 40px; background: #222; border-radius: 40px 40px 0 0; border: 2px solid #555; border-bottom: none; }
-    .lamp-bulb { width: 24px; height: 12px; background: #ffeb3b; border-radius: 50%; box-shadow: 0 0 30px #ffeb3b, 0 0 80px #ffeb3b; margin-top: -6px; }
-    
-    /* 3D СВЕТ */
-    .light-cone {
-      position: absolute; top: 80px; left: 50%; transform: translateX(-50%) rotateX(60deg);
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(255,235,59,0.15) 0%, rgba(0,0,0,0) 70%);
-      border-radius: 50%; pointer-events: none; z-index: 1;
-    }
+    .lamp-wire { width: 4px; height: 60px; background: #222; }
+    .lamp-shade { width: 90px; height: 50px; background: #111; border-radius: 45px 45px 0 0; border: 2px solid #333; border-bottom: none; }
+    .lamp-bulb { width: 30px; height: 15px; background: #ffeb3b; border-radius: 50%; box-shadow: 0 0 40px #ffeb3b, 0 0 120px #ffeb3b; margin-top: -8px; }
 
-    /* 3D СТОЛ */
-    .table {
-      position: absolute; top: 55%; left: 50%; 
-      /* Наклоняем стол */
-      transform: translate(-50%, -50%) rotateX(65deg); 
-      width: 350px; height: 350px;
-      background: radial-gradient(circle, #1e2c33 0%, #0a0f12 100%);
-      border-radius: 50%; 
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px #000;
-      border: 4px solid #2c5364; 
+    /* НАСТОЯЩИЙ ОБЪЕМНЫЙ СТОЛ */
+    .table-container {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotateX(60deg); /* Наклон */
+      transform-style: preserve-3d;
       z-index: 2;
     }
     
+    /* Боковая часть стола (толщина) */
+    .table-side {
+      position: absolute; top: 0; left: 0;
+      width: 320px; height: 320px;
+      background: #0a0f12;
+      border-radius: 50%;
+      transform: translateZ(-40px); /* Опускаем вниз */
+      box-shadow: 0 40px 50px rgba(0,0,0,0.9);
+    }
+    
+    /* Верхняя часть стола */
+    .table-top {
+      position: absolute; top: 0; left: 0;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, #2a3b42 0%, #111 80%);
+      border-radius: 50%; 
+      box-shadow: inset 0 0 30px #000;
+      border: 4px solid #3a5060; 
+      display: flex; align-items: center; justify-content: center;
+    }
+    
     .table-text {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(-65deg);
-      font-size: 20px; font-weight: bold; color: rgba(255,255,255,0.4);
-      text-align: center; pointer-events: none; width: 100%;
+      transform: rotateX(-60deg) translateZ(20px); 
+      font-size: 18px; font-weight: bold; color: rgba(255,255,255,0.4);
+      text-align: center; pointer-events: none; width: 200px; line-height: 1.4;
+      text-shadow: 0 5px 10px #000;
     }
 
-    /* ИГРОКИ ЗА СТОЛОМ (3D Расположение) */
+    /* ИГРОКИ */
     .seat {
       position: absolute; display: flex; flex-direction: column; align-items: center;
-      z-index: 5; transition: 0.3s;
-      /* Чтобы аватарки не наклонялись вместе со столом */
-      transform-style: preserve-3d;
+      z-index: 5; transition: 0.3s; transform-style: preserve-3d;
     }
     
-    /* Боты сверху (дальше от нас - меньше) */
-    .seat-top { top: 15%; left: 50%; transform: translateX(-50%) scale(0.8); }
-    .seat-left { top: 40%; left: 10%; transform: translateY(-50%) scale(0.9); }
-    .seat-right { top: 40%; right: 10%; transform: translateY(-50%) scale(0.9); }
-    
-    /* Игрок снизу (ближе к нам - больше) */
-    .seat-bottom { bottom: 180px; left: 50%; transform: translateX(-50%) scale(1.1); }
+    .seat-top { top: 8%; left: 50%; transform: translateX(-50%) translateZ(-50px) scale(0.7); }
+    .seat-left { top: 40%; left: 5%; transform: translateY(-50%) translateZ(0) scale(0.85); }
+    .seat-right { top: 40%; right: 5%; transform: translateY(-50%) translateZ(0) scale(0.85); }
+    .seat-bottom { bottom: 200px; left: 50%; transform: translateX(-50%) translateZ(50px) scale(1.1); }
 
     .avatar-box {
       position: relative; width: 70px; height: 70px;
-      background: #203a43; border-radius: 50%;
+      background: #1a2a33; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 36px; border: 3px solid #4facfe;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 20px rgba(79, 172, 254, 0.4); 
+      font-size: 38px; border: 3px solid #4facfe;
+      box-shadow: 0 15px 25px rgba(0,0,0,0.9), 0 0 20px rgba(79, 172, 254, 0.5); 
       margin-bottom: 8px; transition: 0.3s;
-      transform: translateZ(20px); /* Выталкиваем аватар вперед */
+      transform: translateZ(50px); /* Высоко парит */
     }
-    .avatar-box.enemy { border-color: #ff0055; box-shadow: 0 10px 20px rgba(0,0,0,0.6), 0 0 20px rgba(255, 0, 85, 0.4); }
+    .avatar-box.enemy { border-color: #ff0055; box-shadow: 0 15px 25px rgba(0,0,0,0.9), 0 0 20px rgba(255, 0, 85, 0.5); }
     
     .avatar-box.stunned { filter: grayscale(1) brightness(0.5); border-color: #888; }
-    .avatar-box.stunned::after { content: '💫'; position: absolute; top: -15px; font-size: 24px; animation: spin 2s linear infinite; }
+    .avatar-box.stunned::after { content: '💫'; position: absolute; top: -20px; font-size: 26px; animation: spin 2s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     
     .avatar-box.dead { opacity: 0.3; filter: grayscale(1); border-color: #000; }
     .avatar-box.dead::before { content: '💀'; position: absolute; font-size: 40px; z-index: 2; }
 
     .hp-bar-container {
-      width: 80px; height: 14px; background: #222; border-radius: 7px;
+      width: 80px; height: 16px; background: #111; border-radius: 8px;
       overflow: hidden; border: 2px solid #000; position: relative;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+      transform: translateZ(30px);
     }
     .hp-fill { height: 100%; width: 100%; background: #00ff00; transition: width 0.3s, background 0.3s; }
     .hp-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
 
-    /* СТОПКИ КАРТ БОТОВ */
     .bot-deck {
       display: flex; margin-top: 5px; position: relative; height: 20px; width: 60px; justify-content: center;
+      transform: translateZ(20px);
     }
     .bot-card {
       position: absolute;
-      width: 20px; height: 30px;
+      width: 18px; height: 26px;
       background: linear-gradient(135deg, #8b0000, #ff0055);
       border: 1px solid #fff; border-radius: 3px;
-      box-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.9);
     }
-    .bot-card:nth-child(1) { transform: rotate(-15deg) translateX(-15px); }
-    .bot-card:nth-child(2) { transform: rotate(-5deg) translateX(-5px); }
-    .bot-card:nth-child(3) { transform: rotate(5deg) translateX(5px); }
-    .bot-card:nth-child(4) { transform: rotate(15deg) translateX(15px); }
+    .bot-card:nth-child(1) { transform: rotate(-15deg) translateX(-12px); }
+    .bot-card:nth-child(2) { transform: rotate(-5deg) translateX(-4px); }
+    .bot-card:nth-child(3) { transform: rotate(5deg) translateX(4px); }
+    .bot-card:nth-child(4) { transform: rotate(15deg) translateX(12px); }
 
-    /* ТВОИ КАРТЫ (КАРТЕЖНЫЙ ВЕЕР) */
+    /* ПАНЕЛЬ ОПИСАНИЯ */
+    .card-info-panel {
+      position: absolute; bottom: 170px; left: 50%; transform: translateX(-50%) translateZ(80px);
+      width: 90%; max-width: 350px;
+      background: rgba(15, 25, 35, 0.95); border: 2px solid #ffeb3b;
+      border-radius: 15px; padding: 12px; text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+      opacity: 0; pointer-events: none; transition: 0.3s;
+      z-index: 30;
+    }
+    .card-info-panel.active { opacity: 1; transform: translateX(-50%) translateY(-10px) translateZ(80px); }
+    
+    .info-title { color: #ffeb3b; font-size: 16px; font-weight: bold; margin-bottom: 4px; }
+    .info-desc { color: #fff; font-size: 13px; line-height: 1.4; }
+    .info-hint { color: #4facfe; font-size: 11px; margin-top: 8px; font-style: italic;}
+
+    /* ТВОИ КАРТЫ (РУКА-ВЕЕР) */
     .player-hand {
-      position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%) translateZ(100px);
       display: flex; gap: 5px; z-index: 20; 
       transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       transform-style: preserve-3d;
     }
     
     .card {
-      width: 80px; height: 120px;
-      background: rgba(30, 45, 55, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      border: 2px solid #4facfe; border-radius: 10px;
+      width: 85px; height: 125px;
+      background: rgba(30, 45, 55, 0.95); backdrop-filter: blur(10px);
+      border: 2px solid #4facfe; border-radius: 12px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: -5px 10px 20px rgba(0,0,0,0.7), inset 0 0 15px rgba(79, 172, 254, 0.2);
+      cursor: pointer; box-shadow: 0 15px 25px rgba(0,0,0,0.9), inset 0 0 15px rgba(79, 172, 254, 0.3);
       transition: 0.2s; position: relative;
-      transform: rotateX(-10deg) translateY(0);
-    }
-    .card:hover { 
-      transform: rotateX(0deg) translateY(-25px) scale(1.1); 
-      box-shadow: 0 20px 30px rgba(0,0,0,0.8), 0 0 20px #4facfe; z-index: 25;
+      transform-origin: bottom center;
     }
     
-    .card-icon { font-size: 36px; margin-bottom: 5px; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
-    .card-name { font-size: 10px; font-weight: bold; text-align: center; line-height: 1.1; padding: 0 5px;}
-    .card-desc { font-size: 8px; color: #aaa; text-align: center; margin-top: 3px;}
+    /* Выгибаем руку веером */
+    .card:nth-child(1) { transform: rotateZ(-10deg) translateY(5px); }
+    .card:nth-child(2) { transform: rotateZ(-5deg); }
+    .card:nth-child(3) { transform: rotateZ(0deg); }
+    .card:nth-child(4) { transform: rotateZ(5deg); }
+    .card:nth-child(5) { transform: rotateZ(10deg) translateY(5px); }
 
-    /* ПРИЦЕЛ ДЛЯ ВЫБОРА ЦЕЛИ */
-    .target-overlay {
-      position: absolute; width: 80px; height: 80px; border: 3px dashed #ff0055; border-radius: 50%;
-      display: none; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; top: -5px; left: -5px;
+    /* При наведении карта вылетает вперед */
+    .card:hover { 
+      transform: rotateZ(0deg) translateY(-30px) translateZ(50px) scale(1.1); 
+      box-shadow: 0 25px 40px rgba(0,0,0,0.9), 0 0 30px #4facfe; z-index: 25;
+      border-color: #fff;
     }
-    @keyframes pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.2); opacity: 1; } }
+    .card.selected { 
+      transform: rotateZ(0deg) translateY(-40px) translateZ(70px) scale(1.15); 
+      border-color: #ffeb3b; box-shadow: 0 0 40px #ffeb3b; z-index: 26;
+    }
+    
+    .card-icon { font-size: 38px; margin-bottom: 5px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); }
+    .card-name { font-size: 10px; font-weight: bold; text-align: center; line-height: 1.1; padding: 0 5px;}
+
+    /* ПРИЦЕЛ */
+    .target-overlay {
+      position: absolute; width: 85px; height: 85px; border: 3px dashed #ff0055; border-radius: 50%;
+      display: none; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; 
+      top: -5px; left: -5px; transform: translateZ(60px);
+    }
+    @keyframes pulse { from { transform: scale(1) translateZ(60px); opacity: 0.7; } to { transform: scale(1.2) translateZ(60px); opacity: 1; } }
 
     /* АНИМАЦИИ УРОНА */
     .floating-text {
-      position: absolute; font-size: 28px; font-weight: 900; pointer-events: none;
-      animation: floatUp 1s ease-out forwards; z-index: 100; text-shadow: 2px 2px 0 #000, 0 0 10px currentColor;
+      position: absolute; font-size: 30px; font-weight: 900; pointer-events: none;
+      animation: floatUp 1s ease-out forwards; z-index: 100; text-shadow: 2px 2px 0 #000, 0 0 20px currentColor;
+      transform: translateZ(80px);
     }
-    @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 1; transform: translateY(-30px) scale(1.3); } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(0.5) translateZ(80px); opacity: 0; } 20% { opacity: 1; transform: translateY(-30px) scale(1.3) translateZ(80px); } 100% { transform: translateY(-80px) scale(1) translateZ(80px); opacity: 0; } }
 
     /* ЛОГ ИГРЫ */
     .game-log {
-      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateZ(60px);
       width: 90%; max-width: 350px; text-align: center; font-size: 14px; color: #4facfe; font-weight: bold; z-index: 10;
-      text-shadow: 1px 1px 3px #000; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 10px;
+      text-shadow: 1px 1px 5px #000; background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 10px;
+      border: 1px solid rgba(79, 172, 254, 0.5); box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
   </style>
 </head>
 <body>
 
-  <!-- МЕНЮ -->
   <div id="menu">
     <h1>🃏 Битва Мемов</h1>
-    <p>3D-стол ждет тебя</p>
+    <p>Почувствуй объем (почти как в 3D)</p>
     <button class="menu-btn" onclick="startGame(2)">Дуэль (1 на 1)</button>
     <button class="menu-btn" onclick="startGame(3)">Тройная угроза (1 на 2)</button>
     <button class="menu-btn" onclick="startGame(4)">Королевская битва (1 на 3)</button>
   </div>
 
-  <!-- ИГРА -->
   <div id="game-container">
     <div class="lamp-container">
       <div class="lamp-wire"></div>
       <div class="lamp-shade"></div>
       <div class="lamp-bulb"></div>
     </div>
-    <div class="light-cone"></div>
 
-    <div class="table">
-      <div class="table-text" id="table-text">Ожидание...</div>
+    <div class="game-log" id="game-log">Нажми на карту, чтобы прочитать описание</div>
+
+    <!-- Объемный стол -->
+    <div class="table-container">
+      <div class="table-side"></div>
+      <div class="table-top">
+        <div class="table-text" id="table-text">Ожидание...</div>
+      </div>
     </div>
 
-    <!-- Места -->
     <div class="seat seat-top" id="seat-1"></div>
     <div class="seat seat-left" id="seat-2"></div>
     <div class="seat seat-right" id="seat-3"></div>
-    
     <div class="seat seat-bottom" id="seat-player"></div>
+    
+    <div class="card-info-panel" id="card-info">
+      <div class="info-title" id="info-title">Название</div>
+      <div class="info-desc" id="info-desc">Описание карты</div>
+      <div class="info-hint" id="info-hint"></div>
+    </div>
 
-    <div class="game-log" id="game-log">Выбери карту, чтобы начать...</div>
     <div class="player-hand" id="player-hand"></div>
   </div>
 
   <script>
     const CARDS_LIB = [
-      { id: 'rock', name: 'Скала', icon: '🗿', dmg: 0, heal: 0, shield: 15, desc: 'Щит +15' },
-      { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: '5 урона, яд' },
-      { id: 'pizza', name: 'Пицца', icon: '🍕', dmg: 0, heal: 15, desc: 'Лечит 15' },
-      { id: 'poop', name: 'Какашка', icon: '💩', dmg: 15, selfDmg: 5, desc: '15 ур, 5 себе' },
-      { id: 'ufo', name: 'НЛО', icon: '👽', dmg: 10, heal: 10, desc: '10 ур, лечит 10' },
-      { id: 'cat', name: 'Кот', icon: '🐱', dmg: 10, desc: '10 ур (лечит при HP<20)' },
-      { id: 'bomb', name: 'Бомба', icon: '💣', dmg: 30, desc: '30 урона' },
-      { id: 'stun', name: 'ДПС (Стан)', icon: '⚡', stun: true, desc: 'Пропуск хода врага' },
-      { id: 'skull', name: 'Череп', icon: '💀', dmg: 20, desc: '20 ур (игнор щита)' },
-      { id: 'doge', name: 'Доге', icon: '🐕', dmg: 12, desc: '12 урона' },
-      { id: 'brain', name: 'Мозг', icon: '🧠', heal: 5, desc: 'Лечит 5, дает +1 карту' }
+      { id: 'rock', name: 'Скала', icon: '🗿', dmg: 0, heal: 0, shield: 15, desc: 'Дает 15 брони. Броня поглощает урон до атаки.' },
+      { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: 'Наносит 5 урона и вешает яд (5 урона в ход).' },
+      { id: 'pizza', name: 'Пицца', icon: '🍕', dmg: 0, heal: 15, desc: 'Восстанавливает 15 единиц здоровья.' },
+      { id: 'poop', name: 'Какашка', icon: '💩', dmg: 15, selfDmg: 5, desc: 'Наносит 15 урона, но ты получаешь 5 урона.' },
+      { id: 'ufo', name: 'НЛО', icon: '👽', dmg: 10, heal: 10, desc: 'Крадет 10 HP у врага и отдает тебе.' },
+      { id: 'cat', name: 'Кот', icon: '🐱', dmg: 10, desc: 'Наносит 10 урона. Если у тебя < 20 HP, лечит на 15.' },
+      { id: 'bomb', name: 'Бомба', icon: '💣', dmg: 30, desc: 'Наносит колоссальные 30 урона.' },
+      { id: 'stun', name: 'ДПС (Стан)', icon: '⚡', stun: true, desc: 'Враг пропускает свой следующий ход.' },
+      { id: 'skull', name: 'Череп', icon: '💀', dmg: 20, desc: 'Наносит 20 урона, игнорируя броню.' },
+      { id: 'doge', name: 'Доге', icon: '🐕', dmg: 12, desc: 'Наносит 12 урона. Такой мемный, что бьет больно.' },
+      { id: 'brain', name: 'Мозг', icon: '🧠', heal: 5, desc: 'Лечит на 5 и дает тебе дополнительную карту.' }
     ];
 
     let players = [];
@@ -283,7 +324,6 @@
       const handEl = document.getElementById('player-hand');
       handEl.innerHTML = '';
       
-      // Если рука пустая, добираем карту
       if (playerHand.length === 0) {
          drawCards(1);
          return;
@@ -295,7 +335,6 @@
         cardEl.innerHTML = `
           <div class="card-icon">${card.icon}</div>
           <div class="card-name">${card.name}</div>
-          <div class="card-desc">${card.desc}</div>
         `;
         cardEl.onclick = () => selectCard(index);
         handEl.appendChild(cardEl);
@@ -309,17 +348,42 @@
         return;
       }
 
-      selectedCardIndex = index;
       const card = playerHand[index];
+
+      if (selectedCardIndex === index) {
+        if (card.dmg > 0 || card.stun) {
+          log("Выбери цель для атаки (нажми на прицел)!");
+        } else {
+          applyCard(card, 0, index); 
+        }
+        return;
+      }
+
+      selectedCardIndex = index;
       renderHand();
+      
+      document.getElementById('info-title').innerText = card.icon + ' ' + card.name;
+      document.getElementById('info-desc').innerText = card.desc;
+      document.getElementById('card-info').classList.add('active');
 
       if (card.dmg > 0 || card.stun) {
+        document.getElementById('info-hint').innerText = "Нажми на красный прицел над врагом, чтобы атаковать.";
         isTargeting = true;
         document.getElementById('table-text').innerText = "Выбери цель!";
         showTargets(true);
       } else {
-        applyCard(card, 0, index);
+        document.getElementById('info-hint').innerText = "Нажми на карту ЕЩЕ РАЗ, чтобы применить на себя.";
+        isTargeting = false;
+        showTargets(false);
       }
+    }
+
+    function hideCardInfo() {
+      document.getElementById('card-info').classList.remove('active');
+      selectedCardIndex = -1;
+      isTargeting = false;
+      showTargets(false);
+      renderHand();
     }
 
     function showTargets(show) {
@@ -344,9 +408,7 @@
     function applyCard(card, targetIndex, handIndex) {
       if (!isTargeting && (card.dmg > 0 || card.stun)) return; 
 
-      isTargeting = false;
-      showTargets(false);
-      selectedCardIndex = -1;
+      hideCardInfo(); 
       
       const attacker = players[0];
       const target = players[targetIndex];
@@ -357,12 +419,10 @@
         attacker.hp = Math.min(attacker.maxHp, attacker.hp + card.heal);
         showFloatText(attacker, `+${card.heal}`, '#00ff00');
       }
-      
       if (card.shield) {
         attacker.shield += card.shield;
         showFloatText(attacker, `🛡️ +${card.shield}`, '#4facfe');
       }
-
       if (card.dmg) {
         let damage = card.dmg;
         if (target.shield > 0 && card.id !== 'skull') {
@@ -374,26 +434,21 @@
         target.hp -= damage;
         if (damage > 0) showFloatText(target, `-${damage}`, '#ff0055');
       }
-
       if (card.selfDmg) {
         attacker.hp -= card.selfDmg;
         showFloatText(attacker, `-${card.selfDmg}`, '#ff0055');
       }
-
       if (card.id === 'cat' && attacker.hp < 20) {
         attacker.hp += 15;
         showFloatText(attacker, `+15`, '#00ff00');
       }
-
       if (card.stun) {
         target.status.push('stun');
         showFloatText(target, `💫 СТАН`, '#ffeb3b');
       }
-
       if (card.poison) {
         target.status.push('poison');
       }
-
       if (card.id === 'brain') {
         drawCards(1);
       }
@@ -425,6 +480,7 @@
 
       if (currentTurn === 0) {
         document.getElementById('table-text').innerText = "Твой ход";
+        document.getElementById('info-hint').innerText = "Нажми на карту, чтобы выбрать её.";
         
         if (players[0].status.includes('stun')) {
            log("Ты пропускаешь ход из-за стана!");
@@ -461,10 +517,7 @@
       }
 
       let cardToPlay = null;
-      
-      if (bot.hp < 20 && Math.random() < 0.6) {
-         cardToPlay = CARDS_LIB.find(c => c.id === 'pizza');
-      } 
+      if (bot.hp < 20 && Math.random() < 0.6) cardToPlay = CARDS_LIB.find(c => c.id === 'pizza');
       if (!cardToPlay) {
          const attackCards = CARDS_LIB.filter(c => c.dmg > 0 || c.stun);
          cardToPlay = attackCards[Math.floor(Math.random() * attackCards.length)];
@@ -472,12 +525,8 @@
 
       const validTargets = players.filter(p => p.id !== bot.id && p.alive);
       let target = null;
-      if (Math.random() < 0.6 && players[0].alive) {
-        target = players[0];
-      } else {
-        target = validTargets[Math.floor(Math.random() * validTargets.length)];
-      }
-
+      if (Math.random() < 0.6 && players[0].alive) target = players[0];
+      else target = validTargets[Math.floor(Math.random() * validTargets.length)];
       if (!target) { setTimeout(nextTurn, 1000); return; }
 
       log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
@@ -541,27 +590,15 @@
       return false;
     }
 
-    // --- ОБНОВЛЕНИЕ UI (С ДОБАВЛЕНИЕМ СТОПОК КАРТ) ---
     function updateUI() {
       players.forEach((p, index) => {
-        let seatId = '';
-        if (index === 0) seatId = 'seat-player';
-        else if (index === 1) seatId = 'seat-1';
-        else if (index === 2) seatId = 'seat-2';
-        else if (index === 3) seatId = 'seat-3';
-
+        let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
         const seatEl = document.getElementById(seatId);
         if (!seatEl) return;
 
-        // Проверяем, есть ли стопка карт у бота (рисуем её)
         let deckHTML = '';
         if (p.isBot && p.alive) {
-           deckHTML = `
-             <div class="bot-deck">
-               <div class="bot-card"></div><div class="bot-card"></div>
-               <div class="bot-card"></div><div class="bot-card"></div>
-             </div>
-           `;
+           deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`;
         }
 
         seatEl.innerHTML = `
