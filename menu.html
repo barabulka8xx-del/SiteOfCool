@@ -6,142 +6,246 @@
   <title>Мои проекты</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background: #0f2027;
       color: white;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
+      padding: 15px;
       overflow-x: hidden;
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 40px;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      margin-top: 10px;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
       text-align: center;
-      background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+    .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-bottom: 40px;
     }
 
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    /* --- БАННЕР НОВИНКИ --- */
+    .banner {
+      width: 100%;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       border-radius: 20px;
-      padding: 30px 20px;
-      text-align: center;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       text-decoration: none;
       color: white;
-      transition: all 0.3s ease;
+      border: 2px solid #ffd700;
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
       position: relative;
       overflow: hidden;
+      transition: 0.3s;
+      margin-bottom: 5px;
     }
+    
+    .banner:active { transform: scale(0.98); }
 
-    .card:hover {
-      transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .card::before {
+    .banner::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-      transform: translateX(-100%);
-      transition: 0.5s;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,215,0,0.2), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
     }
 
-    .card:hover::before {
-      transform: translateX(100%);
+    @keyframes shine {
+      0% { transform: translateX(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) rotate(45deg); }
     }
 
-    .icon { font-size: 50px; margin-bottom: 15px; display: block; }
-    .title { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-    .desc { font-size: 13px; color: #aaa; line-height: 1.4; }
+    .banner-info {
+      display: flex;
+      flex-direction: column;
+      z-index: 2;
+    }
 
-    /* Цветовые акценты для карточек */
-    .card-cocktails { border-bottom: 4px solid #ffe066; }
-    .card-button { border-bottom: 4px solid #ff4b1f; }
-    .card-universe { border-bottom: 4px solid #8a2be2; }
-    .card-excuse { border-bottom: 4px solid #ffeb3b; }
-    .card-gravity { border-bottom: 4px solid #00f2fe; }
-    .card-apocalypse { border-bottom: 4px solid #ff0000; }
-    .card-roblox { border-bottom: 4px solid #00ff00; }
+    .banner-badge {
+      font-size: 12px;
+      font-weight: 900;
+      color: #ffd700;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
 
-    .footer { margin-top: 50px; font-size: 12px; color: #666; }
+    .banner-title {
+      font-size: 22px;
+      font-weight: bold;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .banner-desc {
+      font-size: 12px;
+      color: #ccc;
+      margin-top: 5px;
+    }
+
+    .banner-icon-box {
+      width: 70px;
+      height: 70px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      z-index: 2;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .banner-icon {
+      font-size: 40px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+    }
+
+    /* --- СЕТКА ИГР --- */
+    .games-list {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .game-card {
+      background: #203a43;
+      border-radius: 15px;
+      padding: 15px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #2c5364;
+      transition: 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+    }
+    
+    .game-card:hover { border-color: #4facfe; transform: scale(1.03); }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #2c5364, #203a43);
+      border-radius: 16px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .game-icon {
+      font-size: 34px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+    }
+
+    .game-title { 
+      font-size: 13px; 
+      font-weight: bold; 
+      text-align: center; 
+      margin-bottom: 5px; 
+    }
+    
+    .game-desc {
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <h1>Мои проекты 🚀</h1>
 
-  <div class="grid">
-    
-    <a href="index.html" class="card card-cocktails">
-      <span class="icon">🤑🍹</span>
-      <div class="title">Напиток-Миллионера</div>
-      <div class="desc">Сгенерируй напиток, который пахнет деньгами. Чем больше жмешь, тем выше цена.</div>
+  <div class="container">
+
+    <!-- БАННЕР НОВИНКИ -->
+    <a href="roblox.html" class="banner">
+      <div class="banner-info">
+        <div class="banner-badge">👑 НОВИНКА 💎</div>
+        <div class="banner-title">Роблокс-Биржа</div>
+        <div class="banner-desc">Покупай акции игр и следи за онлайном.</div>
+      </div>
+      <div class="banner-icon-box">
+        <div class="banner-icon">📈</div>
+      </div>
     </a>
 
-    <a href="button.html" class="card card-button">
-      <span class="icon">😈🔴</span>
-      <div class="title">Опасная кнопка</div>
-      <div class="desc">То, что нельзя нажимать. Но ты же нажмешь? Посмотрим, хватит ли тебе смелости.</div>
-    </a>
+    <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
+    <div class="games-list">
+      
+      <a href="index.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
+        <div class="game-title">Напиток-Миллионера</div>
+        <div class="game-desc">Генератор дорогих коктейлей.</div>
+      </a>
 
-    <a href="universe.html" class="card card-universe">
-      <span class="icon">🌌🎛️</span>
-      <div class="title">Управление Вселенной</div>
-      <div class="desc">Квадратные коты, метеориты, НЛО и смена времени суток. Полный контроль над хаосом.</div>
-    </a>
+      <a href="button.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">😈🔴</div></div>
+        <div class="game-title">Опасная кнопка</div>
+        <div class="game-desc">То, что нельзя нажимать.</div>
+      </a>
 
-    <a href="excuse.html" class="card card-excuse">
-      <span class="icon">🗣️📜</span>
-      <div class="title">Генератор Отмазок</div>
-      <div class="desc">Железобетонные причины, почему ты опоздал, не сделал домашку или забил на встречу.</div>
-    </a>
+      <a href="universe.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
+        <div class="game-title">Управление Вселенной</div>
+        <div class="game-desc">Квадратные коты и хаос.</div>
+      </a>
 
-    <a href="gravity.html" class="card card-gravity">
-      <span class="icon">🌌🪐</span>
-      <div class="title">Гравитационная Песочница</div>
-      <div class="desc">Создавай планеты тапами. Смотри, как они сталкиваются, сливаются в огромные шары и превращаются в черные дыры.</div>
-    </a>
+      <a href="excuse.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
+        <div class="game-title">Генератор Отмазок</div>
+        <div class="game-desc">Железобетонные причины.</div>
+      </a>
 
-    <a href="apocalypse.html" class="card card-apocalypse">
-      <span class="icon">💣💥</span>
-      <div class="title">Кнопка Апокалипсиса</div>
-      <div class="desc">Одна кнопка. Один клик. И мир начинает рушиться. Сможешь довести стабильность до 0%?</div>
-    </a>
+      <a href="gravity.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
+        <div class="game-title">Гравитация</div>
+        <div class="game-desc">Создавай планеты и черные дыры.</div>
+      </a>
 
-    <!-- НОВАЯ ИГРА: Роблокс-Биржа -->
-    <a href="roblox.html" class="card card-roblox">
-      <span class="icon">📈💵</span>
-      <div class="title">Роблокс-Биржа</div>
-      <div class="desc">Покупай акции популярных игр, следи за онлайном и продавай в нужный момент. Стань крипто-магнатом.</div>
-    </a>
+      <a href="apocalypse.html" class="game-card">
+        <div class="icon-box"><div class="game-icon">💣💥</div></div>
+        <div class="game-title">Кнопка Апокалипсиса</div>
+        <div class="game-desc">Уничтожь 8 миллиардов человек.</div>
+      </a>
 
-  </div>
+    </div>
 
-  <div class="footer">
-    Создано с любовью и котами 🐈
+    <div class="footer">
+      Создано с любовью и котами 🐈
+    </div>
+
   </div>
 
 </body>
