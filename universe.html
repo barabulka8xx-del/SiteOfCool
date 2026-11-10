@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Управление Вселенной</title>
+  <title>Управление Вселенной 2.0</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
@@ -29,7 +29,7 @@
     /* --- КАТСЦЕНА И РЕЖИМ МИРА --- */
     #world-view {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); /* Дефолт: День */
+      background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); 
       z-index: 40; 
       display: none; 
       flex-direction: column;
@@ -74,14 +74,11 @@
 
     /* --- ГОРОД --- */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
-    .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2;}
-    
-    .ground-pile { 
-      position: absolute; bottom: 5px; width: 100%; height: 25%; 
-      z-index: 3; display: flex; flex-wrap: wrap-reverse; 
-      justify-content: center; align-items: flex-start; align-content: flex-start; 
-      pointer-events: none; gap: 5px; overflow: hidden;
-    }
+    .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2; transition: background 1s; }
+
+    .trees-container { position: absolute; bottom: 24%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; pointer-events: none; }
+    .tree { font-size: 50px; transform: scale(0); transform-origin: bottom center; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .trees-container.active .tree { transform: scale(1); }
 
     .buildings-back {
       position: absolute; bottom: 25%; width: 100%; height: 200px; 
@@ -115,7 +112,7 @@
     .panel {
       background: rgba(15, 25, 35, 0.8);
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px;
       border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       width: 90vw; max-width: 380px; max-height: 90vh; overflow-y: auto;
     }
@@ -148,16 +145,16 @@
     @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
     h1 {
-      text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 20px;
+      text-align: center; font-size: 18px; font-weight: 700; margin-bottom: 15px;
       background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
     .toggle-row:last-child { border-bottom: none; }
-    .toggle-label { font-size: 14px; font-weight: 500; color: #e0e0e0; }
+    .toggle-label { font-size: 13px; font-weight: 500; color: #e0e0e0; }
 
-    .switch { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0;}
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;}
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -165,27 +162,36 @@
       border: 1px solid rgba(255,255,255,0.2);
     }
     .slider:before {
-      position: absolute; content: ""; height: 18px; width: 18px;
+      position: absolute; content: ""; height: 16px; width: 16px;
       left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%;
     }
+    
+    /* Цвета тумблеров */
     #toggle-cats:checked + .slider { background-color: #ff9900; border-color: #ff9900; }
     #toggle-gravity:checked + .slider { background-color: #00f2fe; border-color: #00f2fe; }
     #toggle-pizza:checked + .slider { background-color: #ff69b4; border-color: #ff69b4; }
     #toggle-fish:checked + .slider { background-color: #00ffff; border-color: #00ffff; }
     #toggle-aliens:checked + .slider { background-color: #9d4edd; border-color: #9d4edd; }
     #toggle-sky:checked + .slider { background-color: #00ff00; border-color: #00ff00; }
-    input:checked + .slider:before { transform: translateX(22px); }
+    #toggle-blackhole:checked + .slider { background-color: #333333; border-color: #8a2be2; }
+    #toggle-meteor:checked + .slider { background-color: #ff4500; border-color: #ff4500; }
+    #toggle-trees:checked + .slider { background-color: #32cd32; border-color: #32cd32; }
+    #toggle-balloons:checked + .slider { background-color: #ff1493; border-color: #ff1493; }
+    #toggle-peace:checked + .slider { background-color: #ffffff; border-color: #ffffff; }
+
+    input:checked + .slider:before { transform: translateX(20px); }
 
     .world-btn {
-      width: 100%; margin-top: 20px; padding: 15px;
+      width: 100%; margin-top: 15px; padding: 12px;
       background: linear-gradient(90deg, #00f2fe, #4facfe);
       border: none; border-radius: 12px; color: #000;
-      font-weight: 900; font-size: 16px; cursor: pointer;
+      font-weight: 900; font-size: 14px; cursor: pointer;
       box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
       transition: transform 0.2s;
     }
     .world-btn:active { transform: scale(0.95); }
 
+    /* --- КВАДРАТНЫЙ КОТ --- */
     .modern-cat {
       position: absolute; width: 60px; height: 60px;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
@@ -205,8 +211,21 @@
     .cat-paw-l { left: 10px; }
     .cat-paw-r { right: 15px; }
 
-    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; }
+    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; z-index: 100;}
 
+    /* Черная дыра */
+    .black-hole {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      width: 100px; height: 100px; border-radius: 50%;
+      background: radial-gradient(circle, #000 30%, #8a2be2 70%, transparent 100%);
+      box-shadow: 0 0 50px 20px rgba(138, 43, 226, 0.6);
+      z-index: 80; transition: transform 0.5s ease; pointer-events: none;
+    }
+    .black-hole.active { transform: translate(-50%, -50%) scale(1); }
+    .black-hole.pulsate { animation: pulseHole 2s infinite alternate; }
+    @keyframes pulseHole { 0% { box-shadow: 0 0 50px 20px rgba(138, 43, 226, 0.6); } 100% { box-shadow: 0 0 80px 40px rgba(138, 43, 226, 0.9); } }
+
+    /* Анимации */
     .run-anim { animation: runAcross linear forwards; }
     @keyframes runAcross { 0% { transform: translateX(-100px); } 100% { transform: translateX(100vw); } }
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
@@ -216,8 +235,19 @@
     .fly-up-anim { animation: flyUp linear forwards; }
     @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; } }
 
+    /* Притяжение к черной дыре */
+    .sucked-in { animation: suckIn 1.5s ease-in forwards; }
+    @keyframes suckIn {
+      0% { transform: scale(1) translate(0, 0) rotate(0); opacity: 1; }
+      100% { transform: scale(0) translate(50vw, 50vh) rotate(720deg); opacity: 0; }
+    }
+
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
+
+    /* Мир во всем мире */
+    .peace-glow { filter: drop-shadow(0 0 15px #ffd700) !important; }
+    .peace-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important; }
 
     .sky-day { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important; }
     .sky-sunset { background: linear-gradient(135deg, #2b1055, #7597de) !important; }
@@ -233,7 +263,6 @@
 </head>
 <body class="sky-day" id="main-body">
 
-  <!-- Экран "МИР" / Катсцены -->
   <div id="world-view" class="world-sky-day">
     <button class="close-world-btn" id="close-world-btn">Выйти из Мира ✖</button>
     <div class="world-text" id="world-text">Наблюдение за миром...</div>
@@ -242,21 +271,34 @@
       <div class="buildings-back"></div>
       <div class="buildings-front"></div>
       <div class="road-surface"></div>
-      <div class="ground-pile" id="ground-pile"></div>
+      <div class="trees-container" id="trees-container">
+        <div class="tree">🌳</div><div class="tree">🌲</div><div class="tree">🌳</div><div class="tree">🌲</div><div class="tree">🌳</div>
+      </div>
     </div>
+    
+    <div class="black-hole" id="black-hole"></div>
   </div>
 
   <div id="animation-layer"></div>
 
   <div class="main-container" id="main-ui">
     <div class="panel">
-      <h1>Управление Вселенной</h1>
+      <h1>Управление Вселенной 2.0</h1>
 
       <div class="toggle-row"><span class="toggle-label">🐈 Квадратные коты</span><label class="switch"><input type="checkbox" id="toggle-cats"><span class="slider"></span></label></div>
       <div class="toggle-row"><span class="toggle-label">🌍 Гравитация</span><label class="switch"><input type="checkbox" id="toggle-gravity" checked><span class="slider"></span></label></div>
       <div class="toggle-row"><span class="toggle-label">🍕 Дождь из пиццы</span><label class="switch"><input type="checkbox" id="toggle-pizza"><span class="slider"></span></label></div>
       <div class="toggle-row"><span class="toggle-label">🐟 Рыбный дождь</span><label class="switch"><input type="checkbox" id="toggle-fish"><span class="slider"></span></label></div>
       <div class="toggle-row"><span class="toggle-label">👽 Вторжение НЛО</span><label class="switch"><input type="checkbox" id="toggle-aliens"><span class="slider"></span></label></div>
+      
+      <div style="margin: 10px 0; border-top: 1px dashed #555;"></div>
+      
+      <div class="toggle-row"><span class="toggle-label">🌪️ Черная дыра</span><label class="switch"><input type="checkbox" id="toggle-blackhole"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">☄️ Метеоритный дождь</span><label class="switch"><input type="checkbox" id="toggle-meteor"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🌳 Посадка деревьев</span><label class="switch"><input type="checkbox" id="toggle-trees"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">🎈 Воздушные шарики</span><label class="switch"><input type="checkbox" id="toggle-balloons"><span class="slider"></span></label></div>
+      <div class="toggle-row"><span class="toggle-label">👼 Мир во всем мире</span><label class="switch"><input type="checkbox" id="toggle-peace"><span class="slider"></span></label></div>
+
       <div class="toggle-row"><span class="toggle-label">🌅 Сменить время суток</span><label class="switch"><input type="checkbox" id="toggle-sky"><span class="slider"></span></label></div>
       
       <button class="world-btn" id="enter-world-btn">Режим наблюдателя 🌏</button>
@@ -271,26 +313,30 @@
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
     
+    // Тумблеры
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
     const fishToggle = document.getElementById('toggle-fish');
     const alienToggle = document.getElementById('toggle-aliens');
     const skyToggle = document.getElementById('toggle-sky');
+    const blackholeToggle = document.getElementById('toggle-blackhole');
+    const meteorToggle = document.getElementById('toggle-meteor');
+    const treesToggle = document.getElementById('toggle-trees');
+    const balloonsToggle = document.getElementById('toggle-balloons');
+    const peaceToggle = document.getElementById('toggle-peace');
     
+    // Элементы Мира
     const worldView = document.getElementById('world-view');
     const mainUI = document.getElementById('main-ui');
     const enterWorldBtn = document.getElementById('enter-world-btn');
     const closeWorldBtn = document.getElementById('close-world-btn');
-    const groundPile = document.getElementById('ground-pile');
     const worldText = document.getElementById('world-text');
+    const treesContainer = document.getElementById('trees-container');
+    const blackHole = document.getElementById('black-hole');
 
-    let catInterval = null;
-    let pizzaInterval = null;
-    let fishInterval = null;
-    let alienInterval = null;
-    
-    const played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false };
+    let intervals = { cats: null, pizza: null, fish: null, aliens: null, meteors: null, balloons: null };
+    const played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false, blackhole: false, meteor: false, trees: false, balloons: false, peace: false };
     const isWorldMode = () => worldView.classList.contains('active') && mainUI.classList.contains('hidden');
 
     // --- НОВОСТИ ---
@@ -301,6 +347,8 @@
       { name: "Pizza Post", color: "#ff69b4", topic: "pizza" },
       { name: "Fishy Business", color: "#00ffff", topic: "fish" },
       { name: "Galactic Gossip", color: "#9d4edd", topic: "aliens" },
+      { name: "Eco Watch", color: "#32cd32", topic: "trees" },
+      { name: "Party Times", color: "#ff1493", topic: "balloons" },
       { name: "Red Team", color: "#ffd700", isRare: true, topic: "all" }
     ];
 
@@ -310,7 +358,7 @@
       if (isRedTeam) { press = pressList.find(p => p.isRare); } 
       else {
         const relevantPress = pressList.filter(p => !p.isRare && (p.topic === topic || p.topic === "all"));
-        press = relevantPress[Math.floor(Math.random() * relevantPress.length)];
+        press = relevantPress[Math.floor(Math.random() * relevantPress.length)] || pressList[0];
       }
       const newsItem = document.createElement('div');
       newsItem.className = 'news-item' + (isRedTeam ? ' red-team' : '');
@@ -326,24 +374,13 @@
       worldView.classList.add('active');
       closeWorldBtn.classList.add('active');
       worldText.textContent = "Режим наблюдателя активирован...";
-      worldText.style.animation = 'none';
-      worldText.offsetHeight; 
-      worldText.style.animation = 'fadeInOut 3s forwards';
-      
-      // Переносим котов на дорогу при входе в мир
-      document.querySelectorAll('.modern-cat').forEach(cat => {
-        if (gravityToggle.checked) {
-          cat.style.top = 'auto';
-          cat.style.bottom = '25%';
-        }
-      });
+      worldText.style.animation = 'none'; worldText.offsetHeight; worldText.style.animation = 'fadeInOut 3s forwards';
     });
 
     closeWorldBtn.addEventListener('click', () => {
       worldView.classList.remove('active');
       closeWorldBtn.classList.remove('active');
       mainUI.classList.remove('hidden'); 
-      setTimeout(() => { groundPile.innerHTML = ''; }, 500);
     });
 
     // --- КАТСЦЕНЫ ---
@@ -353,88 +390,24 @@
       mainUI.classList.add('hidden'); 
       worldView.classList.add('active');
       worldText.textContent = text;
+      worldText.style.animation = 'none'; worldText.offsetHeight; worldText.style.animation = 'fadeInOut 2.5s forwards';
       
-      const isGravityOn = gravityToggle.checked;
-      const cutsceneObjects = [];
-
-      // Коты в катсцене (теперь строго на земле)
-      if (catsToggle.checked) {
-        for(let i=0; i<3; i++) {
-          const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
-          cat.style.bottom = '25%'; 
-          cat.style.top = 'auto';
-          
-          if (isGravityOn) { cat.classList.add('run-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's'; cat.style.animationDelay = i * 0.3 + 's'; } 
-          else { cat.style.left = (Math.random() * 80 + 10) + '%'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; cat.style.animationDelay = i * 0.2 + 's'; }
-          layer.appendChild(cat); cutsceneObjects.push(cat);
-        }
-      }
-      // Пицца
-      if (pizzaToggle.checked) {
-        for(let i=0; i<5; i++) {
-          const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
-          if (isGravityOn) { pizza.classList.add('fall-anim'); pizza.style.top = '-100px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; } 
-          else { pizza.classList.add('fly-up-anim'); pizza.style.bottom = '10%'; pizza.style.top = 'auto'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; }
-          layer.appendChild(pizza); cutsceneObjects.push(pizza);
-        }
-      }
-      // Рыба
-      if (fishToggle.checked) {
-        for(let i=0; i<7; i++) {
-          const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
-          if (isGravityOn) { fish.classList.add('fall-anim'); fish.style.top = '-100px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; } 
-          else { fish.classList.add('fly-up-anim'); fish.style.bottom = '10%'; fish.style.top = 'auto'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; }
-          layer.appendChild(fish); cutsceneObjects.push(fish);
-        }
-      }
-      // НЛО
-      if (alienToggle.checked) {
-        for(let i=0; i<3; i++) {
-          const ufo = document.createElement('div'); ufo.className = 'flying-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 80 + 10) + '%';
-          if (isGravityOn) { ufo.classList.add('float-anim'); ufo.style.top = '20%'; ufo.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; } 
-          else { ufo.classList.add('fly-up-anim'); ufo.style.bottom = '20%'; ufo.style.top = 'auto'; ufo.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; }
-          layer.appendChild(ufo); cutsceneObjects.push(ufo);
-        }
-      }
-
       setTimeout(() => {
         worldView.classList.remove('active'); 
         mainUI.classList.remove('hidden'); 
-        cutsceneObjects.forEach(obj => obj.remove());
       }, duration); 
     }
 
     // --- СПАВНЕРЫ ---
     const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
 
-    function addToGroundPile(element, textContent) {
-      if (!isWorldMode()) {
-        element.remove(); return;
-      }
-
-      const pileItem = document.createElement('div');
-      pileItem.style.fontSize = '30px'; 
-      if(textContent) pileItem.textContent = textContent;
-      else pileItem.innerHTML = catHTML; 
-      
-      if(element.classList.contains('modern-cat')) {
-         pileItem.style.width = '30px'; pileItem.style.height = '30px'; pileItem.style.position = 'relative';
-         pileItem.querySelectorAll('.cat-head, .cat-body, .cat-tail, .cat-paw-l, .cat-paw-r').forEach(el => {
-            el.style.transform = 'scale(0.5)'; el.style.transformOrigin = 'top left';
-         });
-      }
-      groundPile.appendChild(pileItem);
-
-      setTimeout(() => {
-        pileItem.classList.add('dissolve-anim');
-        setTimeout(() => pileItem.remove(), 1500);
-      }, 2000);
-
-      element.remove();
+    function removeElement(el) {
+      el.classList.add('dissolve-anim');
+      setTimeout(() => el.remove(), 1500);
     }
 
     function startCats() {
-      catInterval = setInterval(() => {
+      intervals.cats = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
         const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML;
         
@@ -442,28 +415,24 @@
           cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
           cat.addEventListener('animationend', () => cat.remove());
         } else { 
-          if (isWorldMode()) {
-             cat.style.bottom = '25%'; // В мире строго на дороге
-             cat.style.top = 'auto';
-          } else {
-             cat.style.top = (Math.random() * 60 + 20) + 'vh';
-          }
+          if (isWorldMode()) { cat.style.bottom = '25%'; cat.style.top = 'auto'; } 
+          else { cat.style.top = (Math.random() * 60 + 20) + 'vh'; }
           cat.style.animationDuration = (Math.random() * 2 + 3) + 's'; 
           cat.classList.add('run-anim'); 
-          cat.addEventListener('animationend', () => addToGroundPile(cat)); 
+          cat.addEventListener('animationend', () => removeElement(cat)); 
         }
         layer.appendChild(cat);
       }, 1000);
     }
 
     function startPizza() {
-      pizzaInterval = setInterval(() => {
+      intervals.pizza = setInterval(() => {
         if (document.querySelectorAll('.pizza-item').length > 30) return;
         const pizza = document.createElement('div'); pizza.className = 'flying-item pizza-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 85 + 5) + 'vw';
         
         if (gravityToggle.checked) { 
           pizza.style.top = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fall-anim'); 
-          pizza.addEventListener('animationend', () => addToGroundPile(pizza, '🍕'));
+          pizza.addEventListener('animationend', () => removeElement(pizza));
         } else { 
           pizza.style.bottom = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fly-up-anim'); 
           pizza.addEventListener('animationend', () => pizza.remove());
@@ -473,13 +442,13 @@
     }
 
     function startFish() {
-      fishInterval = setInterval(() => {
+      intervals.fish = setInterval(() => {
         if (document.querySelectorAll('.fish-item').length > 30) return;
         const fish = document.createElement('div'); fish.className = 'flying-item fish-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 85 + 5) + 'vw';
         
         if (gravityToggle.checked) { 
           fish.style.top = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fall-anim'); 
-          fish.addEventListener('animationend', () => addToGroundPile(fish, '🐟'));
+          fish.addEventListener('animationend', () => removeElement(fish));
         } else { 
           fish.style.bottom = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fly-up-anim'); 
           fish.addEventListener('animationend', () => fish.remove());
@@ -489,7 +458,7 @@
     }
 
     function startAliens() {
-      alienInterval = setInterval(() => {
+      intervals.aliens = setInterval(() => {
         if (document.querySelectorAll('.ufo-item').length > 10) return;
         const ufo = document.createElement('div'); ufo.className = 'flying-item ufo-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 85 + 5) + 'vw';
         
@@ -503,111 +472,144 @@
       }, 2000);
     }
 
-    // --- ОБРАБОТЧИКИ ---
-    catsToggle.addEventListener('change', (e) => {
+    function startMeteors() {
+      intervals.meteors = setInterval(() => {
+        const meteor = document.createElement('div'); meteor.className = 'flying-item meteor-item'; meteor.textContent = '☄️'; meteor.style.left = (Math.random() * 85 + 5) + 'vw';
+        meteor.style.top = '-60px'; meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; meteor.classList.add('fall-anim');
+        meteor.addEventListener('animationend', () => {
+          // При падении можно добавить вспышку, но пока просто исчезает
+          meteor.remove();
+        });
+        layer.appendChild(meteor);
+      }, 400);
+    }
+
+    function startBalloons() {
+      intervals.balloons = setInterval(() => {
+        const balloon = document.createElement('div'); balloon.className = 'flying-item balloon-item'; balloon.textContent = '🎈'; balloon.style.left = (Math.random() * 85 + 5) + 'vw';
+        balloon.style.bottom = '-60px'; balloon.style.animationDuration = (Math.random() * 3 + 2) + 's'; balloon.classList.add('fly-up-anim');
+        balloon.addEventListener('animationend', () => balloon.remove());
+        layer.appendChild(balloon);
+      }, 600);
+    }
+
+    // --- ОБРАБОТЧИКИ НОВЫХ ФУНКЦИЙ ---
+    
+    // Черная дыра
+    blackholeToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
-        if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление квадратных котов.", "cats"); setTimeout(startCats, 2500); } 
-        else { startCats(); addNews("Квадратные коты вернулись.", "cats"); }
+        if (!played.blackhole) { played.blackhole = true; showCutscene("Внимание! Обнаружена аномалия..."); addNews("В центре города образовалась черная дыра!", "all"); }
+        
+        blackHole.classList.add('active');
+        setTimeout(() => blackHole.classList.add('pulsate'), 500);
+        
+        // Начинаем засасывать все объекты
+        intervals.blackhole = setInterval(() => {
+          document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => {
+            if(!obj.classList.contains('sucked-in') && !obj.classList.contains('dissolve-anim')) {
+               obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
+               obj.classList.add('sucked-in');
+               obj.addEventListener('animationend', () => obj.remove());
+            }
+          });
+        }, 1000);
       } else {
-        clearInterval(catInterval);
-        document.querySelectorAll('.modern-cat').forEach(c => { c.style.transform = 'scale(0)'; c.style.opacity = '0'; setTimeout(() => c.remove(), 500); });
-        addNews("Квадратные коты исчезли.", "cats");
+        blackHole.classList.remove('active', 'pulsate');
+        clearInterval(intervals.blackhole);
       }
+    });
+
+    // Метеориты
+    meteorToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!played.meteor) { played.meteor = true; showCutscene("Конец света отменяется, но метеориты прилетели..."); addNews("Метеоритный дождь! Берегите головы!", "all"); }
+        startMeteors();
+      } else {
+        clearInterval(intervals.meteors);
+      }
+    });
+
+    // Деревья
+    treesToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!played.trees) { played.trees = true; showCutscene("Время наводить порядок..."); addNews("Город стал зеленее! Экологи в восторге.", "trees"); }
+        treesContainer.classList.add('active');
+      } else {
+        treesContainer.classList.remove('active');
+      }
+    });
+
+    // Шарики
+    balloonsToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!played.balloons) { played.balloons = true; showCutscene("Праздник к нам приходит..."); addNews("В небе появились воздушные шарики!", "balloons"); }
+        startBalloons();
+      } else {
+        clearInterval(intervals.balloons);
+        document.querySelectorAll('.balloon-item').forEach(b => b.remove());
+      }
+    });
+
+    // Мир во всем мире
+    peaceToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        if (!played.peace) { played.peace = true; showCutscene("Все конфликты урегулированы..."); addNews("Наступил мир во всем мире. Все обнимаются!", "all"); }
+        
+        // Отключаем все злые штуки
+        document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+          if (chk !== peaceToggle && chk !== skyToggle && chk !== catsToggle && chk !== gravityToggle) {
+            if (chk.checked) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
+          }
+        });
+
+        // Добавляем всем свечение
+        document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => obj.classList.add('peace-glow'));
+        body.classList.add('peace-bg');
+      } else {
+        document.querySelectorAll('.peace-glow').forEach(obj => obj.classList.remove('peace-glow'));
+        body.classList.remove('peace-bg');
+      }
+    });
+
+    // --- СТАРЫЕ ОБРАБОТЧИКИ ---
+    catsToggle.addEventListener('change', (e) => {
+      if (e.target.checked) { if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление котов.", "cats"); setTimeout(startCats, 2500); } else { startCats(); } } 
+      else { clearInterval(intervals.cats); document.querySelectorAll('.modern-cat').forEach(c => c.remove()); }
     });
 
     pizzaToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.pizza) { played.pizza = true; showCutscene("Пицца вызывается на ковёр..."); addNews("На город обрушился дождь из пиццы!", "pizza"); setTimeout(startPizza, 2500); } 
-        else { startPizza(); }
-      } else {
-        clearInterval(pizzaInterval);
-        document.querySelectorAll('.pizza-item').forEach(p => { p.style.transform = 'scale(0)'; p.style.opacity = '0'; setTimeout(() => p.remove(), 500); });
-        addNews("Дождь из пиццы прекратился.", "pizza");
-      }
+      if (e.target.checked) { if (!played.pizza) { played.pizza = true; showCutscene("Пицца вызывается на ковёр..."); addNews("Дождь из пиццы!", "pizza"); setTimeout(startPizza, 2500); } else { startPizza(); } } 
+      else { clearInterval(intervals.pizza); document.querySelectorAll('.pizza-item').forEach(p => p.remove()); }
     });
 
     fishToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.fish) { played.fish = true; showCutscene("Рыбный шторм неизбежен..."); addNews("Внезапно пошёл рыбный дождь.", "fish"); setTimeout(startFish, 2500); } 
-        else { startFish(); }
-      } else {
-        clearInterval(fishInterval);
-        document.querySelectorAll('.fish-item').forEach(f => { f.style.transform = 'scale(0)'; f.style.opacity = '0'; setTimeout(() => f.remove(), 500); });
-        addNews("Рыбный дождь закончился.", "fish");
-      }
+      if (e.target.checked) { if (!played.fish) { played.fish = true; showCutscene("Рыбный шторм неизбежен..."); addNews("Пошёл рыбный дождь.", "fish"); setTimeout(startFish, 2500); } else { startFish(); } } 
+      else { clearInterval(intervals.fish); document.querySelectorAll('.fish-item').forEach(f => f.remove()); }
     });
 
     alienToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.aliens) { played.aliens = true; showCutscene("Обнаружены НЛО..."); addNews("Скопление НЛО над городом!", "aliens"); setTimeout(startAliens, 2500); } 
-        else { startAliens(); addNews("НЛО вернулись.", "aliens"); }
-      } else {
-        clearInterval(alienInterval);
-        document.querySelectorAll('.ufo-item').forEach(u => { u.style.transform = 'scale(0)'; u.style.opacity = '0'; setTimeout(() => u.remove(), 500); });
-        addNews("НЛО покинули атмосферу.", "aliens");
-      }
+      if (e.target.checked) { if (!played.aliens) { played.aliens = true; showCutscene("Обнаружены НЛО..."); addNews("НЛО над городом!", "aliens"); setTimeout(startAliens, 2500); } else { startAliens(); } } 
+      else { clearInterval(intervals.aliens); document.querySelectorAll('.ufo-item').forEach(u => u.remove()); }
     });
 
     gravityToggle.addEventListener('change', (e) => {
-      const cats = document.querySelectorAll('.modern-cat');
-      const items = document.querySelectorAll('.flying-item');
-      
       if (!e.target.checked) {
-        if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Учёные: гравитация отключена.", "all"); } 
-        else { addNews("Гравитация снова отключена.", "all"); }
-
-        cats.forEach(cat => {
-          const rect = cat.getBoundingClientRect(); cat.style.top = 'auto'; cat.style.bottom = (window.innerHeight - rect.bottom) + 'px'; cat.style.left = rect.left + 'px';
-          cat.classList.remove('run-anim'); setTimeout(() => { cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; }, 10);
-          cat.addEventListener('animationend', () => cat.remove());
-        });
-        
-        items.forEach(item => {
-          if(item.classList.contains('ufo-item')) return;
-          item.className = 'flying-item fly-up-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
-          item.style.top = '100vh'; item.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-          item.addEventListener('animationend', () => item.remove());
-        });
-
-      } else {
-        addNews("Гравитация восстановлена.", "all");
-        cats.forEach(cat => {
-          cat.classList.remove('fly-up-anim'); 
-          if(isWorldMode()) { cat.style.bottom = '25%'; cat.style.top = 'auto'; }
-          else { cat.style.top = (Math.random() * 60 + 20) + 'vh'; cat.style.bottom = 'auto'; }
-          setTimeout(() => cat.classList.add('run-anim'), 100);
-        });
-        items.forEach(item => {
-          if(item.classList.contains('ufo-item')) return;
-          item.className = 'flying-item fall-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
-          item.style.top = '-60px'; item.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-          item.addEventListener('animationend', () => addToGroundPile(item, item.textContent));
-        });
+        if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Гравитация отключена!", "all"); }
       }
     });
 
-    // --- СМЕНА НЕБА (ТЕПЕРЬ И В МИРЕ) ---
+    // Смена неба
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
-      
-      // Удаляем старые классы неба
       body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
       worldView.classList.remove('world-sky-day', 'world-sky-sunset', 'world-sky-night', 'world-sky-matrix');
       
       let skyName = "";
-      if (skyState === 0) { 
-        body.classList.add('sky-day'); worldView.classList.add('world-sky-day'); skyName = "День"; 
-      }
-      if (skyState === 1) { 
-        body.classList.add('sky-sunset'); worldView.classList.add('world-sky-sunset'); skyName = "Закат"; 
-      }
-      if (skyState === 2) { 
-        body.classList.add('sky-night'); worldView.classList.add('world-sky-night'); skyName = "Ночь"; 
-      }
-      if (skyState === 3) { 
-        body.classList.add('sky-matrix'); worldView.classList.add('world-sky-matrix'); skyName = "Матрица"; 
-      }
+      if (skyState === 0) { body.classList.add('sky-day'); worldView.classList.add('world-sky-day'); skyName = "День"; }
+      if (skyState === 1) { body.classList.add('sky-sunset'); worldView.classList.add('world-sky-sunset'); skyName = "Закат"; }
+      if (skyState === 2) { body.classList.add('sky-night'); worldView.classList.add('world-sky-night'); skyName = "Ночь"; }
+      if (skyState === 3) { body.classList.add('sky-matrix'); worldView.classList.add('world-sky-matrix'); skyName = "Матрица"; }
 
       addNews(`Время суток изменилось на: ${skyName}.`, "all");
     });
