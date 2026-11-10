@@ -177,36 +177,47 @@
 
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
-    /* --- МОДАЛЬНОЕ ОКНО (КАК В БИРЖЕ) --- */
+    /* --- МОДАЛЬНОЕ ОКНО (СНИЗУ, ПРЯМОУГОЛЬНОЕ) --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
-      z-index: 100; backdrop-filter: blur(8px); padding: 20px;
+      background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center;
+      z-index: 100; backdrop-filter: blur(4px);
     }
     .modal-overlay.active { display: flex; }
 
     .modal-content {
-      background: #1a1a24; padding: 25px 20px; border-radius: 24px;
-      width: 100%; max-width: 350px; border: 2px solid #4facfe;
-      display: flex; flex-direction: column; align-items: center; gap: 15px;
+      background: #151b22; padding: 25px 20px 35px 20px; 
+      border-radius: 20px 20px 0 0; /* Прямоугольное, но с закруглением сверху */
+      width: 100%; max-width: 500px; 
+      border: 2px solid #4facfe; border-bottom: none;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
       animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       text-align: center;
+      box-shadow: 0 -10px 30px rgba(79, 172, 254, 0.2);
     }
-    @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
     .modal-icon-box {
-      width: 90px; height: 90px;
+      width: 80px; height: 80px;
       background: linear-gradient(135deg, #2c5364, #203a43);
-      border-radius: 22px;
+      border-radius: 20px;
       display: flex; align-items: center; justify-content: center;
       box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       margin-bottom: 5px;
     }
-    .modal-icon { font-size: 50px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); display: flex; gap: 5px; }
+    .modal-icon { font-size: 45px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); display: flex; gap: 5px; }
 
-    .modal-title { font-size: 24px; font-weight: bold; }
-    .modal-desc { font-size: 14px; color: #aaa; line-height: 1.5; margin-bottom: 10px; }
+    .modal-title { font-size: 22px; font-weight: bold; color: #fff; }
+    .modal-desc { font-size: 13px; color: #aaa; line-height: 1.4; margin-bottom: 5px; }
+    
+    /* Дата последнего обновления */
+    .modal-date {
+      font-size: 11px; color: #4facfe; font-weight: bold;
+      background: rgba(79, 172, 254, 0.1); padding: 4px 10px; border-radius: 10px;
+      border: 1px solid rgba(79, 172, 254, 0.3);
+      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
+    }
 
     .btn-play {
       background: linear-gradient(90deg, #00f2fe, #4facfe);
@@ -217,9 +228,9 @@
     .btn-play:active { transform: scale(0.95); }
 
     .btn-close-modal {
-      background: transparent; border: 1px solid #555; color: #aaa;
+      background: transparent; border: 1px solid #444; color: #ccc;
       padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold;
-      width: 100%; cursor: pointer; margin-top: 5px; transition: 0.2s;
+      width: 100%; cursor: pointer; transition: 0.2s;
     }
     .btn-close-modal:active { background: #333; }
 
@@ -232,7 +243,7 @@
   <div class="container">
 
     <!-- 1. ТОП БАННЕР (ЗОЛОТОЙ) -->
-    <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!')">
+    <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
       <div class="banner-info">
         <div class="banner-badge">👑 ТОП ИГРА 👑</div>
         <div class="banner-title">Роблокс-Биржа</div>
@@ -244,7 +255,7 @@
     </div>
 
     <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
-    <div class="banner banner-new" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!')">
+    <div class="banner banner-new" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!', '10.11.2026')">
       <div class="banner-info">
         <div class="banner-badge">🔥 НОВИНКА 🔥</div>
         <div class="banner-title">Битва Мемов</div>
@@ -258,37 +269,37 @@
     <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
     <div class="games-list">
       
-      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!')">
+      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!', '01.11.2026')">
         <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
         <div class="game-title">Напиток-Миллионера</div>
         <div class="game-desc">Генератор дорогих коктейлей.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?')">
+      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '28.10.2026')">
         <div class="icon-box"><div class="game-icon">😈🔴</div></div>
         <div class="game-title">Опасная кнопка</div>
         <div class="game-desc">То, что нельзя нажимать.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.')">
+      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.', '05.11.2026')">
         <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
         <div class="game-title">Управление Вселенной</div>
         <div class="game-desc">Квадратные коты и хаос.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.')">
+      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '20.10.2026')">
         <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
         <div class="game-title">Генератор Отмазок</div>
         <div class="game-desc">Железобетонные причины.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.')">
+      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.', '08.11.2026')">
         <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
         <div class="game-title">Гравитация</div>
         <div class="game-desc">Создавай планеты и черные дыры.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.')">
+      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.', '02.11.2026')">
         <div class="icon-box"><div class="game-icon">💣💥</div></div>
         <div class="game-title">Кнопка Апокалипсиса</div>
         <div class="game-desc">Уничтожь 8 миллиардов человек.</div>
@@ -311,6 +322,9 @@
       <div class="modal-title" id="modal-title">Название</div>
       <div class="modal-desc" id="modal-desc">Описание игры...</div>
       
+      <!-- Плашка с датой -->
+      <div class="modal-date" id="modal-date">⏱️ Обновлено: 01.01.2026</div>
+      
       <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
       <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
     </div>
@@ -320,17 +334,21 @@
     // --- ЛОГИКА МОДАЛЬНОГО ОКНА ---
     let currentGameUrl = '';
 
-    function openModal(url, title, icon, desc) {
+    // Функция теперь принимает пятый аргумент - дату
+    function openModal(url, title, icon, desc, date) {
       currentGameUrl = url;
       document.getElementById('modal-title').textContent = title;
       document.getElementById('modal-icon').textContent = icon;
       document.getElementById('modal-desc').textContent = desc;
+      
+      // Устанавливаем дату. Если дата не передана, ставим прочерк
+      document.getElementById('modal-date').innerHTML = `⏱️ Обновлено: ${date || '--.--.----'}`;
+      
       document.getElementById('game-modal').classList.add('active');
     }
 
     function closeModal(event) {
       if (event) {
-        // Закрываем только если кликнули по фону или кнопке закрытия
         if (event.target.id !== 'game-modal' && !event.target.classList.contains('btn-close-modal')) return;
       }
       document.getElementById('game-modal').classList.remove('active');
