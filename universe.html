@@ -234,12 +234,18 @@
     .fly-up-anim { animation: flyUp linear forwards; }
     @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; } }
 
-    /* Катсцены падают ровно вниз (без кувырканий) */
     .fall-smooth-anim { animation: fallSmooth linear forwards; }
     @keyframes fallSmooth { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(75vh); opacity: 0; } }
 
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
+
+    /* Спиральный вихрь для черной дыры */
+    .vortex-anim { animation: vortex 2s ease-in forwards; }
+    @keyframes vortex {
+      0% { transform: scale(1) rotate(0deg) translateX(0); opacity: 1; }
+      100% { transform: scale(0) rotate(720deg) translateX(100px); opacity: 0; }
+    }
 
     .peace-glow { filter: drop-shadow(0 0 15px #ffd700) !important; }
     .peace-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important; }
@@ -397,7 +403,6 @@
       const isGravityOn = gravityToggle.checked;
       const cutsceneObjects = [];
 
-      // Спавним котов
       if (catsToggle.checked) {
         for(let i=0; i<3; i++) {
           const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
@@ -407,7 +412,6 @@
           layer.appendChild(cat); cutsceneObjects.push(cat);
         }
       }
-      // Пицца
       if (pizzaToggle.checked) {
         for(let i=0; i<5; i++) {
           const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
@@ -416,7 +420,6 @@
           layer.appendChild(pizza); cutsceneObjects.push(pizza);
         }
       }
-      // Рыба
       if (fishToggle.checked) {
         for(let i=0; i<7; i++) {
           const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
@@ -504,7 +507,10 @@
       intervals.meteors = setInterval(() => {
         const meteor = document.createElement('div'); meteor.className = 'flying-item meteor-item'; meteor.textContent = '☄️'; meteor.style.left = (Math.random() * 85 + 5) + 'vw';
         meteor.style.top = '-60px'; meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; meteor.classList.add('fall-anim');
-        meteor.addEventListener('animationend', () => meteor.remove());
+        meteor.addEventListener('animationend', () => {
+           if (blackholeToggle.checked) return; // Если дыра включена, метеорит просто исчезает
+           meteor.remove();
+        });
         layer.appendChild(meteor);
       }, 400);
     }
@@ -518,28 +524,21 @@
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА (ТЕПЕРЬ НЕ УДАЛЯЕТ, А ПРИТЯГИВАЕТ) ---
+    // --- ЧЕРНАЯ ДЫРА (СПИРАЛЬ) ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-
+      
       objects.forEach(obj => {
         if (obj.classList.contains('sucked')) return;
-        const rect = obj.getBoundingClientRect();
-        const objX = rect.left + rect.width / 2;
-        const objY = rect.top + rect.height / 2;
-        
-        // Вектор к центру
-        const deltaX = centerX - objX;
-        const deltaY = centerY - objY;
         
         obj.classList.add('sucked');
-        obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
+        obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim', 'fall-smooth-anim');
         
-        // Оставляем их кружить вокруг дыры
-        obj.style.transition = 'all 2s ease-in-out';
-        obj.style.transform = `translate(${deltaX * 0.8}px, ${deltaY * 0.8}px) rotate(360deg)`;
+        // Применяем спиральную анимацию
+        obj.classList.add('vortex-anim');
+        
+        // Удаляем после завершения
+        setTimeout(() => obj.remove(), 2000);
       });
     }
 
@@ -553,10 +552,8 @@
       } else {
         blackHole.classList.remove('active', 'pulsate');
         clearInterval(intervals.blackholeSuck);
-        // Возвращаем объекты обратно (сбрасываем анимацию)
         document.querySelectorAll('.sucked').forEach(obj => {
-           obj.classList.remove('sucked');
-           obj.style.transition = 'none';
+           obj.classList.remove('sucked', 'vortex-anim');
            obj.style.transform = 'none';
         });
       }
@@ -594,7 +591,6 @@
       if (e.target.checked) {
         if (!played.peace) { played.peace = true; showCutscene("Все конфликты урегулированы..."); addNews("Наступил мир во всем мире. Все обнимаются!", "all"); }
         
-        // Отключаем злые тумблеры
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
           if (chk !== peaceToggle && chk !== skyToggle && chk !== catsToggle && chk !== gravityToggle) {
             if (chk.checked) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
