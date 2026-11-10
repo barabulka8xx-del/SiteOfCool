@@ -15,8 +15,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between; /* Распределяет элементы по высоте */
-      padding: 20px 20px 30px 20px; /* Отступ снизу побольше */
+      justify-content: space-between;
+      padding: 10px 15px 20px 15px;
       overflow: hidden;
       transition: background 0.3s ease;
     }
@@ -41,29 +41,37 @@
     }
 
     h1 {
-      font-size: 22px;
+      font-size: 20px;
       text-transform: uppercase;
       margin-bottom: 5px;
       text-shadow: 0 0 10px rgba(255,255,255,0.2);
     }
 
     .status {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       font-family: monospace;
       color: #00ff00;
-      margin-bottom: 15px;
       text-shadow: 0 0 10px currentColor;
       transition: color 0.3s;
     }
 
+    .fragments {
+      font-size: 18px;
+      font-weight: bold;
+      color: #00f2fe;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00f2fe;
+    }
+
     .progress-bar {
       width: 100%;
-      height: 15px;
+      height: 12px;
       background: #333;
       border-radius: 10px;
       overflow: hidden;
       border: 2px solid #555;
+      margin-bottom: 5px;
     }
     .progress-fill {
       height: 100%;
@@ -78,19 +86,20 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-grow: 1; /* Занимает свободное место */
+      flex-grow: 1;
       z-index: 10;
+      position: relative;
     }
 
     .apocalypse-btn {
-      width: 180px;
-      height: 180px;
+      width: 170px;
+      height: 170px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff4b1f, #8b0000);
       border: 8px solid #333;
-      box-shadow: 0 10px 0 #222, inset 0 -10px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 0 #222, inset 0 -10px 20px rgba(0,0,0,0.5);
       cursor: pointer;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: white;
       text-shadow: 2px 2px 0px #000;
@@ -101,9 +110,24 @@
     }
 
     .apocalypse-btn:active {
-      transform: translateY(10px);
+      transform: translateY(8px);
       box-shadow: 0 0 0 #222, inset 0 5px 20px rgba(0,0,0,0.8);
     }
+
+    /* Предупреждение античита */
+    .warning-text {
+      position: absolute;
+      top: -50px;
+      color: #ff0055;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 0 0 10px #ff0055;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      text-align: center;
+    }
+    .warning-text.show { opacity: 1; animation: shake 0.2s infinite; }
 
     /* --- НИЖНЯЯ ПАНЕЛЬ --- */
     .bottom-bar {
@@ -113,15 +137,14 @@
       flex-direction: column;
       align-items: center;
       z-index: 10;
-      padding-bottom: 10px;
     }
 
     .people-counter {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 900;
       color: #ff0055;
       font-family: monospace;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       text-align: center;
       text-shadow: 0 0 15px #ff0055;
     }
@@ -137,7 +160,7 @@
 
     .actions {
       display: flex;
-      gap: 15px;
+      gap: 10px;
       width: 100%;
       justify-content: center;
     }
@@ -146,17 +169,17 @@
       background: rgba(255,255,255,0.1);
       border: 1px solid #555;
       color: white;
-      padding: 12px 15px;
+      padding: 10px;
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
       flex: 1;
       transition: 0.2s;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .action-btn:active { transform: scale(0.95); }
-    .btn-stop { border-color: #00f2fe; color: #00f2fe; }
+    .btn-stop { border-color: #ff0055; color: #ff0055; }
     .btn-shop { border-color: #ffeb3b; color: #ffeb3b; }
 
     /* --- МАГАЗИН --- */
@@ -196,11 +219,11 @@
       border: 1px solid #555;
     }
 
-    .shop-item-info h3 { font-size: 16px; margin-bottom: 5px; }
-    .shop-item-info p { font-size: 12px; color: #aaa; }
+    .shop-item-info h3 { font-size: 15px; margin-bottom: 5px; }
+    .shop-item-info p { font-size: 11px; color: #aaa; }
 
     .buy-btn {
-      background: #00ff00;
+      background: #00f2fe;
       color: #000;
       border: none;
       padding: 8px 12px;
@@ -266,12 +289,14 @@
   <div class="top-bar">
     <h1>Кнопка Апокалипсиса</h1>
     <div class="status" id="status">Стабильность: 100%</div>
+    <div class="fragments">Осколки: <span id="fragments-count">0</span> 💎</div>
     <div class="progress-bar">
       <div class="progress-fill" id="progress-fill"></div>
     </div>
   </div>
 
   <div class="center-area">
+    <div class="warning-text" id="warning-text">АНТИЧИТ: НЕ ТАПАЙ ТАК БЫСТРО!</div>
     <button class="apocalypse-btn" id="apoc-btn">ЖМИ</button>
   </div>
 
@@ -282,7 +307,7 @@
     </div>
 
     <div class="actions">
-      <button class="action-btn btn-stop" id="btn-stop">Стоп (1с) ⏱️</button>
+      <button class="action-btn btn-stop" id="btn-stop">Вкл. Античит 🛡️</button>
       <button class="action-btn btn-shop" id="btn-shop">Магазин 🛒</button>
     </div>
   </div>
@@ -297,7 +322,7 @@
           <h3>Усиление урона</h3>
           <p>+100к к урону (Ур. <span id="lvl-dmg">1</span>)</p>
         </div>
-        <button class="buy-btn" id="buy-dmg">Цена: 500к 👥</button>
+        <button class="buy-btn" id="buy-dmg">Цена: 1 💎</button>
       </div>
 
       <div class="shop-item">
@@ -305,7 +330,15 @@
           <h3>Автокликер</h3>
           <p>+50к/сек (Ур. <span id="lvl-auto">0</span>)</p>
         </div>
-        <button class="buy-btn" id="buy-auto">Цена: 1 млн 👥</button>
+        <button class="buy-btn" id="buy-auto">Цена: 3 💎</button>
+      </div>
+
+      <div class="shop-item">
+        <div class="shop-item-info">
+          <h3>Ускорение тапа</h3>
+          <p>Снижает задержку (Ур. <span id="lvl-speed">0</span>)</p>
+        </div>
+        <button class="buy-btn" id="buy-speed">Цена: 5 💎</button>
       </div>
 
       <button class="close-shop" id="close-shop">Закрыть</button>
@@ -322,18 +355,29 @@
     // --- НАСТРОЙКИ ---
     const MAX_PEOPLE = 8000000000;
     
-    // --- СОСТОЯНИЕ ИГРЫ ---
+    // --- СОСТОЯНИЕ ---
     let people = MAX_PEOPLE;
     let clickDamage = 100000;
     let autoDamage = 0;
     let levelDmg = 1;
     let levelAuto = 0;
-    let costDmg = 500000;
-    let costAuto = 1000000;
-    let isAutoStopped = false;
+    let levelSpeed = 0;
+    
+    let costDmg = 1;
+    let costAuto = 3;
+    let costSpeed = 5;
+    
+    let fragments = 0;
+    let clickCounter = 0;
+    
+    // --- АНТИЧИТ ---
+    let isAntiCheatActive = false;
+    let lastClickTime = 0;
+    let minClickInterval = 200; // Базовый интервал 200мс
+    let isBanned = false;
 
-    // --- ЗАГРУЗКА СОХРАНЕНИЯ ---
-    const savedData = localStorage.getItem('apocalypseSave');
+    // --- СОХРАНЕНИЕ ---
+    const savedData = localStorage.getItem('apocalypseSaveV4');
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
@@ -342,8 +386,13 @@
         autoDamage = data.autoDamage || 0;
         levelDmg = data.levelDmg || 1;
         levelAuto = data.levelAuto || 0;
-        costDmg = data.costDmg || 500000;
-        costAuto = data.costAuto || 1000000;
+        levelSpeed = data.levelSpeed || 0;
+        costDmg = data.costDmg || 1;
+        costAuto = data.costAuto || 3;
+        costSpeed = data.costSpeed || 5;
+        fragments = data.fragments || 0;
+        clickCounter = data.clickCounter || 0;
+        minClickInterval = Math.max(50, 200 - (levelSpeed * 30)); // Пересчет таймера
       } catch(e) { console.error("Ошибка загрузки"); }
     }
 
@@ -351,15 +400,21 @@
     const body = document.getElementById('body');
     const apocBtn = document.getElementById('apoc-btn');
     const statusEl = document.getElementById('status');
+    const fragmentsEl = document.getElementById('fragments-count');
     const progressFill = document.getElementById('progress-fill');
     const peopleCounter = document.getElementById('people-counter');
     const shopModal = document.getElementById('shop-modal');
     const endScreen = document.getElementById('end-screen');
+    const btnStop = document.getElementById('btn-stop');
+    const warningText = document.getElementById('warning-text');
     
     const lvlDmgText = document.getElementById('lvl-dmg');
     const lvlAutoText = document.getElementById('lvl-auto');
+    const lvlSpeedText = document.getElementById('lvl-speed');
+    
     const buyDmgBtn = document.getElementById('buy-dmg');
     const buyAutoBtn = document.getElementById('buy-auto');
+    const buySpeedBtn = document.getElementById('buy-speed');
 
     // --- ФУНКЦИИ ---
     function formatNumber(num) {
@@ -367,16 +422,16 @@
     }
 
     function saveGame() {
-      const data = { people, clickDamage, autoDamage, levelDmg, levelAuto, costDmg, costAuto };
-      localStorage.setItem('apocalypseSave', JSON.stringify(data));
+      const data = { people, clickDamage, autoDamage, levelDmg, levelAuto, levelSpeed, costDmg, costAuto, costSpeed, fragments, clickCounter };
+      localStorage.setItem('apocalypseSaveV4', JSON.stringify(data));
     }
 
     function updateUI() {
       if (people < 0) people = 0;
       
       peopleCounter.innerHTML = `<span class="people-label">Осталось в живых:</span>${formatNumber(people)}`;
+      fragmentsEl.textContent = fragments;
       
-      // Стабильность в процентах
       let stability = (people / MAX_PEOPLE) * 100;
       statusEl.textContent = `Стабильность: ${stability.toFixed(2)}%`;
       progressFill.style.width = `${stability}%`;
@@ -385,24 +440,25 @@
       else if (stability > 30) progressFill.style.background = '#ff9800';
       else progressFill.style.background = '#ff0055';
 
-      // Меняем фон
       if (stability < 50) body.style.background = 'linear-gradient(45deg, #1a0000, #000)';
       if (stability < 20) body.style.background = 'linear-gradient(45deg, #330000, #000)';
 
-      // Обновляем магазин
       lvlDmgText.textContent = levelDmg;
       lvlAutoText.textContent = levelAuto;
-      buyDmgBtn.textContent = `Цена: ${formatNumber(costDmg)} 👥`;
-      buyAutoBtn.textContent = `Цена: ${formatNumber(costAuto)} 👥`;
+      lvlSpeedText.textContent = levelSpeed;
       
-      buyDmgBtn.disabled = people < costDmg;
-      buyAutoBtn.disabled = people < costAuto;
+      buyDmgBtn.textContent = `Цена: ${costDmg} 💎`;
+      buyAutoBtn.textContent = `Цена: ${costAuto} 💎`;
+      buySpeedBtn.textContent = `Цена: ${costSpeed} 💎`;
+      
+      buyDmgBtn.disabled = fragments < costDmg;
+      buyAutoBtn.disabled = fragments < costAuto;
+      buySpeedBtn.disabled = fragments < costSpeed;
 
-      // Проверка на конец
       if (people <= 0 && !endScreen.classList.contains('active')) {
         endScreen.classList.add('active');
         apocBtn.style.display = 'none';
-        localStorage.removeItem('apocalypseSave'); // Удаляем сейв при победе
+        localStorage.removeItem('apocalypseSaveV4'); 
       }
     }
 
@@ -427,54 +483,99 @@
       if (Math.random() > 0.6) spawnChaos();
       
       updateUI();
-      saveGame(); // Сохраняем прогресс
+      saveGame();
     }
 
-    // --- КЛИКИ И АВТОКЛИК ---
-    apocBtn.addEventListener('click', () => dealDamage(clickDamage));
+    // --- АНТИЧИТ ВКЛ/ВЫКЛ ---
+    btnStop.addEventListener('click', () => {
+      isAntiCheatActive = !isAntiCheatActive;
+      if (isAntiCheatActive) {
+        btnStop.textContent = "Античит ВКЛ 🛡️";
+        btnStop.style.borderColor = "#00ff00";
+        btnStop.style.color = "#00ff00";
+      } else {
+        btnStop.textContent = "Античит ВЫКЛ 🛡️";
+        btnStop.style.borderColor = "#ff0055";
+        btnStop.style.color = "#ff0055";
+      }
+    });
 
+    // --- КЛИКИ ---
+    apocBtn.addEventListener('click', () => {
+      if (isBanned) return;
+
+      if (isAntiCheatActive) {
+        const now = Date.now();
+        const timeDiff = now - lastClickTime;
+        
+        if (timeDiff < minClickInterval) { // Используем динамический интервал
+          warningText.classList.add('show');
+          
+          isBanned = true;
+          setTimeout(() => {
+            isBanned = false;
+            warningText.classList.remove('show');
+          }, 1000);
+          
+          return;
+        }
+        lastClickTime = now;
+      }
+
+      dealDamage(clickDamage);
+      
+      clickCounter++;
+      if (clickCounter >= 5) {
+        fragments++;
+        clickCounter = 0;
+        updateUI();
+        saveGame();
+      }
+    });
+
+    // --- АВТОКЛИКЕР ---
     setInterval(() => {
-      if (autoDamage > 0 && !isAutoStopped && people > 0) {
+      if (autoDamage > 0 && people > 0) {
         dealDamage(autoDamage);
       }
     }, 1000);
-
-    // --- КНОПКА СТОП ---
-    const btnStop = document.getElementById('btn-stop');
-    btnStop.addEventListener('click', () => {
-      if(isAutoStopped) return;
-      isAutoStopped = true;
-      btnStop.textContent = "Стоп...";
-      btnStop.style.opacity = "0.5";
-      
-      setTimeout(() => {
-        isAutoStopped = false;
-        btnStop.textContent = "Стоп (1с) ⏱️";
-        btnStop.style.opacity = "1";
-      }, 1000);
-    });
 
     // --- МАГАЗИН ---
     document.getElementById('btn-shop').addEventListener('click', () => shopModal.classList.add('active'));
     document.getElementById('close-shop').addEventListener('click', () => shopModal.classList.remove('active'));
 
     buyDmgBtn.addEventListener('click', () => {
-      if (people >= costDmg) {
-        people -= costDmg;
+      if (fragments >= costDmg) {
+        fragments -= costDmg;
         clickDamage += 100000;
         levelDmg++;
-        costDmg = Math.floor(costDmg * 1.5);
+        costDmg = Math.floor(costDmg * 1.5); 
         updateUI();
         saveGame();
       }
     });
 
     buyAutoBtn.addEventListener('click', () => {
-      if (people >= costAuto) {
-        people -= costAuto;
+      if (fragments >= costAuto) {
+        fragments -= costAuto;
         autoDamage += 50000;
         levelAuto++;
-        costAuto = Math.floor(costAuto * 2);
+        costAuto = Math.floor(costAuto * 1.5); 
+        updateUI();
+        saveGame();
+      }
+    });
+
+    // ПОКУПКА УСКОРЕНИЯ ТАПА
+    buySpeedBtn.addEventListener('click', () => {
+      if (fragments >= costSpeed) {
+        fragments -= costSpeed;
+        levelSpeed++;
+        
+        // Уменьшаем интервал на 30мс, но не меньше 50мс
+        minClickInterval = Math.max(50, minClickInterval - 30);
+        
+        costSpeed = Math.floor(costSpeed * 2); 
         updateUI();
         saveGame();
       }
@@ -482,7 +583,7 @@
 
     // --- РЕСТАРТ ---
     document.getElementById('restart-btn').addEventListener('click', () => {
-      localStorage.removeItem('apocalypseSave');
+      localStorage.removeItem('apocalypseSaveV4');
       location.reload();
     });
 
