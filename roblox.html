@@ -74,6 +74,7 @@
       margin-bottom: 12px;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
       border: 1px solid rgba(255,255,255,0.05);
+      position: relative;
     }
 
     .game-icon {
@@ -88,8 +89,20 @@
     .bought-badge {
       position: absolute; top: 5px; right: 5px;
       font-size: 10px; background: #ffeb3b; color: #000; 
-      padding: 2px 5px; border-radius: 5px; font-weight: bold;
+      padding: 2px 5px; border-radius: 5px; font-weight: bold; z-index: 2;
     }
+
+    /* ПЛАШКИ СОБЫТИЙ В МЕНЮ */
+    .event-badge {
+      position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 10px;
+      white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      z-index: 3; animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.1); } }
+
+    .event-hype { background: linear-gradient(90deg, #ff512f, #dd2476); color: #fff; border: 1px solid #ff9999;}
+    .event-peak { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; border: 1px solid #fff; box-shadow: 0 0 15px #ffd700;}
 
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -143,14 +156,27 @@
     .btn-close { background: transparent; border: 1px solid #555; color: #aaa; flex: none; width: 100%; margin-top: 5px;}
     .btn-close:active { background: #333; }
 
+    /* УВЕДОМЛЕНИЯ */
     .notification {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-      background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 10px;
-      font-weight: bold; border: 1px solid #fff; transition: transform 0.3s; z-index: 200;
+      padding: 12px 25px; border-radius: 12px;
+      font-weight: bold; transition: transform 0.3s; z-index: 200;
+      text-align: center; font-size: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     }
     .notification.show { transform: translateX(-50%) translateY(0); }
-    .notification.good { border-color: #00ff00; color: #00ff00; }
-    .notification.bad { border-color: #ff0055; color: #ff0055; }
+    
+    .notification.good { background: rgba(0, 40, 0, 0.9); border: 1px solid #00ff00; color: #00ff00; }
+    .notification.bad { background: rgba(40, 0, 0, 0.9); border: 1px solid #ff0055; color: #ff0055; }
+    
+    /* НОВЫЕ ТОНА УВЕДОМЛЕНИЙ */
+    .notification.hype { 
+      background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%); 
+      color: white; border: 2px solid #fff; text-shadow: 1px 1px 2px #000;
+    }
+    .notification.peak { 
+      background: linear-gradient(90deg, #ffd700 0%, #ff8c00 100%); 
+      color: #000; border: 2px solid #fff; font-weight: 900; text-transform: uppercase;
+    }
 
   </style>
 </head>
@@ -200,31 +226,31 @@
   <script>
     // 25 ИГР
     const gamesData = [
-      { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [] },
-      { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [] },
-      { id: 'brook', name: 'Brookhaven', icon: '🏡', online: 350000, history: [] },
-      { id: 'adopt', name: 'Adopt Me!', icon: '🐶', online: 220000, history: [] },
-      { id: 'blox', name: 'Blox Fruits', icon: '🍎', online: 180000, history: [] },
-      { id: 'dress', name: 'Dress to Impress', icon: '👗', online: 150000, history: [] },
-      { id: 'piggy', name: 'Piggy', icon: '🐷', online: 120000, history: [] },
-      { id: 'doors', name: 'DOORS', icon: '👁️', online: 85000, history: [] },
-      { id: 'bedwars', name: 'BedWars', icon: '🛏️', online: 60000, history: [] },
-      { id: 'jail', name: 'Jailbreak', icon: '🚓', online: 45000, history: [] },
-      { id: 'arsenal', name: 'Arsenal', icon: '🔫', online: 35000, history: [] },
-      { id: 'tower', name: 'Tower Defense', icon: '🏰', online: 25000, history: [] },
-      { id: 'murder', name: 'Murder Mystery', icon: '🔪', online: 18000, history: [] },
-      { id: 'royale', name: 'Royale High', icon: '👑', online: 12000, history: [] },
-      { id: 'speed', name: 'Speed Run 4', icon: '🏃', online: 8000, history: [] },
-      { id: 'theme', name: 'Theme Park Tycoon', icon: '🎢', online: 5000, history: [] },
-      { id: 'work', name: 'Pizza Place', icon: '🍕', online: 3500, history: [] },
-      { id: 'survive', name: 'Survive Disasters', icon: '🌪️', online: 1500, history: [] },
-      { id: 'natural', name: 'Natural Disaster', icon: '🌋', online: 900, history: [] },
-      { id: 'obby', name: 'Mega Easy Obby', icon: '🌈', online: 500, history: [] },
-      { id: 'escape', name: 'Escape Dungeon', icon: '🗝️', online: 300, history: [] },
-      { id: 'stone', name: 'Симулятор Камня', icon: '🪨', online: 150, history: [] },
-      { id: 'box', name: 'Симулятор Коробки', icon: '📦', online: 80, history: [] },
-      { id: 'dead', name: 'Особняк', icon: '🏚️', online: 35, history: [] },
-      { id: 'void', name: 'Пустота', icon: '🕳️', online: 10, history: [] }
+      { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [], event: null, eventTimer: null },
+      { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [], event: null, eventTimer: null },
+      { id: 'brook', name: 'Brookhaven', icon: '🏡', online: 350000, history: [], event: null, eventTimer: null },
+      { id: 'adopt', name: 'Adopt Me!', icon: '🐶', online: 220000, history: [], event: null, eventTimer: null },
+      { id: 'blox', name: 'Blox Fruits', icon: '🍎', online: 180000, history: [], event: null, eventTimer: null },
+      { id: 'dress', name: 'Dress to Impress', icon: '👗', online: 150000, history: [], event: null, eventTimer: null },
+      { id: 'piggy', name: 'Piggy', icon: '🐷', online: 120000, history: [], event: null, eventTimer: null },
+      { id: 'doors', name: 'DOORS', icon: '👁️', online: 85000, history: [], event: null, eventTimer: null },
+      { id: 'bedwars', name: 'BedWars', icon: '🛏️', online: 60000, history: [], event: null, eventTimer: null },
+      { id: 'jail', name: 'Jailbreak', icon: '🚓', online: 45000, history: [], event: null, eventTimer: null },
+      { id: 'arsenal', name: 'Arsenal', icon: '🔫', online: 35000, history: [], event: null, eventTimer: null },
+      { id: 'tower', name: 'Tower Defense', icon: '🏰', online: 25000, history: [], event: null, eventTimer: null },
+      { id: 'murder', name: 'Murder Mystery', icon: '🔪', online: 18000, history: [], event: null, eventTimer: null },
+      { id: 'royale', name: 'Royale High', icon: '👑', online: 12000, history: [], event: null, eventTimer: null },
+      { id: 'speed', name: 'Speed Run 4', icon: '🏃', online: 8000, history: [], event: null, eventTimer: null },
+      { id: 'theme', name: 'Theme Park Tycoon', icon: '🎢', online: 5000, history: [], event: null, eventTimer: null },
+      { id: 'work', name: 'Pizza Place', icon: '🍕', online: 3500, history: [], event: null, eventTimer: null },
+      { id: 'survive', name: 'Survive Disasters', icon: '🌪️', online: 1500, history: [], event: null, eventTimer: null },
+      { id: 'natural', name: 'Natural Disaster', icon: '🌋', online: 900, history: [], event: null, eventTimer: null },
+      { id: 'obby', name: 'Mega Easy Obby', icon: '🌈', online: 500, history: [], event: null, eventTimer: null },
+      { id: 'escape', name: 'Escape Dungeon', icon: '🗝️', online: 300, history: [], event: null, eventTimer: null },
+      { id: 'stone', name: 'Симулятор Камня', icon: '🪨', online: 150, history: [], event: null, eventTimer: null },
+      { id: 'box', name: 'Симулятор Коробки', icon: '📦', online: 80, history: [], event: null, eventTimer: null },
+      { id: 'dead', name: 'Особняк', icon: '🏚️', online: 35, history: [], event: null, eventTimer: null },
+      { id: 'void', name: 'Пустота', icon: '🕳️', online: 10, history: [], event: null, eventTimer: null }
     ];
 
     let balance = 1000; 
@@ -239,8 +265,8 @@
 
     let activeGameId = null;
 
-    // Загрузка сохранения (V7 для сброса на 1000)
-    const saved = localStorage.getItem('robloxExchangeV7');
+    // Загрузка (V8 для сброса)
+    const saved = localStorage.getItem('robloxExchangeV8');
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -272,24 +298,23 @@
     function showNotification(text, type) {
       notifEl.textContent = text;
       notifEl.className = `notification show ${type}`;
-      setTimeout(() => { notifEl.className = 'notification'; }, 2000);
+      setTimeout(() => { notifEl.className = 'notification'; }, 2500);
     }
 
     function saveGame() {
-      localStorage.setItem('robloxExchangeV7', JSON.stringify({ balance, portfolio, gamesData }));
+      // Очищаем таймеры перед сохранением, чтобы не было багов
+      const cleanGamesData = gamesData.map(g => ({ id: g.id, online: g.online, history: g.history }));
+      localStorage.setItem('robloxExchangeV8', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
     }
 
-    // ЦЕНА = ОНЛАЙНУ
     function getPrice(game) {
       return game.online;
     }
 
-    // ФУНКЦИЯ ОТРИСОВКИ С СОРТИРОВКОЙ
     function renderGames() {
       gamesListEl.innerHTML = '';
       balanceEl.textContent = formatMoney(balance);
 
-      // СОРТИРОВКА: Сначала самые популярные, в конце самые мертвые
       gamesData.sort((a, b) => b.online - a.online);
 
       gamesData.forEach(game => {
@@ -306,7 +331,16 @@
         card.className = 'game-card';
         card.onclick = () => openModal(game.id);
         
+        // Определяем, какую плашку показать
+        let eventBadgeHTML = '';
+        if (game.event === 'peak') {
+          eventBadgeHTML = `<div class="event-badge event-peak">👑 ПИК</div>`;
+        } else if (game.event === 'hype') {
+          eventBadgeHTML = `<div class="event-badge event-hype">🔥 ХАЙП</div>`;
+        }
+
         card.innerHTML = `
+          ${eventBadgeHTML}
           <div class="icon-box">
             <div class="game-icon">${game.icon}</div>
           </div>
@@ -437,19 +471,37 @@
       }
     };
 
-    // ИГРОВОЙ ЦИКЛ (с Хайпом и трендом на рост)
+    // ИГРОВОЙ ЦИКЛ
     setInterval(() => {
       gamesData.forEach(game => {
         const isDead = game.online < 10000;
         const volatility = isDead ? 0.4 : 0.15;
-        const trend = 0.05; // Небольшой базовый рост
+        const trend = 0.05; 
         
         let change = (Math.random() * volatility * 2) - volatility + trend;
         
-        // МЕХАНИКА "ХАЙПА" (5% шанс на резкий скачок)
-        if (Math.random() < 0.05) {
-          change += 0.3 + (Math.random() * 0.5); // Скачок от +30% до +80%
-          showNotification(`🔥 ХАЙП! ${game.name} взлетает!`, 'good');
+        // ГЕНЕРАЦИЯ СОБЫТИЙ
+        const eventRoll = Math.random();
+        
+        // ПИК ПОПУЛЯРНОСТИ (Шанс 0.5%)
+        if (eventRoll < 0.005 && !game.event) {
+          change += 1.0 + Math.random(); // +100% к +200%
+          game.event = 'peak';
+          showNotification(`👑 ПИК ПОПУЛЯРНОСТИ: ${game.name}! 👑`, 'peak');
+          renderGames(); // Сразу перерисовать, чтобы появилась плашка
+          
+          clearTimeout(game.eventTimer);
+          game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000); // Длится 10 сек
+        } 
+        // ХАЙП (Шанс 2%)
+        else if (eventRoll < 0.025 && !game.event) {
+          change += 0.4 + (Math.random() * 0.4); // +40% к +80%
+          game.event = 'hype';
+          showNotification(`🔥 ХАЙП! ${game.name} взлетает! 🔥`, 'hype');
+          renderGames();
+          
+          clearTimeout(game.eventTimer);
+          game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000); 
         }
 
         game.online = Math.floor(game.online * (1 + change));
@@ -461,7 +513,7 @@
         if (game.history.length > 30) game.history.shift();
       });
 
-      renderGames(); // Перерисовываем с новой сортировкой
+      renderGames(); 
       
       if (activeGameId) {
         updateModalUI();
