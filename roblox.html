@@ -35,8 +35,10 @@
       z-index: 50;
     }
 
+    .balance-container { display: flex; flex-direction: column; }
     .balance { font-size: 22px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
-    .balance-label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
+    .balance-label { font-size: 11px; color: #aaa; display: block; margin-bottom: 2px; }
+    .portfolio-value { font-size: 11px; color: #ffe066; margin-top: 2px; }
 
     .games-list {
       width: 100%;
@@ -77,22 +79,25 @@
       position: relative;
     }
 
-    .game-icon {
-      font-size: 34px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-    }
+    .game-icon { font-size: 34px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
 
     .game-title { font-size: 13px; font-weight: bold; margin-bottom: 5px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center;}
     .game-online { font-size: 12px; color: #4facfe; font-weight: bold; text-align: center; }
     .game-price { font-size: 13px; color: #ffe066; margin-top: 5px; text-align: center; font-weight: bold;}
     
-    .bought-badge {
-      position: absolute; top: 5px; right: 5px;
-      font-size: 10px; background: #ffeb3b; color: #000; 
-      padding: 2px 5px; border-radius: 5px; font-weight: bold; z-index: 2;
+    .bought-info {
+      background: rgba(0,0,0,0.3);
+      padding: 4px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 11px;
+      text-align: center;
+      width: 100%;
     }
+    .bought-shares { color: #ffeb3b; }
+    .bought-value { color: #00ff00; font-weight: bold; }
 
-    /* ПЛАШКИ СОБЫТИЙ В МЕНЮ */
+    /* ПЛАШКИ СОБЫТИЙ */
     .event-badge {
       position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
       font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 10px;
@@ -104,6 +109,7 @@
     .event-hype { background: linear-gradient(90deg, #ff512f, #dd2476); color: #fff; border: 1px solid #ff9999;}
     .event-peak { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; border: 1px solid #fff; box-shadow: 0 0 15px #ffd700;}
 
+    /* МОДАЛЬНОЕ ОКНО */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
@@ -168,7 +174,6 @@
     .notification.good { background: rgba(0, 40, 0, 0.9); border: 1px solid #00ff00; color: #00ff00; }
     .notification.bad { background: rgba(40, 0, 0, 0.9); border: 1px solid #ff0055; color: #ff0055; }
     
-    /* НОВЫЕ ТОНА УВЕДОМЛЕНИЙ */
     .notification.hype { 
       background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%); 
       color: white; border: 2px solid #fff; text-shadow: 1px 1px 2px #000;
@@ -183,9 +188,10 @@
 <body>
 
   <div class="header">
-    <div>
-      <span class="balance-label">Твой баланс:</span>
+    <div class="balance-container">
+      <span class="balance-label">Баланс (кэш):</span>
       <span class="balance" id="balance">1000</span> 💵
+      <span class="portfolio-value" id="portfolio-value">Акции: 0 💵</span>
     </div>
     <div style="font-size: 24px;">📈</div>
   </div>
@@ -224,7 +230,6 @@
   <div class="notification" id="notification"></div>
 
   <script>
-    // 25 ИГР
     const gamesData = [
       { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [], event: null, eventTimer: null },
       { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [], event: null, eventTimer: null },
@@ -257,6 +262,7 @@
     let portfolio = {}; 
     
     const balanceEl = document.getElementById('balance');
+    const portfolioValueEl = document.getElementById('portfolio-value');
     const gamesListEl = document.getElementById('games-list');
     const notifEl = document.getElementById('notification');
     const modalOverlay = document.getElementById('modal');
@@ -265,8 +271,7 @@
 
     let activeGameId = null;
 
-    // Загрузка (V8 для сброса)
-    const saved = localStorage.getItem('robloxExchangeV8');
+    const saved = localStorage.getItem('robloxExchangeV9');
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -284,7 +289,6 @@
       } catch(e) {}
     }
 
-    // Инициализация истории
     gamesData.forEach(game => {
       if (game.history.length === 0) {
         for (let i = 0; i < 20; i++) game.history.push(game.online);
@@ -302,9 +306,8 @@
     }
 
     function saveGame() {
-      // Очищаем таймеры перед сохранением, чтобы не было багов
       const cleanGamesData = gamesData.map(g => ({ id: g.id, online: g.online, history: g.history }));
-      localStorage.setItem('robloxExchangeV8', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
+      localStorage.setItem('robloxExchangeV9', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
     }
 
     function getPrice(game) {
@@ -313,7 +316,16 @@
 
     function renderGames() {
       gamesListEl.innerHTML = '';
+      
+      let totalSharesValue = 0;
+      gamesData.forEach(game => {
+         if(portfolio[game.id]) {
+            totalSharesValue += portfolio[game.id].shares * game.online;
+         }
+      });
+
       balanceEl.textContent = formatMoney(balance);
+      portfolioValueEl.textContent = `Акции: ${formatMoney(totalSharesValue)} 💵`;
 
       gamesData.sort((a, b) => b.online - a.online);
 
@@ -331,12 +343,23 @@
         card.className = 'game-card';
         card.onclick = () => openModal(game.id);
         
-        // Определяем, какую плашку показать
         let eventBadgeHTML = '';
         if (game.event === 'peak') {
           eventBadgeHTML = `<div class="event-badge event-peak">👑 ПИК</div>`;
         } else if (game.event === 'hype') {
           eventBadgeHTML = `<div class="event-badge event-hype">🔥 ХАЙП</div>`;
+        }
+
+        // Показываем, сколько игрок получит при продаже
+        let portfolioHTML = '';
+        if (bought) {
+           const currentValue = bought.shares * price;
+           portfolioHTML = `
+             <div class="bought-info">
+               <div class="bought-shares">У тебя: ${bought.shares} шт.</div>
+               <div class="bought-value">💰 ${formatMoney(currentValue)} 💵</div>
+             </div>
+           `;
         }
 
         card.innerHTML = `
@@ -346,8 +369,8 @@
           </div>
           <div class="game-title">${game.name}</div>
           <div class="game-online">${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
-          <div class="game-price">${formatMoney(price)} 💵</div>
-          ${bought ? `<div class="bought-badge">${bought.shares} шт.</div>` : ''}
+          <div class="game-price">Цена: ${formatMoney(price)}</div>
+          ${portfolioHTML}
         `;
         gamesListEl.appendChild(card);
       });
@@ -409,7 +432,15 @@
       const bought = portfolio[game.id];
 
       if (bought) {
-        portfolioEl.innerHTML = `У тебя: <strong>${bought.shares}</strong> акций.<br>Ср. цена: <strong>${formatMoney(bought.avgPrice)}</strong> 💵`;
+        const currentValue = bought.shares * price;
+        const profit = currentValue - (bought.shares * bought.avgPrice);
+        const color = profit >= 0 ? '#00ff00' : '#ff0055';
+        
+        portfolioEl.innerHTML = `
+          У тебя: <strong>${bought.shares}</strong> акций.<br>
+          Стоимость: <strong style="color:#ffe066">${formatMoney(currentValue)} 💵</strong><br>
+          Прибыль: <strong style="color:${color}">${profit > 0 ? '+' : ''}${formatMoney(profit)} 💵</strong>
+        `;
       } else {
         portfolioEl.innerHTML = `У тебя нет акций этой игры.`;
       }
@@ -471,31 +502,33 @@
       }
     };
 
-    // ИГРОВОЙ ЦИКЛ
     setInterval(() => {
       gamesData.forEach(game => {
         const isDead = game.online < 10000;
         const volatility = isDead ? 0.4 : 0.15;
-        const trend = 0.05; 
         
-        let change = (Math.random() * volatility * 2) - volatility + trend;
+        // Теперь рынок больше падает (тренд вниз)
+        let change = (Math.random() * volatility * 1.5) - (volatility * 1.2);
         
-        // ГЕНЕРАЦИЯ СОБЫТИЙ
+        // Защита от бесконечного роста
+        if (game.online > 1000000) change -= 0.1; 
+        if (game.online > 2000000) change = -0.5; // Жесткий обвал на пике
+
         const eventRoll = Math.random();
         
-        // ПИК ПОПУЛЯРНОСТИ (Шанс 0.5%)
+        // ПИК ПОПУЛЯРНОСТИ (0.5%)
         if (eventRoll < 0.005 && !game.event) {
-          change += 1.0 + Math.random(); // +100% к +200%
+          change += 0.8 + Math.random(); 
           game.event = 'peak';
           showNotification(`👑 ПИК ПОПУЛЯРНОСТИ: ${game.name}! 👑`, 'peak');
-          renderGames(); // Сразу перерисовать, чтобы появилась плашка
+          renderGames(); 
           
           clearTimeout(game.eventTimer);
-          game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000); // Длится 10 сек
+          game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000);
         } 
-        // ХАЙП (Шанс 2%)
+        // ХАЙП (2%)
         else if (eventRoll < 0.025 && !game.event) {
-          change += 0.4 + (Math.random() * 0.4); // +40% к +80%
+          change += 0.3 + (Math.random() * 0.3); 
           game.event = 'hype';
           showNotification(`🔥 ХАЙП! ${game.name} взлетает! 🔥`, 'hype');
           renderGames();
@@ -507,7 +540,6 @@
         game.online = Math.floor(game.online * (1 + change));
         
         if (game.online < 5) game.online = 5; 
-        if (game.online > 5000000) game.online = 5000000;
 
         game.history.push(game.online);
         if (game.history.length > 30) game.history.shift();
