@@ -38,32 +38,26 @@
       padding-bottom: 40px;
     }
 
-    /* --- БАННЕР НОВИНКИ --- */
+    /* --- ОБЩИЕ СТИЛИ ДЛЯ БАННЕРОВ --- */
     .banner {
       width: 100%;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       border-radius: 20px;
       padding: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       text-decoration: none;
-      color: white;
-      border: 2px solid #ffd700;
-      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
       position: relative;
       overflow: hidden;
       transition: 0.3s;
-      margin-bottom: 5px;
     }
-    
     .banner:active { transform: scale(0.98); }
 
     .banner::before {
       content: '';
       position: absolute;
       top: -50%; left: -50%; width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,215,0,0.2), transparent);
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
       transform: rotate(45deg);
       animation: shine 3s infinite;
     }
@@ -82,7 +76,6 @@
     .banner-badge {
       font-size: 12px;
       font-weight: 900;
-      color: #ffd700;
       letter-spacing: 1px;
       margin-bottom: 5px;
       text-transform: uppercase;
@@ -96,19 +89,16 @@
 
     .banner-desc {
       font-size: 12px;
-      color: #ccc;
       margin-top: 5px;
     }
 
     .banner-icon-box {
       width: 70px;
       height: 70px;
-      background: rgba(0, 0, 0, 0.3);
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 215, 0, 0.3);
       z-index: 2;
       box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
@@ -117,6 +107,28 @@
       font-size: 40px;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
     }
+
+    /* --- ТОП (ЗОЛОТОЙ) --- */
+    .banner-top {
+      background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
+      border: 2px solid #fff;
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+      color: #000;
+    }
+    .banner-top .banner-badge { color: #3e2723; }
+    .banner-top .banner-desc { color: #3e2723; font-weight: 500; }
+    .banner-top .banner-icon-box { background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1); }
+
+    /* --- НОВИНКА (ГОЛУБОЙ) --- */
+    .banner-new {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      border: 2px solid #4facfe;
+      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+      color: #fff;
+    }
+    .banner-new .banner-badge { color: #4facfe; }
+    .banner-new .banner-desc { color: #ccc; }
+    .banner-new .banner-icon-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(79, 172, 254, 0.3); }
 
     /* --- СЕТКА ИГР --- */
     .games-list {
@@ -157,7 +169,7 @@
     }
 
     .game-icon {
-      font-size: 22px; /* УМЕНЬШИЛ РАЗМЕР, ЧТОБЫ ВЛЕЗАЛИ ДВОЙНЫЕ ЭМОДЗИ */
+      font-size: 22px; 
       filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
       display: flex;
       gap: 2px;
@@ -191,15 +203,27 @@
 
   <div class="container">
 
-    <!-- БАННЕР НОВИНКИ -->
-    <a href="roblox.html" class="banner">
+    <!-- 1. ТОП БАННЕР (ЗОЛОТОЙ) -->
+    <a href="roblox.html" class="banner banner-top">
       <div class="banner-info">
-        <div class="banner-badge">👑 НОВИНКА 💎</div>
+        <div class="banner-badge">👑 ТОП ИГРА 👑</div>
         <div class="banner-title">Роблокс-Биржа</div>
-        <div class="banner-desc">Покупай акции игр и следи за онлайном.</div>
+        <div class="banner-desc" id="banner-capital">Покупай акции и следи за онлайном.</div>
       </div>
       <div class="banner-icon-box">
         <div class="banner-icon">📈</div>
+      </div>
+    </a>
+
+    <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
+    <a href="cards.html" class="banner banner-new">
+      <div class="banner-info">
+        <div class="banner-badge">🔥 НОВИНКА 🔥</div>
+        <div class="banner-title">Битва Мемов</div>
+        <div class="banner-desc">Карточная игра за столом с ботами.</div>
+      </div>
+      <div class="banner-icon-box">
+        <div class="banner-icon">🃏</div>
       </div>
     </a>
 
@@ -250,5 +274,29 @@
 
   </div>
 
+  <!-- СКРИПТ ДЛЯ ПОКАЗА КАПИТАЛА В РОБЛОКС-БИРЖЕ -->
+  <script>
+    const savedData = localStorage.getItem('robloxExchangeV10'); // Актуальная версия сейва
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        if (data.balance !== undefined) {
+          let netWorth = data.balance;
+          if (data.portfolio && data.gamesData) {
+             for (const id in data.portfolio) {
+                const game = data.gamesData.find(g => g.id === id);
+                if (game) {
+                   netWorth += data.portfolio[id].shares * game.online;
+                }
+             }
+          }
+          const bannerDesc = document.getElementById('banner-capital');
+          if (bannerDesc) {
+             bannerDesc.innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b><br>Покупай акции и следи за онлайном.`;
+          }
+        }
+      } catch(e){}
+    }
+  </script>
 </body>
 </html>
