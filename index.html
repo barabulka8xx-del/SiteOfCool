@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Коктейль-Миллионер 🤑🍹</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at top, #2b1055, #0b0018 60%);
+      color: white;
+      overflow: hidden;
+      padding: 20px;
+    }
+    .card {
+      width: min(560px, 100%);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 28px;
+      padding: 28px;
+      text-align: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+      z-index: 2;
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 6vw, 42px); }
+    .sub { margin: 0 0 24px; opacity: 0.75; }
+    .cocktail {
+      min-height: 90px;
+      display: grid;
+      place-items: center;
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin: 18px 0;
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,215,0,0.18), rgba(255,0,150,0.12));
+      border: 1px dashed rgba(255,255,255,0.25);
+    }
+    .price {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffe066;
+      margin-bottom: 22px;
+    }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 16px 22px;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #1a0010;
+      background: linear-gradient(135deg, #ffe066, #ff9f1c);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    button:hover { transform: translateY(-2px) scale(1.01); filter: brightness(1.08); }
+    button:active { transform: scale(0.98); }
+    .hint { margin: 16px 0 0; font-size: 13px; opacity: 0.6; }
+    .emoji {
+      position: fixed;
+      top: -50px;
+      font-size: 32px;
+      pointer-events: none;
+      animation: fall linear forwards;
+      z-index: 1;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Коктейль-Миллионер 🤑🍹</h1>
+    <p class="sub">Смешай напиток, который пахнет деньгами</p>
+
+    <div id="cocktail" class="cocktail">Нажми кнопку — и стань богаче</div>
+    <div id="price" class="price">Цена: —</div>
+
+    <button id="mix">Смешать 🍸</button>
+    <p class="hint">Чем больше жмёшь, тем абсурднее цена.</p>
+  </div>
+
+  <script>
+    const bases = [
+      "джин", "ром", "виски", "текила", "водка", "абсент",
+      "ликёр из маракуйи", "холодный эспрессо", "берёзовый сок",
+      "слёзы инвестора", "настой на биткоинах"
+    ];
+
+    const mixers = [
+      "тоник", "кола", "лаймовый сок", "кокосовое молоко",
+      "жидкий золотой сироп", "пенка из шампанского",
+      "смузи из зелёных акций", "ледяной чай", "мятный туман"
+    ];
+
+    const toppings = [
+      "веточка мяты", "золотая пыль", "кубик льда из Дубая",
+      "съедобный бриллиант", "кружок лайма", "кредитная карта",
+      "печенье с предсказанием курса валют", "попкорн из трюфелей"
+    ];
+
+    const names = [
+      "Мартини «Ипотека»", "Лонг-Айленд «Стартап»", "Негрони «Крипто»",
+      "Мохито «Оффшор»", "Дайкири «Дивиденды»", "Космополитен «Налоговый вычет»",
+      "Пина Колада «Пассивный доход»", "Апероль «Швейцарский счёт»",
+      "Кровавая Мэри «Кредитный рейтинг»", "Эспрессо-мартини «Юниты»"
+    ];
+
+    const emojis = ["🤑", "🍹", "💰", "💸", "🍸", "🥂", "💎", "🪙", "🍋"];
+
+    const cocktailEl = document.getElementById("cocktail");
+    const priceEl = document.getElementById("price");
+    const button = document.getElementById("mix");
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function randomPrice() {
+      const value = Math.floor(Math.random() * 999_999_999) + 1000;
+      return new Intl.NumberFormat("ru-RU").format(value) + " ₽";
+    }
+
+    function rain() {
+      const count = 18;
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("span");
+        el.className = "emoji";
+        el.textContent = pick(emojis);
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.animationDuration = (2 + Math.random() * 2.5) + "s";
+        el.style.animationDelay = Math.random() * 0.4 + "s";
+        el.style.fontSize = (20 + Math.random() * 28) + "px";
+        document.body.appendChild(el);
+        el.addEventListener("animationend", () => el.remove());
+      }
+    }
+
+    function makeCocktail() {
+      const name = pick(names);
+      const base = pick(bases);
+      const mixer = pick(mixers);
+      const topping = pick(toppings);
+      cocktailEl.textContent = `${name}: ${base} + ${mixer} + ${topping}`;
+      priceEl.textContent = "Цена: " + randomPrice();
+      rain();
+    }
+
+    button.addEventListener("click", makeCocktail);
+  </script>
+</body>
+</html>
