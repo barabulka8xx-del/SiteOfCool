@@ -240,13 +240,6 @@
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
 
-    /* Спиральный вихрь для черной дыры */
-    .vortex-anim { animation: vortex 2s ease-in forwards; }
-    @keyframes vortex {
-      0% { transform: scale(1) rotate(0deg) translateX(0); opacity: 1; }
-      100% { transform: scale(0) rotate(720deg) translateX(100px); opacity: 0; }
-    }
-
     .peace-glow { filter: drop-shadow(0 0 15px #ffd700) !important; }
     .peace-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important; }
 
@@ -391,7 +384,7 @@
       mainUI.classList.remove('hidden'); 
     });
 
-    // --- КАТСЦЕНЫ (ИСПРАВЛЕНЫ: ПАДАЮТ РОВНО) ---
+    // --- КАТСЦЕНЫ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
@@ -524,21 +517,34 @@
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА (СПИРАЛЬ) ---
+    // --- ЧЕРНАЯ ДЫРА (РЕАЛЬНОЕ ПРИТЯЖЕНИЕ) ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
-      
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+
       objects.forEach(obj => {
         if (obj.classList.contains('sucked')) return;
         
+        // Получаем текущие координаты объекта
+        const rect = obj.getBoundingClientRect();
+        const objX = rect.left + rect.width / 2;
+        const objY = rect.top + rect.height / 2;
+
+        // Считаем, на сколько нужно сдвинуть объект, чтобы он попал в центр
+        const deltaX = centerX - objX;
+        const deltaY = centerY - objY;
+
         obj.classList.add('sucked');
         obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim', 'fall-smooth-anim');
         
-        // Применяем спиральную анимацию
-        obj.classList.add('vortex-anim');
-        
-        // Удаляем после завершения
-        setTimeout(() => obj.remove(), 2000);
+        // Применяем плавный сдвиг в центр
+        obj.style.transition = 'transform 1.5s ease-in, opacity 1.5s ease-in';
+        obj.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0) rotate(720deg)`;
+        obj.style.opacity = '0';
+
+        // Удаляем после того, как долетит
+        setTimeout(() => obj.remove(), 1500);
       });
     }
 
@@ -553,8 +559,9 @@
         blackHole.classList.remove('active', 'pulsate');
         clearInterval(intervals.blackholeSuck);
         document.querySelectorAll('.sucked').forEach(obj => {
-           obj.classList.remove('sucked', 'vortex-anim');
+           obj.classList.remove('sucked');
            obj.style.transform = 'none';
+           obj.style.opacity = '1';
         });
       }
     });
