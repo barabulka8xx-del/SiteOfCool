@@ -271,7 +271,8 @@
 
     let activeGameId = null;
 
-    const saved = localStorage.getItem('robloxExchangeV9');
+    // Загрузка V10 (сброс прогресса для новых правил)
+    const saved = localStorage.getItem('robloxExchangeV10');
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -307,7 +308,7 @@
 
     function saveGame() {
       const cleanGamesData = gamesData.map(g => ({ id: g.id, online: g.online, history: g.history }));
-      localStorage.setItem('robloxExchangeV9', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
+      localStorage.setItem('robloxExchangeV10', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
     }
 
     function getPrice(game) {
@@ -350,7 +351,6 @@
           eventBadgeHTML = `<div class="event-badge event-hype">🔥 ХАЙП</div>`;
         }
 
-        // Показываем, сколько игрок получит при продаже
         let portfolioHTML = '';
         if (bought) {
            const currentValue = bought.shares * price;
@@ -502,23 +502,32 @@
       }
     };
 
+    // ОБНОВЛЕННЫЙ ИГРОВОЙ ЦИКЛ
     setInterval(() => {
       gamesData.forEach(game => {
-        const isDead = game.online < 10000;
-        const volatility = isDead ? 0.4 : 0.15;
+        const isCheap = game.online < 10000;
+        const volatility = isCheap ? 0.25 : 0.10; // Шанс скачка
         
-        // Теперь рынок больше падает (тренд вниз)
-        let change = (Math.random() * volatility * 1.5) - (volatility * 1.2);
+        // Случайное изменение
+        let change = (Math.random() * volatility * 2) - volatility;
         
-        // Защита от бесконечного роста
-        if (game.online > 1000000) change -= 0.1; 
-        if (game.online > 2000000) change = -0.5; // Жесткий обвал на пике
+        // Базовый рост, чтобы игра не умирала
+        change += 0.015; 
+
+        // Второе дыхание для дешевых игр
+        if (game.online < 50) {
+          change += 0.2; 
+        }
+
+        // Сопротивление в космосе (выше 1 млн)
+        if (game.online > 1000000) change -= 0.05;
+        if (game.online > 2000000) change -= 0.15; 
 
         const eventRoll = Math.random();
         
-        // ПИК ПОПУЛЯРНОСТИ (0.5%)
+        // ПИК ПОПУЛЯРНОСТИ
         if (eventRoll < 0.005 && !game.event) {
-          change += 0.8 + Math.random(); 
+          change += 1.0 + Math.random(); 
           game.event = 'peak';
           showNotification(`👑 ПИК ПОПУЛЯРНОСТИ: ${game.name}! 👑`, 'peak');
           renderGames(); 
@@ -526,9 +535,9 @@
           clearTimeout(game.eventTimer);
           game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000);
         } 
-        // ХАЙП (2%)
+        // ХАЙП
         else if (eventRoll < 0.025 && !game.event) {
-          change += 0.3 + (Math.random() * 0.3); 
+          change += 0.4 + (Math.random() * 0.4); 
           game.event = 'hype';
           showNotification(`🔥 ХАЙП! ${game.name} взлетает! 🔥`, 'hype');
           renderGames();
@@ -539,7 +548,9 @@
 
         game.online = Math.floor(game.online * (1 + change));
         
+        // Защита от нуля и бесконечности
         if (game.online < 5) game.online = 5; 
+        if (game.online > 5000000) game.online = 5000000;
 
         game.history.push(game.online);
         if (game.history.length > 30) game.history.shift();
