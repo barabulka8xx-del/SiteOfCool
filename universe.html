@@ -82,16 +82,32 @@
     }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    .emoji-item {
+    /* --- НАСТОЯЩИЙ КВАДРАТНЫЙ КОТ (Увеличенный) --- */
+    .pixel-cat {
       position: absolute;
-      font-size: 40px; 
+      width: 10px; /* Размер одного пикселя */
+      height: 10px;
+      /* Огромный массив теней для прорисовки */
+      box-shadow: 
+        20px 0 0 #f4a460, 60px 0 0 #f4a460,
+        10px 10px 0 #f4a460, 20px 10px 0 #f4a460, 30px 10px 0 #f4a460, 50px 10px 0 #f4a460, 60px 10px 0 #f4a460, 70px 10px 0 #f4a460,
+        0 20px 0 #f4a460, 10px 20px 0 #f4a460, 20px 20px 0 #f4a460, 30px 20px 0 #f4a460, 40px 20px 0 #f4a460, 50px 20px 0 #f4a460, 60px 20px 0 #f4a460, 70px 20px 0 #f4a460, 80px 20px 0 #f4a460,
+        0 30px 0 #f4a460, 10px 30px 0 #000000, 20px 30px 0 #000000, 30px 30px 0 #f4a460, 40px 30px 0 #f4a460, 50px 30px 0 #000000, 60px 30px 0 #000000, 70px 30px 0 #f4a460, 80px 30px 0 #f4a460,
+        0 40px 0 #f4a460, 10px 40px 0 #f4a460, 20px 40px 0 #f4a460, 30px 40px 0 #f4a460, 40px 40px 0 #ff69b4, 50px 40px 0 #f4a460, 60px 40px 0 #f4a460, 70px 40px 0 #f4a460, 80px 40px 0 #f4a460,
+        0 50px 0 #f4a460, 10px 50px 0 #f4a460, 20px 50px 0 #f4a460, 30px 50px 0 #f4a460, 40px 50px 0 #f4a460, 50px 50px 0 #f4a460, 60px 50px 0 #f4a460, 70px 50px 0 #f4a460, 80px 50px 0 #f4a460,
+        10px 60px 0 #f4a460, 20px 60px 0 #f4a460, 30px 60px 0 #f4a460, 40px 60px 0 #f4a460, 50px 60px 0 #f4a460, 60px 60px 0 #f4a460, 70px 60px 0 #f4a460,
+        10px 70px 0 #f4a460, 20px 70px 0 #f4a460, 30px 70px 0 #f4a460, 40px 70px 0 #f4a460, 50px 70px 0 #f4a460, 60px 70px 0 #f4a460, 70px 70px 0 #f4a460,
+        10px 80px 0 #f4a460, 20px 80px 0 #000000, 30px 80px 0 #f4a460, 50px 80px 0 #f4a460, 60px 80px 0 #000000, 70px 80px 0 #f4a460,
+        80px 60px 0 #f4a460, 90px 50px 0 #f4a460, 90px 40px 0 #f4a460;
+      
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
       transition: top 1s ease-in-out, transform 1s ease-in-out;
     }
 
-    /* Эффект "Квадратности" для эмодзи */
-    .blocky-cat {
-      /* Делаем его квадратным, плоским и с черным контуром */
-      filter: contrast(2) saturate(1.5) drop-shadow(2px 2px 0px #000) drop-shadow(-2px -2px 0px #000);
+    .pixel-pizza {
+      position: absolute;
+      font-size: 40px;
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
     }
 
     .run-anim { animation: runAcross steps(20) infinite; }
@@ -178,8 +194,7 @@
 
     function spawnCat() {
       const cat = document.createElement('div');
-      cat.className = 'emoji-item blocky-cat'; // Добавили класс blocky-cat
-      cat.textContent = '🐈'; 
+      cat.className = 'pixel-cat';
       
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
@@ -195,7 +210,7 @@
     }
 
     gravityToggle.addEventListener('change', (e) => {
-      const cats = document.querySelectorAll('.blocky-cat');
+      const cats = document.querySelectorAll('.pixel-cat');
       
       if (!e.target.checked) {
         cats.forEach(cat => {
@@ -217,7 +232,7 @@
       if (e.target.checked) {
         pizzaInterval = setInterval(() => {
           const pizza = document.createElement('div');
-          pizza.className = 'emoji-item';
+          pizza.className = 'pixel-pizza';
           pizza.textContent = '🍕';
           pizza.style.left = (Math.random() * 85 + 5) + 'vw';
           pizza.style.top = '-50px';
