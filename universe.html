@@ -13,7 +13,7 @@
       color: white;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      flex-direction: row; /* Для новостей справа */
       align-items: center;
       justify-content: center;
       overflow: hidden;
@@ -106,14 +106,84 @@
       50% { opacity: 0.6; }
     }
 
-    /* --- ИНТЕРФЕЙС --- */
+    /* --- ИНТЕРФЕЙС (Пульт и Новости) --- */
+    .main-container {
+      display: flex;
+      gap: 20px;
+      z-index: 10;
+      align-items: flex-start;
+      justify-content: center;
+      width: 100%;
+      padding: 20px;
+    }
+
     .panel {
-      position: relative; z-index: 10; background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px 25px;
       border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       width: 90vw; max-width: 380px;
       max-height: 90vh; overflow-y: auto;
+    }
+
+    /* Стили для новостной ленты */
+    .news-panel {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 15px;
+      width: 280px;
+      max-height: 80vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .news-panel h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ff0055;
+      text-align: center;
+      margin-bottom: 5px;
+      border-bottom: 2px solid #ff0055;
+      padding-bottom: 10px;
+    }
+
+    .news-item {
+      font-size: 12px;
+      line-height: 1.4;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #4facfe;
+      border-radius: 4px;
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    /* Стиль для Red Team */
+    .news-item.red-team {
+      border-left: 3px solid #ffd700;
+      background: rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+
+    .news-item .press-name {
+      font-weight: 900;
+      color: #fff;
+      margin-right: 5px;
+    }
+    .news-item.red-team .press-name {
+      color: #ffd700;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     h1 {
@@ -144,7 +214,7 @@
     .modern-cat {
       position: absolute; width: 60px; height: 60px;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
-      transition: transform 0.5s ease, opacity 0.5s ease; /* Плавные переходы */
+      transition: transform 0.5s ease, opacity 0.5s ease;
     }
     
     .cat-head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
@@ -174,14 +244,12 @@
       100% { transform: translateX(100vw); }
     }
 
-    /* Левитация котов (просто зависают на месте) */
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover {
       0% { transform: translateY(0) rotate(-15deg); }
       100% { transform: translateY(-30px) rotate(15deg); }
     }
 
-    /* Падение и Улет */
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown {
       0% { transform: translateY(0) rotate(0deg); }
@@ -201,6 +269,13 @@
     .sky-matrix { background: linear-gradient(135deg, #000000, #003300) !important; }
 
     .reality-inverted { filter: invert(1) hue-rotate(180deg); }
+
+    /* Адаптив для телефонов (новости прячутся вниз) */
+    @media (max-width: 768px) {
+      body { flex-direction: column; justify-content: flex-start; padding-top: 20px; overflow-y: auto;}
+      .main-container { flex-direction: column; align-items: center; }
+      .news-panel { width: 90vw; max-width: 380px; max-height: 200px; margin-top: 20px; }
+    }
   </style>
 </head>
 <body class="sky-day" id="main-body">
@@ -222,61 +297,74 @@
 
   <div id="animation-layer"></div>
 
-  <div class="panel">
-    <h1>Управление Вселенной</h1>
+  <!-- Основной контейнер (Пульт + Новости) -->
+  <div class="main-container">
+    
+    <!-- Пульт -->
+    <div class="panel">
+      <h1>Управление Вселенной</h1>
 
-    <div class="toggle-row">
-      <span class="toggle-label">🐈 Квадратные коты</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-cats">
-        <span class="slider"></span>
-      </label>
+      <div class="toggle-row">
+        <span class="toggle-label">🐈 Квадратные коты</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-cats">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🌍 Гравитация</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-gravity" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🍕 Дождь из пиццы</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-pizza">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🐟 Рыбный дождь</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-fish">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🌅 Сменить небо</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-sky">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🌀 Сменить реальность</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-reality">
+          <span class="slider"></span>
+        </label>
+      </div>
     </div>
 
-    <div class="toggle-row">
-      <span class="toggle-label">🌍 Гравитация</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-gravity" checked>
-        <span class="slider"></span>
-      </label>
+    <!-- Новостная панель -->
+    <div class="news-panel" id="news-feed">
+      <h2>Срочные новости</h2>
+      <!-- Сюда будут падать новости -->
     </div>
 
-    <div class="toggle-row">
-      <span class="toggle-label">🍕 Дождь из пиццы</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-pizza">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span class="toggle-label">🐟 Рыбный дождь</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-fish">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span class="toggle-label">🌅 Сменить небо</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-sky">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="toggle-row">
-      <span class="toggle-label">🌀 Сменить реальность</span>
-      <label class="switch">
-        <input type="checkbox" id="toggle-reality">
-        <span class="slider"></span>
-      </label>
-    </div>
   </div>
 
   <script>
     const body = document.getElementById('main-body');
     const layer = document.getElementById('animation-layer');
+    const newsFeed = document.getElementById('news-feed');
     
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
@@ -294,6 +382,63 @@
     let fishInterval = null;
     
     const played = { cats: false, pizza: false, gravity: false, fish: false, sky: false };
+
+    // --- НОВОСТНАЯ СИСТЕМА ---
+    const pressList = [
+      { name: "Daily Pixel", color: "#4facfe" },
+      { name: "The Quantum Times", color: "#00f2fe" },
+      { name: "Cat News Network", color: "#ff9900" },
+      { name: "Pizza Post", color: "#ff69b4" },
+      { name: "Fishy Business", color: "#00ffff" },
+      { name: "Red Team", color: "#ffd700", isRare: true } // Редкая пресса
+    ];
+
+    function addNews(text) {
+      // Определяем, будет ли это Red Team (шанс 5%)
+      const isRedTeam = Math.random() < 0.05;
+      
+      let press;
+      if (isRedTeam) {
+        press = pressList.find(p => p.isRare);
+      } else {
+        // Выбираем случайную обычную прессу
+        const normalPress = pressList.filter(p => !p.isRare);
+        press = normalPress[Math.floor(Math.random() * normalPress.length)];
+      }
+
+      const newsItem = document.createElement('div');
+      newsItem.className = 'news-item' + (isRedTeam ? ' red-team' : '');
+      
+      // Если Red Team, добавляем звездочки
+      const stars = isRedTeam ? ' ⭐⭐⭐' : '';
+      
+      newsItem.innerHTML = `
+        <span class="press-name" style="color: ${press.color}">${press.name}${stars}:</span> 
+        ${text}
+      `;
+
+      // Добавляем в ленту сверху
+      newsFeed.insertBefore(newsItem, newsFeed.children[1]);
+
+      // Удаляем старые новости, если их больше 10
+      if (newsFeed.children.length > 11) {
+        newsFeed.removeChild(newsFeed.lastChild);
+      }
+    }
+
+    // --- ОСТАНОВКА ТАЙМЕРОВ ПРИ СКРЫТИИ ВКЛАДКИ ---
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(catInterval);
+        clearInterval(pizzaInterval);
+        clearInterval(fishInterval);
+      } else {
+        // Возобновляем, если тумблеры включены
+        if (catsToggle.checked) startCats();
+        if (pizzaToggle.checked) startPizza();
+        if (fishToggle.checked) startFish();
+      }
+    });
 
     const catHTML = `
       <div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div>
@@ -321,7 +466,6 @@
              cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
              cat.style.animationDelay = i * 0.3 + 's';
           } else {
-             // Коты улетают вверх с разных точек
              cat.style.left = (Math.random() * 80 + 10) + '%';
              cat.classList.add('fly-up-anim');
              cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
@@ -391,30 +535,39 @@
         if (!played.cats) {
           played.cats = true;
           showCutscene("Квадратные коты выходят на связь...");
+          addNews("Массовое появление квадратных котов зафиксировано в городе.");
           setTimeout(startCats, 2500);
         } else {
           startCats();
+          addNews("Квадратные коты снова вернулись.");
         }
       } else {
         clearInterval(catInterval);
+        // Удаляем всех котов с экрана
+        document.querySelectorAll('.modern-cat').forEach(cat => {
+          cat.style.transform = 'scale(0)';
+          cat.style.opacity = '0';
+          setTimeout(() => cat.remove(), 500);
+        });
+        addNews("Квадратные коты внезапно исчезли.");
       }
     });
 
     function startCats() {
       catInterval = setInterval(() => {
+        // Ограничение: не более 15 котов на экране
+        if (document.querySelectorAll('.modern-cat').length > 15) return;
+
         const cat = document.createElement('div');
         cat.className = 'modern-cat';
         cat.innerHTML = catHTML;
         
-        // Если гравитации нет, они спавнятся внизу и улетают вверх
         if (!gravityToggle.checked) {
           cat.style.bottom = '-60px'; 
           cat.style.left = (Math.random() * 90) + 'vw'; 
           cat.classList.add('fly-up-anim');
-          // Задаем случайную скорость
           cat.style.animationDuration = (Math.random() * 2 + 2) + 's';
         } else {
-          // Если гравитация есть, они бегут по горизонтали
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
           cat.style.animationDuration = (Math.random() * 2 + 3) + 's';
           cat.classList.add('run-anim');
@@ -431,18 +584,25 @@
         if (!played.pizza) {
           played.pizza = true;
           showCutscene("Пицца вызывается на ковёр...");
+          addNews("На город обрушился дождь из пиццы! Службы спасения раздают соус.");
           setTimeout(startPizza, 2500);
         } else {
           startPizza();
         }
       } else {
         clearInterval(pizzaInterval);
-        document.querySelectorAll('.pizza-item').forEach(p => p.remove());
+        document.querySelectorAll('.pizza-item').forEach(p => {
+           p.style.transform = 'scale(0)';
+           p.style.opacity = '0';
+           setTimeout(() => p.remove(), 500);
+        });
       }
     });
 
     function startPizza() {
       pizzaInterval = setInterval(() => {
+        if (document.querySelectorAll('.pizza-item').length > 30) return;
+
         const pizza = document.createElement('div');
         pizza.className = 'flying-item pizza-item';
         pizza.textContent = '🍕';
@@ -468,18 +628,25 @@
         if (!played.fish) {
           played.fish = true;
           showCutscene("Рыбный шторм неизбежен...");
+          addNews("Внезапно пошёл рыбный дождь. Ихтиологи в панике.");
           setTimeout(startFish, 2500);
         } else {
           startFish();
         }
       } else {
         clearInterval(fishInterval);
-        document.querySelectorAll('.fish-item').forEach(f => f.remove());
+        document.querySelectorAll('.fish-item').forEach(f => {
+           f.style.transform = 'scale(0)';
+           f.style.opacity = '0';
+           setTimeout(() => f.remove(), 500);
+        });
       }
     });
 
     function startFish() {
       fishInterval = setInterval(() => {
+        if (document.querySelectorAll('.fish-item').length > 30) return;
+
         const fish = document.createElement('div');
         fish.className = 'flying-item fish-item';
         fish.textContent = '🐟';
@@ -508,24 +675,23 @@
         if (!played.gravity) {
           played.gravity = true;
           showCutscene("Гравитация отключена...");
+          addNews("Учёные подтвердили: гравитация отключена. Все летают.");
+        } else {
+          addNews("Гравитация снова отключена. Будьте осторожны.");
         }
 
-        // Все коты на экране начинают улетать вверх
         cats.forEach(cat => {
           const rect = cat.getBoundingClientRect();
           cat.style.top = 'auto';
-          cat.style.bottom = (window.innerHeight - rect.bottom) + 'px'; // Фиксируем текущую позицию
+          cat.style.bottom = (window.innerHeight - rect.bottom) + 'px';
           cat.style.left = rect.left + 'px';
-          
           cat.classList.remove('run-anim');
-          // Через микро-задержку включаем анимацию полета
           setTimeout(() => {
             cat.classList.add('fly-up-anim');
             cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           }, 10);
         });
         
-        // Предметы улетают вверх
         items.forEach(item => {
           item.className = 'flying-item fly-up-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
           item.style.top = '100vh';
@@ -533,7 +699,7 @@
         });
 
       } else {
-        // Включаем гравитацию обратно
+        addNews("Гравитация восстановлена. Все падают вниз.");
         cats.forEach(cat => {
           cat.classList.remove('fly-up-anim');
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
@@ -554,10 +720,13 @@
       skyState = (skyState + 1) % 4;
       body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
       
-      if (skyState === 0) body.classList.add('sky-day');
-      if (skyState === 1) body.classList.add('sky-sunset');
-      if (skyState === 2) body.classList.add('sky-night');
-      if (skyState === 3) body.classList.add('sky-matrix');
+      let skyName = "";
+      if (skyState === 0) { body.classList.add('sky-day'); skyName = "День"; }
+      if (skyState === 1) { body.classList.add('sky-sunset'); skyName = "Закат"; }
+      if (skyState === 2) { body.classList.add('sky-night'); skyName = "Ночь"; }
+      if (skyState === 3) { body.classList.add('sky-matrix'); skyName = "Матрица"; }
+
+      addNews(`Время суток изменилось на: ${skyName}.`);
 
       if (!played.sky) {
         played.sky = true;
@@ -568,6 +737,11 @@
     // --- РЕАЛЬНОСТЬ ---
     realityToggle.addEventListener('change', (e) => {
       body.classList.toggle('reality-inverted', e.target.checked);
+      if(e.target.checked) {
+        addNews("Внимание! Реальность инвертирована. Не смотрите в зеркала.");
+      } else {
+        addNews("Реальность вернулась в норму.");
+      }
     });
   </script>
 </body>
