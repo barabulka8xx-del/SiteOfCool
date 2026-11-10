@@ -179,21 +179,28 @@
 
     /* --- МОДАЛЬНОЕ ОКНО (СНИЗУ, ПРЯМОУГОЛЬНОЕ) --- */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center;
       z-index: 100; backdrop-filter: blur(4px);
+      overflow-y: auto; /* Позволяет скроллить, если контент не влезает */
     }
     .modal-overlay.active { display: flex; }
 
     .modal-content {
-      background: #151b22; padding: 25px 20px 35px 20px; 
-      border-radius: 20px 20px 0 0; /* Прямоугольное, но с закруглением сверху */
+      background: #151b22; 
+      padding: 25px 20px; 
+      /* Учет безопасной зоны телефона (чтобы кнопки не улетали за панель навигации) */
+      padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); 
+      border-radius: 20px 20px 0 0; 
       width: 100%; max-width: 500px; 
       border: 2px solid #4facfe; border-bottom: none;
       display: flex; flex-direction: column; align-items: center; gap: 12px;
       animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       text-align: center;
       box-shadow: 0 -10px 30px rgba(79, 172, 254, 0.2);
+      max-height: 90vh; /* Ограничиваем высоту */
+      max-height: 90dvh; /* Для новых браузеров */
+      overflow-y: auto; /* Добавляем скролл внутри окна */
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
@@ -205,6 +212,7 @@
       box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       margin-bottom: 5px;
+      flex-shrink: 0; /* Чтобы иконка не сжималась при скролле */
     }
     .modal-icon { font-size: 45px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); display: flex; gap: 5px; }
 
@@ -224,6 +232,7 @@
       color: #000; border: none; padding: 15px; border-radius: 12px;
       font-size: 18px; font-weight: bold; width: 100%; cursor: pointer;
       box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4); transition: 0.2s;
+      flex-shrink: 0;
     }
     .btn-play:active { transform: scale(0.95); }
 
@@ -231,6 +240,7 @@
       background: transparent; border: 1px solid #444; color: #ccc;
       padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold;
       width: 100%; cursor: pointer; transition: 0.2s;
+      flex-shrink: 0;
     }
     .btn-close-modal:active { background: #333; }
 
@@ -238,7 +248,7 @@
 </head>
 <body>
 
-  <h1>Мои проекты 🚀</h1>
+  <h1>🚀Наши проекты 🚀</h1>
 
   <div class="container">
 
@@ -359,6 +369,8 @@
     };
 
     // --- КАПИТАЛ ДЛЯ РОБЛОКС-БИРЖИ ---
+    // ВАЖНО: здесь используется ключ 'robloxExchangeV10'. 
+    // Если у тебя в бирже ключ 'ROBLOX_EXCHANGE_ALPHA_SAVE', замени его здесь!
     const savedData = localStorage.getItem('robloxExchangeV10');
     if (savedData) {
       try {
