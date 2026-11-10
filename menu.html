@@ -50,6 +50,7 @@
       position: relative;
       overflow: hidden;
       transition: 0.3s;
+      cursor: pointer;
     }
     .banner:active { transform: scale(0.98); }
 
@@ -103,10 +104,7 @@
       box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     }
 
-    .banner-icon {
-      font-size: 40px;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-    }
+    .banner-icon { font-size: 40px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
 
     /* --- ТОП (ЗОЛОТОЙ) --- */
     .banner-top {
@@ -149,7 +147,6 @@
       border: 1px solid #2c5364;
       transition: 0.2s;
       cursor: pointer;
-      text-decoration: none;
       color: white;
     }
     
@@ -175,26 +172,57 @@
       gap: 2px;
     }
 
-    .game-title { 
-      font-size: 13px; 
-      font-weight: bold; 
-      text-align: center; 
-      margin-bottom: 5px; 
-    }
-    
-    .game-desc {
-      font-size: 11px;
-      color: #aaa;
-      text-align: center;
-      line-height: 1.3;
-    }
+    .game-title { font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 5px; }
+    .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
 
-    .footer {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #666;
+    .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
+
+    /* --- МОДАЛЬНОЕ ОКНО (КАК В БИРЖЕ) --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
+      z-index: 100; backdrop-filter: blur(8px); padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: #1a1a24; padding: 25px 20px; border-radius: 24px;
+      width: 100%; max-width: 350px; border: 2px solid #4facfe;
+      display: flex; flex-direction: column; align-items: center; gap: 15px;
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       text-align: center;
     }
+    @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+    .modal-icon-box {
+      width: 90px; height: 90px;
+      background: linear-gradient(135deg, #2c5364, #203a43);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 5px;
+    }
+    .modal-icon { font-size: 50px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); display: flex; gap: 5px; }
+
+    .modal-title { font-size: 24px; font-weight: bold; }
+    .modal-desc { font-size: 14px; color: #aaa; line-height: 1.5; margin-bottom: 10px; }
+
+    .btn-play {
+      background: linear-gradient(90deg, #00f2fe, #4facfe);
+      color: #000; border: none; padding: 15px; border-radius: 12px;
+      font-size: 18px; font-weight: bold; width: 100%; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4); transition: 0.2s;
+    }
+    .btn-play:active { transform: scale(0.95); }
+
+    .btn-close-modal {
+      background: transparent; border: 1px solid #555; color: #aaa;
+      padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold;
+      width: 100%; cursor: pointer; margin-top: 5px; transition: 0.2s;
+    }
+    .btn-close-modal:active { background: #333; }
+
   </style>
 </head>
 <body>
@@ -204,7 +232,7 @@
   <div class="container">
 
     <!-- 1. ТОП БАННЕР (ЗОЛОТОЙ) -->
-    <a href="roblox.html" class="banner banner-top">
+    <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!')">
       <div class="banner-info">
         <div class="banner-badge">👑 ТОП ИГРА 👑</div>
         <div class="banner-title">Роблокс-Биржа</div>
@@ -213,10 +241,10 @@
       <div class="banner-icon-box">
         <div class="banner-icon">📈</div>
       </div>
-    </a>
+    </div>
 
     <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
-    <a href="cards.html" class="banner banner-new">
+    <div class="banner banner-new" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!')">
       <div class="banner-info">
         <div class="banner-badge">🔥 НОВИНКА 🔥</div>
         <div class="banner-title">Битва Мемов</div>
@@ -225,46 +253,46 @@
       <div class="banner-icon-box">
         <div class="banner-icon">🃏</div>
       </div>
-    </a>
+    </div>
 
     <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
     <div class="games-list">
       
-      <a href="index.html" class="game-card">
+      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!')">
         <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
         <div class="game-title">Напиток-Миллионера</div>
         <div class="game-desc">Генератор дорогих коктейлей.</div>
-      </a>
+      </div>
 
-      <a href="button.html" class="game-card">
+      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?')">
         <div class="icon-box"><div class="game-icon">😈🔴</div></div>
         <div class="game-title">Опасная кнопка</div>
         <div class="game-desc">То, что нельзя нажимать.</div>
-      </a>
+      </div>
 
-      <a href="universe.html" class="game-card">
+      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.')">
         <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
         <div class="game-title">Управление Вселенной</div>
         <div class="game-desc">Квадратные коты и хаос.</div>
-      </a>
+      </div>
 
-      <a href="excuse.html" class="game-card">
+      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.')">
         <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
         <div class="game-title">Генератор Отмазок</div>
         <div class="game-desc">Железобетонные причины.</div>
-      </a>
+      </div>
 
-      <a href="gravity.html" class="game-card">
+      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.')">
         <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
         <div class="game-title">Гравитация</div>
         <div class="game-desc">Создавай планеты и черные дыры.</div>
-      </a>
+      </div>
 
-      <a href="apocalypse.html" class="game-card">
+      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.')">
         <div class="icon-box"><div class="game-icon">💣💥</div></div>
         <div class="game-title">Кнопка Апокалипсиса</div>
         <div class="game-desc">Уничтожь 8 миллиардов человек.</div>
-      </a>
+      </div>
 
     </div>
 
@@ -274,9 +302,46 @@
 
   </div>
 
-  <!-- СКРИПТ ДЛЯ ПОКАЗА КАПИТАЛА В РОБЛОКС-БИРЖЕ -->
+  <!-- МОДАЛЬНОЕ ОКНО -->
+  <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
+    <div class="modal-content" id="modal-content">
+      <div class="modal-icon-box">
+        <div class="modal-icon" id="modal-icon">🎮</div>
+      </div>
+      <div class="modal-title" id="modal-title">Название</div>
+      <div class="modal-desc" id="modal-desc">Описание игры...</div>
+      
+      <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
+      <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
+    </div>
+  </div>
+
   <script>
-    const savedData = localStorage.getItem('robloxExchangeV10'); // Актуальная версия сейва
+    // --- ЛОГИКА МОДАЛЬНОГО ОКНА ---
+    let currentGameUrl = '';
+
+    function openModal(url, title, icon, desc) {
+      currentGameUrl = url;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-icon').textContent = icon;
+      document.getElementById('modal-desc').textContent = desc;
+      document.getElementById('game-modal').classList.add('active');
+    }
+
+    function closeModal(event) {
+      if (event) {
+        // Закрываем только если кликнули по фону или кнопке закрытия
+        if (event.target.id !== 'game-modal' && !event.target.classList.contains('btn-close-modal')) return;
+      }
+      document.getElementById('game-modal').classList.remove('active');
+    }
+
+    document.getElementById('modal-btn-play').onclick = () => {
+      if (currentGameUrl) window.location.href = currentGameUrl;
+    };
+
+    // --- КАПИТАЛ ДЛЯ РОБЛОКС-БИРЖИ ---
+    const savedData = localStorage.getItem('robloxExchangeV10');
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
@@ -285,14 +350,12 @@
           if (data.portfolio && data.gamesData) {
              for (const id in data.portfolio) {
                 const game = data.gamesData.find(g => g.id === id);
-                if (game) {
-                   netWorth += data.portfolio[id].shares * game.online;
-                }
+                if (game) netWorth += data.portfolio[id].shares * game.online;
              }
           }
           const bannerDesc = document.getElementById('banner-capital');
           if (bannerDesc) {
-             bannerDesc.innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b><br>Покупай акции и следи за онлайном.`;
+             bannerDesc.innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
           }
         }
       } catch(e){}
