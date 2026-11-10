@@ -226,10 +226,17 @@
     @keyframes runAcross { 0% { transform: translateX(-100px); } 100% { transform: translateX(100vw); } }
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover { 0% { transform: translateY(0) rotate(-15deg); } 100% { transform: translateY(-30px) rotate(15deg); } }
+    
+    /* Метеориты падают БЕЗ вращения */
     .fall-anim { animation: fallDown linear forwards; }
-    @keyframes fallDown { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(75vh) rotate(360deg); } }
+    @keyframes fallDown { 0% { transform: translateY(0); } 100% { transform: translateY(75vh); } }
+    
     .fly-up-anim { animation: flyUp linear forwards; }
     @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; } }
+
+    /* Катсцены падают ровно вниз (без кувырканий) */
+    .fall-smooth-anim { animation: fallSmooth linear forwards; }
+    @keyframes fallSmooth { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(75vh); opacity: 0; } }
 
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
@@ -378,7 +385,7 @@
       mainUI.classList.remove('hidden'); 
     });
 
-    // --- КАТСЦЕНЫ ---
+    // --- КАТСЦЕНЫ (ИСПРАВЛЕНЫ: ПАДАЮТ РОВНО) ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
@@ -390,7 +397,7 @@
       const isGravityOn = gravityToggle.checked;
       const cutsceneObjects = [];
 
-      // Спавним котов для катсцены (строго на земле)
+      // Спавним котов
       if (catsToggle.checked) {
         for(let i=0; i<3; i++) {
           const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
@@ -404,7 +411,7 @@
       if (pizzaToggle.checked) {
         for(let i=0; i<5; i++) {
           const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
-          if (isGravityOn) { pizza.classList.add('fall-anim'); pizza.style.top = '-100px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; } 
+          if (isGravityOn) { pizza.classList.add('fall-smooth-anim'); pizza.style.top = '-100px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; } 
           else { pizza.classList.add('fly-up-anim'); pizza.style.bottom = '10%'; pizza.style.top = 'auto'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; }
           layer.appendChild(pizza); cutsceneObjects.push(pizza);
         }
@@ -413,7 +420,7 @@
       if (fishToggle.checked) {
         for(let i=0; i<7; i++) {
           const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
-          if (isGravityOn) { fish.classList.add('fall-anim'); fish.style.top = '-100px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; } 
+          if (isGravityOn) { fish.classList.add('fall-smooth-anim'); fish.style.top = '-100px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; } 
           else { fish.classList.add('fly-up-anim'); fish.style.bottom = '10%'; fish.style.top = 'auto'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; }
           layer.appendChild(fish); cutsceneObjects.push(fish);
         }
@@ -511,7 +518,7 @@
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА ---
+    // --- ЧЕРНАЯ ДЫРА (ТЕПЕРЬ НЕ УДАЛЯЕТ, А ПРИТЯГИВАЕТ) ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
       const centerX = window.innerWidth / 2;
@@ -522,16 +529,17 @@
         const rect = obj.getBoundingClientRect();
         const objX = rect.left + rect.width / 2;
         const objY = rect.top + rect.height / 2;
+        
+        // Вектор к центру
         const deltaX = centerX - objX;
         const deltaY = centerY - objY;
-
-        obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
-        obj.classList.add('sucked');
         
-        obj.style.transition = 'transform 1.5s ease-in, opacity 1.5s ease-in';
-        obj.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0) rotate(720deg)`;
-        obj.style.opacity = '0';
-        setTimeout(() => obj.remove(), 1500);
+        obj.classList.add('sucked');
+        obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
+        
+        // Оставляем их кружить вокруг дыры
+        obj.style.transition = 'all 2s ease-in-out';
+        obj.style.transform = `translate(${deltaX * 0.8}px, ${deltaY * 0.8}px) rotate(360deg)`;
       });
     }
 
@@ -545,6 +553,12 @@
       } else {
         blackHole.classList.remove('active', 'pulsate');
         clearInterval(intervals.blackholeSuck);
+        // Возвращаем объекты обратно (сбрасываем анимацию)
+        document.querySelectorAll('.sucked').forEach(obj => {
+           obj.classList.remove('sucked');
+           obj.style.transition = 'none';
+           obj.style.transform = 'none';
+        });
       }
     });
 
@@ -576,18 +590,17 @@
       }
     });
 
-    // ИСПРАВЛЕННЫЙ МИР ВО ВСЕМ МИРЕ (ОПУСКАЕТ ВСЕХ НА ЗЕМЛЮ)
     peaceToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.peace) { played.peace = true; showCutscene("Все конфликты урегулированы..."); addNews("Наступил мир во всем мире. Все обнимаются!", "all"); }
         
+        // Отключаем злые тумблеры
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
           if (chk !== peaceToggle && chk !== skyToggle && chk !== catsToggle && chk !== gravityToggle) {
             if (chk.checked) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
           }
         });
 
-        // Опускаем всех котов и предметы на землю
         document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => {
           obj.classList.add('peace-glow');
           obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
@@ -595,7 +608,7 @@
           if(obj.classList.contains('modern-cat')) {
              obj.style.top = 'auto'; obj.style.bottom = '25%';
           } else {
-             obj.style.top = '72vh'; // Примерно уровень земли
+             obj.style.top = '72vh'; 
           }
         });
         
