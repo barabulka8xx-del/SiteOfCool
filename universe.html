@@ -26,7 +26,6 @@
       overflow: hidden; 
     }
 
-    /* --- КАТСЦЕНА И РЕЖИМ МИРА --- */
     #world-view {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
@@ -66,7 +65,6 @@
     }
     .close-world-btn.active { display: block; }
 
-    /* --- ГОРОД --- */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2;}
     
@@ -99,7 +97,6 @@
       background-size: 100% 100%;
     }
 
-    /* --- ИНТЕРФЕЙС --- */
     .main-container {
       display: flex; gap: 20px; z-index: 60; align-items: flex-start; justify-content: center;
       width: 100%; padding: 20px; transition: opacity 0.5s ease;
@@ -180,7 +177,6 @@
     }
     .world-btn:active { transform: scale(0.95); }
 
-    /* --- КВАДРАТНЫЙ КОТ --- */
     .modern-cat {
       position: absolute; width: 60px; height: 60px;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
@@ -200,10 +196,8 @@
     .cat-paw-l { left: 10px; }
     .cat-paw-r { right: 15px; }
 
-    /* Объекты */
     .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; }
 
-    /* Анимации */
     .run-anim { animation: runAcross linear forwards; }
     @keyframes runAcross { 0% { transform: translateX(-100px); } 100% { transform: translateX(100vw); } }
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
@@ -216,7 +210,6 @@
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
 
-    /* Смена неба */
     .sky-day { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important; }
     .sky-sunset { background: linear-gradient(135deg, #2b1055, #7597de) !important; }
     .sky-night { background: linear-gradient(135deg, #000000, #434343) !important; }
@@ -291,7 +284,6 @@
     const played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false };
     const isWorldMode = () => worldView.classList.contains('active') && mainUI.classList.contains('hidden');
 
-    // --- НОВОСТИ ---
     const pressList = [
       { name: "Daily Pixel", color: "#4facfe", topic: "all" },
       { name: "The Quantum Times", color: "#00f2fe", topic: "all" },
@@ -318,29 +310,35 @@
       if (newsFeed.children.length > 11) newsFeed.removeChild(newsFeed.lastChild);
     }
 
-    // --- РЕЖИМ МИРА ---
     enterWorldBtn.addEventListener('click', () => {
-      mainUI.classList.add('hidden'); // Скрываем пульт
+      mainUI.classList.add('hidden'); 
       worldView.classList.add('active');
       closeWorldBtn.classList.add('active');
       worldText.textContent = "Режим наблюдателя активирован...";
       worldText.style.animation = 'none';
       worldText.offsetHeight; 
       worldText.style.animation = 'fadeInOut 3s forwards';
+      
+      // Переносим котов на дорогу
+      document.querySelectorAll('.modern-cat').forEach(cat => {
+        if (gravityToggle.checked) {
+          cat.style.top = 'auto';
+          cat.style.bottom = '25%';
+        }
+      });
     });
 
     closeWorldBtn.addEventListener('click', () => {
       worldView.classList.remove('active');
       closeWorldBtn.classList.remove('active');
-      mainUI.classList.remove('hidden'); // Возвращаем пульт
+      mainUI.classList.remove('hidden'); 
       setTimeout(() => { groundPile.innerHTML = ''; }, 500);
     });
 
-    // --- КАТСЦЕНЫ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
-      mainUI.classList.add('hidden'); // СКРЫВАЕМ ПУЛЬТ НА ВРЕМЯ КАТСЦЕНЫ
+      mainUI.classList.add('hidden'); 
       worldView.classList.add('active');
       worldText.textContent = text;
       
@@ -382,12 +380,11 @@
 
       setTimeout(() => {
         worldView.classList.remove('active'); 
-        mainUI.classList.remove('hidden'); // ВОЗВРАЩАЕМ ПУЛЬТ
+        mainUI.classList.remove('hidden'); 
         cutsceneObjects.forEach(obj => obj.remove());
       }, duration); 
     }
 
-    // --- СПАВНЕРЫ ---
     const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
 
     function addToGroundPile(element, textContent) {
@@ -408,7 +405,6 @@
       }
       groundPile.appendChild(pileItem);
 
-      // Лежат 2 сек и растворяются
       setTimeout(() => {
         pileItem.classList.add('dissolve-anim');
         setTimeout(() => pileItem.remove(), 1500);
@@ -426,8 +422,9 @@
           cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
           cat.addEventListener('animationend', () => cat.remove());
         } else { 
+          // В режиме мира коты всегда бегут по дороге (снизу)
           if (isWorldMode()) {
-             cat.style.bottom = '25%'; // Строго по дороге
+             cat.style.bottom = '25%'; 
              cat.style.top = 'auto';
           } else {
              cat.style.top = (Math.random() * 60 + 20) + 'vh';
@@ -487,7 +484,6 @@
       }, 2000);
     }
 
-    // --- ОБРАБОТЧИКИ ---
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление квадратных котов.", "cats"); setTimeout(startCats, 2500); } 
@@ -570,7 +566,6 @@
       }
     });
 
-    // Смена неба
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
