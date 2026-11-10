@@ -26,20 +26,27 @@
       overflow: hidden; 
     }
 
+    /* --- КАТСЦЕНА И РЕЖИМ МИРА --- */
     #world-view {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+      background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); /* Дефолт: День */
       z-index: 40; 
       display: none; 
       flex-direction: column;
       align-items: center;
       justify-content: center;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.5s ease, background 1s ease;
       overflow: hidden;
     }
 
     #world-view.active { display: flex; opacity: 1; }
+
+    /* Смена неба для мира */
+    .world-sky-day { background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%) !important; }
+    .world-sky-sunset { background: linear-gradient(to bottom, #ff7e5f 0%, #feb47b 100%) !important; }
+    .world-sky-night { background: linear-gradient(to bottom, #0f2027 0%, #203a43 100%) !important; }
+    .world-sky-matrix { background: linear-gradient(to bottom, #000000 0%, #003300 100%) !important; }
 
     .world-text {
       position: absolute; top: 25%; font-size: 24px; font-weight: 700; text-align: center;
@@ -65,6 +72,7 @@
     }
     .close-world-btn.active { display: block; }
 
+    /* --- ГОРОД --- */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2;}
     
@@ -97,6 +105,7 @@
       background-size: 100% 100%;
     }
 
+    /* --- ИНТЕРФЕЙС --- */
     .main-container {
       display: flex; gap: 20px; z-index: 60; align-items: flex-start; justify-content: center;
       width: 100%; padding: 20px; transition: opacity 0.5s ease;
@@ -224,7 +233,8 @@
 </head>
 <body class="sky-day" id="main-body">
 
-  <div id="world-view">
+  <!-- Экран "МИР" / Катсцены -->
+  <div id="world-view" class="world-sky-day">
     <button class="close-world-btn" id="close-world-btn">Выйти из Мира ✖</button>
     <div class="world-text" id="world-text">Наблюдение за миром...</div>
     
@@ -256,8 +266,7 @@
       <h2>Лента событий</h2>
     </div>
   </div>
-
-  <script>
+    <script>
     const body = document.getElementById('main-body');
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
@@ -284,6 +293,7 @@
     const played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false };
     const isWorldMode = () => worldView.classList.contains('active') && mainUI.classList.contains('hidden');
 
+    // --- НОВОСТИ ---
     const pressList = [
       { name: "Daily Pixel", color: "#4facfe", topic: "all" },
       { name: "The Quantum Times", color: "#00f2fe", topic: "all" },
@@ -310,6 +320,7 @@
       if (newsFeed.children.length > 11) newsFeed.removeChild(newsFeed.lastChild);
     }
 
+    // --- РЕЖИМ МИРА ---
     enterWorldBtn.addEventListener('click', () => {
       mainUI.classList.add('hidden'); 
       worldView.classList.add('active');
@@ -319,7 +330,7 @@
       worldText.offsetHeight; 
       worldText.style.animation = 'fadeInOut 3s forwards';
       
-      // Переносим котов на дорогу
+      // Переносим котов на дорогу при входе в мир
       document.querySelectorAll('.modern-cat').forEach(cat => {
         if (gravityToggle.checked) {
           cat.style.top = 'auto';
@@ -335,6 +346,7 @@
       setTimeout(() => { groundPile.innerHTML = ''; }, 500);
     });
 
+    // --- КАТСЦЕНЫ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
@@ -345,14 +357,19 @@
       const isGravityOn = gravityToggle.checked;
       const cutsceneObjects = [];
 
+      // Коты в катсцене (теперь строго на земле)
       if (catsToggle.checked) {
         for(let i=0; i<3; i++) {
-          const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; cat.style.bottom = '25%'; 
+          const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
+          cat.style.bottom = '25%'; 
+          cat.style.top = 'auto';
+          
           if (isGravityOn) { cat.classList.add('run-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's'; cat.style.animationDelay = i * 0.3 + 's'; } 
           else { cat.style.left = (Math.random() * 80 + 10) + '%'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; cat.style.animationDelay = i * 0.2 + 's'; }
           layer.appendChild(cat); cutsceneObjects.push(cat);
         }
       }
+      // Пицца
       if (pizzaToggle.checked) {
         for(let i=0; i<5; i++) {
           const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
@@ -361,6 +378,7 @@
           layer.appendChild(pizza); cutsceneObjects.push(pizza);
         }
       }
+      // Рыба
       if (fishToggle.checked) {
         for(let i=0; i<7; i++) {
           const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
@@ -369,6 +387,7 @@
           layer.appendChild(fish); cutsceneObjects.push(fish);
         }
       }
+      // НЛО
       if (alienToggle.checked) {
         for(let i=0; i<3; i++) {
           const ufo = document.createElement('div'); ufo.className = 'flying-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 80 + 10) + '%';
@@ -385,6 +404,7 @@
       }, duration); 
     }
 
+    // --- СПАВНЕРЫ ---
     const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
 
     function addToGroundPile(element, textContent) {
@@ -422,9 +442,8 @@
           cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
           cat.addEventListener('animationend', () => cat.remove());
         } else { 
-          // В режиме мира коты всегда бегут по дороге (снизу)
           if (isWorldMode()) {
-             cat.style.bottom = '25%'; 
+             cat.style.bottom = '25%'; // В мире строго на дороге
              cat.style.top = 'auto';
           } else {
              cat.style.top = (Math.random() * 60 + 20) + 'vh';
@@ -484,6 +503,7 @@
       }, 2000);
     }
 
+    // --- ОБРАБОТЧИКИ ---
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление квадратных котов.", "cats"); setTimeout(startCats, 2500); } 
@@ -566,16 +586,28 @@
       }
     });
 
+    // --- СМЕНА НЕБА (ТЕПЕРЬ И В МИРЕ) ---
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
+      
+      // Удаляем старые классы неба
       body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
+      worldView.classList.remove('world-sky-day', 'world-sky-sunset', 'world-sky-night', 'world-sky-matrix');
       
       let skyName = "";
-      if (skyState === 0) { body.classList.add('sky-day'); skyName = "День"; }
-      if (skyState === 1) { body.classList.add('sky-sunset'); skyName = "Закат"; }
-      if (skyState === 2) { body.classList.add('sky-night'); skyName = "Ночь"; }
-      if (skyState === 3) { body.classList.add('sky-matrix'); skyName = "Матрица"; }
+      if (skyState === 0) { 
+        body.classList.add('sky-day'); worldView.classList.add('world-sky-day'); skyName = "День"; 
+      }
+      if (skyState === 1) { 
+        body.classList.add('sky-sunset'); worldView.classList.add('world-sky-sunset'); skyName = "Закат"; 
+      }
+      if (skyState === 2) { 
+        body.classList.add('sky-night'); worldView.classList.add('world-sky-night'); skyName = "Ночь"; 
+      }
+      if (skyState === 3) { 
+        body.classList.add('sky-matrix'); worldView.classList.add('world-sky-matrix'); skyName = "Матрица"; 
+      }
 
       addNews(`Время суток изменилось на: ${skyName}.`, "all");
     });
