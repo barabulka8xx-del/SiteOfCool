@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <!-- Запрещаем браузеру уменьшать масштаб на телефонах -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Пиксельный Пульт</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -26,7 +27,6 @@
     #animation-layer {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none; z-index: 1;
-      /* Ограничиваем, чтобы коты не улетали за экран */
       overflow: hidden; 
     }
 
@@ -69,36 +69,34 @@
     input:checked + .slider { background-color: #55ff55; }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- ДЕТАЛЬНЫЙ ПИКСЕЛЬНЫЙ КОТ --- */
+    /* --- УВЕЛИЧЕННЫЙ ПИКСЕЛЬНЫЙ КОТ --- */
     .pixel-cat {
       position: absolute;
-      width: 6px; height: 6px; 
+      width: 8px; height: 8px; /* Увеличили размер пикселя */
       box-shadow: 
-        12px 0 0 #f4a460, 36px 0 0 #f4a460,
-        6px 6px 0 #f4a460, 12px 6px 0 #f4a460, 18px 6px 0 #f4a460, 30px 6px 0 #f4a460, 36px 6px 0 #f4a460, 42px 6px 0 #f4a460,
-        0 12px 0 #f4a460, 6px 12px 0 #f4a460, 12px 12px 0 #f4a460, 18px 12px 0 #f4a460, 24px 12px 0 #f4a460, 30px 12px 0 #f4a460, 36px 12px 0 #f4a460, 42px 12px 0 #f4a460, 48px 12px 0 #f4a460,
-        0 18px 0 #f4a460, 6px 18px 0 #000, 12px 18px 0 #000, 18px 18px 0 #f4a460, 24px 18px 0 #f4a460, 30px 18px 0 #000, 36px 18px 0 #000, 42px 18px 0 #f4a460, 48px 18px 0 #f4a460,
-        0 24px 0 #f4a460, 6px 24px 0 #f4a460, 12px 24px 0 #f4a460, 18px 24px 0 #f4a460, 24px 24px 0 #ff69b4, 30px 24px 0 #f4a460, 36px 24px 0 #f4a460, 42px 24px 0 #f4a460, 48px 24px 0 #f4a460,
-        0 30px 0 #f4a460, 6px 30px 0 #f4a460, 12px 30px 0 #f4a460, 18px 30px 0 #f4a460, 24px 30px 0 #f4a460, 30px 30px 0 #f4a460, 36px 30px 0 #f4a460, 42px 30px 0 #f4a460, 48px 30px 0 #f4a460,
-        6px 36px 0 #f4a460, 12px 36px 0 #f4a460, 18px 36px 0 #f4a460, 24px 36px 0 #f4a460, 30px 36px 0 #f4a460, 36px 36px 0 #f4a460, 42px 36px 0 #f4a460,
-        6px 42px 0 #f4a460, 12px 42px 0 #f4a460, 18px 42px 0 #f4a460, 24px 42px 0 #f4a460, 30px 42px 0 #f4a460, 36px 42px 0 #f4a460, 42px 42px 0 #f4a460,
-        6px 48px 0 #f4a460, 12px 48px 0 #000, 18px 48px 0 #f4a460, 30px 48px 0 #f4a460, 36px 48px 0 #000, 42px 48px 0 #f4a460,
-        48px 36px 0 #f4a460, 54px 30px 0 #f4a460, 54px 24px 0 #f4a460;
+        16px 0 0 #f4a460, 48px 0 0 #f4a460,
+        8px 8px 0 #f4a460, 16px 8px 0 #f4a460, 24px 8px 0 #f4a460, 40px 8px 0 #f4a460, 48px 8px 0 #f4a460, 56px 8px 0 #f4a460,
+        0 16px 0 #f4a460, 8px 16px 0 #f4a460, 16px 16px 0 #f4a460, 24px 16px 0 #f4a460, 32px 16px 0 #f4a460, 40px 16px 0 #f4a460, 48px 16px 0 #f4a460, 56px 16px 0 #f4a460, 64px 16px 0 #f4a460,
+        0 24px 0 #f4a460, 8px 24px 0 #000, 16px 24px 0 #000, 24px 24px 0 #f4a460, 32px 24px 0 #f4a460, 40px 24px 0 #000, 48px 24px 0 #000, 56px 24px 0 #f4a460, 64px 24px 0 #f4a460,
+        0 32px 0 #f4a460, 8px 32px 0 #f4a460, 16px 32px 0 #f4a460, 24px 32px 0 #f4a460, 32px 32px 0 #ff69b4, 40px 32px 0 #f4a460, 48px 32px 0 #f4a460, 56px 32px 0 #f4a460, 64px 32px 0 #f4a460,
+        0 40px 0 #f4a460, 8px 40px 0 #f4a460, 16px 40px 0 #f4a460, 24px 40px 0 #f4a460, 32px 40px 0 #f4a460, 40px 40px 0 #f4a460, 48px 40px 0 #f4a460, 56px 40px 0 #f4a460, 64px 40px 0 #f4a460,
+        8px 48px 0 #f4a460, 16px 48px 0 #f4a460, 24px 48px 0 #f4a460, 32px 48px 0 #f4a460, 40px 48px 0 #f4a460, 48px 48px 0 #f4a460, 56px 48px 0 #f4a460,
+        8px 56px 0 #f4a460, 16px 56px 0 #f4a460, 24px 56px 0 #f4a460, 32px 56px 0 #f4a460, 40px 56px 0 #f4a460, 48px 56px 0 #f4a460, 56px 56px 0 #f4a460,
+        8px 64px 0 #f4a460, 16px 64px 0 #000, 24px 64px 0 #f4a460, 40px 64px 0 #f4a460, 48px 64px 0 #000, 56px 64px 0 #f4a460,
+        64px 48px 0 #f4a460, 72px 40px 0 #f4a460, 72px 32px 0 #f4a460;
       
-      /* Плавные переходы для JS */
       transition: top 1s ease-in, transform 1s ease-in;
     }
 
     .pixel-pizza {
       position: absolute;
-      width: 8px; height: 8px;
+      width: 10px; height: 10px;
       box-shadow: 
-        16px 0 0 #ffcc00,
-        8px 8px 0 #ffcc00, 16px 8px 0 #ff0000, 24px 8px 0 #ffcc00,
-        0 16px 0 #ffcc00, 8px 16px 0 #ffcc00, 16px 16px 0 #ffcc00, 24px 16px 0 #ffcc00, 32px 16px 0 #ffcc00;
+        20px 0 0 #ffcc00,
+        10px 10px 0 #ffcc00, 20px 10px 0 #ff0000, 30px 10px 0 #ffcc00,
+        0 20px 0 #ffcc00, 10px 20px 0 #ffcc00, 20px 20px 0 #ffcc00, 30px 20px 0 #ffcc00, 40px 20px 0 #ffcc00;
     }
 
-    /* Анимация бега (бесконечная) */
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
       0% { transform: translateX(-100px) scaleX(1); }
@@ -107,7 +105,6 @@
       100% { transform: translateX(-100px) scaleX(-1); }
     }
 
-    /* Анимация парения в невесомости */
     .float-anim { animation: hover steps(10) infinite alternate; }
     @keyframes hover {
       0% { transform: translateY(0) rotate(-10deg); }
@@ -186,13 +183,11 @@
       const cat = document.createElement('div');
       cat.className = 'pixel-cat';
       
-      // Задаем стартовую позицию (внизу экрана)
-      const startY = Math.random() * 40 + 50; 
+      // Коты бегают по всей высоте экрана
+      const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
-      cat.dataset.startY = startY; // Запоминаем высоту
 
       if (!gravityToggle.checked) {
-        // Если гравитация выключена, сразу закидываем наверх
         cat.style.top = '10vh'; 
         cat.classList.add('float-anim');
       } else {
@@ -206,31 +201,17 @@
       const cats = document.querySelectorAll('.pixel-cat');
       
       if (!e.target.checked) {
-        // Гравитация ВЫКЛ - коты улетают вверх и остаются там парить
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
-          cat.style.animation = 'none'; // Сбрасываем анимацию бега
-          
-          // Плавно перемещаем кота наверх экрана (в невесомость)
+          cat.style.animation = 'none'; 
           cat.style.top = (Math.random() * 15 + 5) + 'vh'; 
-          
-          // Включаем анимацию парения
-          setTimeout(() => {
-            cat.classList.add('float-anim');
-          }, 1000); // Ждем, пока долетит
+          setTimeout(() => cat.classList.add('float-anim'), 1000);
         });
       } else {
-        // Гравитация ВКЛ - коты падают вниз и бегут
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
-          
-          // Возвращаем кота на его изначальную высоту (или рандомную внизу)
-          cat.style.top = (Math.random() * 40 + 50) + 'vh';
-          
-          // Через секунду (когда упадет) включаем бег
-          setTimeout(() => {
-            cat.classList.add('run-anim');
-          }, 1000);
+          cat.style.top = (Math.random() * 60 + 20) + 'vh';
+          setTimeout(() => cat.classList.add('run-anim'), 1000);
         });
       }
     });
