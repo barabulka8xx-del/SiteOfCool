@@ -301,7 +301,6 @@
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
     
-    // Элементы управления
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
@@ -314,7 +313,6 @@
     const balloonsToggle = document.getElementById('toggle-balloons');
     const peaceToggle = document.getElementById('toggle-peace');
     
-    // Элементы Мира
     const worldView = document.getElementById('world-view');
     const mainUI = document.getElementById('main-ui');
     const enterWorldBtn = document.getElementById('enter-world-btn');
@@ -380,7 +378,7 @@
       mainUI.classList.remove('hidden'); 
     });
 
-    // --- КАТСЦЕНЫ С ОБЪЕКТАМИ ---
+    // --- КАТСЦЕНЫ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
@@ -392,7 +390,7 @@
       const isGravityOn = gravityToggle.checked;
       const cutsceneObjects = [];
 
-      // Спавним котов для катсцены
+      // Спавним котов для катсцены (строго на земле)
       if (catsToggle.checked) {
         for(let i=0; i<3; i++) {
           const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
@@ -402,7 +400,7 @@
           layer.appendChild(cat); cutsceneObjects.push(cat);
         }
       }
-      // Спавним пиццу для катсцены
+      // Пицца
       if (pizzaToggle.checked) {
         for(let i=0; i<5; i++) {
           const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
@@ -411,7 +409,7 @@
           layer.appendChild(pizza); cutsceneObjects.push(pizza);
         }
       }
-      // Спавним рыбу для катсцены
+      // Рыба
       if (fishToggle.checked) {
         for(let i=0; i<7; i++) {
           const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
@@ -578,6 +576,7 @@
       }
     });
 
+    // ИСПРАВЛЕННЫЙ МИР ВО ВСЕМ МИРЕ (ОПУСКАЕТ ВСЕХ НА ЗЕМЛЮ)
     peaceToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.peace) { played.peace = true; showCutscene("Все конфликты урегулированы..."); addNews("Наступил мир во всем мире. Все обнимаются!", "all"); }
@@ -588,7 +587,18 @@
           }
         });
 
-        document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => obj.classList.add('peace-glow'));
+        // Опускаем всех котов и предметы на землю
+        document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => {
+          obj.classList.add('peace-glow');
+          obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
+          obj.style.transition = 'all 1s ease';
+          if(obj.classList.contains('modern-cat')) {
+             obj.style.top = 'auto'; obj.style.bottom = '25%';
+          } else {
+             obj.style.top = '72vh'; // Примерно уровень земли
+          }
+        });
+        
         body.classList.add('peace-bg');
       } else {
         document.querySelectorAll('.peace-glow').forEach(obj => obj.classList.remove('peace-glow'));
@@ -622,7 +632,6 @@
       }
     });
 
-    // Смена неба
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
