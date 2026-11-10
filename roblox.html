@@ -198,7 +198,7 @@
   <div class="notification" id="notification"></div>
 
   <script>
-    // 25 ИГР (от гигантов до мертвых)
+    // 25 ИГР
     const gamesData = [
       { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [] },
       { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [] },
@@ -227,7 +227,7 @@
       { id: 'void', name: 'Пустота', icon: '🕳️', online: 10, history: [] }
     ];
 
-    let balance = 1000; // СТАРТОВЫЙ БАЛАНС 1000
+    let balance = 1000; 
     let portfolio = {}; 
     
     const balanceEl = document.getElementById('balance');
@@ -239,8 +239,8 @@
 
     let activeGameId = null;
 
-    // Загрузка (версия V6 для сброса)
-    const saved = localStorage.getItem('robloxExchangeV6');
+    // Загрузка сохранения (V7 для сброса на 1000)
+    const saved = localStorage.getItem('robloxExchangeV7');
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -276,17 +276,21 @@
     }
 
     function saveGame() {
-      localStorage.setItem('robloxExchangeV6', JSON.stringify({ balance, portfolio, gamesData }));
+      localStorage.setItem('robloxExchangeV7', JSON.stringify({ balance, portfolio, gamesData }));
     }
 
-    // ЦЕНА = ОНЛАЙНУ (как ты просил)
+    // ЦЕНА = ОНЛАЙНУ
     function getPrice(game) {
       return game.online;
     }
 
+    // ФУНКЦИЯ ОТРИСОВКИ С СОРТИРОВКОЙ
     function renderGames() {
       gamesListEl.innerHTML = '';
       balanceEl.textContent = formatMoney(balance);
+
+      // СОРТИРОВКА: Сначала самые популярные, в конце самые мертвые
+      gamesData.sort((a, b) => b.online - a.online);
 
       gamesData.forEach(game => {
         const bought = portfolio[game.id];
@@ -433,28 +437,40 @@
       }
     };
 
+    // ИГРОВОЙ ЦИКЛ (с Хайпом и трендом на рост)
     setInterval(() => {
       gamesData.forEach(game => {
         const isDead = game.online < 10000;
         const volatility = isDead ? 0.4 : 0.15;
-        const change = (Math.random() * volatility * 2) - volatility;
+        const trend = 0.05; // Небольшой базовый рост
+        
+        let change = (Math.random() * volatility * 2) - volatility + trend;
+        
+        // МЕХАНИКА "ХАЙПА" (5% шанс на резкий скачок)
+        if (Math.random() < 0.05) {
+          change += 0.3 + (Math.random() * 0.5); // Скачок от +30% до +80%
+          showNotification(`🔥 ХАЙП! ${game.name} взлетает!`, 'good');
+        }
+
         game.online = Math.floor(game.online * (1 + change));
         
         if (game.online < 5) game.online = 5; 
-        if (game.online > 2000000) game.online = 2000000;
+        if (game.online > 5000000) game.online = 5000000;
 
         game.history.push(game.online);
         if (game.history.length > 30) game.history.shift();
       });
 
-      renderGames();
+      renderGames(); // Перерисовываем с новой сортировкой
+      
       if (activeGameId) {
         updateModalUI();
         const game = gamesData.find(g => g.id === activeGameId);
         drawChart(game);
       }
+      
       saveGame();
-    }, 2000);
+    }, 1500);
 
     renderGames();
   </script>
