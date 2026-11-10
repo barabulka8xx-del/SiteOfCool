@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Роблокс-Биржа 📈</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0f2027;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #203a43;
+      padding: 15px 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 15px;
+      z-index: 50;
+    }
+
+    .balance { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
+    .balance-label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
+
+    .chart-container {
+      width: 100%;
+      max-width: 500px;
+      height: 180px;
+      background: #1a1a24;
+      border-radius: 15px;
+      border: 1px solid #333;
+      position: relative;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .games-list {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-bottom: 40px;
+    }
+
+    .game-card {
+      background: #203a43;
+      border-radius: 15px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #2c5364;
+      transition: 0.3s;
+    }
+    
+    .game-card:hover { border-color: #4facfe; }
+
+    .game-info { flex: 1; cursor: pointer; }
+    .game-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+    .game-online { font-size: 13px; color: #4facfe; font-weight: bold; }
+    .game-price { font-size: 12px; color: #aaa; margin-top: 5px; }
+
+    .game-actions { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.2s;
+    }
+    .btn:active { transform: scale(0.95); }
+
+    .btn-buy { background: #00ff00; color: #000; }
+    .btn-buy:disabled { background: #555; color: #888; cursor: not-allowed; }
+    
+    .btn-sell { background: #ff0055; color: #fff; }
+    .btn-sell:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+    /* Всплывающие уведомления */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(0,0,0,0.8);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      border: 1px solid #fff;
+      transition: transform 0.3s;
+      z-index: 100;
+    }
+    .notification.show { transform: translateX(-50%) translateY(0); }
+    .notification.good { border-color: #00ff00; color: #00ff00; }
+    .notification.bad { border-color: #ff0055; color: #ff0055; }
+
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <span class="balance-label">Твой баланс:</span>
+      <span class="balance" id="balance">1000</span> 💵
+    </div>
+    <div style="font-size: 24px;">📈</div>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="games-list" id="games-list">
+    <!-- Игры будут добавляться через JS -->
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script>
+    // Игры (от топовых до мертвых)
+    const gamesData = [
+      { id: 'grow', name: 'Grow a Garden 🌱', online: 450000, history: [] }, // Топ
+      { id: 'adopt', name: 'Adopt Me! 🐶', online: 180000, history: [] },   // Популярное
+      { id: 'doors', name: 'DOORS 👁️', online: 85000, history: [] },       // Среднее
+      { id: 'blox', name: 'Blox Fruits 🍎', online: 120000, history: [] },  // Популярное
+      { id: 'dead1', name: 'Заброшенный дом 🏚️', online: 3500, history: [] }, // Малоизвестное
+      { id: 'dead2', name: 'Симулятор камня 🪨', online: 1200, history: [] },  // Мусор
+      { id: 'dead3', name: 'Мой первый обби 🏃', online: 500, history: [] }    // Почти мертвое
+    ];
+
+    let balance = 1000;
+    let portfolio = {}; // { id: { shares: 1, avgPrice: 100 } }
+
+    const balanceEl = document.getElementById('balance');
+    const gamesListEl = document.getElementById('games-list');
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    const notifEl = document.getElementById('notification');
+
+    let activeGameId = 'grow'; // Какая игра сейчас на графике
+
+    // Настройка холста
+    function resizeCanvas() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Загрузка
+    const saved = localStorage.getItem('robloxExchangeV2');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        balance = data.balance || 1000;
+        portfolio = data.portfolio || {};
+        if (data.gamesData) {
+          data.gamesData.forEach(savedGame => {
+            const game = gamesData.find(g => g.id === savedGame.id);
+            if (game) {
+              game.online = savedGame.online;
+              game.history = savedGame.history || [];
+            }
+          });
+        }
+      } catch(e) {}
+    }
+
+    // Инициализация
+    gamesData.forEach(game => {
+      if (game.history.length === 0) {
+        for (let i = 0; i < 20; i++) game.history.push(game.online);
+      }
+    });
+
+    function formatMoney(num) {
+      return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    function showNotification(text, type) {
+      notifEl.textContent = text;
+      notifEl.className = `notification show ${type}`;
+      setTimeout(() => { notifEl.className = 'notification'; }, 2000);
+    }
+
+    function saveGame() {
+      localStorage.setItem('robloxExchangeV2', JSON.stringify({ balance, portfolio, gamesData }));
+    }
+
+    function drawChart() {
+      const game = gamesData.find(g => g.id === activeGameId);
+      if (!game) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const history = game.history;
+      const max = Math.max(...history) * 1.1;
+      const min = Math.min(...history) * 0.9;
+      const range = max - min || 1;
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+
+      for (let i = 0; i < history.length; i++) {
+        const x = (i / (history.length - 1)) * canvas.width;
+        const y = canvas.height - ((history[i] - min) / range) * canvas.height;
+        
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.lineTo(0, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+      ctx.fill();
+    }
+
+    function renderGames() {
+      gamesListEl.innerHTML = '';
+      balanceEl.textContent = formatMoney(balance);
+
+      gamesData.forEach(game => {
+        const bought = portfolio[game.id];
+        
+        // Цена: 1 акция = 10 онлайна (чтобы дешевые игры стоили копейки)
+        const buyPrice = Math.floor(game.online / 100) + 1; 
+        
+        const lastOnline = game.history[game.history.length - 1];
+        const prevOnline = game.history[game.history.length - 2] || lastOnline;
+        const isGrowing = lastOnline >= prevOnline;
+        const trendColor = isGrowing ? '#00ff00' : '#ff0055';
+        const trendArrow = isGrowing ? '▲' : '▼';
+
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.innerHTML = `
+          <div class="game-info" onclick="activeGameId='${game.id}'; drawChart();">
+            <div class="game-title">${game.name}</div>
+            <div class="game-online">Онлайн: ${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
+            <div class="game-price">Цена: ${formatMoney(buyPrice)} 💵</div>
+            ${bought ? `<div style="font-size:11px; color:#ffeb3b; margin-top:5px;">У тебя: ${bought.shares} акций (ср. цена ${formatMoney(bought.avgPrice)})</div>` : ''}
+          </div>
+          <div class="game-actions">
+            <button class="btn btn-buy" ${balance < buyPrice ? 'disabled' : ''} onclick="buyGame('${game.id}', ${buyPrice})">Купить</button>
+            <button class="btn btn-sell" ${!bought ? 'disabled' : ''} onclick="sellGame('${game.id}', ${buyPrice})">Продать</button>
+          </div>
+        `;
+        gamesListEl.appendChild(card);
+      });
+    }
+
+    // Покупка (с расчетом средней цены)
+    window.buyGame = function(id, price) {
+      if (balance >= price) {
+        balance -= price;
+        
+        if (!portfolio[id]) portfolio[id] = { shares: 0, avgPrice: 0 };
+        
+        // Формула средней цены
+        const totalCost = (portfolio[id].shares * portfolio[id].avgPrice) + price;
+        portfolio[id].shares++;
+        portfolio[id].avgPrice = totalCost / portfolio[id].shares;
+        
+        showNotification(`Куплено! -${formatMoney(price)} 💵`, 'good');
+        saveGame();
+        renderGames();
+      }
+    };
+
+    // Продажа (с расчетом профита от средней цены)
+    window.sellGame = function(id, currentPrice) {
+      if (portfolio[id] && portfolio[id].shares > 0) {
+        const avgPrice = portfolio[id].avgPrice;
+        const profit = currentPrice - avgPrice;
+        
+        balance += currentPrice;
+        portfolio[id].shares--;
+        
+        if (portfolio[id].shares === 0) delete portfolio[id];
+
+        if (profit > 0) showNotification(`Продано! +${formatMoney(profit)} 💵`, 'good');
+        else showNotification(`Продано в минус: ${formatMoney(profit)} 💵`, 'bad');
+
+        saveGame();
+        renderGames();
+      }
+    };
+
+    // Игровой цикл
+    setInterval(() => {
+      gamesData.forEach(game => {
+        // Если игра популярная - скачет меньше. Если мертвая - может внезапно взлететь
+        const isDead = game.online < 10000;
+        const volatility = isDead ? 0.4 : 0.15; // Мертвые игры более непредсказуемы
+        
+        const change = (Math.random() * volatility * 2) - volatility;
+        game.online = Math.floor(game.online * (1 + change));
+        
+        if (game.online < 100) game.online = 100; // Не умираем полностью
+        if (game.online > 1000000) game.online = 1000000;
+
+        game.history.push(game.online);
+        if (game.history.length > 30) game.history.shift();
+      });
+
+      drawChart();
+      renderGames();
+      saveGame();
+    }, 2000);
+
+    // Первый запуск
+    renderGames();
+    drawChart();
+
+  </script>
+</body>
+  </html>
