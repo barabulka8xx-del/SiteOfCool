@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title> 🌌Управление Вселенной🌌 </title>
+  <title>🌌Управление Вселенной🌌</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
@@ -271,7 +271,7 @@
 
   <div class="main-container" id="main-ui">
     <div class="panel">
-      <h1>Управление Вселенной 2.0</h1>
+      <h1>🌌Управление Вселенной🌌</h1>
 
       <div class="toggle-row"><span class="toggle-label">🐈 Квадратные коты</span><label class="switch"><input type="checkbox" id="toggle-cats"><span class="slider"></span></label></div>
       <div class="toggle-row"><span class="toggle-label">🌍 Гравитация</span><label class="switch"><input type="checkbox" id="toggle-gravity" checked><span class="slider"></span></label></div>
@@ -301,6 +301,7 @@
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
     
+    // Элементы управления
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
@@ -313,6 +314,7 @@
     const balloonsToggle = document.getElementById('toggle-balloons');
     const peaceToggle = document.getElementById('toggle-peace');
     
+    // Элементы Мира
     const worldView = document.getElementById('world-view');
     const mainUI = document.getElementById('main-ui');
     const enterWorldBtn = document.getElementById('enter-world-btn');
@@ -354,6 +356,15 @@
       if (newsFeed.children.length > 11) newsFeed.removeChild(newsFeed.lastChild);
     }
 
+    // --- БАЗОВЫЕ ФУНКЦИИ ---
+    const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
+
+    function removeElement(el) {
+      if(!el) return;
+      el.classList.add('dissolve-anim');
+      setTimeout(() => el.remove(), 1500);
+    }
+
     // --- РЕЖИМ МИРА ---
     enterWorldBtn.addEventListener('click', () => {
       mainUI.classList.add('hidden'); 
@@ -369,29 +380,55 @@
       mainUI.classList.remove('hidden'); 
     });
 
-    // --- КАТСЦЕНЫ ---
+    // --- КАТСЦЕНЫ С ОБЪЕКТАМИ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
+      
       mainUI.classList.add('hidden'); 
       worldView.classList.add('active');
       worldText.textContent = text;
       worldText.style.animation = 'none'; worldText.offsetHeight; worldText.style.animation = 'fadeInOut 2.5s forwards';
       
+      const isGravityOn = gravityToggle.checked;
+      const cutsceneObjects = [];
+
+      // Спавним котов для катсцены
+      if (catsToggle.checked) {
+        for(let i=0; i<3; i++) {
+          const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML; 
+          cat.style.bottom = '25%'; cat.style.top = 'auto';
+          if (isGravityOn) { cat.classList.add('run-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's'; cat.style.animationDelay = i * 0.3 + 's'; } 
+          else { cat.style.left = (Math.random() * 80 + 10) + '%'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; cat.style.animationDelay = i * 0.2 + 's'; }
+          layer.appendChild(cat); cutsceneObjects.push(cat);
+        }
+      }
+      // Спавним пиццу для катсцены
+      if (pizzaToggle.checked) {
+        for(let i=0; i<5; i++) {
+          const pizza = document.createElement('div'); pizza.className = 'flying-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 80 + 10) + '%';
+          if (isGravityOn) { pizza.classList.add('fall-anim'); pizza.style.top = '-100px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; } 
+          else { pizza.classList.add('fly-up-anim'); pizza.style.bottom = '10%'; pizza.style.top = 'auto'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.style.animationDelay = i * 0.2 + 's'; }
+          layer.appendChild(pizza); cutsceneObjects.push(pizza);
+        }
+      }
+      // Спавним рыбу для катсцены
+      if (fishToggle.checked) {
+        for(let i=0; i<7; i++) {
+          const fish = document.createElement('div'); fish.className = 'flying-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 90 + 5) + '%';
+          if (isGravityOn) { fish.classList.add('fall-anim'); fish.style.top = '-100px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; } 
+          else { fish.classList.add('fly-up-anim'); fish.style.bottom = '10%'; fish.style.top = 'auto'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.style.animationDelay = i * 0.15 + 's'; }
+          layer.appendChild(fish); cutsceneObjects.push(fish);
+        }
+      }
+
       setTimeout(() => {
         worldView.classList.remove('active'); 
         mainUI.classList.remove('hidden'); 
+        cutsceneObjects.forEach(obj => obj.remove());
       }, duration); 
     }
 
     // --- СПАВНЕРЫ ---
-    const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
-
-    function removeElement(el) {
-      if(!el) return;
-      el.classList.add('dissolve-anim');
-      setTimeout(() => el.remove(), 1500);
-    }
-
     function startCats() {
       intervals.cats = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
@@ -462,11 +499,7 @@
       intervals.meteors = setInterval(() => {
         const meteor = document.createElement('div'); meteor.className = 'flying-item meteor-item'; meteor.textContent = '☄️'; meteor.style.left = (Math.random() * 85 + 5) + 'vw';
         meteor.style.top = '-60px'; meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; meteor.classList.add('fall-anim');
-        
-        // Удаляем ровно тогда, когда он коснется земли (окончание анимации)
-        meteor.addEventListener('animationend', () => {
-          meteor.remove();
-        });
+        meteor.addEventListener('animationend', () => meteor.remove());
         layer.appendChild(meteor);
       }, 400);
     }
@@ -480,7 +513,7 @@
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА (ИСПРАВЛЕНА) ---
+    // --- ЧЕРНАЯ ДЫРА ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
       const centerX = window.innerWidth / 2;
@@ -488,37 +521,28 @@
 
       objects.forEach(obj => {
         if (obj.classList.contains('sucked')) return;
-        
-        // Получаем текущие координаты объекта
         const rect = obj.getBoundingClientRect();
         const objX = rect.left + rect.width / 2;
         const objY = rect.top + rect.height / 2;
-
-        // Вычисляем вектор до центра
         const deltaX = centerX - objX;
         const deltaY = centerY - objY;
 
-        // Отключаем старые анимации, чтобы они не мешали
         obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
         obj.classList.add('sucked');
         
-        // Применяем плавный сдвиг к центру
         obj.style.transition = 'transform 1.5s ease-in, opacity 1.5s ease-in';
         obj.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0) rotate(720deg)`;
         obj.style.opacity = '0';
-
-        // Удаляем после завершения полета
         setTimeout(() => obj.remove(), 1500);
       });
     }
 
+    // --- ОБРАБОТЧИКИ ТУМБЛЕРОВ ---
     blackholeToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.blackhole) { played.blackhole = true; showCutscene("Внимание! Обнаружена аномалия..."); addNews("В центре города образовалась черная дыра!", "all"); }
         blackHole.classList.add('active');
         setTimeout(() => blackHole.classList.add('pulsate'), 500);
-        
-        // Запускаем засасывание каждые 500мс
         intervals.blackholeSuck = setInterval(suckObjects, 500);
       } else {
         blackHole.classList.remove('active', 'pulsate');
@@ -526,7 +550,6 @@
       }
     });
 
-    // --- ОСТАЛЬНЫЕ ФУНКЦИИ ---
     meteorToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.meteor) { played.meteor = true; showCutscene("Конец света отменяется, но метеориты прилетели..."); addNews("Метеоритный дождь! Берегите головы!", "all"); }
@@ -573,7 +596,6 @@
       }
     });
 
-    // --- СТАРЫЕ ОБРАБОТЧИКИ ---
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) { if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление котов.", "cats"); setTimeout(startCats, 2500); } else { startCats(); } } 
       else { clearInterval(intervals.cats); document.querySelectorAll('.modern-cat').forEach(c => c.remove()); }
@@ -600,6 +622,7 @@
       }
     });
 
+    // Смена неба
     let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
       skyState = (skyState + 1) % 4;
