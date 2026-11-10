@@ -38,79 +38,84 @@
     .balance { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
     .balance-label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
 
-    .chart-container {
-      width: 100%;
-      max-width: 500px;
-      height: 180px;
-      background: #1a1a24;
-      border-radius: 15px;
-      border: 1px solid #333;
-      position: relative;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    canvas { width: 100%; height: 100%; display: block; }
-
     .games-list {
       width: 100%;
       max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
       padding-bottom: 40px;
     }
 
     .game-card {
       background: #203a43;
       border-radius: 15px;
-      padding: 15px;
+      padding: 12px;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
       border: 1px solid #2c5364;
-      transition: 0.3s;
+      transition: 0.2s;
+      cursor: pointer;
     }
     
-    .game-card:hover { border-color: #4facfe; }
+    .game-card:hover { border-color: #4facfe; transform: scale(1.02); }
 
-    .game-info { flex: 1; cursor: pointer; }
-    .game-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
-    .game-online { font-size: 13px; color: #4facfe; font-weight: bold; }
+    .game-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .game-online { font-size: 12px; color: #4facfe; font-weight: bold; }
     .game-price { font-size: 12px; color: #aaa; margin-top: 5px; }
+    
+    .bought-badge {
+      font-size: 10px; background: #ffeb3b; color: #000; 
+      padding: 2px 5px; border-radius: 5px; margin-top: 5px; display: inline-block;
+    }
 
-    .game-actions { display: flex; gap: 10px; }
+    /* --- МОДАЛЬНОЕ ОКНО --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center;
+      z-index: 100; backdrop-filter: blur(5px); padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: #1a1a24; padding: 20px; border-radius: 20px;
+      width: 100%; max-width: 400px; border: 2px solid #4facfe;
+      display: flex; flex-direction: column; gap: 15px;
+      animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .modal-title { font-size: 20px; font-weight: bold; text-align: center; color: #fff; }
+    
+    .chart-container {
+      width: 100%; height: 150px; background: #0f2027;
+      border-radius: 10px; border: 1px solid #333; position: relative; overflow: hidden;
+    }
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .modal-stats { display: flex; justify-content: space-between; font-size: 14px; color: #aaa; }
+    
+    .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
 
     .btn {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 12px;
-      transition: 0.2s;
+      padding: 12px; border: none; border-radius: 10px;
+      font-weight: bold; cursor: pointer; font-size: 14px; flex: 1; transition: 0.2s;
     }
     .btn:active { transform: scale(0.95); }
-
     .btn-buy { background: #00ff00; color: #000; }
     .btn-buy:disabled { background: #555; color: #888; cursor: not-allowed; }
-    
     .btn-sell { background: #ff0055; color: #fff; }
     .btn-sell:disabled { background: #555; color: #888; cursor: not-allowed; }
+    
+    .btn-close { background: transparent; border: 1px solid #555; color: #aaa; flex: none; width: 100%; margin-top: 5px;}
+    .btn-close:active { background: #333; }
 
     /* Всплывающие уведомления */
     .notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-100px);
-      background: rgba(0,0,0,0.8);
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: bold;
-      border: 1px solid #fff;
-      transition: transform 0.3s;
-      z-index: 100;
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+      background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 10px;
+      font-weight: bold; border: 1px solid #fff; transition: transform 0.3s; z-index: 200;
     }
     .notification.show { transform: translateX(-50%) translateY(0); }
     .notification.good { border-color: #00ff00; color: #00ff00; }
@@ -128,53 +133,91 @@
     <div style="font-size: 24px;">📈</div>
   </div>
 
-  <div class="chart-container">
-    <canvas id="chart"></canvas>
-  </div>
-
   <div class="games-list" id="games-list">
     <!-- Игры будут добавляться через JS -->
   </div>
 
-  <div class="notification" id="notification"></div>
+  <!-- МОДАЛЬНОЕ ОКНО ИГРЫ -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-content">
+      <div class="modal-title" id="modal-title">Название игры</div>
+      
+      <div class="chart-container">
+        <canvas id="modal-chart"></canvas>
+      </div>
 
-  <script>
-    // Игры (от топовых до мертвых)
+      <div class="modal-stats">
+        <span>Онлайн: <strong id="modal-online" style="color:#4facfe;">0</strong></span>
+        <span>Цена: <strong id="modal-price" style="color:#ffe066;">0</strong> 💵</span>
+      </div>
+
+      <div id="modal-portfolio" style="font-size: 13px; color: #aaa; text-align: center;">
+        <!-- Информация о купленных акциях -->
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-buy" id="modal-btn-buy">Купить</button>
+        <button class="btn btn-sell" id="modal-btn-sell">Продать</button>
+      </div>
+
+      <button class="btn btn-close" id="modal-btn-close">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+    <script>
+    // 25 ИГР (от гигантов до мертвых проектов)
     const gamesData = [
-      { id: 'grow', name: 'Grow a Garden 🌱', online: 450000, history: [] }, // Топ
-      { id: 'adopt', name: 'Adopt Me! 🐶', online: 180000, history: [] },   // Популярное
-      { id: 'doors', name: 'DOORS 👁️', online: 85000, history: [] },       // Среднее
-      { id: 'blox', name: 'Blox Fruits 🍎', online: 120000, history: [] },  // Популярное
-      { id: 'dead1', name: 'Заброшенный дом 🏚️', online: 3500, history: [] }, // Малоизвестное
-      { id: 'dead2', name: 'Симулятор камня 🪨', online: 1200, history: [] },  // Мусор
-      { id: 'dead3', name: 'Мой первый обби 🏃', online: 500, history: [] }    // Почти мертвое
+      // ТОПЫ (Высокий онлайн)
+      { id: 'grow', name: 'Grow a Garden 🌱', online: 650000, history: [] },
+      { id: 'steal', name: 'Steal a Brainrot 🧠', online: 480000, history: [] },
+      { id: 'brook', name: 'Brookhaven 🏡', online: 350000, history: [] },
+      { id: 'adopt', name: 'Adopt Me! 🐶', online: 220000, history: [] },
+      { id: 'blox', name: 'Blox Fruits 🍎', online: 180000, history: [] },
+      { id: 'dress', name: 'Dress to Impress 👗', online: 150000, history: [] },
+      { id: 'piggy', name: 'Piggy 🐷', online: 120000, history: [] },
+      { id: 'doors', name: 'DOORS 👁️', online: 85000, history: [] },
+      { id: 'bedwars', name: 'BedWars 🛏️', online: 60000, history: [] },
+      { id: 'jail', name: 'Jailbreak 🚓', online: 45000, history: [] },
+      
+      // СРЕДНЯК (Стабильные, но не топы)
+      { id: 'arsenal', name: 'Arsenal 🔫', online: 35000, history: [] },
+      { id: 'tower', name: 'Tower Defense 🏰', online: 25000, history: [] },
+      { id: 'murder', name: 'Murder Mystery 🔪', online: 18000, history: [] },
+      { id: 'royale', name: 'Royale High 👑', online: 12000, history: [] },
+      { id: 'speed', name: 'Speed Run 4 🏃', online: 8000, history: [] },
+      { id: 'theme', name: 'Theme Park Tycoon 🎢', online: 5000, history: [] },
+      { id: 'work', name: 'Work at a Pizza Place 🍕', online: 3500, history: [] },
+
+      // МЕРТВЫЕ / ИНДИ (Дешевые, но волатильные)
+      { id: 'survive', name: 'Survive the Disasters 🌪️', online: 1500, history: [] },
+      { id: 'natural', name: 'Natural Disaster 🌋', online: 900, history: [] },
+      { id: 'obby', name: 'Mega Easy Obby 🌈', online: 500, history: [] },
+      { id: 'escape', name: 'Escape the Dungeon 🗝️', online: 300, history: [] },
+      { id: 'stone', name: 'Симулятор Камня 🪨', online: 150, history: [] },
+      { id: 'box', name: 'Симулятор Коробки 📦', online: 80, history: [] },
+      { id: 'dead', name: 'Заброшенный особняк 🏚️', online: 35, history: [] },
+      { id: 'void', name: 'Пустота (Void) 🕳️', online: 10, history: [] }
     ];
 
     let balance = 1000;
     let portfolio = {}; // { id: { shares: 1, avgPrice: 100 } }
-
+    
     const balanceEl = document.getElementById('balance');
     const gamesListEl = document.getElementById('games-list');
-    const canvas = document.getElementById('chart');
-    const ctx = canvas.getContext('2d');
     const notifEl = document.getElementById('notification');
+    const modalOverlay = document.getElementById('modal');
+    const modalChart = document.getElementById('modal-chart');
+    const ctx = modalChart.getContext('2d');
 
-    let activeGameId = 'grow'; // Какая игра сейчас на графике
+    let activeGameId = null; // Какая игра сейчас открыта в модалке
 
-    // Настройка холста
-    function resizeCanvas() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // Загрузка
-    const saved = localStorage.getItem('robloxExchangeV2');
+    // --- ЗАГРУЗКА ---
+    const saved = localStorage.getItem('robloxExchangeV3');
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        balance = data.balance || 1000;
+        balance = data.balance !== undefined ? data.balance : 1000;
         portfolio = data.portfolio || {};
         if (data.gamesData) {
           data.gamesData.forEach(savedGame => {
@@ -188,7 +231,7 @@
       } catch(e) {}
     }
 
-    // Инициализация
+    // Инициализация истории
     gamesData.forEach(game => {
       if (game.history.length === 0) {
         for (let i = 0; i < 20; i++) game.history.push(game.online);
@@ -206,14 +249,52 @@
     }
 
     function saveGame() {
-      localStorage.setItem('robloxExchangeV2', JSON.stringify({ balance, portfolio, gamesData }));
+      localStorage.setItem('robloxExchangeV3', JSON.stringify({ balance, portfolio, gamesData }));
     }
 
-    function drawChart() {
-      const game = gamesData.find(g => g.id === activeGameId);
-      if (!game) return;
+    // Расчет цены (1 акция = онлайн / 100 + базовая цена 1)
+    function getPrice(game) {
+      return Math.floor(game.online / 100) + 1;
+    }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // --- ОТРИСОВКА МЕНЮ ---
+    function renderGames() {
+      gamesListEl.innerHTML = '';
+      balanceEl.textContent = formatMoney(balance);
+
+      gamesData.forEach(game => {
+        const bought = portfolio[game.id];
+        const price = getPrice(game);
+        
+        const lastOnline = game.history[game.history.length - 1];
+        const prevOnline = game.history[game.history.length - 2] || lastOnline;
+        const isGrowing = lastOnline >= prevOnline;
+        const trendColor = isGrowing ? '#00ff00' : '#ff0055';
+        const trendArrow = isGrowing ? '▲' : '▼';
+
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.onclick = () => openModal(game.id);
+        
+        card.innerHTML = `
+          <div>
+            <div class="game-title">${game.name}</div>
+            <div class="game-online">Онлайн: ${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
+            <div class="game-price">Цена: ${formatMoney(price)} 💵</div>
+          </div>
+          ${bought ? `<div class="bought-badge">У тебя: ${bought.shares} шт.</div>` : ''}
+        `;
+        gamesListEl.appendChild(card);
+      });
+    }
+
+    // --- ОТРИСОВКА ГРАФИКА ---
+    function drawChart(game) {
+      // Настраиваем размер холста под контейнер
+      modalChart.width = modalChart.offsetWidth;
+      modalChart.height = modalChart.offsetHeight;
+      
+      ctx.clearRect(0, 0, modalChart.width, modalChart.height);
       
       const history = game.history;
       const max = Math.max(...history) * 1.1;
@@ -226,118 +307,146 @@
       ctx.lineJoin = 'round';
 
       for (let i = 0; i < history.length; i++) {
-        const x = (i / (history.length - 1)) * canvas.width;
-        const y = canvas.height - ((history[i] - min) / range) * canvas.height;
+        const x = (i / (history.length - 1)) * modalChart.width;
+        const y = modalChart.height - ((history[i] - min) / range) * modalChart.height;
         
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      ctx.lineTo(canvas.width, canvas.height);
-      ctx.lineTo(0, canvas.height);
+      ctx.lineTo(modalChart.width, modalChart.height);
+      ctx.lineTo(0, modalChart.height);
       ctx.closePath();
       ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
       ctx.fill();
     }
 
-    function renderGames() {
-      gamesListEl.innerHTML = '';
-      balanceEl.textContent = formatMoney(balance);
+    // --- МОДАЛЬНОЕ ОКНО ---
+    function openModal(id) {
+      activeGameId = id;
+      const game = gamesData.find(g => g.id === id);
+      if (!game) return;
 
-      gamesData.forEach(game => {
-        const bought = portfolio[game.id];
-        
-        // Цена: 1 акция = 10 онлайна (чтобы дешевые игры стоили копейки)
-        const buyPrice = Math.floor(game.online / 100) + 1; 
-        
-        const lastOnline = game.history[game.history.length - 1];
-        const prevOnline = game.history[game.history.length - 2] || lastOnline;
-        const isGrowing = lastOnline >= prevOnline;
-        const trendColor = isGrowing ? '#00ff00' : '#ff0055';
-        const trendArrow = isGrowing ? '▲' : '▼';
-
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.innerHTML = `
-          <div class="game-info" onclick="activeGameId='${game.id}'; drawChart();">
-            <div class="game-title">${game.name}</div>
-            <div class="game-online">Онлайн: ${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
-            <div class="game-price">Цена: ${formatMoney(buyPrice)} 💵</div>
-            ${bought ? `<div style="font-size:11px; color:#ffeb3b; margin-top:5px;">У тебя: ${bought.shares} акций (ср. цена ${formatMoney(bought.avgPrice)})</div>` : ''}
-          </div>
-          <div class="game-actions">
-            <button class="btn btn-buy" ${balance < buyPrice ? 'disabled' : ''} onclick="buyGame('${game.id}', ${buyPrice})">Купить</button>
-            <button class="btn btn-sell" ${!bought ? 'disabled' : ''} onclick="sellGame('${game.id}', ${buyPrice})">Продать</button>
-          </div>
-        `;
-        gamesListEl.appendChild(card);
-      });
+      document.getElementById('modal-title').textContent = game.name;
+      updateModalUI();
+      
+      modalOverlay.classList.add('active');
+      
+      // Небольшая задержка для отрисовки графика (когда окно уже видно)
+      setTimeout(() => drawChart(game), 50);
     }
 
-    // Покупка (с расчетом средней цены)
-    window.buyGame = function(id, price) {
+    function updateModalUI() {
+      if (!activeGameId) return;
+      const game = gamesData.find(g => g.id === activeGameId);
+      if (!game) return;
+
+      const price = getPrice(game);
+      document.getElementById('modal-online').textContent = formatMoney(game.online);
+      document.getElementById('modal-price').textContent = formatMoney(price);
+
+      const portfolioEl = document.getElementById('modal-portfolio');
+      const bought = portfolio[game.id];
+
+      if (bought) {
+        portfolioEl.innerHTML = `У тебя: <strong>${bought.shares}</strong> акций.<br>Ср. цена покупки: <strong>${formatMoney(bought.avgPrice)}</strong> 💵`;
+      } else {
+        portfolioEl.innerHTML = `У тебя нет акций этой игры.`;
+      }
+
+      document.getElementById('modal-btn-buy').disabled = balance < price;
+      document.getElementById('modal-btn-sell').disabled = !bought;
+    }
+
+    // Кнопки в модалке
+    document.getElementById('modal-btn-buy').onclick = () => {
+      const game = gamesData.find(g => g.id === activeGameId);
+      const price = getPrice(game);
+      
       if (balance >= price) {
         balance -= price;
+        if (!portfolio[game.id]) portfolio[game.id] = { shares: 0, avgPrice: 0 };
         
-        if (!portfolio[id]) portfolio[id] = { shares: 0, avgPrice: 0 };
-        
-        // Формула средней цены
-        const totalCost = (portfolio[id].shares * portfolio[id].avgPrice) + price;
-        portfolio[id].shares++;
-        portfolio[id].avgPrice = totalCost / portfolio[id].shares;
+        const totalCost = (portfolio[game.id].shares * portfolio[game.id].avgPrice) + price;
+        portfolio[game.id].shares++;
+        portfolio[game.id].avgPrice = totalCost / portfolio[game.id].shares;
         
         showNotification(`Куплено! -${formatMoney(price)} 💵`, 'good');
-        saveGame();
+        updateModalUI();
         renderGames();
+        saveGame();
       }
     };
 
-    // Продажа (с расчетом профита от средней цены)
-    window.sellGame = function(id, currentPrice) {
-      if (portfolio[id] && portfolio[id].shares > 0) {
-        const avgPrice = portfolio[id].avgPrice;
-        const profit = currentPrice - avgPrice;
+    document.getElementById('modal-btn-sell').onclick = () => {
+      const game = gamesData.find(g => g.id === activeGameId);
+      const price = getPrice(game);
+      
+      if (portfolio[game.id] && portfolio[game.id].shares > 0) {
+        const avgPrice = portfolio[game.id].avgPrice;
+        const profit = price - avgPrice;
         
-        balance += currentPrice;
-        portfolio[id].shares--;
+        balance += price;
+        portfolio[game.id].shares--;
         
-        if (portfolio[id].shares === 0) delete portfolio[id];
+        if (portfolio[game.id].shares === 0) delete portfolio[game.id];
 
         if (profit > 0) showNotification(`Продано! +${formatMoney(profit)} 💵`, 'good');
         else showNotification(`Продано в минус: ${formatMoney(profit)} 💵`, 'bad');
 
-        saveGame();
+        updateModalUI();
         renderGames();
+        saveGame();
       }
     };
 
-    // Игровой цикл
+    document.getElementById('modal-btn-close').onclick = () => {
+      modalOverlay.classList.remove('active');
+      activeGameId = null;
+    };
+
+    // Закрытие при клике вне окна
+    modalOverlay.onclick = (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.classList.remove('active');
+        activeGameId = null;
+      }
+    };
+
+    // --- ИГРОВОЙ ЦИКЛ ---
     setInterval(() => {
       gamesData.forEach(game => {
-        // Если игра популярная - скачет меньше. Если мертвая - может внезапно взлететь
+        // Мертвые игры (онлайн < 10000) скачут сильнее (волатильность до 40%)
         const isDead = game.online < 10000;
-        const volatility = isDead ? 0.4 : 0.15; // Мертвые игры более непредсказуемы
+        const volatility = isDead ? 0.4 : 0.15;
         
         const change = (Math.random() * volatility * 2) - volatility;
         game.online = Math.floor(game.online * (1 + change));
         
-        if (game.online < 100) game.online = 100; // Не умираем полностью
-        if (game.online > 1000000) game.online = 1000000;
+        // Ограничения
+        if (game.online < 5) game.online = 5; 
+        if (game.online > 2000000) game.online = 2000000;
 
         game.history.push(game.online);
         if (game.history.length > 30) game.history.shift();
       });
 
-      drawChart();
       renderGames();
+      
+      // Если модалка открыта - обновляем и в ней
+      if (activeGameId) {
+        updateModalUI();
+        const game = gamesData.find(g => g.id === activeGameId);
+        drawChart(game);
+      }
+
       saveGame();
     }, 2000);
 
-    // Первый запуск
+    // Запуск
     renderGames();
-    drawChart();
 
   </script>
 </body>
-  </html>
+</html>
