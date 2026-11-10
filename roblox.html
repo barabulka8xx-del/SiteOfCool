@@ -35,45 +35,67 @@
       z-index: 50;
     }
 
-    .balance { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
+    .balance { font-size: 22px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); }
     .balance-label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
 
     .games-list {
       width: 100%;
       max-width: 500px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
       padding-bottom: 40px;
     }
 
     .game-card {
       background: #203a43;
       border-radius: 15px;
-      padding: 12px;
+      padding: 15px 10px;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: space-between;
       border: 1px solid #2c5364;
       transition: 0.2s;
       cursor: pointer;
+      position: relative;
     }
     
-    .game-card:hover { border-color: #4facfe; transform: scale(1.02); }
+    .game-card:hover { border-color: #4facfe; transform: scale(1.03); }
 
-    .game-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .game-online { font-size: 12px; color: #4facfe; font-weight: bold; }
-    .game-price { font-size: 12px; color: #aaa; margin-top: 5px; }
+    /* РАМКА ДЛЯ ИКОНКИ */
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #2c5364, #203a43);
+      border-radius: 16px; /* Квадрат с закругленными углами */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .game-icon {
+      font-size: 34px;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+    }
+
+    .game-title { font-size: 13px; font-weight: bold; margin-bottom: 5px; text-align: center; min-height: 34px; display: flex; align-items: center; justify-content: center;}
+    .game-online { font-size: 12px; color: #4facfe; font-weight: bold; text-align: center; }
+    .game-price { font-size: 13px; color: #ffe066; margin-top: 5px; text-align: center; font-weight: bold;}
     
     .bought-badge {
+      position: absolute; top: 5px; right: 5px;
       font-size: 10px; background: #ffeb3b; color: #000; 
-      padding: 2px 5px; border-radius: 5px; margin-top: 5px; display: inline-block;
+      padding: 2px 5px; border-radius: 5px; font-weight: bold;
     }
 
     /* --- МОДАЛЬНОЕ ОКНО --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
       z-index: 100; backdrop-filter: blur(5px); padding: 20px;
     }
     .modal-overlay.active { display: flex; }
@@ -86,7 +108,20 @@
     }
     @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    .modal-title { font-size: 20px; font-weight: bold; text-align: center; color: #fff; }
+    .modal-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 5px;}
+    
+    /* Рамка для большой иконки */
+    .icon-box-large {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #2c5364, #203a43);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-icon { font-size: 50px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+
+    .modal-title { font-size: 22px; font-weight: bold; text-align: center; }
     
     .chart-container {
       width: 100%; height: 150px; background: #0f2027;
@@ -94,7 +129,7 @@
     }
     canvas { width: 100%; height: 100%; display: block; }
 
-    .modal-stats { display: flex; justify-content: space-between; font-size: 14px; color: #aaa; }
+    .modal-stats { display: flex; justify-content: space-between; font-size: 15px; color: #aaa; padding: 0 10px;}
     
     .modal-actions { display: flex; gap: 10px; margin-top: 10px; }
 
@@ -111,7 +146,6 @@
     .btn-close { background: transparent; border: 1px solid #555; color: #aaa; flex: none; width: 100%; margin-top: 5px;}
     .btn-close:active { background: #333; }
 
-    /* Всплывающие уведомления */
     .notification {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
       background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 10px;
@@ -128,19 +162,21 @@
   <div class="header">
     <div>
       <span class="balance-label">Твой баланс:</span>
-      <span class="balance" id="balance">1000</span> 💵
+      <span class="balance" id="balance">0</span> 💵
     </div>
     <div style="font-size: 24px;">📈</div>
   </div>
 
-  <div class="games-list" id="games-list">
-    <!-- Игры будут добавляться через JS -->
-  </div>
+  <div class="games-list" id="games-list"></div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ИГРЫ -->
   <div class="modal-overlay" id="modal">
     <div class="modal-content">
-      <div class="modal-title" id="modal-title">Название игры</div>
+      <div class="modal-header">
+        <div class="icon-box-large">
+          <div class="modal-icon" id="modal-icon">🎮</div>
+        </div>
+        <div class="modal-title" id="modal-title">Название</div>
+      </div>
       
       <div class="chart-container">
         <canvas id="modal-chart"></canvas>
@@ -151,9 +187,7 @@
         <span>Цена: <strong id="modal-price" style="color:#ffe066;">0</strong> 💵</span>
       </div>
 
-      <div id="modal-portfolio" style="font-size: 13px; color: #aaa; text-align: center;">
-        <!-- Информация о купленных акциях -->
-      </div>
+      <div id="modal-portfolio" style="font-size: 13px; color: #aaa; text-align: center;"></div>
 
       <div class="modal-actions">
         <button class="btn btn-buy" id="modal-btn-buy">Купить</button>
@@ -165,43 +199,39 @@
   </div>
 
   <div class="notification" id="notification"></div>
-    <script>
-    // 25 ИГР (от гигантов до мертвых проектов)
-    const gamesData = [
-      // ТОПЫ (Высокий онлайн)
-      { id: 'grow', name: 'Grow a Garden 🌱', online: 650000, history: [] },
-      { id: 'steal', name: 'Steal a Brainrot 🧠', online: 480000, history: [] },
-      { id: 'brook', name: 'Brookhaven 🏡', online: 350000, history: [] },
-      { id: 'adopt', name: 'Adopt Me! 🐶', online: 220000, history: [] },
-      { id: 'blox', name: 'Blox Fruits 🍎', online: 180000, history: [] },
-      { id: 'dress', name: 'Dress to Impress 👗', online: 150000, history: [] },
-      { id: 'piggy', name: 'Piggy 🐷', online: 120000, history: [] },
-      { id: 'doors', name: 'DOORS 👁️', online: 85000, history: [] },
-      { id: 'bedwars', name: 'BedWars 🛏️', online: 60000, history: [] },
-      { id: 'jail', name: 'Jailbreak 🚓', online: 45000, history: [] },
-      
-      // СРЕДНЯК (Стабильные, но не топы)
-      { id: 'arsenal', name: 'Arsenal 🔫', online: 35000, history: [] },
-      { id: 'tower', name: 'Tower Defense 🏰', online: 25000, history: [] },
-      { id: 'murder', name: 'Murder Mystery 🔪', online: 18000, history: [] },
-      { id: 'royale', name: 'Royale High 👑', online: 12000, history: [] },
-      { id: 'speed', name: 'Speed Run 4 🏃', online: 8000, history: [] },
-      { id: 'theme', name: 'Theme Park Tycoon 🎢', online: 5000, history: [] },
-      { id: 'work', name: 'Work at a Pizza Place 🍕', online: 3500, history: [] },
 
-      // МЕРТВЫЕ / ИНДИ (Дешевые, но волатильные)
-      { id: 'survive', name: 'Survive the Disasters 🌪️', online: 1500, history: [] },
-      { id: 'natural', name: 'Natural Disaster 🌋', online: 900, history: [] },
-      { id: 'obby', name: 'Mega Easy Obby 🌈', online: 500, history: [] },
-      { id: 'escape', name: 'Escape the Dungeon 🗝️', online: 300, history: [] },
-      { id: 'stone', name: 'Симулятор Камня 🪨', online: 150, history: [] },
-      { id: 'box', name: 'Симулятор Коробки 📦', online: 80, history: [] },
-      { id: 'dead', name: 'Заброшенный особняк 🏚️', online: 35, history: [] },
-      { id: 'void', name: 'Пустота (Void) 🕳️', online: 10, history: [] }
+  <script>
+    // 25 ИГР
+    const gamesData = [
+      { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [] },
+      { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [] },
+      { id: 'brook', name: 'Brookhaven', icon: '🏡', online: 350000, history: [] },
+      { id: 'adopt', name: 'Adopt Me!', icon: '🐶', online: 220000, history: [] },
+      { id: 'blox', name: 'Blox Fruits', icon: '🍎', online: 180000, history: [] },
+      { id: 'dress', name: 'Dress to Impress', icon: '👗', online: 150000, history: [] },
+      { id: 'piggy', name: 'Piggy', icon: '🐷', online: 120000, history: [] },
+      { id: 'doors', name: 'DOORS', icon: '👁️', online: 85000, history: [] },
+      { id: 'bedwars', name: 'BedWars', icon: '🛏️', online: 60000, history: [] },
+      { id: 'jail', name: 'Jailbreak', icon: '🚓', online: 45000, history: [] },
+      { id: 'arsenal', name: 'Arsenal', icon: '🔫', online: 35000, history: [] },
+      { id: 'tower', name: 'Tower Defense', icon: '🏰', online: 25000, history: [] },
+      { id: 'murder', name: 'Murder Mystery', icon: '🔪', online: 18000, history: [] },
+      { id: 'royale', name: 'Royale High', icon: '👑', online: 12000, history: [] },
+      { id: 'speed', name: 'Speed Run 4', icon: '🏃', online: 8000, history: [] },
+      { id: 'theme', name: 'Theme Park Tycoon', icon: '🎢', online: 5000, history: [] },
+      { id: 'work', name: 'Pizza Place', icon: '🍕', online: 3500, history: [] },
+      { id: 'survive', name: 'Survive Disasters', icon: '🌪️', online: 1500, history: [] },
+      { id: 'natural', name: 'Natural Disaster', icon: '🌋', online: 900, history: [] },
+      { id: 'obby', name: 'Mega Easy Obby', icon: '🌈', online: 500, history: [] },
+      { id: 'escape', name: 'Escape Dungeon', icon: '🗝️', online: 300, history: [] },
+      { id: 'stone', name: 'Симулятор Камня', icon: '🪨', online: 150, history: [] },
+      { id: 'box', name: 'Симулятор Коробки', icon: '📦', online: 80, history: [] },
+      { id: 'dead', name: 'Особняк', icon: '🏚️', online: 35, history: [] },
+      { id: 'void', name: 'Пустота', icon: '🕳️', online: 10, history: [] }
     ];
 
-    let balance = 1000;
-    let portfolio = {}; // { id: { shares: 1, avgPrice: 100 } }
+    let balance = 1000000; // Стартовый баланс 1 млн, так как цены = онлайн
+    let portfolio = {}; 
     
     const balanceEl = document.getElementById('balance');
     const gamesListEl = document.getElementById('games-list');
@@ -210,14 +240,14 @@
     const modalChart = document.getElementById('modal-chart');
     const ctx = modalChart.getContext('2d');
 
-    let activeGameId = null; // Какая игра сейчас открыта в модалке
+    let activeGameId = null;
 
-    // --- ЗАГРУЗКА ---
-    const saved = localStorage.getItem('robloxExchangeV3');
+    // Загрузка
+    const saved = localStorage.getItem('robloxExchangeV4');
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        balance = data.balance !== undefined ? data.balance : 1000;
+        balance = data.balance !== undefined ? data.balance : 1000000;
         portfolio = data.portfolio || {};
         if (data.gamesData) {
           data.gamesData.forEach(savedGame => {
@@ -249,15 +279,14 @@
     }
 
     function saveGame() {
-      localStorage.setItem('robloxExchangeV3', JSON.stringify({ balance, portfolio, gamesData }));
+      localStorage.setItem('robloxExchangeV4', JSON.stringify({ balance, portfolio, gamesData }));
     }
 
-    // Расчет цены (1 акция = онлайн / 100 + базовая цена 1)
+    // Цена = Онлайн (как ты и просил)
     function getPrice(game) {
-      return Math.floor(game.online / 100) + 1;
+      return game.online;
     }
 
-    // --- ОТРИСОВКА МЕНЮ ---
     function renderGames() {
       gamesListEl.innerHTML = '';
       balanceEl.textContent = formatMoney(balance);
@@ -277,23 +306,21 @@
         card.onclick = () => openModal(game.id);
         
         card.innerHTML = `
-          <div>
-            <div class="game-title">${game.name}</div>
-            <div class="game-online">Онлайн: ${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
-            <div class="game-price">Цена: ${formatMoney(price)} 💵</div>
+          <div class="icon-box">
+            <div class="game-icon">${game.icon}</div>
           </div>
-          ${bought ? `<div class="bought-badge">У тебя: ${bought.shares} шт.</div>` : ''}
+          <div class="game-title">${game.name}</div>
+          <div class="game-online">${formatMoney(game.online)} <span style="color:${trendColor}">${trendArrow}</span></div>
+          <div class="game-price">${formatMoney(price)} 💵</div>
+          ${bought ? `<div class="bought-badge">${bought.shares} шт.</div>` : ''}
         `;
         gamesListEl.appendChild(card);
       });
     }
 
-    // --- ОТРИСОВКА ГРАФИКА ---
     function drawChart(game) {
-      // Настраиваем размер холста под контейнер
       modalChart.width = modalChart.offsetWidth;
       modalChart.height = modalChart.offsetHeight;
-      
       ctx.clearRect(0, 0, modalChart.width, modalChart.height);
       
       const history = game.history;
@@ -309,7 +336,6 @@
       for (let i = 0; i < history.length; i++) {
         const x = (i / (history.length - 1)) * modalChart.width;
         const y = modalChart.height - ((history[i] - min) / range) * modalChart.height;
-        
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
@@ -322,18 +348,16 @@
       ctx.fill();
     }
 
-    // --- МОДАЛЬНОЕ ОКНО ---
     function openModal(id) {
       activeGameId = id;
       const game = gamesData.find(g => g.id === id);
       if (!game) return;
 
       document.getElementById('modal-title').textContent = game.name;
+      document.getElementById('modal-icon').textContent = game.icon;
       updateModalUI();
       
       modalOverlay.classList.add('active');
-      
-      // Небольшая задержка для отрисовки графика (когда окно уже видно)
       setTimeout(() => drawChart(game), 50);
     }
 
@@ -350,7 +374,7 @@
       const bought = portfolio[game.id];
 
       if (bought) {
-        portfolioEl.innerHTML = `У тебя: <strong>${bought.shares}</strong> акций.<br>Ср. цена покупки: <strong>${formatMoney(bought.avgPrice)}</strong> 💵`;
+        portfolioEl.innerHTML = `У тебя: <strong>${bought.shares}</strong> акций.<br>Ср. цена: <strong>${formatMoney(bought.avgPrice)}</strong> 💵`;
       } else {
         portfolioEl.innerHTML = `У тебя нет акций этой игры.`;
       }
@@ -359,7 +383,6 @@
       document.getElementById('modal-btn-sell').disabled = !bought;
     }
 
-    // Кнопки в модалке
     document.getElementById('modal-btn-buy').onclick = () => {
       const game = gamesData.find(g => g.id === activeGameId);
       const price = getPrice(game);
@@ -406,7 +429,6 @@
       activeGameId = null;
     };
 
-    // Закрытие при клике вне окна
     modalOverlay.onclick = (e) => {
       if (e.target === modalOverlay) {
         modalOverlay.classList.remove('active');
@@ -414,17 +436,13 @@
       }
     };
 
-    // --- ИГРОВОЙ ЦИКЛ ---
     setInterval(() => {
       gamesData.forEach(game => {
-        // Мертвые игры (онлайн < 10000) скачут сильнее (волатильность до 40%)
         const isDead = game.online < 10000;
         const volatility = isDead ? 0.4 : 0.15;
-        
         const change = (Math.random() * volatility * 2) - volatility;
         game.online = Math.floor(game.online * (1 + change));
         
-        // Ограничения
         if (game.online < 5) game.online = 5; 
         if (game.online > 2000000) game.online = 2000000;
 
@@ -433,20 +451,15 @@
       });
 
       renderGames();
-      
-      // Если модалка открыта - обновляем и в ней
       if (activeGameId) {
         updateModalUI();
         const game = gamesData.find(g => g.id === activeGameId);
         drawChart(game);
       }
-
       saveGame();
     }, 2000);
 
-    // Запуск
     renderGames();
-
   </script>
 </body>
 </html>
