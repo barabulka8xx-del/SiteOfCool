@@ -15,8 +15,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px 15px 20px 15px;
+      justify-content: space-between; /* Элементы прижмутся к краям */
+      padding: 15px 15px 25px 15px;
       overflow: hidden;
       transition: background 0.3s ease;
     }
@@ -38,10 +38,11 @@
       flex-direction: column;
       align-items: center;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 18px;
       text-transform: uppercase;
       margin-bottom: 5px;
       text-shadow: 0 0 10px rgba(255,255,255,0.2);
@@ -57,7 +58,7 @@
     }
 
     .fragments {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       color: #00f2fe;
       margin-bottom: 10px;
@@ -66,12 +67,11 @@
 
     .progress-bar {
       width: 100%;
-      height: 12px;
+      height: 10px;
       background: #333;
       border-radius: 10px;
       overflow: hidden;
       border: 2px solid #555;
-      margin-bottom: 5px;
     }
     .progress-fill {
       height: 100%;
@@ -86,20 +86,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-grow: 1;
+      flex-grow: 1; /* Занимает всё свободное место */
       z-index: 10;
       position: relative;
+      width: 100%;
     }
 
     .apocalypse-btn {
-      width: 170px;
-      height: 170px;
+      width: 160px;
+      height: 160px;
       border-radius: 50%;
       background: radial-gradient(circle at 30% 30%, #ff4b1f, #8b0000);
       border: 8px solid #333;
       box-shadow: 0 8px 0 #222, inset 0 -10px 20px rgba(0,0,0,0.5);
       cursor: pointer;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 900;
       color: white;
       text-shadow: 2px 2px 0px #000;
@@ -107,6 +108,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
 
     .apocalypse-btn:active {
@@ -114,18 +116,18 @@
       box-shadow: 0 0 0 #222, inset 0 5px 20px rgba(0,0,0,0.8);
     }
 
-    /* Предупреждение античита */
     .warning-text {
       position: absolute;
-      top: -50px;
+      top: 10px;
       color: #ff0055;
-      font-weight: bold;
-      font-size: 18px;
+      font-weight: 900;
+      font-size: 16px;
       text-shadow: 0 0 10px #ff0055;
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
       text-align: center;
+      width: 100%;
     }
     .warning-text.show { opacity: 1; animation: shake 0.2s infinite; }
 
@@ -137,10 +139,11 @@
       flex-direction: column;
       align-items: center;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     .people-counter {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: #ff0055;
       font-family: monospace;
@@ -150,10 +153,10 @@
     }
 
     .people-label {
-      font-size: 12px;
+      font-size: 11px;
       color: #aaa;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
       font-weight: normal;
       text-shadow: none;
     }
@@ -169,17 +172,17 @@
       background: rgba(255,255,255,0.1);
       border: 1px solid #555;
       color: white;
-      padding: 10px;
+      padding: 12px 5px;
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
       flex: 1;
       transition: 0.2s;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .action-btn:active { transform: scale(0.95); }
-    .btn-stop { border-color: #ff0055; color: #ff0055; }
+    .btn-stop { border-color: #00ff00; color: #00ff00; }
     .btn-shop { border-color: #ffeb3b; color: #ffeb3b; }
 
     /* --- МАГАЗИН --- */
@@ -197,21 +200,21 @@
 
     .shop-content {
       background: #222;
-      padding: 20px;
+      padding: 15px;
       border-radius: 20px;
       width: 90%;
-      max-width: 350px;
+      max-width: 320px;
       border: 2px solid #444;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
     }
 
-    .shop-content h2 { text-align: center; color: #ffeb3b; margin-bottom: 5px; }
+    .shop-content h2 { text-align: center; color: #ffeb3b; margin-bottom: 5px; font-size: 18px;}
 
     .shop-item {
       background: #333;
-      padding: 15px;
+      padding: 12px;
       border-radius: 10px;
       display: flex;
       justify-content: space-between;
@@ -219,18 +222,18 @@
       border: 1px solid #555;
     }
 
-    .shop-item-info h3 { font-size: 15px; margin-bottom: 5px; }
-    .shop-item-info p { font-size: 11px; color: #aaa; }
+    .shop-item-info h3 { font-size: 13px; margin-bottom: 3px; }
+    .shop-item-info p { font-size: 10px; color: #aaa; }
 
     .buy-btn {
       background: #00f2fe;
       color: #000;
       border: none;
-      padding: 8px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
     }
     .buy-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
 
@@ -238,7 +241,7 @@
       background: #ff0055;
       color: white;
       border: none;
-      padding: 12px;
+      padding: 10px;
       border-radius: 10px;
       font-weight: bold;
       cursor: pointer;
@@ -267,7 +270,7 @@
     }
 
     .flying-obj {
-      position: absolute; font-size: 40px; pointer-events: none; z-index: 5;
+      position: absolute; font-size: 35px; pointer-events: none; z-index: 5;
       animation: flyUp linear forwards;
     }
     @keyframes flyUp {
@@ -307,7 +310,7 @@
     </div>
 
     <div class="actions">
-      <button class="action-btn btn-stop" id="btn-stop">Вкл. Античит 🛡️</button>
+      <button class="action-btn btn-stop" id="btn-stop">Античит ВКЛ 🛡️</button>
       <button class="action-btn btn-shop" id="btn-shop">Магазин 🛒</button>
     </div>
   </div>
@@ -373,11 +376,11 @@
     // --- АНТИЧИТ ---
     let isAntiCheatActive = false;
     let lastClickTime = 0;
-    let minClickInterval = 200; // Базовый интервал 200мс
+    let minClickInterval = 200; 
     let isBanned = false;
 
     // --- СОХРАНЕНИЕ ---
-    const savedData = localStorage.getItem('apocalypseSaveV4');
+    const savedData = localStorage.getItem('apocalypseSaveV5');
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
@@ -392,7 +395,7 @@
         costSpeed = data.costSpeed || 5;
         fragments = data.fragments || 0;
         clickCounter = data.clickCounter || 0;
-        minClickInterval = Math.max(50, 200 - (levelSpeed * 30)); // Пересчет таймера
+        minClickInterval = Math.max(50, 200 - (levelSpeed * 30));
       } catch(e) { console.error("Ошибка загрузки"); }
     }
 
@@ -423,7 +426,7 @@
 
     function saveGame() {
       const data = { people, clickDamage, autoDamage, levelDmg, levelAuto, levelSpeed, costDmg, costAuto, costSpeed, fragments, clickCounter };
-      localStorage.setItem('apocalypseSaveV4', JSON.stringify(data));
+      localStorage.setItem('apocalypseSaveV5', JSON.stringify(data));
     }
 
     function updateUI() {
@@ -458,7 +461,7 @@
       if (people <= 0 && !endScreen.classList.contains('active')) {
         endScreen.classList.add('active');
         apocBtn.style.display = 'none';
-        localStorage.removeItem('apocalypseSaveV4'); 
+        localStorage.removeItem('apocalypseSaveV5'); 
       }
     }
 
@@ -493,10 +496,12 @@
         btnStop.textContent = "Античит ВКЛ 🛡️";
         btnStop.style.borderColor = "#00ff00";
         btnStop.style.color = "#00ff00";
+        btnStop.style.background = "rgba(0, 255, 0, 0.2)";
       } else {
         btnStop.textContent = "Античит ВЫКЛ 🛡️";
         btnStop.style.borderColor = "#ff0055";
         btnStop.style.color = "#ff0055";
+        btnStop.style.background = "rgba(255, 0, 85, 0.2)";
       }
     });
 
@@ -508,7 +513,7 @@
         const now = Date.now();
         const timeDiff = now - lastClickTime;
         
-        if (timeDiff < minClickInterval) { // Используем динамический интервал
+        if (timeDiff < minClickInterval) { 
           warningText.classList.add('show');
           
           isBanned = true;
@@ -566,15 +571,11 @@
       }
     });
 
-    // ПОКУПКА УСКОРЕНИЯ ТАПА
     buySpeedBtn.addEventListener('click', () => {
       if (fragments >= costSpeed) {
         fragments -= costSpeed;
         levelSpeed++;
-        
-        // Уменьшаем интервал на 30мс, но не меньше 50мс
         minClickInterval = Math.max(50, minClickInterval - 30);
-        
         costSpeed = Math.floor(costSpeed * 2); 
         updateUI();
         saveGame();
@@ -583,7 +584,7 @@
 
     // --- РЕСТАРТ ---
     document.getElementById('restart-btn').addEventListener('click', () => {
-      localStorage.removeItem('apocalypseSaveV4');
+      localStorage.removeItem('apocalypseSaveV5');
       location.reload();
     });
 
