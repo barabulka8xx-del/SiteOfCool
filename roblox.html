@@ -63,12 +63,11 @@
     
     .game-card:hover { border-color: #4facfe; transform: scale(1.03); }
 
-    /* РАМКА ДЛЯ ИКОНКИ */
     .icon-box {
       width: 60px;
       height: 60px;
       background: linear-gradient(135deg, #2c5364, #203a43);
-      border-radius: 16px; /* Квадрат с закругленными углами */
+      border-radius: 16px; 
       display: flex;
       align-items: center;
       justify-content: center;
@@ -92,7 +91,6 @@
       padding: 2px 5px; border-radius: 5px; font-weight: bold;
     }
 
-    /* --- МОДАЛЬНОЕ ОКНО --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
@@ -110,7 +108,6 @@
 
     .modal-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 5px;}
     
-    /* Рамка для большой иконки */
     .icon-box-large {
       width: 80px; height: 80px;
       background: linear-gradient(135deg, #2c5364, #203a43);
@@ -162,7 +159,7 @@
   <div class="header">
     <div>
       <span class="balance-label">Твой баланс:</span>
-      <span class="balance" id="balance">0</span> 💵
+      <span class="balance" id="balance">1000</span> 💵
     </div>
     <div style="font-size: 24px;">📈</div>
   </div>
@@ -201,7 +198,7 @@
   <div class="notification" id="notification"></div>
 
   <script>
-    // 25 ИГР
+    // 25 ИГР (от гигантов до мертвых)
     const gamesData = [
       { id: 'grow', name: 'Grow a Garden', icon: '🌱', online: 650000, history: [] },
       { id: 'steal', name: 'Steal a Brainrot', icon: '🧠', online: 480000, history: [] },
@@ -230,7 +227,7 @@
       { id: 'void', name: 'Пустота', icon: '🕳️', online: 10, history: [] }
     ];
 
-    let balance = 1000000; // Стартовый баланс 1 млн, так как цены = онлайн
+    let balance = 1000; // СТАРТОВЫЙ БАЛАНС 1000
     let portfolio = {}; 
     
     const balanceEl = document.getElementById('balance');
@@ -242,12 +239,12 @@
 
     let activeGameId = null;
 
-    // Загрузка
-    const saved = localStorage.getItem('robloxExchangeV4');
+    // Загрузка (версия V6 для сброса)
+    const saved = localStorage.getItem('robloxExchangeV6');
     if (saved) {
       try {
         const data = JSON.parse(saved);
-        balance = data.balance !== undefined ? data.balance : 1000000;
+        balance = data.balance !== undefined ? data.balance : 1000;
         portfolio = data.portfolio || {};
         if (data.gamesData) {
           data.gamesData.forEach(savedGame => {
@@ -279,10 +276,10 @@
     }
 
     function saveGame() {
-      localStorage.setItem('robloxExchangeV4', JSON.stringify({ balance, portfolio, gamesData }));
+      localStorage.setItem('robloxExchangeV6', JSON.stringify({ balance, portfolio, gamesData }));
     }
 
-    // Цена = Онлайн (как ты и просил)
+    // ЦЕНА = ОНЛАЙНУ (как ты просил)
     function getPrice(game) {
       return game.online;
     }
