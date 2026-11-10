@@ -75,7 +75,8 @@
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2; transition: background 1s; }
 
-    .trees-container { position: absolute; bottom: 24%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; pointer-events: none; }
+    /* ОПУСТИЛИ ДЕРЕВЬЯ НА ЗЕМЛЮ */
+    .trees-container { position: absolute; bottom: 20%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; pointer-events: none; }
     .tree { font-size: 50px; transform: scale(0); transform-origin: bottom center; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .trees-container.active .tree { transform: scale(1); }
 
@@ -227,7 +228,6 @@
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover { 0% { transform: translateY(0) rotate(-15deg); } 100% { transform: translateY(-30px) rotate(15deg); } }
     
-    /* Метеориты падают БЕЗ вращения */
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown { 0% { transform: translateY(0); } 100% { transform: translateY(75vh); } }
     
@@ -429,11 +429,12 @@
       }, duration); 
     }
 
-    // --- СПАВНЕРЫ ---
+    // --- СПАВНЕРЫ (С ФЛАГОМ ДЛЯ ЧЕРНОЙ ДЫРЫ) ---
     function startCats() {
       intervals.cats = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
         const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML;
+        cat.dataset.spawnTime = Date.now();
         
         if (!gravityToggle.checked) { 
           cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
@@ -453,6 +454,7 @@
       intervals.pizza = setInterval(() => {
         if (document.querySelectorAll('.pizza-item').length > 30) return;
         const pizza = document.createElement('div'); pizza.className = 'flying-item pizza-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 85 + 5) + 'vw';
+        pizza.dataset.spawnTime = Date.now();
         
         if (gravityToggle.checked) { 
           pizza.style.top = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fall-anim'); 
@@ -469,6 +471,7 @@
       intervals.fish = setInterval(() => {
         if (document.querySelectorAll('.fish-item').length > 30) return;
         const fish = document.createElement('div'); fish.className = 'flying-item fish-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 85 + 5) + 'vw';
+        fish.dataset.spawnTime = Date.now();
         
         if (gravityToggle.checked) { 
           fish.style.top = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fall-anim'); 
@@ -485,6 +488,7 @@
       intervals.aliens = setInterval(() => {
         if (document.querySelectorAll('.ufo-item').length > 10) return;
         const ufo = document.createElement('div'); ufo.className = 'flying-item ufo-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 85 + 5) + 'vw';
+        ufo.dataset.spawnTime = Date.now();
         
         if (gravityToggle.checked) { 
           ufo.style.top = (Math.random() * 50 + 10) + 'vh'; ufo.classList.add('float-anim'); 
@@ -500,8 +504,10 @@
       intervals.meteors = setInterval(() => {
         const meteor = document.createElement('div'); meteor.className = 'flying-item meteor-item'; meteor.textContent = '☄️'; meteor.style.left = (Math.random() * 85 + 5) + 'vw';
         meteor.style.top = '-60px'; meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; meteor.classList.add('fall-anim');
+        meteor.dataset.spawnTime = Date.now();
+        
         meteor.addEventListener('animationend', () => {
-           if (blackholeToggle.checked) return; // Если дыра включена, метеорит просто исчезает
+           if (blackholeToggle.checked) return; 
            meteor.remove();
         });
         layer.appendChild(meteor);
@@ -512,12 +518,14 @@
       intervals.balloons = setInterval(() => {
         const balloon = document.createElement('div'); balloon.className = 'flying-item balloon-item'; balloon.textContent = '🎈'; balloon.style.left = (Math.random() * 85 + 5) + 'vw';
         balloon.style.bottom = '-60px'; balloon.style.animationDuration = (Math.random() * 3 + 2) + 's'; balloon.classList.add('fly-up-anim');
+        balloon.dataset.spawnTime = Date.now();
+        
         balloon.addEventListener('animationend', () => balloon.remove());
         layer.appendChild(balloon);
       }, 600);
     }
 
-    // --- ЧЕРНАЯ ДЫРА (РЕАЛЬНОЕ ПРИТЯЖЕНИЕ) ---
+    // --- ЧЕРНАЯ ДЫРА (НЕ ТРОГАЕТ НОВЫЕ ОБЪЕКТЫ) ---
     function suckObjects() {
       const objects = document.querySelectorAll('.modern-cat, .flying-item');
       const centerX = window.innerWidth / 2;
@@ -526,24 +534,23 @@
       objects.forEach(obj => {
         if (obj.classList.contains('sucked')) return;
         
-        // Получаем текущие координаты объекта
+        const spawnTime = parseInt(obj.dataset.spawnTime || 0);
+        const age = Date.now() - spawnTime;
+        
+        if (age < 500) return; // Даем объекту 0.5 сек, чтобы вылететь
+
         const rect = obj.getBoundingClientRect();
         const objX = rect.left + rect.width / 2;
         const objY = rect.top + rect.height / 2;
-
-        // Считаем, на сколько нужно сдвинуть объект, чтобы он попал в центр
         const deltaX = centerX - objX;
         const deltaY = centerY - objY;
 
         obj.classList.add('sucked');
         obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim', 'fall-smooth-anim');
         
-        // Применяем плавный сдвиг в центр
         obj.style.transition = 'transform 1.5s ease-in, opacity 1.5s ease-in';
         obj.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0) rotate(720deg)`;
         obj.style.opacity = '0';
-
-        // Удаляем после того, как долетит
         setTimeout(() => obj.remove(), 1500);
       });
     }
