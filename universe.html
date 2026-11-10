@@ -17,7 +17,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      transition: background 1s ease; /* Плавная смена фона */
+      transition: background 1s ease;
     }
 
     #animation-layer {
@@ -44,7 +44,7 @@
 
     .cutscene-text {
       position: absolute;
-      top: 40%;
+      top: 30%;
       font-size: 24px; font-weight: 700; text-align: center;
       opacity: 0; animation: fadeInOut 2.5s forwards; z-index: 10;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
@@ -61,7 +61,7 @@
     }
 
     /* --- ГОРОД --- */
-    .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; }
+    .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #2a2a35; border-top: 4px solid #444; }
     
     .buildings-back {
@@ -82,7 +82,7 @@
       border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px 25px;
       border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       width: 90vw; max-width: 380px;
-      max-height: 90vh; overflow-y: auto; /* Прокрутка, если не влезет */
+      max-height: 90vh; overflow-y: auto;
     }
 
     h1 {
@@ -113,7 +113,7 @@
     .modern-cat {
       position: absolute; width: 60px; height: 60px;
       filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
-      transition: all 0.5s ease; /* Плавные изменения при переключении гравитации */
+      transition: all 0.5s ease;
     }
     
     .cat-head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
@@ -134,7 +134,7 @@
     .cat-paw-r { right: 15px; }
 
     /* Пицца и Рыба */
-    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
+    .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: all 0.5s ease; }
 
     /* Анимации */
     .run-anim { animation: runAcross linear forwards; }
@@ -175,12 +175,14 @@
   <!-- Катсцена -->
   <div id="cutscene">
     <div class="cutscene-text" id="cutscene-text"></div>
+    
     <div class="street-scene">
       <div class="buildings-back"></div>
       <div class="buildings-front"></div>
       <div class="road-surface"></div>
     </div>
-    <div id="cutscene-objects"></div>
+    
+    <div id="cutscene-objects" style="position:absolute; width:100%; height:100%; top:0; left:0; z-index:5; pointer-events:none;"></div>
   </div>
 
   <div id="animation-layer"></div>
@@ -220,7 +222,6 @@
       </label>
     </div>
 
-    <!-- Новая функция: Смена времени суток -->
     <div class="toggle-row">
       <span class="toggle-label">🌅 Сменить небо</span>
       <label class="switch">
@@ -242,7 +243,6 @@
     const body = document.getElementById('main-body');
     const layer = document.getElementById('animation-layer');
     
-    // Получаем элементы тумблеров
     const catsToggle = document.getElementById('toggle-cats');
     const gravityToggle = document.getElementById('toggle-gravity');
     const pizzaToggle = document.getElementById('toggle-pizza');
@@ -270,6 +270,76 @@
       cutscene.classList.add('active');
       cutsceneText.textContent = text;
       cutsceneObjects.innerHTML = '';
+      
+      // Если включена гравитация, объекты падают. Если нет - улетают.
+      const isGravityOn = gravityToggle.checked;
+
+      // Спавним объекты, которые сейчас включены
+      if (catsToggle.checked) {
+        for(let i=0; i<3; i++) {
+          const cat = document.createElement('div');
+          cat.className = 'modern-cat';
+          cat.innerHTML = catHTML;
+          cat.style.bottom = '25%'; // На дороге
+          
+          if (isGravityOn) {
+             cat.classList.add('run-anim');
+             cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+             cat.style.animationDelay = i * 0.3 + 's';
+          } else {
+             cat.classList.add('fly-up-anim');
+             cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+             cat.style.animationDelay = i * 0.2 + 's';
+          }
+          cutsceneObjects.appendChild(cat);
+        }
+      }
+
+      if (pizzaToggle.checked) {
+        for(let i=0; i<5; i++) {
+          const pizza = document.createElement('div');
+          pizza.className = 'flying-item';
+          pizza.textContent = '🍕';
+          pizza.style.left = (Math.random() * 80 + 10) + '%';
+          
+          if (isGravityOn) {
+             pizza.classList.add('fall-anim');
+             pizza.style.top = '-100px';
+             pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+             pizza.style.animationDelay = i * 0.2 + 's';
+          } else {
+             pizza.classList.add('fly-up-anim');
+             pizza.style.bottom = '10%';
+             pizza.style.top = 'auto';
+             pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+             pizza.style.animationDelay = i * 0.2 + 's';
+          }
+          cutsceneObjects.appendChild(pizza);
+        }
+      }
+
+      if (fishToggle.checked) {
+        for(let i=0; i<7; i++) {
+          const fish = document.createElement('div');
+          fish.className = 'flying-item';
+          fish.textContent = '🐟';
+          fish.style.left = (Math.random() * 90 + 5) + '%';
+          
+          if (isGravityOn) {
+             fish.classList.add('fall-anim');
+             fish.style.top = '-100px';
+             fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+             fish.style.animationDelay = i * 0.15 + 's';
+          } else {
+             fish.classList.add('fly-up-anim');
+             fish.style.bottom = '10%';
+             fish.style.top = 'auto';
+             fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+             fish.style.animationDelay = i * 0.15 + 's';
+          }
+          cutsceneObjects.appendChild(fish);
+        }
+      }
 
       setTimeout(() => {
         cutscene.classList.remove('active');
@@ -283,15 +353,6 @@
         if (!played.cats) {
           played.cats = true;
           showCutscene("Квадратные коты выходят на связь...");
-          for(let i=0; i<3; i++) {
-            const cat = document.createElement('div');
-            cat.className = 'modern-cat run-anim';
-            cat.style.bottom = '25%';
-            cat.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
-            cat.style.animationDelay = i * 0.4 + 's';
-            cat.innerHTML = catHTML;
-            cutsceneObjects.appendChild(cat);
-          }
           setTimeout(startCats, 2500);
         } else {
           startCats();
@@ -325,16 +386,6 @@
         if (!played.pizza) {
           played.pizza = true;
           showCutscene("Пицца вызывается на ковёр...");
-          for(let i=0; i<5; i++) {
-            const pizza = document.createElement('div');
-            pizza.className = 'flying-item fall-anim';
-            pizza.textContent = '🍕';
-            pizza.style.left = (Math.random() * 80 + 10) + '%';
-            pizza.style.top = '-100px';
-            pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-            pizza.style.animationDelay = i * 0.2 + 's';
-            cutsceneObjects.appendChild(pizza);
-          }
           setTimeout(startPizza, 2500);
         } else {
           startPizza();
@@ -366,22 +417,12 @@
       }, 500);
     }
 
-    // --- РЫБНЫЙ ДОЖДЬ (Новая функция) ---
+    // --- РЫБНЫЙ ДОЖДЬ ---
     fishToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.fish) {
           played.fish = true;
           showCutscene("Рыбный шторм неизбежен...");
-          for(let i=0; i<7; i++) {
-            const fish = document.createElement('div');
-            fish.className = 'flying-item fall-anim';
-            fish.textContent = '🐟';
-            fish.style.left = (Math.random() * 90 + 5) + '%';
-            fish.style.top = '-100px';
-            fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-            fish.style.animationDelay = i * 0.15 + 's';
-            cutsceneObjects.appendChild(fish);
-          }
           setTimeout(startFish, 2500);
         } else {
           startFish();
@@ -410,7 +451,7 @@
         }
         fish.addEventListener('animationend', () => fish.remove());
         layer.appendChild(fish);
-      }, 300); // Рыба падает чаще
+      }, 300); 
     }
 
     // --- ГРАВИТАЦИЯ ---
@@ -422,20 +463,11 @@
         if (!played.gravity) {
           played.gravity = true;
           showCutscene("Гравитация отключена...");
-          for(let i=0; i<3; i++) {
-            const cat = document.createElement('div');
-            cat.className = 'modern-cat fly-up-anim';
-            cat.style.bottom = '25%';
-            cat.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
-            cat.style.animationDelay = i * 0.2 + 's';
-            cat.innerHTML = catHTML;
-            cutsceneObjects.appendChild(cat);
-          }
         }
 
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
-          setTimeout(() => cat.classList.add('float-anim'), 100); // Плавный переход
+          setTimeout(() => cat.classList.add('float-anim'), 100);
         });
         items.forEach(item => {
           item.className = 'flying-item fly-up-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
@@ -446,7 +478,7 @@
       } else {
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
-          setTimeout(() => cat.classList.add('run-anim'), 100); // Плавный переход
+          setTimeout(() => cat.classList.add('run-anim'), 100);
         });
         items.forEach(item => {
           item.className = 'flying-item fall-anim ' + (item.classList.contains('pizza-item') ? 'pizza-item' : 'fish-item');
@@ -456,26 +488,24 @@
       }
     });
 
-    // --- СМЕНА НЕБА (Новая функция) ---
-    let skyState = 0; // 0 - день, 1 - закат, 2 - ночь, 3 - матрица
+    // --- СМЕНА НЕБА ---
+    let skyState = 0; 
     skyToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.sky) {
-          played.sky = true;
-          showCutscene("Время суток меняется...");
-        }
-        
-        skyState = (skyState + 1) % 4;
-        body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
-        
-        if (skyState === 0) body.classList.add('sky-day');
-        if (skyState === 1) body.classList.add('sky-sunset');
-        if (skyState === 2) body.classList.add('sky-night');
-        if (skyState === 3) body.classList.add('sky-matrix');
-        
-        // Автоматически выключаем тумблер обратно, чтобы можно было нажимать много раз
-        setTimeout(() => { e.target.checked = false; }, 100);
+      // Каждый раз при клике меняем фон (даже если тумблер уже включен)
+      skyState = (skyState + 1) % 4;
+      body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
+      
+      if (skyState === 0) body.classList.add('sky-day');
+      if (skyState === 1) body.classList.add('sky-sunset');
+      if (skyState === 2) body.classList.add('sky-night');
+      if (skyState === 3) body.classList.add('sky-matrix');
+
+      if (!played.sky) {
+        played.sky = true;
+        showCutscene("Время суток меняется...");
       }
+      
+      // Оставляем тумблер включенным, чтобы он горел зеленым
     });
 
     // --- РЕАЛЬНОСТЬ ---
