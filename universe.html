@@ -2,19 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <!-- Запрещаем браузеру уменьшать масштаб на телефонах -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Пиксельный Пульт</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  
+  <title>Пульт Вселенной</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
 
     body {
-      font-family: 'Press Start 2P', monospace;
-      background-color: #111;
-      background-image: linear-gradient(rgba(0,0,0,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.7) 1px, transparent 1px);
-      background-size: 20px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      /* Современный градиентный фон */
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: white;
       min-height: 100vh;
       display: flex;
@@ -22,6 +18,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      transition: filter 0.3s ease;
     }
 
     #animation-layer {
@@ -30,73 +27,73 @@
       overflow: hidden; 
     }
 
+    /* Пульт в стиле Glassmorphism (матовое стекло) */
     .panel {
       position: relative; z-index: 10;
-      background: #333;
-      padding: 20px;
-      border: 4px solid #fff;
-      box-shadow: 8px 8px 0px #000;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px 25px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       width: 90vw;
-      max-width: 350px;
+      max-width: 380px;
     }
 
     h1 {
       text-align: center; 
-      font-size: 12px; 
-      margin-bottom: 20px;
-      color: #55ff55; 
-      text-shadow: 2px 2px 0px #000;
+      font-size: 22px; 
+      font-weight: 700;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .toggle-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 4px dashed #555;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
     .toggle-row:last-child { border-bottom: none; }
 
-    .toggle-label { font-size: 8px; line-height: 1.5; }
+    .toggle-label { font-size: 15px; font-weight: 500; color: #e0e0e0; }
 
-    .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0;}
+    /* Современный тумблер */
+    .switch { position: relative; display: inline-block; width: 52px; height: 28px; flex-shrink: 0;}
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #222; border: 4px solid #fff;
+      background-color: rgba(255,255,255,0.1);
+      transition: .4s;
+      border-radius: 34px;
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .slider:before {
-      position: absolute; content: ""; height: 10px; width: 10px;
-      left: 4px; bottom: 4px; background-color: #fff; transition: .1s steps(2);
+      position: absolute; content: ""; height: 20px; width: 20px;
+      left: 3px; bottom: 3px; 
+      background-color: #fff; 
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
-    input:checked + .slider { background-color: #55ff55; }
+    input:checked + .slider {
+      background-color: #4facfe;
+      border-color: #4facfe;
+    }
     input:checked + .slider:before { transform: translateX(24px); }
 
-    /* --- УВЕЛИЧЕННЫЙ ПИКСЕЛЬНЫЙ КОТ --- */
-    .pixel-cat {
+    /* --- КОТЫ И ПИЦЦА (Эмодзи) --- */
+    .emoji-item {
       position: absolute;
-      width: 8px; height: 8px; /* Увеличили размер пикселя */
-      box-shadow: 
-        16px 0 0 #f4a460, 48px 0 0 #f4a460,
-        8px 8px 0 #f4a460, 16px 8px 0 #f4a460, 24px 8px 0 #f4a460, 40px 8px 0 #f4a460, 48px 8px 0 #f4a460, 56px 8px 0 #f4a460,
-        0 16px 0 #f4a460, 8px 16px 0 #f4a460, 16px 16px 0 #f4a460, 24px 16px 0 #f4a460, 32px 16px 0 #f4a460, 40px 16px 0 #f4a460, 48px 16px 0 #f4a460, 56px 16px 0 #f4a460, 64px 16px 0 #f4a460,
-        0 24px 0 #f4a460, 8px 24px 0 #000, 16px 24px 0 #000, 24px 24px 0 #f4a460, 32px 24px 0 #f4a460, 40px 24px 0 #000, 48px 24px 0 #000, 56px 24px 0 #f4a460, 64px 24px 0 #f4a460,
-        0 32px 0 #f4a460, 8px 32px 0 #f4a460, 16px 32px 0 #f4a460, 24px 32px 0 #f4a460, 32px 32px 0 #ff69b4, 40px 32px 0 #f4a460, 48px 32px 0 #f4a460, 56px 32px 0 #f4a460, 64px 32px 0 #f4a460,
-        0 40px 0 #f4a460, 8px 40px 0 #f4a460, 16px 40px 0 #f4a460, 24px 40px 0 #f4a460, 32px 40px 0 #f4a460, 40px 40px 0 #f4a460, 48px 40px 0 #f4a460, 56px 40px 0 #f4a460, 64px 40px 0 #f4a460,
-        8px 48px 0 #f4a460, 16px 48px 0 #f4a460, 24px 48px 0 #f4a460, 32px 48px 0 #f4a460, 40px 48px 0 #f4a460, 48px 48px 0 #f4a460, 56px 48px 0 #f4a460,
-        8px 56px 0 #f4a460, 16px 56px 0 #f4a460, 24px 56px 0 #f4a460, 32px 56px 0 #f4a460, 40px 56px 0 #f4a460, 48px 56px 0 #f4a460, 56px 56px 0 #f4a460,
-        8px 64px 0 #f4a460, 16px 64px 0 #000, 24px 64px 0 #f4a460, 40px 64px 0 #f4a460, 48px 64px 0 #000, 56px 64px 0 #f4a460,
-        64px 48px 0 #f4a460, 72px 40px 0 #f4a460, 72px 32px 0 #f4a460;
-      
-      transition: top 1s ease-in, transform 1s ease-in;
+      font-size: 40px; /* Размер эмодзи */
+      filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+      transition: top 1s ease-in-out, transform 1s ease-in-out;
     }
 
-    .pixel-pizza {
-      position: absolute;
-      width: 10px; height: 10px;
-      box-shadow: 
-        20px 0 0 #ffcc00,
-        10px 10px 0 #ffcc00, 20px 10px 0 #ff0000, 30px 10px 0 #ffcc00,
-        0 20px 0 #ffcc00, 10px 20px 0 #ffcc00, 20px 20px 0 #ffcc00, 30px 20px 0 #ffcc00, 40px 20px 0 #ffcc00;
-    }
-
+    /* Анимация бега */
     .run-anim { animation: runAcross steps(20) infinite; }
     @keyframes runAcross {
       0% { transform: translateX(-100px) scaleX(1); }
@@ -105,19 +102,22 @@
       100% { transform: translateX(-100px) scaleX(-1); }
     }
 
+    /* Анимация парения в невесомости */
     .float-anim { animation: hover steps(10) infinite alternate; }
     @keyframes hover {
-      0% { transform: translateY(0) rotate(-10deg); }
-      100% { transform: translateY(-20px) rotate(10deg); }
+      0% { transform: translateY(0) rotate(-15deg); }
+      100% { transform: translateY(-30px) rotate(15deg); }
     }
 
-    .fall-anim { animation: fallDown steps(15) forwards; }
+    /* Анимация падения пиццы */
+    .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown {
       0% { transform: translateY(0) rotate(0deg); }
-      100% { transform: translateY(120vh) rotate(180deg); }
+      100% { transform: translateY(120vh) rotate(360deg); }
     }
 
-    .reality-inverted { filter: invert(1) hue-rotate(90deg); }
+    /* Инверсия цветов */
+    .reality-inverted { filter: invert(1) hue-rotate(180deg); }
   </style>
 </head>
 <body>
@@ -125,10 +125,10 @@
   <div id="animation-layer"></div>
 
   <div class="panel">
-    <h1>ПУЛЬТ ВСЕЛЕННОЙ</h1>
+    <h1>Управление Вселенной</h1>
 
     <div class="toggle-row">
-      <span class="toggle-label">Квадратные<br>коты</span>
+      <span class="toggle-label">🐈 Квадратные коты</span>
       <label class="switch">
         <input type="checkbox" id="toggle-cats">
         <span class="slider"></span>
@@ -136,7 +136,7 @@
     </div>
 
     <div class="toggle-row">
-      <span class="toggle-label">Гравитация</span>
+      <span class="toggle-label">🌍 Гравитация</span>
       <label class="switch">
         <input type="checkbox" id="toggle-gravity" checked>
         <span class="slider"></span>
@@ -144,7 +144,7 @@
     </div>
 
     <div class="toggle-row">
-      <span class="toggle-label">Дождь<br>пиццы</span>
+      <span class="toggle-label">🍕 Дождь из пиццы</span>
       <label class="switch">
         <input type="checkbox" id="toggle-pizza">
         <span class="slider"></span>
@@ -152,7 +152,7 @@
     </div>
 
     <div class="toggle-row">
-      <span class="toggle-label">Сменить<br>реальность</span>
+      <span class="toggle-label">🌀 Сменить реальность</span>
       <label class="switch">
         <input type="checkbox" id="toggle-reality">
         <span class="slider"></span>
@@ -181,9 +181,9 @@
 
     function spawnCat() {
       const cat = document.createElement('div');
-      cat.className = 'pixel-cat';
+      cat.className = 'emoji-item';
+      cat.textContent = '🐈'; // Используем эмодзи кота
       
-      // Коты бегают по всей высоте экрана
       const startY = Math.random() * 60 + 20; 
       cat.style.top = startY + 'vh';
 
@@ -198,16 +198,18 @@
     }
 
     gravityToggle.addEventListener('change', (e) => {
-      const cats = document.querySelectorAll('.pixel-cat');
+      const cats = document.querySelectorAll('.emoji-item');
       
       if (!e.target.checked) {
+        // Гравитация ВЫКЛ
         cats.forEach(cat => {
           cat.classList.remove('run-anim');
           cat.style.animation = 'none'; 
-          cat.style.top = (Math.random() * 15 + 5) + 'vh'; 
+          cat.style.top = (Math.random() * 20 + 5) + 'vh'; 
           setTimeout(() => cat.classList.add('float-anim'), 1000);
         });
       } else {
+        // Гравитация ВКЛ
         cats.forEach(cat => {
           cat.classList.remove('float-anim');
           cat.style.top = (Math.random() * 60 + 20) + 'vh';
@@ -220,13 +222,15 @@
       if (e.target.checked) {
         pizzaInterval = setInterval(() => {
           const pizza = document.createElement('div');
-          pizza.className = 'pixel-pizza';
+          pizza.className = 'emoji-item';
+          pizza.textContent = '🍕';
           pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-          pizza.style.animationDuration = (Math.random() * 1 + 1) + 's';
+          pizza.style.top = '-50px';
+          pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
           pizza.classList.add('fall-anim');
           pizza.addEventListener('animationend', () => pizza.remove());
           layer.appendChild(pizza);
-        }, 600);
+        }, 500);
       } else {
         clearInterval(pizzaInterval);
       }
