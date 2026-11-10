@@ -40,6 +40,13 @@
     .balance-label { font-size: 11px; color: #aaa; display: block; margin-bottom: 2px; }
     .portfolio-value { font-size: 11px; color: #ffe066; margin-top: 2px; }
 
+    .btn-reset {
+      background: rgba(255, 0, 85, 0.1); border: 1px solid #ff0055; color: #ff0055;
+      padding: 8px 12px; border-radius: 10px; font-weight: bold; font-size: 12px;
+      cursor: pointer; transition: 0.2s;
+    }
+    .btn-reset:active { background: #ff0055; color: #fff; }
+
     .games-list {
       width: 100%;
       max-width: 500px;
@@ -189,11 +196,11 @@
 
   <div class="header">
     <div class="balance-container">
-      <span class="balance-label">Баланс (кэш):</span>
+      <span class="balance-label">Баланс:</span>
       <span class="balance" id="balance">1000</span> 💵
       <span class="portfolio-value" id="portfolio-value">Акции: 0 💵</span>
     </div>
-    <div style="font-size: 24px;">📈</div>
+    <button class="btn-reset" id="btn-reset" onclick="resetGame()">Сброс 🔄</button>
   </div>
 
   <div class="games-list" id="games-list"></div>
@@ -270,9 +277,12 @@
     const ctx = modalChart.getContext('2d');
 
     let activeGameId = null;
+    
+    // НАЗВАНИЕ СОХРАНЕНИЯ, КОТОРОЕ МЫ БОЛЬШЕ НИКОГДА НЕ БУДЕМ МЕНЯТЬ
+    const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
 
-    // Загрузка V10 (сброс прогресса для новых правил)
-    const saved = localStorage.getItem('robloxExchangeV10');
+    // Загрузка
+    const saved = localStorage.getItem(SAVE_KEY);
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -308,7 +318,14 @@
 
     function saveGame() {
       const cleanGamesData = gamesData.map(g => ({ id: g.id, online: g.online, history: g.history }));
-      localStorage.setItem('robloxExchangeV10', JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
+      localStorage.setItem(SAVE_KEY, JSON.stringify({ balance, portfolio, gamesData: cleanGamesData }));
+    }
+
+    function resetGame() {
+      if(confirm('Вы уверены, что хотите сбросить весь прогресс?')) {
+         localStorage.removeItem(SAVE_KEY);
+         location.reload();
+      }
     }
 
     function getPrice(game) {
@@ -502,30 +519,22 @@
       }
     };
 
-    // ОБНОВЛЕННЫЙ ИГРОВОЙ ЦИКЛ
+    // ИГРОВОЙ ЦИКЛ
     setInterval(() => {
       gamesData.forEach(game => {
         const isCheap = game.online < 10000;
-        const volatility = isCheap ? 0.25 : 0.10; // Шанс скачка
+        const volatility = isCheap ? 0.25 : 0.10; 
         
-        // Случайное изменение
         let change = (Math.random() * volatility * 2) - volatility;
-        
-        // Базовый рост, чтобы игра не умирала
         change += 0.015; 
 
-        // Второе дыхание для дешевых игр
-        if (game.online < 50) {
-          change += 0.2; 
-        }
+        if (game.online < 50) change += 0.2; 
 
-        // Сопротивление в космосе (выше 1 млн)
         if (game.online > 1000000) change -= 0.05;
         if (game.online > 2000000) change -= 0.15; 
 
         const eventRoll = Math.random();
         
-        // ПИК ПОПУЛЯРНОСТИ
         if (eventRoll < 0.005 && !game.event) {
           change += 1.0 + Math.random(); 
           game.event = 'peak';
@@ -535,7 +544,6 @@
           clearTimeout(game.eventTimer);
           game.eventTimer = setTimeout(() => { game.event = null; renderGames(); }, 10000);
         } 
-        // ХАЙП
         else if (eventRoll < 0.025 && !game.event) {
           change += 0.4 + (Math.random() * 0.4); 
           game.event = 'hype';
@@ -548,7 +556,6 @@
 
         game.online = Math.floor(game.online * (1 + change));
         
-        // Защита от нуля и бесконечности
         if (game.online < 5) game.online = 5; 
         if (game.online > 5000000) game.online = 5000000;
 
