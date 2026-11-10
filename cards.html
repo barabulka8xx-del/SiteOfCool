@@ -17,7 +17,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      /* 3D сцена */
       perspective: 1000px;
       perspective-origin: 50% 30%;
     }
@@ -46,7 +45,7 @@
       transform-style: preserve-3d;
     }
 
-    /* ЛАМПА (Объемная) */
+    /* ЛАМПА */
     .lamp-container {
       position: absolute; top: -20px; left: 50%; 
       transform: translateX(-50%) translateZ(100px);
@@ -56,7 +55,7 @@
     .lamp-shade { width: 90px; height: 45px; background: #111; border-radius: 45px 45px 0 0; border: 2px solid #333; border-bottom: none; }
     .lamp-bulb { width: 30px; height: 15px; background: #ffeb3b; border-radius: 50%; box-shadow: 0 0 40px #ffeb3b, 0 0 150px #ffeb3b; margin-top: -8px; }
 
-    /* 3D СТОЛ (Центрирован) */
+    /* 3D СТОЛ */
     .table-wrapper {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%) rotateX(55deg);
@@ -69,7 +68,6 @@
       background: radial-gradient(circle, #2a3b42 0%, #111 85%);
       border-radius: 50%; 
       border: 4px solid #3a5060; 
-      /* Объем стола за счет жесткой тени */
       box-shadow: 0 15px 0 #151a1f, 0 30px 40px rgba(0,0,0,0.9);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       position: relative;
@@ -80,10 +78,9 @@
       position: absolute; top: 20%;
       font-size: 18px; font-weight: bold; color: rgba(255,255,255,0.3);
       text-align: center; pointer-events: none; width: 200px;
-      transform: translateZ(1px); /* Чуть выше поверхности */
+      transform: translateZ(1px);
     }
 
-    /* Колода в центре */
     .center-deck {
       position: absolute;
       width: 50px; height: 70px;
@@ -95,7 +92,6 @@
       transform: translateZ(2px);
     }
 
-    /* Зона карт на столе */
     .played-cards-area {
       position: absolute;
       width: 100%; height: 100%;
@@ -111,7 +107,6 @@
       display: flex; align-items: center; justify-content: center; font-size: 35px;
       opacity: 0;
       box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-      /* Карта плоская, лежит прямо на столе */
       animation: dropAndStay 2.5s forwards;
     }
     
@@ -122,7 +117,7 @@
       100% { transform: translateZ(0px) scale(0.8); opacity: 0; }
     }
 
-    /* --- ИГРОКИ (Плоские, но стоят вокруг 3D стола) --- */
+    /* --- ИГРОКИ --- */
     .seat {
       position: absolute; display: flex; flex-direction: column; align-items: center;
       z-index: 5; transition: 0.3s;
@@ -189,7 +184,7 @@
     .info-desc { color: #fff; font-size: 12px; line-height: 1.3; }
     .info-hint { color: #4facfe; font-size: 10px; margin-top: 5px; font-style: italic;}
 
-    /* РУКА ИГРОКА (Плоская, поверх 3D) */
+    /* РУКА ИГРОКА */
     .player-hand {
       position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 5px; z-index: 20; 
@@ -227,11 +222,11 @@
 
     /* ПРИЦЕЛ */
     .target-overlay {
-      position: absolute; width: 75px; height: 75px; border: 3px dashed #ff0055; border-radius: 50%;
-      display: none; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; 
-      top: -5px; left: -5px;
+      position: absolute; width: 100%; height: 100%; border: 3px dashed #ff0055; border-radius: 50%;
+      z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; 
+      top: 0; left: 0; box-sizing: border-box;
     }
-    @keyframes pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.2); opacity: 1; } }
+    @keyframes pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.1); opacity: 1; } }
 
     /* АНИМАЦИИ УРОНА */
     .floating-text {
@@ -295,7 +290,7 @@
   <script>
     const CARDS_LIB = [
       { id: 'rock', name: 'Скала', icon: '🗿', dmg: 0, heal: 0, shield: 15, desc: 'Дает 15 брони.' },
-      { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: '5 урона + яд.' },
+      { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: '5 урона + яд (3 хода).' },
       { id: 'pizza', name: 'Пицца', icon: '🍕', dmg: 0, heal: 15, desc: 'Лечит 15 HP.' },
       { id: 'poop', name: 'Какашка', icon: '💩', dmg: 15, selfDmg: 5, desc: '15 урона, 5 себе.' },
       { id: 'ufo', name: 'НЛО', icon: '👽', dmg: 10, heal: 10, desc: '10 урона, лечит 10.' },
@@ -336,6 +331,9 @@
         playerHand = state.playerHand;
         gameMode = state.gameMode;
 
+        // Восстановление совместимости (если старые сохранения без poisonTurns)
+        players.forEach(p => { if (p.poisonTurns === undefined) p.poisonTurns = 0; });
+
         document.getElementById('menu').style.display = 'none';
         document.getElementById('game-container').style.display = 'block';
 
@@ -358,6 +356,7 @@
 
         return true;
       } catch(e) {
+        console.error(e);
         return false;
       }
     }
@@ -370,13 +369,13 @@
       
       gameMode = numPlayers;
       players = [];
-      players.push({ id: 'you', name: 'Ты', icon: '😎', hp: 50, maxHp: 50, shield: 0, isBot: false, alive: true, status: [] });
+      players.push({ id: 'you', name: 'Ты', icon: '😎', hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: false, alive: true, status: [] });
       
       const botIcons = ['😈', '🤖', '👽'];
       const botSeats = ['seat-1', 'seat-2', 'seat-3'];
       
       for (let i = 0; i < numPlayers - 1; i++) {
-        players.push({ id: 'bot'+i, name: 'Бот '+(i+1), icon: botIcons[i], hp: 50, maxHp: 50, shield: 0, isBot: true, alive: true, status: [] });
+        players.push({ id: 'bot'+i, name: 'Бот '+(i+1), icon: botIcons[i], hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: true, alive: true, status: [] });
         document.getElementById(botSeats[i]).style.display = 'flex';
       }
       
@@ -433,12 +432,9 @@
 
       const card = playerHand[index];
 
+      // Если карта уже выбрана, снимаем выделение
       if (selectedCardIndex === index) {
-        if (card.dmg > 0 || card.stun) {
-          log("Выбери цель для атаки (нажми на прицел)!");
-        } else {
-          applyCard(card, 0, index); 
-        }
+        hideCardInfo();
         return;
       }
 
@@ -449,15 +445,15 @@
       document.getElementById('info-desc').innerText = card.desc;
       document.getElementById('card-info').classList.add('active');
 
+      // Если карта требует цели (урон или стан)
       if (card.dmg > 0 || card.stun) {
-        document.getElementById('info-hint').innerText = "Нажми на прицел над врагом.";
+        document.getElementById('info-hint').innerText = "Выбери цель для атаки (нажми на прицел).";
         isTargeting = true;
         document.getElementById('table-text').innerText = "Выбери цель!";
-        showTargets(true);
+        updateUI(); // Обновляем интерфейс, чтобы появились прицелы
       } else {
-        document.getElementById('info-hint').innerText = "Нажми на карту ЕЩЕ РАЗ.";
-        isTargeting = false;
-        showTargets(false);
+        // Если карта мирная (лечение, броня), применяем сразу без второго клика
+        applyCard(card, 0, index);
       }
     }
 
@@ -465,27 +461,8 @@
       document.getElementById('card-info').classList.remove('active');
       selectedCardIndex = -1;
       isTargeting = false;
-      showTargets(false);
-      renderHand();
-    }
-
-    function showTargets(show) {
-      players.forEach((p, index) => {
-        if (p.isBot && p.alive) {
-          const seat = document.getElementById('seat-' + (index === 1 ? '1' : index === 2 ? '2' : '3'));
-          let overlay = seat.querySelector('.target-overlay');
-          if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.className = 'target-overlay';
-            seat.appendChild(overlay);
-            overlay.onclick = (e) => {
-              e.stopPropagation();
-              if (isTargeting) applyCard(playerHand[selectedCardIndex], index, selectedCardIndex);
-            };
-          }
-          overlay.style.display = show ? 'block' : 'none';
-        }
-      });
+      document.getElementById('table-text').innerText = "Твой ход";
+      updateUI(); // Убираем прицелы
     }
 
     function showPlayedCard(card) {
@@ -498,6 +475,7 @@
     }
 
     function applyCard(card, targetIndex, handIndex) {
+      // Защита от случайного вызова карты урона без выбора цели
       if (!isTargeting && (card.dmg > 0 || card.stun)) return; 
 
       hideCardInfo(); 
@@ -505,7 +483,13 @@
       const attacker = players[0];
       const target = players[targetIndex];
 
-      log(`Ты играешь ${card.name} против ${target.name}!`);
+      // Исправлен лог, теперь нет "Ты играешь против Ты"
+      if (targetIndex === 0) {
+        log(`Ты применяешь ${card.name}!`);
+      } else {
+        log(`Ты играешь ${card.name} против ${target.name}!`);
+      }
+      
       showPlayedCard(card);
 
       if (card.heal) {
@@ -540,7 +524,8 @@
         showFloatText(target, `💫 СТАН`, '#ffeb3b');
       }
       if (card.poison) {
-        target.status.push('poison');
+        target.poisonTurns = 3; // Яд теперь висит 3 хода, а не вечно
+        showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0');
       }
       if (card.id === 'brain') {
         drawCards(1);
@@ -583,10 +568,14 @@
            setTimeout(nextTurn, 2500);
            return;
         }
-        if (players[0].status.includes('poison')) {
+        
+        // Обработка яда игрока
+        if (players[0].poisonTurns > 0) {
            players[0].hp -= 5;
-           showFloatText(players[0], `-5`, '#a020f0');
+           players[0].poisonTurns--;
+           showFloatText(players[0], `☠️ -5`, '#a020f0');
            checkDeaths();
+           if (!players[0].alive) { checkGameOver(); return; }
         }
 
       } else {
@@ -604,9 +593,12 @@
         setTimeout(nextTurn, 2500);
         return;
       }
-      if (bot.status.includes('poison')) {
+      
+      // Обработка яда бота
+      if (bot.poisonTurns > 0) {
         bot.hp -= 5;
-        showFloatText(bot, `-5`, '#a020f0');
+        bot.poisonTurns--;
+        showFloatText(bot, `☠️ -5`, '#a020f0');
         checkDeaths();
         if (!bot.alive) { setTimeout(nextTurn, 2500); return; }
       }
@@ -623,7 +615,12 @@
       
       if (!target) { setTimeout(nextTurn, 2500); return; }
 
-      log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
+      if (target.id === bot.id) {
+        log(`${bot.name} применяет ${cardToPlay.name}!`);
+      } else {
+        log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
+      }
+      
       showPlayedCard(cardToPlay);
 
       if (cardToPlay.heal) {
@@ -648,6 +645,10 @@
       if (cardToPlay.stun) {
         target.status.push('stun');
         showFloatText(target, `💫 СТАН`, '#ffeb3b');
+      }
+      if (cardToPlay.poison) {
+        target.poisonTurns = 3;
+        showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0');
       }
 
       checkDeaths();
@@ -699,8 +700,15 @@
            deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`;
         }
 
+        // Генерация прицела прямо в интерфейсе (исправляет исчезновение)
+        let overlayHTML = '';
+        if (isTargeting && p.isBot && p.alive) {
+            overlayHTML = `<div class="target-overlay" onclick="event.stopPropagation(); applyCard(playerHand[selectedCardIndex], ${index}, selectedCardIndex)"></div>`;
+        }
+
         seatEl.innerHTML = `
           <div class="avatar-box ${p.isBot ? 'enemy' : ''} ${p.status.includes('stun') ? 'stunned' : ''} ${!p.alive ? 'dead' : ''}">
+            ${overlayHTML}
             ${p.icon}
           </div>
           <div class="hp-bar-container">
