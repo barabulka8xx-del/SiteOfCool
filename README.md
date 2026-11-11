@@ -1,6 +1,6 @@
 # 🚀Наши Проекты🚀
 
-**[👉 ИГРАТЬ ЗДЕСЬ ](https://barabulka8xx-del.github.io/SiteOfCool/)** 👈
+**[👉 ИГРАТЬ ЗДЕСЬ ](https://barabulka8xx-del.github.io/SiteOfCool/menu.html)** 👈
 
 ![Обложка проекта](preview.jpg)
 
