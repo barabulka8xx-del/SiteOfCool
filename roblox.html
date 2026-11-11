@@ -16,7 +16,7 @@
       padding-bottom: 30px;
     }
 
-    /* --- ШАПКА (Компактная) --- */
+    /* --- ШАПКА --- */
     .header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(15, 32, 39, 0.95);
@@ -44,6 +44,20 @@
     .btn-create { background: rgba(0, 255, 0, 0.15); color: #00ff00; border: 1px solid #00ff00; }
     .btn-create:disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; color: #555; background: rgba(0,0,0,0.2); }
     .btn-reset { background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid #ff0055; }
+
+    /* --- АЛЕРТ СОБЫТИЙ --- */
+    .event-banner {
+      position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #f12711, #f5af19);
+      color: #000; padding: 12px 20px; border-radius: 12px;
+      font-weight: 900; font-size: 16px; text-align: center;
+      box-shadow: 0 10px 30px rgba(241, 39, 17, 0.5);
+      border: 2px solid #fff; z-index: 100;
+      opacity: 0; pointer-events: none; transition: 0.3s;
+      width: 90%; max-width: 350px;
+    }
+    .event-banner.show { opacity: 1; animation: pulseEvent 1s infinite alternate; }
+    @keyframes pulseEvent { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-50%) scale(1.05); } }
 
     /* --- СЕТКА ИГР --- */
     .games-grid {
@@ -117,7 +131,6 @@
     .modal-icon { font-size: 50px; }
     .modal-title { font-size: 20px; font-weight: bold; }
     
-    /* График */
     .chart-container {
       width: 100%; height: 120px; background: #0f2027;
       border-radius: 12px; border: 1px solid #2c5364;
@@ -173,6 +186,8 @@
     </div>
   </div>
 
+  <div class="event-banner" id="event-banner">СОБЫТИЕ!</div>
+
   <div class="games-grid" id="games-grid"></div>
 
   <!-- МОДАЛЬНОЕ ОКНО -->
@@ -213,6 +228,7 @@
     const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
     let currentGameId = null;
 
+    // ПОЛНЫЙ СПИСОК 25 ИГР (с реально маленькими онлайнами в конце)
     const BASE_GAMES = [
       { id: 'grow_a_garden', name: 'Grow a Garden', icon: '🌱', baseOnline: 1058604 },
       { id: 'dress_to_impress', name: 'Dress to Impress', icon: '👗', baseOnline: 473514 },
@@ -234,11 +250,12 @@
       { id: 'mm2', name: 'MM2', icon: '🔫', baseOnline: 15000 },
       { id: 'shindo_life', name: 'Shindo Life', icon: '👁️', baseOnline: 12000 },
       { id: 'all_star_tower', name: 'All Star Tower Defense', icon: '⭐', baseOnline: 10000 },
-      { id: 'saber_simulator', name: 'Saber Simulator', icon: '⚔️', baseOnline: 8000 },
-      { id: 'mining_simulator', name: 'Mining Simulator', icon: '⛏️', baseOnline: 6000 },
-      { id: 'speed_run', name: 'Speed Run 4', icon: '🏃', baseOnline: 4000 },
-      { id: 'natural_disaster', name: 'Natural Disaster Survival', icon: '🌪️', baseOnline: 2000 },
-      { id: 'epic_minigames', name: 'Epic Minigames', icon: '🎮', baseOnline: 1000 }
+      { id: 'saber_simulator', name: 'Saber Simulator', icon: '⚔️', baseOnline: 5000 },
+      // ВОТ ОНИ, ПОМОЙНЫЕ ИГРЫ С МАЛЕНЬКИМ ОНЛАЙНОМ
+      { id: 'speed_run', name: 'Speed Run 4', icon: '🏃', baseOnline: 450 },
+      { id: 'natural_disaster', name: 'Natural Disaster Survival', icon: '🌪️', baseOnline: 120 },
+      { id: 'epic_minigames', name: 'Epic Minigames', icon: '🎮', baseOnline: 35 },
+      { id: 'flood_escape', name: 'Flood Escape 2', icon: '🌊', baseOnline: 5 }
     ];
 
     let state = { balance: 1000, portfolio: {}, gamesData: [], nextGamePrice: 10000 };
@@ -253,7 +270,7 @@
           state.portfolio = parsed.portfolio || {};
           state.nextGamePrice = parsed.nextGamePrice !== undefined ? parsed.nextGamePrice : 10000;
           
-          if (!parsed.gamesData || parsed.gamesData.length < 25 || !parsed.gamesData[0].name) {
+          if (!parsed.gamesData || parsed.gamesData.length < BASE_GAMES.length || !parsed.gamesData[0].name) {
              state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
              state.gamesData.forEach(g => g.online = g.baseOnline);
           } else {
@@ -270,6 +287,7 @@
 
       updateUI();
       startGameLoop();
+      startEventLoop(); // Запускаем генератор событий
     }
 
     function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
@@ -298,7 +316,6 @@
       updateUI(); saveGame();
     }
 
-    // ЛОГИКА МОДАЛЬНОГО ОКНА
     function openModal(gameId) {
       currentGameId = gameId;
       const game = state.gamesData.find(g => g.id === gameId);
@@ -341,12 +358,10 @@
       currentGameId = null;
     }
 
-    // ФУНКЦИЯ ОТРИСОВКИ ГРАФИКА
     function drawChart(game) {
       const canvas = document.getElementById('game-chart');
       const ctx = canvas.getContext('2d');
       
-      // Делаем canvas резким на мобилках
       const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = rect.width * 2;
       canvas.height = rect.height * 2;
@@ -355,33 +370,27 @@
       const w = rect.width;
       const h = rect.height;
 
-      // Генерируем фейковые точки для графика (30 точек)
       const points = [];
       let currentVal = game.online;
       for (let i = 0; i < 30; i++) {
-        // Небольшое колебание вокруг текущего онлайна
         const noise = (Math.random() - 0.5) * (game.online * 0.05); 
         points.push(currentVal + noise);
         currentVal += noise;
       }
-      // Последняя точка = текущий онлайн
       points[points.length - 1] = game.online;
 
-      // Находим мин/макс для масштабирования
       const maxVal = Math.max(...points) * 1.05;
       const minVal = Math.min(...points) * 0.95;
       const range = maxVal - minVal || 1;
 
       ctx.clearRect(0, 0, w, h);
 
-      // Рисуем сетку
       ctx.strokeStyle = 'rgba(79, 172, 254, 0.1)';
       ctx.lineWidth = 1;
       for(let i=1; i<4; i++) {
         ctx.beginPath(); ctx.moveTo(0, h * i / 4); ctx.lineTo(w, h * i / 4); ctx.stroke();
       }
 
-      // Рисуем линию
       ctx.beginPath();
       ctx.strokeStyle = game.online >= game.baseOnline ? '#00ff00' : '#ff0055';
       ctx.lineWidth = 3;
@@ -395,7 +404,6 @@
       });
       ctx.stroke();
 
-      // Заливка под графиком
       ctx.lineTo(w, h);
       ctx.lineTo(0, h);
       ctx.closePath();
@@ -468,13 +476,64 @@
         }
         
         updateUI();
-        if (currentGameId) { // Если открыто окно, обновляем в нем данные
+        if (currentGameId) {
           updateModalData();
           const game = state.gamesData.find(g => g.id === currentGameId);
           if(game) drawChart(game); 
         }
         saveGame();
       }, 3000);
+    }
+
+    // --- ГЕНЕРАТОР СОБЫТИЙ (ХАЙП И ПИК) ---
+    function startEventLoop() {
+      setInterval(() => {
+        // 30% шанс, что событие произойдет каждые 10 секунд
+        if (Math.random() < 0.3) {
+          triggerEvent();
+        }
+      }, 10000);
+    }
+
+    function triggerEvent() {
+      // Выбираем случайную игру (не свою)
+      const validGames = state.gamesData.filter(g => !g.isCustom);
+      if (validGames.length === 0) return;
+      
+      const game = validGames[Math.floor(Math.random() * validGames.length)];
+      const isPeak = Math.random() > 0.5; // 50/50 Хайп или Пик
+      
+      const eventBanner = document.getElementById('event-banner');
+      
+      if (isPeak) {
+        // ПИК: Онлайн взлетает в 5-10 раз
+        const multiplier = 5 + Math.floor(Math.random() * 5);
+        game.online = Math.floor(game.online * multiplier);
+        eventBanner.innerText = `👑 ПИК ПОПУЛЯРНОСТИ: ${game.name.toUpperCase()}! 👑`;
+        eventBanner.style.background = 'linear-gradient(135deg, #f5af19, #f12711)';
+      } else {
+        // ХАЙП: Онлайн взлетает в 2-4 раза
+        const multiplier = 2 + Math.floor(Math.random() * 2);
+        game.online = Math.floor(game.online * multiplier);
+        eventBanner.innerText = `🔥 ХАЙП: ${game.name.toUpperCase()}! 🔥`;
+        eventBanner.style.background = 'linear-gradient(135deg, #ffd700, #ff8c00)';
+      }
+
+      eventBanner.classList.add('show');
+      
+      // Обновляем интерфейс, чтобы изменения сразу было видно
+      updateUI();
+      if (currentGameId) {
+        updateModalData();
+        const currentG = state.gamesData.find(g => g.id === currentGameId);
+        if(currentG) drawChart(currentG);
+      }
+      saveGame();
+
+      // Прячем баннер через 4 секунды
+      setTimeout(() => {
+        eventBanner.classList.remove('show');
+      }, 4000);
     }
 
     function updateUI() {
@@ -494,7 +553,6 @@
           const card = document.createElement('div');
           card.className = 'game-card' + (game.isCustom ? ' custom-game' : '');
           card.id = 'card-' + game.id;
-          // Добавляем клик на карточку для открытия модалки
           card.onclick = () => openModal(game.id);
           grid.appendChild(card);
         });
