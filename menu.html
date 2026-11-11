@@ -19,6 +19,35 @@
       overflow-x: hidden;
     }
 
+    /* --- ВЕРХНЯЯ ПАНЕЛЬ С КНОПКОЙ ИНФО --- */
+    .top-nav {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: -10px;
+      z-index: 10;
+    }
+
+    .btn-info {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(79, 172, 254, 0.2);
+      border: 1px solid #4facfe;
+      color: #4facfe;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: serif; /* Чтобы "i" выглядела красиво */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 0 10px rgba(79, 172, 254, 0.2);
+    }
+    .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
+
     h1 {
       font-size: 24px;
       font-weight: bold;
@@ -177,7 +206,7 @@
 
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
-    /* --- МОДАЛЬНОЕ ОКНО (СНИЗУ) --- */
+    /* --- МОДАЛЬНЫЕ ОКНА (ОБЩИЕ) --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center;
@@ -187,8 +216,7 @@
     .modal-overlay.active { display: flex; }
 
     .modal-content {
-      background: #151b22; 
-      padding: 25px 20px; 
+      background: #151b22; padding: 25px 20px; 
       padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); 
       border-radius: 20px 20px 0 0; 
       width: 100%; max-width: 500px; 
@@ -242,9 +270,43 @@
     }
     .btn-close-modal:active { background: #333; }
 
+    /* --- СТИЛИ ДЛЯ ОКНА "О ПРОЕКТЕ" (README) --- */
+    .about-content {
+      text-align: left;
+      width: 100%;
+      font-size: 14px;
+      color: #ccc;
+      line-height: 1.5;
+    }
+    .about-content h2 { color: #4facfe; font-size: 18px; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid rgba(79,172,254,0.3); padding-bottom: 5px;}
+    .about-content h3 { color: #fff; font-size: 15px; margin-top: 12px; margin-bottom: 6px; }
+    .about-content p { margin-bottom: 10px; }
+    .about-content ul { padding-left: 20px; margin-bottom: 10px; }
+    .about-content li { margin-bottom: 5px; }
+    .about-content .check { color: #00ff00; font-weight: bold; }
+    .about-content .cross { color: #555; font-weight: bold; }
+    
+    .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
+    .tech-badge {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold;
+    }
+
+    .support-box {
+      background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe;
+      border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px;
+    }
+    .support-box a { color: #4facfe; text-decoration: none; font-weight: bold; }
+    .copyright { font-size: 11px; color: #666; text-align: center; margin-top: 20px; }
+
   </style>
 </head>
 <body>
+
+  <!-- Кнопка Инфо -->
+  <div class="top-nav">
+    <div class="btn-info" onclick="openAbout()">i</div>
+  </div>
 
   <h1>🚀Наши Проекты🚀</h1>
 
@@ -262,7 +324,7 @@
       </div>
     </div>
 
-    <!-- 2. НОВИНКА (ГОЛУБАЯ) - ТЕПЕРЬ МЕМНЫЙ СУД -->
+    <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
     <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами в неоновом зале суда. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
       <div class="banner-info">
         <div class="banner-badge">🔥 НОВИНКА 🔥</div>
@@ -274,10 +336,9 @@
       </div>
     </div>
 
-    <!-- СЕТКА ОСТАЛЬНЫХ ИГР (ОТСОРТИРОВАНА ОТ НОВЫХ К СТАРЫМ) -->
+    <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
     <div class="games-list">
       
-      <!-- Битва Мемов (самая свежая из сетки) -->
       <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!', '10.11.2026')">
         <div class="icon-box"><div class="game-icon">🃏</div></div>
         <div class="game-title">Битва Мемов</div>
@@ -328,7 +389,7 @@
 
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО -->
+  <!-- ОКНО ОПИСАНИЯ ИГРЫ -->
   <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
     <div class="modal-content" id="modal-content">
       <div class="modal-icon-box">
@@ -336,17 +397,74 @@
       </div>
       <div class="modal-title" id="modal-title">Название</div>
       <div class="modal-desc" id="modal-desc">Описание игры...</div>
-      
-      <!-- Плашка с датой -->
       <div class="modal-date" id="modal-date">⏱️ Обновлено: 10.11.2026</div>
-      
       <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
       <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
     </div>
   </div>
 
+  <!-- ОКНО "О ПРОЕКТЕ" (README) -->
+  <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
+    <div class="modal-content" id="about-content-box" style="border-color: #ffd700;" onclick="event.stopPropagation()">
+      
+      <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
+      
+      <div class="about-content">
+        <p><b>Экосистема интерактивных веб-приложений, симуляторов и мини-игр.</b></p>
+        <p>Коллекция из 9 уникальных проектов, написанных на чистом стеке без использования сторонних фреймворков.</p>
+
+        <h2>🧠 О проекте</h2>
+        <p><b>SiteOfCool</b> — это комплексная экосистема браузерных игр и интерактивных симуляторов.</p>
+        <p>Главная философия проекта — доказать, что для создания качественного, красивого и сложного пользовательского интерфейса (UI) не обязательно использовать тяжелые фреймворки. Вся экосистема работает на <b>Vanilla JavaScript (ES6+)</b>, что обеспечивает:</p>
+        <ul>
+          <li><b>Мгновенную загрузку:</b> Никаких этапов сборки и тяжелых бандлов.</li>
+          <li><b>Минимальное потребление памяти:</b> Прямая работа с DOM-деревом.</li>
+          <li><b>Глубокое понимание веба:</b> Каждая анимация и каждый расчет написаны вручную.</li>
+        </ul>
+
+        <h2>🎨 Ключевые особенности</h2>
+        <ul>
+          <li><b>Современный UI/UX:</b> Темные темы, неоновые свечения, эффекты Glassmorphism и 3D-трансформации.</li>
+          <li><b>Умный State Management:</b> Прогресс сохраняется локально в браузере. Для каждой игры используются изолированные хранилища.</li>
+          <li><b>Оптимизация:</b> Работа с Canvas API для графиков и использование DocumentFragment для массового спавна объектов (без зависаний).</li>
+          <li><b>Mobile-First:</b> Все интерфейсы адаптированы под сенсорные экраны.</li>
+        </ul>
+
+        <h2>🗺 Дорожная карта</h2>
+        <ul>
+          <li><span class="check">✔</span> Запуск базовой версии Роблокс-Биржи.</li>
+          <li><span class="check">✔</span> Внедрение 3D-карточной игры (Битва Мемов).</li>
+          <li><span class="check">✔</span> Разработка Мемного Суда с анимациями.</li>
+          <li><span class="cross">☐</span> Глобальный рефакторинг CSS в global.css.</li>
+          <li><span class="cross">☐</span> Кросс-игровая интеграция валюты.</li>
+          <li><span class="cross">☐</span> PWA (Установка приложений на рабочий стол).</li>
+        </ul>
+
+        <h2>🛠 Технологии</h2>
+        <div class="tech-badges">
+          <span class="tech-badge" style="color: #E34F26;">HTML5</span>
+          <span class="tech-badge" style="color: #1572B6;">CSS3</span>
+          <span class="tech-badge" style="color: #F7DF1E;">JavaScript</span>
+          <span class="tech-badge" style="color: #fff;">Canvas API</span>
+        </div>
+
+        <div class="support-box">
+          <h3>✉️ Поддержка</h3>
+          <p style="margin-bottom: 0;">По всем вопросам: <a href="mailto:chesssupport.lord@gmail.com">chesssupport.lord@gmail.com</a></p>
+        </div>
+
+        <div class="copyright">
+          © 2026 SiteOfCool. Все права защищены.<br>
+          Копирование материалов без согласия автора запрещено.
+        </div>
+      </div>
+
+      <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
+    </div>
+  </div>
+
   <script>
-    // --- ЛОГИКА МОДАЛЬНОГО ОКНА ---
+    // --- ЛОГИКА МОДАЛЬНЫХ ОКОН ---
     let currentGameUrl = '';
 
     function openModal(url, title, icon, desc, date) {
@@ -369,15 +487,25 @@
       if (currentGameUrl) window.location.href = currentGameUrl;
     };
 
+    // Логика окна "О проекте"
+    function openAbout() {
+      document.getElementById('about-modal').classList.add('active');
+    }
+
+    function closeAbout(event) {
+      if (event) {
+        if (event.target.id !== 'about-modal' && !event.target.classList.contains('btn-close-modal')) return;
+      }
+      document.getElementById('about-modal').classList.remove('active');
+    }
+
     // --- КАПИТАЛ ДЛЯ РОБЛОКС-БИРЖИ ---
     const savedData = localStorage.getItem('ROBLOX_EXCHANGE_ALPHA_SAVE');
-    
     if (savedData) {
       try {
         const data = JSON.parse(savedData);
         if (data.balance !== undefined) {
           let netWorth = data.balance;
-          
           if (data.portfolio && data.gamesData) {
              for (const id in data.portfolio) {
                 const game = data.gamesData.find(g => g.id === id);
@@ -386,15 +514,12 @@
                 }
              }
           }
-          
           const bannerDesc = document.getElementById('banner-capital');
           if (bannerDesc) {
              bannerDesc.innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
           }
         }
-      } catch(e){
-        console.error("Ошибка чтения данных биржи:", e);
-      }
+      } catch(e){}
     }
   </script>
 </body>
