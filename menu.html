@@ -336,8 +336,438 @@
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
     </div>
   </div>
+  <script>
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
 
-  <!-- СЮДА ВСТАВИТЬ СКРИПТ -->
-  
+    let token = localStorage.getItem('auth_token');
+    let currentUsername = localStorage.getItem('auth_username');
+    let isRegisterMode = false;
+    let currentGameUrl = '';
+    
+    // Данные пользователя
+    let userCoins = 0;
+    let userUnlockedAvatars = ['😎'];
+    let userAchievements = [];
+    let selectedAvatar = '😎';
+    
+    // Состояние рулетки
+    let lastWonItem = null;
+    let lastRollType = null;
+
+    const ALL_AVATARS = ['😎', '🐸', '🐱', '👽', '🤖', '👑', '🗿', '🦄', '🐶', '🦊', '🐼', '💀'];
+
+    // --- АЧИВКИ ---
+    const ACHIEVEMENTS_LIST = [
+        { id: 'first_game', icon: '🕹️', name: 'Мультигеймер', desc: 'Зайти в 5 разных игр' },
+        { id: 'daily_7', icon: '📅', name: 'Верный фанат', desc: 'Забрать бонус 7 дней подряд' },
+        { id: 'roblox_million', icon: '💼', name: 'Уолл-Стрит', desc: 'Заработать 1 млн на Бирже' },
+        { id: 'court_space', icon: '🔨', name: 'Строгий судья', desc: 'Отправить 10 мемов в космос' },
+        { id: 'clicker_10k', icon: '🖱️', name: 'Мастер клика', desc: '10 000 кликов в Апокалипсисе' },
+        { id: 'cats_100k', icon: '🐱', name: 'Кошатник', desc: 'Вызвать 100 000 котиков' }
+    ];
+
+    // --- АВТОРИЗАЦИЯ ---
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Вход';
+        document.getElementById('auth-submit').innerText = isRegisterMode ? 'Создать аккаунт' : 'Войти';
+        document.getElementById('auth-switch').innerText = isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
+        document.getElementById('auth-error').style.display = 'none';
+        document.getElementById('validation-rules').style.display = isRegisterMode ? 'block' : 'none';
+        validateInputs();
+    }
+
+    function validateInputs() {
+        if (!isRegisterMode) {
+            document.getElementById('auth-submit').disabled = false;
+            document.getElementById('auth-submit').style.opacity = '1';
+            return;
+        }
+        const user = document.getElementById('auth-username').value;
+        const pass = document.getElementById('auth-password').value;
+        
+        const loginValid = /^[a-zA-Z0-9_]{3,20}$/.test(user);
+        const loginEl = document.getElementById('val-login');
+        if (loginValid) { loginEl.innerHTML = '✔️ Логин: 3-20 символов (без пробелов)'; loginEl.classList.add('valid'); } 
+        else { loginEl.innerHTML = '❌ Логин: 3-20 символов (без пробелов)'; loginEl.classList.remove('valid'); }
+
+        const passValid = pass.length >= 6 && !/\s/.test(pass);
+        const passEl = document.getElementById('val-password');
+        if (passValid) { passEl.innerHTML = '✔️ Пароль: от 6 символов (без пробелов)'; passEl.classList.add('valid'); } 
+        else { passEl.innerHTML = '❌ Пароль: от 6 символов (без пробелов)'; passEl.classList.remove('valid'); }
+
+        const btn = document.getElementById('auth-submit');
+        btn.disabled = !(loginValid && passValid);
+        btn.style.opacity = (loginValid && passValid) ? '1' : '0.5';
+    }
+
+    async function submitAuth() {
+        const user = document.getElementById('auth-username').value.trim();
+        const pass = document.getElementById('auth-password').value.trim();
+        const err = document.getElementById('auth-error');
+        if (!user || !pass) { err.innerText = "Заполните все поля!"; err.style.display = 'block'; return; }
+
+        const endpoint = isRegisterMode ? '/register' : '/login';
+        err.style.display = 'none';
+
+        try {
+            const res = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                token = data.token;
+                currentUsername = data.username;
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('auth_username', currentUsername);
+                startApp();
+            } else {
+                err.innerText = data.error || "Ошибка входа";
+                err.style.display = 'block';
+            }
+        } catch (e) {
+            err.innerHTML = "❌ ОШИБКА СЕРВЕРА<br><span style='font-size:11px; font-weight:normal; color:#aaa;'>Сервер выключен или нет связи.</span>";
+            err.style.display = 'block';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_username');
+        location.reload();
+    }
+
+    // --- ПРОФИЛЬ И ЗАГРУЗКА ---
+    function startApp() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        loadProfile();
+        loadCapital(); 
+    }
+
+    async function loadProfile() {
+        try {
+            const res = await fetch(`${API_URL}/user/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                
+                userCoins = data.coins;
+                userUnlockedAvatars = data.unlockedAvatars || ['😎'];
+                userAchievements = data.achievements || [];
+                selectedAvatar = data.avatar;
+                
+                // Отрисовка шапки
+                document.getElementById('user-avatar-display').innerText = data.avatar;
+                document.getElementById('global-coins-display').innerText = data.coins;
+                
+                // Отрисовка имени с учетом титула
+                const nameEl = document.getElementById('user-name-display');
+                nameEl.innerText = data.displayName;
+                nameEl.style.color = data.titleColor;
+                
+                // Сброс старых классов
+                nameEl.className = 'user-name'; 
+                
+                // Применение стилей
+                if (data.titleStyle === 'bold') nameEl.classList.add('title-bold');
+                if (data.titleStyle === 'italic') nameEl.classList.add('title-italic');
+                if (data.titleStyle === 'uppercase') nameEl.classList.add('title-uppercase');
+                if (data.titleStyle === 'outline') nameEl.classList.add('title-outline');
+                
+                // Неон
+                if (data.titleColor.startsWith('neon_')) {
+                    nameEl.classList.add('neon-text');
+                    if (data.titleColor === 'neon_pink') nameEl.style.color = '#ff00ff';
+                    if (data.titleColor === 'neon_cyan') nameEl.style.color = '#00ffff';
+                    if (data.titleColor === 'neon_gold') nameEl.style.color = '#ffd700';
+                }
+
+                // Показ кнопки бонуса
+                if (data.canClaimDaily) {
+                    document.getElementById('btn-daily').style.display = 'block';
+                } else {
+                    document.getElementById('btn-daily').style.display = 'none';
+                }
+
+                // Если открыт профиль, обновляем аватарки и ачивки
+                renderAvatars();
+                renderAchievements();
+            }
+        } catch(e) { console.error('Ошибка загрузки профиля', e); }
+    }
+
+    async function claimDaily() {
+        try {
+            const res = await fetch(`${API_URL}/user/claim_daily`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('global-coins-display').innerText = data.newBalance;
+                document.getElementById('btn-daily').style.display = 'none';
+                alert("🎉 Вы получили 10 мемкоинов!");
+                loadProfile(); // Обновляем данные
+            } else { alert(data.error); }
+        } catch(e) { alert("Ошибка сервера"); }
+    }
+
+    async function loadCapital() {
+        try {
+            const res = await fetch(`${API_URL}/game/load/roblox`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                let netWorth = data.balance !== undefined ? data.balance : 1000;
+                if (data.portfolio && data.gamesData) {
+                    for (const id in data.portfolio) {
+                        const game = data.gamesData.find(g => g.id === id);
+                        if (game && data.portfolio[id].shares > 0) netWorth += data.portfolio[id].shares * game.online;
+                    }
+                }
+                document.getElementById('banner-capital').innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
+            }
+        } catch(e) {
+            document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>";
+        }
+    }
+
+    // --- НАСТРОЙКИ ПРОФИЛЯ (ВКЛАДКИ) ---
+    function openSettings() {
+        document.getElementById('settings-username').value = currentUsername;
+        document.getElementById('settings-name').value = document.getElementById('user-name-display').innerText;
+        document.getElementById('settings-old-password').value = '';
+        document.getElementById('settings-new-password').value = '';
+        document.getElementById('roll-result').style.display = 'none';
+        
+        switchTab('profile');
+        document.getElementById('settings-modal').classList.add('active');
+    }
+
+    function closeSettings(event) {
+        if (event && event.target.id !== 'settings-modal') return;
+        document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        document.getElementById(`tab-btn-${tab}`).classList.add('active');
+        document.getElementById(`tab-content-${tab}`).classList.add('active');
+    }
+
+    // --- АВАТАРКИ ---
+    function renderAvatars() {
+        const grid = document.getElementById('avatar-grid');
+        grid.innerHTML = '';
+        
+        ALL_AVATARS.forEach(emoji => {
+            const isUnlocked = userUnlockedAvatars.includes(emoji);
+            const el = document.createElement('div');
+            el.className = `avatar-option ${selectedAvatar === emoji ? 'selected' : ''} ${!isUnlocked ? 'locked' : ''}`;
+            el.innerHTML = `${emoji}<div class="avatar-price">20 🪙</div>`;
+            el.onclick = () => selectAvatar(el, emoji, isUnlocked);
+            grid.appendChild(el);
+        });
+    }
+
+    function selectAvatar(el, emoji, isUnlocked) {
+        if (!isUnlocked) {
+            if (!confirm(`Эта аватарка стоит 20 мемкоинов. Купить и надеть?`)) return;
+        }
+        document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedAvatar = emoji;
+    }
+
+    // --- АЧИВКИ ---
+    function renderAchievements() {
+        const grid = document.getElementById('achievements-grid');
+        grid.innerHTML = '';
+
+        ACHIEVEMENTS_LIST.forEach(ach => {
+            const isUnlocked = userAchievements.includes(ach.id);
+            const el = document.createElement('div');
+            el.className = `ach-item ${isUnlocked ? 'unlocked' : ''}`;
+            el.innerHTML = `
+                <div class="ach-icon">${ach.icon}</div>
+                <div class="ach-name">${ach.name}</div>
+                <div style="font-size:8px; color:#888; margin-top:3px;">${ach.desc}</div>
+            `;
+            grid.appendChild(el);
+        });
+    }
+
+    // --- СОХРАНЕНИЕ ПРОФИЛЯ ---
+    async function saveProfile() {
+        const newName = document.getElementById('settings-name').value.trim();
+        const oldPass = document.getElementById('settings-old-password').value.trim();
+        const newPass = document.getElementById('settings-new-password').value.trim();
+        
+        if (!newName) { alert("Имя не может быть пустым!"); return; }
+        if (newPass && !oldPass) { alert("Введите старый пароль!"); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/user/update_profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ 
+                    displayName: newName, 
+                    avatar: selectedAvatar, 
+                    oldPassword: oldPass || undefined,
+                    newPassword: newPass || undefined 
+                })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert("Профиль обновлен!");
+                loadProfile(); 
+            } else {
+                alert(data.error);
+            }
+        } catch(e) { alert("Ошибка сервера"); }
+    }
+
+    // --- МАГАЗИН (РУЛЕТКИ) ---
+    async function rollTitle(type) {
+        if (!confirm("Потратить 35 мемкоинов на прокрутку?")) return;
+
+        try {
+            const res = await fetch(`${API_URL}/shop/roll`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ type: type })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                userCoins = data.newBalance;
+                document.getElementById('global-coins-display').innerText = userCoins;
+                
+                lastWonItem = data.item;
+                lastRollType = type;
+                
+                const resultBox = document.getElementById('roll-result');
+                const resultText = document.getElementById('roll-result-text');
+                
+                resultBox.style.display = 'block';
+                
+                if (type === 'name') {
+                    resultText.innerText = data.item.value;
+                    resultText.style.color = '#fff';
+                } else if (type === 'color') {
+                    resultText.innerText = data.item.name;
+                    // Предпросмотр цвета
+                    if (data.item.value.startsWith('neon_')) {
+                         resultText.style.color = data.item.value === 'neon_pink' ? '#ff00ff' : data.item.value === 'neon_cyan' ? '#00ffff' : '#ffd700';
+                         resultText.style.textShadow = '0 0 10px currentColor';
+                    } else {
+                        resultText.style.color = data.item.value;
+                        resultText.style.textShadow = 'none';
+                    }
+                } else if (type === 'style') {
+                    resultText.innerText = data.item.name;
+                    resultText.style.color = '#fff';
+                    resultText.style.textShadow = 'none';
+                    resultText.className = ''; // Сброс
+                    if (data.item.value === 'bold') resultText.classList.add('title-bold');
+                    if (data.item.value === 'italic') resultText.classList.add('title-italic');
+                    if (data.item.value === 'uppercase') resultText.classList.add('title-uppercase');
+                    if (data.item.value === 'outline') resultText.classList.add('title-outline');
+                }
+
+                if (data.isDuplicate) {
+                    alert("Тебе выпал дубликат! Но ты можешь надеть его.");
+                }
+                
+                loadProfile(); // Обновляем БД (там сохранились новые разблокировки)
+            } else {
+                alert(data.error);
+            }
+        } catch(e) { alert("Ошибка сервера"); }
+    }
+
+    async function equipWonTitle() {
+        if (!lastWonItem || !lastRollType) return;
+
+        // Получаем текущие данные
+        const currentName = document.getElementById('user-name-display').innerText;
+        
+        let newTitle = currentName;
+        let newColor = document.getElementById('user-name-display').style.color;
+        let newStyle = 'normal';
+
+        // Костыль для парсинга стилей (так как мы не храним их в DOM)
+        const nameEl = document.getElementById('user-name-display');
+        if (nameEl.classList.contains('title-bold')) newStyle = 'bold';
+        if (nameEl.classList.contains('title-italic')) newStyle = 'italic';
+        if (nameEl.classList.contains('title-uppercase')) newStyle = 'uppercase';
+        if (nameEl.classList.contains('title-outline')) newStyle = 'outline';
+
+        if (lastRollType === 'name') newTitle = lastWonItem.value;
+        if (lastRollType === 'color') newColor = lastWonItem.value;
+        if (lastRollType === 'style') newStyle = lastWonItem.value;
+
+        try {
+            const res = await fetch(`${API_URL}/user/equip_title`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ title: newTitle, color: newColor, style: newStyle })
+            });
+            
+            if (res.ok) {
+                document.getElementById('roll-result').style.display = 'none';
+                loadProfile(); // Перезагружаем, чтобы применилось
+                alert("Титул надет!");
+            }
+        } catch(e) { alert("Ошибка сервера"); }
+    }
+
+    // --- МОДАЛКИ ИГР ---
+    function openModal(url, title, icon, desc) {
+      currentGameUrl = url;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-icon').textContent = icon;
+      document.getElementById('modal-desc').textContent = desc;
+      document.getElementById('game-modal').classList.add('active');
+    }
+
+    function closeModal(event) {
+      if (event && event.target.id !== 'game-modal') return;
+      document.getElementById('game-modal').classList.remove('active');
+    }
+
+    document.getElementById('modal-btn-play').onclick = () => {
+      if (currentGameUrl) window.location.href = currentGameUrl;
+    };
+
+    function openAbout() { document.getElementById('about-modal').classList.add('active'); }
+    function closeAbout(event) {
+      if (event && event.target.id !== 'about-modal') return;
+      document.getElementById('about-modal').classList.remove('active');
+    }
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    window.onload = () => {
+        if (token && currentUsername) {
+            startApp();
+        } else {
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+        }
+    };
+  </script>
+</body>
+</html>
 </body>
 </html>
