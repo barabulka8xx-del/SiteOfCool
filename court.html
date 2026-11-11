@@ -6,470 +6,132 @@
   <title>🚀Наши Проекты🚀 | Мемный Суд</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #080c14; background-image: linear-gradient(rgba(79, 172, 254, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 172, 254, 0.05) 1px, transparent 1px); background-size: 40px 40px; color: white; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; align-items: center; perspective: 1000px; }
+    body::after { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%); pointer-events: none; z-index: 1; }
     
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #080c14;
-      background-image: 
-        linear-gradient(rgba(79, 172, 254, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(79, 172, 254, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      background-position: center;
-      color: white;
-      height: 100dvh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      perspective: 1000px;
-    }
+    /* Экран загрузки/ошибки */
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #080c14; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .loader { border: 4px solid #151b22; border-top: 4px solid #ff0055; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
 
-    /* Затемнение по краям */
-    body::after {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* --- ШАПКА --- */
-    .top-bar {
-      width: 100%;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 10;
-    }
-    
-    .header-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .coins {
-      background: rgba(255, 215, 0, 0.1);
-      border: 1px solid #ffd700;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: bold;
-      color: #ffd700;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    /* --- СЦЕНА СУДА --- */
-    .courtroom {
-      flex: 1;
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      padding-bottom: 20px;
-      z-index: 2;
-    }
-
-    .spotlight {
-      position: absolute;
-      top: -50px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, rgba(79, 172, 254, 0.2) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    /* Публика на фоне */
-    .audience {
-      position: absolute;
-      top: 18%;
-      width: 90%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.3;
-      filter: blur(2px) brightness(0.6);
-    }
-    
-    .audience-row {
-      display: flex;
-      justify-content: space-around;
-      font-size: 35px;
-    }
+    .top-bar { width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+    .header-title { font-size: 16px; font-weight: bold; color: #aaa; text-transform: uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .coins { background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+    .courtroom { flex: 1; width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; padding-bottom: 20px; z-index: 2; }
+    .spotlight { position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 250px; height: 250px; background: radial-gradient(circle, rgba(255, 0, 85, 0.2) 0%, transparent 70%); pointer-events: none; z-index: 1; }
+    .audience { position: absolute; top: 18%; width: 90%; display: flex; flex-direction: column; gap: 10px; pointer-events: none; z-index: 0; opacity: 0.3; filter: blur(2px) brightness(0.6); }
+    .audience-row { display: flex; justify-content: space-around; font-size: 35px; }
     .audience-row:nth-child(2) { font-size: 30px; opacity: 0.7; }
-
-    /* --- ПОДСУДИМЫЙ --- */
-    .defendant-area {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 2;
-      position: relative;
-      width: 100%;
-    }
-
-    .defendant-avatar {
-      width: 100px;
-      height: 100px;
-      background: #151b22;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 60px;
-      border: 3px solid #ff0055;
-      box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
-      margin-bottom: 15px;
-      animation: float 3s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
-      transition: filter 0.3s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    /* --- СТОЛ СУДЬИ (2.5D) --- */
-    .desk-wrapper {
-      position: relative;
-      width: 100%;
-      height: 180px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      margin-top: 10px;
-      transform-style: preserve-3d;
-      z-index: 5;
-    }
-
-    .desk-top {
-      width: 330px;
-      height: 130px;
-      background: linear-gradient(135deg, #3a2518 0%, #1a110c 100%);
-      border: 4px solid #5a3a22;
-      border-radius: 10px;
-      transform: rotateX(45deg);
-      box-shadow: 0 20px 0 #110a07, 0 40px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .gavel-container {
-      transform: rotateX(-45deg) translateY(-20px) translateX(40px);
-      cursor: pointer;
-      transition: 0.1s;
-      position: relative;
-      z-index: 5;
-    }
-
-    .gavel {
-      font-size: 60px;
-      filter: drop-shadow(0 15px 10px rgba(0,0,0,0.8));
-      transition: 0.1s;
-      transform-origin: bottom left;
-    }
-
-    /* Анимация удара молотком */
-    .gavel-container.strike .gavel {
-      animation: hitGavel 0.3s ease-in-out;
-    }
-
-    @keyframes hitGavel {
-      0% { transform: rotate(0deg) translateY(0); }
-      50% { transform: rotate(-45deg) translateY(-20px); }
-      100% { transform: rotate(0deg) translateY(0); }
-    }
-
-    /* Эффект вибрации стола */
-    .desk-top.shake {
-      animation: deskShake 0.3s ease-in-out;
-    }
-    @keyframes deskShake {
-      0%, 100% { transform: rotateX(45deg) translateX(0); }
-      25% { transform: rotateX(45deg) translateX(-5px); }
-      75% { transform: rotateX(45deg) translateX(5px); }
-    }
-
-    /* --- ПАПКА С ДЕЛОМ (ЛИЦОМ К ЭКРАНУ) --- */
-    .folder {
-      position: absolute;
-      width: 160px;
-      height: 100px;
-      background: #d4a373;
-      border-radius: 4px 8px 8px 8px;
-      /* Убрали жесткий 3D-наклон, теперь она лежит ровно, но с легким наклоном для объема */
-      transform: rotateX(-25deg) translateZ(10px) translateX(-40px) translateY(10px) rotateZ(-3deg);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      padding: 12px 10px;
-      left: 10px;
-      border: 1px solid #b5835a;
-      z-index: 4;
-    }
-    
-    .folder::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: 0;
-      width: 60px;
-      height: 15px;
-      background: #d4a373;
-      border-radius: 5px 5px 0 0;
-      border: 1px solid #b5835a;
-      border-bottom: none;
-    }
-
-    .crime-title {
-      color: #cc0000;
-      font-size: 11px;
-      font-weight: 900;
-      margin-bottom: 4px;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 1.1;
-      word-break: break-word;
-    }
-
-    .crime-desc {
-      font-size: 10px;
-      color: #222;
-      line-height: 1.2;
-      text-align: center;
-      font-weight: bold;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical;
-    }
-
-    /* --- КНОПКИ ПРИГОВОРА --- */
-    .verdicts {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 350px;
-      margin-top: 20px;
-      padding: 0 10px;
-      z-index: 10;
-      transition: 0.3s;
-    }
-
-    .verdicts.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px);
-    }
-
-    .btn-verdict {
-      flex: 1;
-      padding: 15px 5px;
-      border: none;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-      text-align: center;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
+    .defendant-area { margin-top: 30px; display: flex; flex-direction: column; align-items: center; z-index: 2; position: relative; width: 100%; }
+    .defendant-avatar { width: 100px; height: 100px; background: #151b22; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 60px; border: 3px solid #ff0055; box-shadow: 0 0 30px rgba(255, 0, 85, 0.4); margin-bottom: 15px; animation: float 3s ease-in-out infinite; position: relative; z-index: 2; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .desk-wrapper { position: relative; width: 100%; height: 180px; display: flex; justify-content: center; align-items: flex-end; margin-top: 10px; transform-style: preserve-3d; z-index: 5; }
+    .desk-top { width: 330px; height: 130px; background: linear-gradient(135deg, #3a2518 0%, #1a110c 100%); border: 4px solid #5a3a22; border-radius: 10px; transform: rotateX(45deg); box-shadow: 0 20px 0 #110a07, 0 40px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8); position: relative; display: flex; justify-content: center; align-items: center; }
+    .gavel-container { transform: rotateX(-45deg) translateY(-20px) translateX(40px); cursor: pointer; transition: 0.1s; z-index: 5; }
+    .gavel { font-size: 60px; filter: drop-shadow(0 15px 10px rgba(0,0,0,0.8)); }
+    .gavel-container.strike .gavel { animation: hitGavel 0.3s ease-in-out; }
+    @keyframes hitGavel { 0% { transform: rotate(0deg); } 50% { transform: rotate(-45deg) translateY(-20px); } 100% { transform: rotate(0deg); } }
+    .desk-top.shake { animation: deskShake 0.3s ease-in-out; }
+    @keyframes deskShake { 0%, 100% { transform: rotateX(45deg) translateX(0); } 25% { transform: rotateX(45deg) translateX(-5px); } 75% { transform: rotateX(45deg) translateX(5px); } }
+    .folder { position: absolute; width: 160px; height: 100px; background: #d4a373; border-radius: 4px 8px 8px 8px; transform: rotateX(-25deg) translateZ(10px) translateX(-40px) translateY(10px) rotateZ(-3deg); box-shadow: 0 10px 20px rgba(0,0,0,0.6); display: flex; flex-direction: column; padding: 12px 10px; left: 10px; border: 1px solid #b5835a; z-index: 4; }
+    .folder::before { content: ''; position: absolute; top: -10px; left: 0; width: 60px; height: 15px; background: #d4a373; border-radius: 5px 5px 0 0; border: 1px solid #b5835a; border-bottom: none; }
+    .crime-title { color: #cc0000; font-size: 11px; font-weight: 900; margin-bottom: 4px; text-transform: uppercase; text-align: center; }
+    .crime-desc { font-size: 10px; color: #222; line-height: 1.2; text-align: center; font-weight: bold; }
+    .verdicts { display: flex; gap: 10px; width: 100%; max-width: 350px; margin-top: 20px; padding: 0 10px; z-index: 10; }
+    .btn-verdict { flex: 1; padding: 15px 5px; border: none; border-radius: 12px; font-size: 13px; font-weight: bold; cursor: pointer; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .btn-verdict:active { transform: scale(0.95); }
-
     .btn-innocent { background: linear-gradient(135deg, #00b09b, #96c93d); }
     .btn-guilty { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
     .btn-space { background: linear-gradient(135deg, #8E2DE2, #4A00E0); }
-
-    /* --- ЛОГ/РЕАКЦИЯ --- */
-    .reaction-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.5);
-      background: rgba(10, 10, 10, 0.95);
-      border: 2px solid #ffeb3b;
-      padding: 20px;
-      border-radius: 15px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      color: #ffeb3b;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      z-index: 100;
-      width: 85%;
-      max-width: 300px;
-      box-shadow: 0 0 40px rgba(255, 235, 59, 0.4);
-    }
-
-    .reaction-text.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    /* Всплывающие монеты */
-    .floating-coin {
-      position: absolute;
-      color: #ffd700;
-      font-weight: bold;
-      font-size: 24px;
-      pointer-events: none;
-      animation: floatCoin 1s ease-out forwards;
-      z-index: 100;
-      text-shadow: 0 0 10px #000;
-    }
-
-    @keyframes floatCoin {
-      0% { transform: translateY(0) scale(0.5); opacity: 1; }
-      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
-    }
-
-    /* --- АНИМАЦИИ ПРИГОВОРОВ --- */
-    
-    /* 1. В Космос (Ракета) */
-    .rocket-anim {
-      position: absolute;
-      font-size: 50px;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      z-index: 1;
-    }
-    .launch-anim {
-      animation: launchToSpace 1.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
-    }
-    @keyframes launchToSpace {
-      0% { transform: translate(-50%, 0) scale(0.5); opacity: 1; }
-      20% { transform: translate(-50%, 0) scale(1.2); opacity: 1; }
-      100% { transform: translate(-50%, -800px) scale(0.5) rotate(10deg); opacity: 0; }
-    }
+    .reaction-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); background: rgba(10, 10, 10, 0.95); border: 2px solid #ffeb3b; padding: 20px; border-radius: 15px; font-size: 18px; font-weight: bold; color: #ffeb3b; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 100; width: 85%; max-width: 300px; text-align: center;}
+    .reaction-text.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .floating-coin { position: absolute; color: #ffd700; font-weight: bold; font-size: 24px; pointer-events: none; animation: floatCoin 1s ease-out forwards; z-index: 100; text-shadow: 0 0 10px #000; }
+    @keyframes floatCoin { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+    .rocket-anim { position: absolute; font-size: 50px; bottom: -20px; left: 50%; transform: translateX(-50%); opacity: 0; z-index: 1; }
+    .launch-anim { animation: launchToSpace 1.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+    @keyframes launchToSpace { 0% { transform: translate(-50%, 0) scale(0.5); opacity: 1; } 20% { transform: translate(-50%, 0) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -800px) scale(0.5) rotate(10deg); opacity: 0; } }
     .rocket-show { opacity: 1; transition: 0.2s; }
-
-    /* 2. Виновен (Полицейский и Арест) */
-    .police-anim {
-      position: absolute;
-      font-size: 50px;
-      bottom: 10px;
-      right: -100px; /* Изначально за экраном справа */
-      z-index: 3;
-      transition: right 0.4s ease-out; /* Выезжает плавно */
-    }
-    .police-show { right: -40px; } /* Останавливается рядом с подсудимым */
-    
-    /* Анимация совместного ухода */
-    .arrest-group-anim {
-      animation: arrestedGroup 1.5s forwards ease-in-out;
-    }
-    @keyframes arrestedGroup {
-      0% { transform: translate(0, 0) scale(1); opacity: 1; }
-      20% { transform: translate(-10px, 0) scale(1); opacity: 1; }
-      100% { transform: translate(300px, 0) scale(0.8); opacity: 0; }
-    }
-
-    /* 3. Оправдать (Исчезновение) */
-    .fade-out {
-      animation: fadeAway 1s forwards;
-    }
-    @keyframes fadeAway {
-      0% { transform: scale(1); opacity: 1; filter: blur(0px); }
-      100% { transform: scale(0.8); opacity: 0; filter: blur(10px); }
-    }
-
+    .police-anim { position: absolute; font-size: 50px; bottom: 10px; right: -100px; z-index: 3; transition: right 0.4s ease-out; }
+    .police-show { right: -40px; }
+    .arrest-group-anim { animation: arrestedGroup 1.5s forwards ease-in-out; }
+    @keyframes arrestedGroup { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 20% { transform: translate(-10px, 0) scale(1); opacity: 1; } 100% { transform: translate(300px, 0) scale(0.8); opacity: 0; } }
+    .fade-out { animation: fadeAway 1s forwards; }
+    @keyframes fadeAway { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.8); opacity: 0; filter: blur(10px); } }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="header-title">Мемный Суд ⚖️</div>
-    <div class="coins" id="coin-display">🪙 0</div>
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loading-screen">
+    <div class="loader" id="loader"></div>
+    <div id="error-msg">
+      ❌ Ошибка авторизации.<br>
+      <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
+    </div>
+    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
   </div>
 
-  <div class="courtroom">
-    <div class="spotlight"></div>
-
-    <!-- Публика -->
-    <div class="audience">
-      <div class="audience-row">
-        <span>👨‍💼</span><span>👩‍⚖️</span><span>🐸</span><span>🧑‍💼</span><span>🦆</span>
-      </div>
-      <div class="audience-row">
-        <span>👽</span><span>🐱</span><span>💩</span><span>🐕</span><span>🗿</span>
-      </div>
+  <!-- ИГРА -->
+  <div id="main-app" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center;">
+    <div class="top-bar">
+      <div class="header-title">Мемный Суд ⚖️</div>
+      <div class="coins" id="coin-display">🪙 0</div>
     </div>
 
-    <div class="defendant-area" id="defendant-area">
-      <!-- Место для полицейского -->
-      <div class="police-anim" id="police">👮‍♂️</div>
-      
-      <!-- Место для ракеты -->
-      <div class="rocket-anim" id="rocket">🚀</div>
-      
-      <div class="defendant-avatar" id="defendant-emoji">🐸</div>
-    </div>
+    <div class="courtroom">
+      <div class="spotlight"></div>
+      <div class="audience">
+        <div class="audience-row"><span>👨‍💼</span><span>👩‍⚖️</span><span>🐸</span><span>🧑‍💼</span><span>🦆</span></div>
+        <div class="audience-row"><span>👽</span><span>🐱</span><span>💩</span><span>🐕</span><span>🗿</span></div>
+      </div>
 
-    <div class="desk-wrapper">
-      <div class="desk-top" id="desk">
-        <!-- Раскрытая папка с делом (теперь лицом к экрану) -->
-        <div class="folder">
-          <div class="crime-title" id="crime-title">Дело №1</div>
-          <div class="crime-desc" id="crime-desc">Загрузка дела...</div>
-        </div>
+      <div class="defendant-area" id="defendant-area">
+        <div class="police-anim" id="police">👮‍♂️</div>
+        <div class="rocket-anim" id="rocket">🚀</div>
+        <div class="defendant-avatar" id="defendant-emoji">🐸</div>
+      </div>
 
-        <div class="gavel-container" id="gavel-btn">
-          <div class="gavel">🔨</div>
+      <div class="desk-wrapper">
+        <div class="desk-top" id="desk">
+          <div class="folder">
+            <div class="crime-title" id="crime-title">Дело №1</div>
+            <div class="crime-desc" id="crime-desc">Загрузка дела...</div>
+          </div>
+          <div class="gavel-container" id="gavel-btn"><div class="gavel">🔨</div></div>
         </div>
       </div>
-    </div>
 
-    <div class="verdicts" id="verdicts">
-      <button class="btn-verdict btn-innocent" onclick="giveVerdict('innocent')">
-        <span>🕊️</span> Оправдать
-      </button>
-      <button class="btn-verdict btn-guilty" onclick="giveVerdict('guilty')">
-        <span>⛓️</span> Виновен
-      </button>
-      <button class="btn-verdict btn-space" onclick="giveVerdict('space')">
-        <span>🚀</span> В космос
-      </button>
-    </div>
+      <div class="verdicts" id="verdicts">
+        <button class="btn-verdict btn-innocent" onclick="giveVerdict('innocent')"><span>🕊️</span> Оправдать</button>
+        <button class="btn-verdict btn-guilty" onclick="giveVerdict('guilty')"><span>⛓️</span> Виновен</button>
+        <button class="btn-verdict btn-space" onclick="giveVerdict('space')"><span>🚀</span> В космос</button>
+      </div>
 
-    <div class="reaction-text" id="reaction-text">Текст приговора</div>
+      <div class="reaction-text" id="reaction-text">Текст приговора</div>
+    </div>
   </div>
 
   <script>
-    const DEFENDANTS = [
-      '🐸', '🐱', '🐕', '🧠', '💩', '🗿', '👽', '🦆', '🤖', '🐷', 
-      '🦄', '🐔', '🐙', '🦖', '🐻', '🐼', '🐀', '🐒', '🦥', '🦦'
-    ];
-    
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'court';
+
+    let token = localStorage.getItem('auth_token');
+    let coins = 0;
+    let currentCrime = null;
+    let canVerdict = true;
+
+    const elAvatar = document.getElementById('defendant-emoji');
+    const elRocket = document.getElementById('rocket');
+    const elPolice = document.getElementById('police');
+    const elGavel = document.getElementById('gavel-btn');
+    const elDesk = document.getElementById('desk');
+    const elDefArea = document.getElementById('defendant-area');
+
+    const DEFENDANTS = ['🐸', '🐱', '🐕', '🧠', '💩', '🗿', '👽', '🦆', '🤖', '🐷', '🦄', '🐔', '🐙', '🦖', '🐻', '🐼', '🐀', '🐒', '🦥', '🦦'];
     const CRIMES = [
       { title: "Кража века", desc: "Украл луну и продал на Avito за 3 рубля." },
       { title: "Нарушение порядка", desc: "Слишком громко молчал в библиотеке." },
@@ -480,96 +142,89 @@
       { title: "Мошенничество", desc: "Уклонялся от налогов, притворяясь пакетом." },
       { title: "Вандализм", desc: "Съел последний кусок пиццы и не поделился." },
       { title: "Шпионаж", desc: "Подглядывал в бинокль из туалетной бумаги." },
-      { title: "Госизмена", desc: "Сказал, что Roblox лучше Minecraft." },
-      { title: "Незаконный стиль", desc: "Носил шляпу не по уставу." },
-      { title: "Газлайтинг", desc: "Убеждал всех, что трава синяя." },
-      { title: "Читерство", desc: "Включил X-Ray в Майнкрафте." },
-      { title: "Разжигание споров", desc: "Сказал, что фри с майонезом лучше." },
-      { title: "Громкий смех", desc: "Смеялся с баяна 2012 года в автобусе." },
-      { title: "Пиратство", desc: "Раздавал торрент со скоростью 0.5 кб/с." },
-      { title: "Ересь", desc: "Публично заявил, что Шрек — не смешно." },
-      { title: "Нарушение сна", desc: "Звонил в 4 утра с просьбой кинуть 100р." },
-      { title: "Утечка данных", desc: "Слил секретный рецепт соуса из бургерной." }
+      { title: "Госизмена", desc: "Сказал, что Roblox лучше Minecraft." }
     ];
-
     const REACTIONS = {
-      innocent: [
-        "Оправдан! Отпущен с миром. (+10 🪙)",
-        "Невиновен! Поверили честным глазам. (+10 🪙)",
-        "Оправдан! Слишком милый для тюрьмы. (+10 🪙)"
-      ],
-      guilty: [
-        "Виновен! В мемную тюрьму на 100 лет. (+20 🪙)",
-        "Строгий режим и грустные мемы. (+20 🪙)",
-        "Виновен! Будет чистить базы данных. (+20 🪙)"
-      ],
-      space: [
-        "В КОСМОС! Выслан на орбиту. (+35 🪙)",
-        "В КОСМОС! Пусть ищет черные дыры. (+35 🪙)",
-        "В КОСМОС! Без скафандра. (+35 🪙)"
-      ]
+      innocent: ["Оправдан! Отпущен с миром. (+10 🪙)", "Невиновен! Поверили честным глазам. (+10 🪙)"],
+      guilty: ["Виновен! В мемную тюрьму на 100 лет. (+20 🪙)", "Строгий режим и грустные мемы. (+20 🪙)"],
+      space: ["В КОСМОС! Выслан на орбиту. (+35 🪙)", "В КОСМОС! Без скафандра. (+35 🪙)"]
     };
 
-    let coins = 0;
-    let currentCrime = null;
-    let canVerdict = true;
+    // --- ЗАГРУЗКА ---
+    async function initGame() {
+        if (!token) {
+            showError();
+            return;
+        }
 
-    // Элементы
-    const elAvatar = document.getElementById('defendant-emoji');
-    const elRocket = document.getElementById('rocket');
-    const elPolice = document.getElementById('police');
-    const elGavel = document.getElementById('gavel-btn');
-    const elDesk = document.getElementById('desk');
-    const elDefArea = document.getElementById('defendant-area');
-
-    function loadGame() {
-      const saved = localStorage.getItem('MEME_COURT_SAVE');
-      if (saved) {
         try {
-          const data = JSON.parse(saved);
-          coins = data.coins || 0;
-          updateCoinsUI();
-        } catch(e) {}
-      }
+            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (res.status === 401 || res.status === 403) { showError(); return; }
+            
+            const data = await res.json();
+            coins = data.coins || 0; // Если пусто, ставим 0
+            
+            // Показываем игру
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            
+            updateCoinsUI();
+            nextCase();
+        } catch (error) {
+            showError("Ошибка соединения с сервером.");
+        }
     }
 
-    function saveGame() {
-      localStorage.setItem('MEME_COURT_SAVE', JSON.stringify({ coins: coins }));
+    function showError(text) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+        if (text) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${text}</span>`;
+        document.getElementById('btn-back').style.display = 'inline-block';
     }
 
+    async function saveGameToServer() {
+        if (!token) return;
+        try {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ coins: coins })
+            });
+        } catch (error) {}
+    }
+
+    // --- ЛОГИКА ИГРЫ ---
     function updateCoinsUI() {
       document.getElementById('coin-display').innerText = `🪙 ${coins.toLocaleString('ru-RU')}`;
     }
 
     function nextCase() {
-      // Полный сброс всех элементов к изначальному состоянию
       elAvatar.className = 'defendant-avatar';
       elAvatar.innerText = '🐸';
       elAvatar.style.filter = '';
-      
       elRocket.className = 'rocket-anim';
       elPolice.className = 'police-anim';
-      
-      elDefArea.className = 'defendant-area'; // Сбрасываем группу ареста
-
+      elDefArea.className = 'defendant-area';
       document.getElementById('reaction-text').classList.remove('show');
       
-      // Рандомим нового подсудимого и дело
       const randomDefendant = DEFENDANTS[Math.floor(Math.random() * DEFENDANTS.length)];
       currentCrime = CRIMES[Math.floor(Math.random() * CRIMES.length)];
-      
       elAvatar.innerText = randomDefendant;
       
       document.getElementById('crime-title').innerText = currentCrime.title;
       document.getElementById('crime-desc').innerText = currentCrime.desc;
-
       canVerdict = true;
     }
 
     function strikeGavel(callback) {
       elGavel.classList.add('strike');
       elDesk.classList.add('shake');
-      
       setTimeout(() => {
         elGavel.classList.remove('strike');
         elDesk.classList.remove('shake');
@@ -582,76 +237,42 @@
       canVerdict = false;
 
       strikeGavel(() => {
-        playVerdictAnimation(type);
+        if (type === 'space') {
+          elRocket.classList.add('rocket-show');
+          setTimeout(() => { elAvatar.classList.add('launch-anim'); }, 200);
+        } else if (type === 'guilty') {
+          elPolice.classList.add('police-show');
+          setTimeout(() => { elDefArea.classList.add('arrest-group-anim'); }, 500);
+        } else if (type === 'innocent') {
+          elAvatar.classList.add('fade-out');
+        }
       });
 
-      let reward = 0;
-      if (type === 'innocent') reward = 10;
-      if (type === 'guilty') reward = 20;
-      if (type === 'space') reward = 35;
-      
+      let reward = type === 'innocent' ? 10 : type === 'guilty' ? 20 : 35;
       coins += reward;
       updateCoinsUI();
-      saveGame();
-      showFloatingCoin(reward);
+      saveGameToServer();
+      
+      const coinEl = document.createElement('div');
+      coinEl.className = 'floating-coin';
+      coinEl.innerText = `+${reward} 🪙`;
+      const rect = document.getElementById('coin-display').getBoundingClientRect();
+      coinEl.style.left = rect.left + 'px';
+      coinEl.style.top = (rect.top + 30) + 'px';
+      document.body.appendChild(coinEl);
+      setTimeout(() => coinEl.remove(), 1000);
 
       const reactionBox = document.getElementById('reaction-text');
       const reactionsList = REACTIONS[type];
       reactionBox.innerText = reactionsList[Math.floor(Math.random() * reactionsList.length)];
       
-      setTimeout(() => {
-        reactionBox.classList.add('show');
-      }, 400); 
+      setTimeout(() => { reactionBox.classList.add('show'); }, 400); 
+      setTimeout(() => { nextCase(); }, 2800);
     }
 
-    function playVerdictAnimation(type) {
-      if (type === 'space') {
-        elRocket.classList.add('rocket-show');
-        setTimeout(() => {
-          elAvatar.classList.add('launch-anim');
-        }, 200);
-        
-      } else if (type === 'guilty') {
-        // 1. Полицейский выезжает
-        elPolice.classList.add('police-show');
-        
-        // 2. Через полсекунды (когда он подъехал) они вместе уезжают
-        setTimeout(() => {
-          // Применяем анимацию ухода ко ВСЕЙ зоне (полицейский + подсудимый)
-          elDefArea.classList.add('arrest-group-anim');
-        }, 500);
+    elGavel.onclick = () => { if (canVerdict) strikeGavel(); };
 
-      } else if (type === 'innocent') {
-        elAvatar.classList.add('fade-out');
-      }
-
-      setTimeout(() => {
-        nextCase();
-      }, 2800);
-    }
-
-    function showFloatingCoin(amount) {
-      const coin = document.createElement('div');
-      coin.className = 'floating-coin';
-      coin.innerText = `+${amount} 🪙`;
-      
-      const rect = document.getElementById('coin-display').getBoundingClientRect();
-      coin.style.left = rect.left + 'px';
-      coin.style.top = (rect.top + 30) + 'px';
-      
-      document.body.appendChild(coin);
-      
-      setTimeout(() => coin.remove(), 1000);
-    }
-
-    elGavel.onclick = () => {
-      if (canVerdict) strikeGavel();
-    };
-
-    window.onload = () => {
-      loadGame();
-      nextCase();
-    };
+    window.onload = initGame;
   </script>
 </body>
 </html>
