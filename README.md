@@ -4,8 +4,8 @@
 
 **Коллекция интерактивных, мемных и безумно залипательных мини-игр в одном месте.**
 
-[![Играть](https://img.shields.io/badge/🎮_ИГРАТЬ_СЕЙЧАС-Нажми_сюда-success?style=for-the-badge&logo=roblox&logoColor=white)](https://barabulka8xx-del.github.io/SiteOfCool/)
-[![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-blue?style=for-the-badge&logo=github)](https://barabulka8xx-del.github.io/SiteOfCool/)
+[![Играть](https://img.shields.io/badge/🎮_ИГРАТЬ_СЕЙЧАС-Нажми_сюда-success?style=for-the-badge&logo=roblox&logoColor=white)](https://barabulka8xx-del.github.io/SiteOfCool/menu.hrml)
+[![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-blue?style=for-the-badge&logo=github)](https://barabulka8xx-del.github.io/SiteOfCool/menu.html)
 
 <!-- Сюда вставится твоя картинка-обложка -->
 <img src="preview.jpg" alt="Превью проекта" width="100%" style="border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
