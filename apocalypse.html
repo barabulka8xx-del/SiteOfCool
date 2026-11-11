@@ -3,451 +3,243 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Кнопка Апокалипсиса 💣</title>
+  <title>🚀Наши Проекты🚀 | Кнопка Апокалипсиса</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f0c29; background: linear-gradient(to bottom, #240b36, #c31432); color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow: hidden; transition: background 0.5s; }
+    
+    /* Экран загрузки */
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f0c29; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .loader { border: 4px solid #1a1a24; border-top: 4px solid #ff0055; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #111;
-      color: white;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      /* Убрали space-between, теперь всё регулируется фиксированными отступами */
-      padding: 20px 20px 90px 20px; /* Снизу отступ 90px, чтобы не перекрывать кнопку магазина */
-      overflow: hidden;
-      transition: background 0.3s ease;
-    }
+    .container { z-index: 10; position: relative; width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+    h1 { font-size: clamp(20px, 6vw, 32px); margin-bottom: 20px; text-transform: uppercase; text-align: center; text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,0,0,0.8); }
 
-    .shake { animation: shake 0.1s infinite; }
-    @keyframes shake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      25% { transform: translate(-2px, 0px) rotate(1deg); }
-      50% { transform: translate(1px, -1px) rotate(-1deg); }
-      75% { transform: translate(-2px, 1px) rotate(0deg); }
-      100% { transform: translate(1px, -2px) rotate(1deg); }
-    }
+    .stats { width: 100%; display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-val { font-size: 20px; font-weight: bold; color: #ffd700; }
+    .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; }
 
-    /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
-    .top-bar {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 10;
-      margin-bottom: 20px;
-    }
+    .btn { padding: 25px 50px; font-size: 22px; font-weight: 900; color: #fff; background: linear-gradient(45deg, #ff0000, #ff4b1f); border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.3); transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); position: relative; text-transform: uppercase; margin-bottom: 30px; }
+    .btn:active { transform: scale(0.9); box-shadow: 0 0 40px rgba(255,0,0,1), inset 0 0 20px rgba(255,255,255,0.6); }
 
-    h1 { font-size: 18px; text-transform: uppercase; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.2); text-align: center; }
-    .status { font-size: 16px; font-weight: bold; font-family: monospace; color: #00ff00; text-shadow: 0 0 10px currentColor; text-align: center; }
-    .fragments { font-size: 16px; font-weight: bold; color: #00f2fe; margin-bottom: 10px; text-shadow: 0 0 10px #00f2fe; text-align: center; }
-
-    .progress-bar { width: 100%; height: 12px; background: #333; border-radius: 10px; overflow: hidden; border: 2px solid #555; }
-    .progress-fill { height: 100%; width: 100%; background: #00ff00; transition: width 0.2s, background 0.2s; }
-
-    /* --- ЦЕНТР --- */
-    .center-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex-grow: 1;
-      z-index: 10;
-      position: relative;
-      width: 100%;
-    }
-
-    .apocalypse-btn {
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ff4b1f, #8b0000);
-      border: 8px solid #333;
-      box-shadow: 0 8px 0 #222, inset 0 -10px 20px rgba(0,0,0,0.5);
-      cursor: pointer;
-      font-size: 22px;
-      font-weight: 900;
-      color: white;
-      text-shadow: 2px 2px 0px #000;
-      transition: all 0.05s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .apocalypse-btn:active {
-      transform: translateY(8px);
-      box-shadow: 0 0 0 #222, inset 0 5px 20px rgba(0,0,0,0.8);
-    }
-
-    .warning-text {
-      position: absolute; top: -30px; color: #ff0055; font-weight: 900; font-size: 16px;
-      text-shadow: 0 0 10px #ff0055; opacity: 0; transition: opacity 0.2s; pointer-events: none; text-align: center; width: 100%;
-    }
-    .warning-text.show { opacity: 1; animation: shake 0.2s infinite; }
-
-    /* --- НИЖНЯЯ ПАНЕЛЬ (СЧЕТЧИК) --- */
-    .people-counter {
-      font-size: 22px;
-      font-weight: 900;
-      color: #ff0055;
-      font-family: monospace;
-      text-align: center;
-      text-shadow: 0 0 15px #ff0055;
-      z-index: 10;
-      margin-bottom: 20px;
-    }
-
-    .people-label { font-size: 11px; color: #aaa; display: block; margin-bottom: 2px; font-weight: normal; text-shadow: none; }
-
-    /* --- КНОПКА МАГАЗИНА (ФИКСИРОВАНА ВНИЗУ) --- */
-    .btn-shop {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      max-width: 400px;
-      margin: 0 auto; /* Центрирование */
-      background: rgba(255, 235, 59, 0.15);
-      border: 2px solid #ffeb3b;
-      color: #ffeb3b;
-      padding: 15px;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.2s;
-      z-index: 50;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    }
-    .btn-shop:active { transform: scale(0.95); background: rgba(255, 235, 59, 0.3); }
-
-    /* --- МАГАЗИН --- */
-    .shop-modal {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
-      z-index: 100; backdrop-filter: blur(5px);
-    }
-    .shop-modal.active { display: flex; }
-
-    .shop-content {
-      background: #222; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px;
-      border: 2px solid #444; display: flex; flex-direction: column; gap: 15px;
-      max-height: 90vh; overflow-y: auto; /* Если не влезет, можно будет прокрутить */
-    }
-
-    .shop-content h2 { text-align: center; color: #ffeb3b; margin-bottom: 5px; font-size: 20px;}
-    .shop-item { background: #333; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #555; }
-    .shop-item-info h3 { font-size: 14px; margin-bottom: 3px; }
-    .shop-item-info p { font-size: 11px; color: #aaa; }
-
-    .buy-btn {
-      background: #00f2fe; color: #000; border: none; padding: 8px 12px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 12px;
-    }
-    .buy-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
-
-    .close-shop {
-      background: #ff0055; color: white; border: none; padding: 12px;
-      border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; font-size: 14px;
-    }
-
-    /* --- КОНЕЦ --- */
-    .end-screen {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle, #ff0000 0%, #330000 50%, #000000 100%);
-      display: none; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 1000; text-align: center; padding: 20px;
-    }
-    .end-screen.active { display: flex; }
-    .end-screen h2 { font-size: 50px; margin-bottom: 20px; color: #fff; animation: glitch 0.3s infinite; }
-    .restart-btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer; }
-
-    .flying-obj { position: absolute; font-size: 40px; pointer-events: none; z-index: 5; animation: flyUp linear forwards; }
-    @keyframes flyUp {
-      0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
-      20% { opacity: 1; }
-      100% { transform: translateY(-20vh) scale(1.5) rotate(360deg); opacity: 0; }
-    }
-
-    @keyframes glitch {
-      0% { transform: translate(0); } 20% { transform: translate(-3px, 3px); }
-      40% { transform: translate(-3px, -3px); } 60% { transform: translate(3px, 3px); }
-      80% { transform: translate(3px, -3px); } 100% { transform: translate(0); }
-    }
-
+    .shop { width: 100%; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); max-height: 250px; overflow-y: auto; }
+    .shop h2 { font-size: 16px; margin-bottom: 10px; text-align: center; color: #ffd700; }
+    .upgrade-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .upgrade-item:last-child { border-bottom: none; }
+    .upgrade-info { display: flex; flex-direction: column; }
+    .upgrade-name { font-size: 14px; font-weight: bold; }
+    .upgrade-desc { font-size: 11px; color: #aaa; }
+    .btn-buy { background: #00b09b; color: #fff; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .btn-buy:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-buy:active { transform: scale(0.95); }
   </style>
 </head>
-<body id="body">
+<body>
 
-  <div class="top-bar">
-    <h1>Кнопка Апокалипсиса</h1>
-    <div class="status" id="status">Стабильность: 100%</div>
-    <div class="fragments">Осколки: <span id="fragments-count">0</span> 💎</div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill"></div>
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loading-screen">
+    <div class="loader" id="loader"></div>
+    <div id="error-msg">
+      ❌ Ошибка авторизации.<br>
+      <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
     </div>
+    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
   </div>
 
-  <div class="center-area">
-    <div class="warning-text" id="warning-text">АНТИЧИТ: НЕ ТАПАЙ ТАК БЫСТРО!</div>
-    <button class="apocalypse-btn" id="apoc-btn">ЖМИ</button>
-  </div>
-
-  <div class="people-counter" id="people-counter">
-    <span class="people-label">Осталось в живых:</span>
-    8 000 000 000
-  </div>
-
-  <button class="btn-shop" id="btn-shop">Магазин 🛒</button>
-
-  <!-- МАГАЗИН -->
-  <div class="shop-modal" id="shop-modal">
-    <div class="shop-content">
-      <h2>Улучшения 🛠️</h2>
-      
-      <div class="shop-item">
-        <div class="shop-item-info">
-          <h3>Усиление урона</h3>
-          <p>+100к к урону (Ур. <span id="lvl-dmg">1</span>)</p>
-        </div>
-        <button class="buy-btn" id="buy-dmg">Цена: 1 💎</button>
+  <!-- ИГРА -->
+  <div class="container" id="main-app" style="display: none;">
+    <h1 id="title">Уничтожь человечество</h1>
+    
+    <div class="stats">
+      <div class="stat-item">
+        <span class="stat-val" id="people-count">8 000 000 000</span>
+        <span class="stat-label">Людей</span>
       </div>
-
-      <div class="shop-item">
-        <div class="shop-item-info">
-          <h3>Автокликер</h3>
-          <p>+50к/сек (Ур. <span id="lvl-auto">0</span>)</p>
-        </div>
-        <button class="buy-btn" id="buy-auto">Цена: 3 💎</button>
+      <div class="stat-item">
+        <span class="stat-val" id="shards-count">0</span>
+        <span class="stat-label">Осколков 💎</span>
       </div>
-
-      <div class="shop-item">
-        <div class="shop-item-info">
-          <h3>Ускорение тапа</h3>
-          <p>Снижает задержку (Ур. <span id="lvl-speed">0</span>)</p>
-        </div>
-        <button class="buy-btn" id="buy-speed">Цена: 5 💎</button>
-      </div>
-
-      <button class="close-shop" id="close-shop">Закрыть</button>
     </div>
-  </div>
 
-  <div class="end-screen" id="end-screen">
-    <h2 class="glitch-text">💥 БУМ 💥</h2>
-    <p style="font-size: 18px; margin-bottom: 30px;">Население земли полностью уничтожено.</p>
-    <button class="restart-btn" id="restart-btn">НОВАЯ ЗЕМЛЯ</button>
+    <button class="btn" id="doom-btn" onclick="clickDoom()">УНИЧТОЖИТЬ</button>
+
+    <div class="shop">
+      <h2>🛒 Магазин улучшений</h2>
+      <div id="shop-list"></div>
+    </div>
   </div>
 
   <script>
-    const MAX_PEOPLE = 8000000000;
-    
-    let people = MAX_PEOPLE;
-    let clickDamage = 100000;
-    let autoDamage = 0;
-    let levelDmg = 1;
-    let levelAuto = 0;
-    let levelSpeed = 0;
-    
-    let costDmg = 1;
-    let costAuto = 3;
-    let costSpeed = 5;
-    
-    let fragments = 0;
-    let clickCounter = 0;
-    
-    let lastClickTime = 0;
-    let minClickInterval = 200; 
-    let isBanned = false;
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'apocalypse';
 
-    const savedData = localStorage.getItem('apocalypseSaveV7');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        people = data.people !== undefined ? data.people : MAX_PEOPLE;
-        clickDamage = data.clickDamage || 100000;
-        autoDamage = data.autoDamage || 0;
-        levelDmg = data.levelDmg || 1;
-        levelAuto = data.levelAuto || 0;
-        levelSpeed = data.levelSpeed || 0;
-        costDmg = data.costDmg || 1;
-        costAuto = data.costAuto || 3;
-        costSpeed = data.costSpeed || 5;
-        fragments = data.fragments || 0;
-        clickCounter = data.clickCounter || 0;
-        minClickInterval = Math.max(50, 200 - (levelSpeed * 30));
-      } catch(e) { console.error("Ошибка загрузки"); }
+    let token = localStorage.getItem('auth_token');
+    
+    // Состояние игры
+    let people = 8000000000;
+    let shards = 0;
+    let clickPower = 1;
+    let autoClickers = 0;
+    let lastClickTime = 0; // Для античита
+
+    const UPGRADES = [
+        { id: 'click_power', name: 'Мощный палец', desc: '+1 к силе клика', basePrice: 10, priceMult: 1.5, effect: () => clickPower += 1 },
+        { id: 'auto_clicker', name: 'Скайнет', desc: '+1 авто-клик в сек', basePrice: 50, priceMult: 1.8, effect: () => autoClickers += 1 }
+    ];
+
+    let upgradeLevels = { click_power: 0, auto_clicker: 0 };
+
+    // --- ЗАГРУЗКА ---
+    async function initGame() {
+        if (!token) { showError(); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) { showError(); return; }
+            
+            const data = await res.json();
+            
+            people = data.people !== undefined ? data.people : 8000000000;
+            shards = data.shards || 0;
+            clickPower = data.clickPower || 1;
+            autoClickers = data.autoClickers || 0;
+            upgradeLevels = data.upgradeLevels || { click_power: 0, auto_clicker: 0 };
+            
+            // Восстанавливаем купленные улучшения при загрузке
+            for (let i = 0; i < upgradeLevels.click_power; i++) clickPower += 1;
+            for (let i = 0; i < upgradeLevels.auto_clicker; i++) autoClickers += 1;
+
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            
+            renderShop();
+            updateUI();
+            startAutoLoop();
+
+        } catch (error) {
+            showError("Ошибка соединения с сервером.");
+        }
     }
 
-    const body = document.getElementById('body');
-    const apocBtn = document.getElementById('apoc-btn');
-    const statusEl = document.getElementById('status');
-    const fragmentsEl = document.getElementById('fragments-count');
-    const progressFill = document.getElementById('progress-fill');
-    const peopleCounter = document.getElementById('people-counter');
-    const shopModal = document.getElementById('shop-modal');
-    const endScreen = document.getElementById('end-screen');
-    const warningText = document.getElementById('warning-text');
-    
-    const lvlDmgText = document.getElementById('lvl-dmg');
-    const lvlAutoText = document.getElementById('lvl-auto');
-    const lvlSpeedText = document.getElementById('lvl-speed');
-    
-    const buyDmgBtn = document.getElementById('buy-dmg');
-    const buyAutoBtn = document.getElementById('buy-auto');
-    const buySpeedBtn = document.getElementById('buy-speed');
-
-    function formatNumber(num) {
-      return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    function showError(text) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+        if (text) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${text}</span>`;
+        document.getElementById('btn-back').style.display = 'inline-block';
     }
 
-    function saveGame() {
-      const data = { people, clickDamage, autoDamage, levelDmg, levelAuto, levelSpeed, costDmg, costAuto, costSpeed, fragments, clickCounter };
-      localStorage.setItem('apocalypseSaveV7', JSON.stringify(data));
+    async function saveGameToServer() {
+        if (!token) return;
+        try {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ 
+                    people: people, 
+                    shards: shards, 
+                    clickPower: clickPower, 
+                    autoClickers: autoClickers,
+                    upgradeLevels: upgradeLevels
+                })
+            });
+        } catch (e) {}
     }
 
+    // --- ЛОГИКА ИГРЫ ---
     function updateUI() {
-      if (people < 0) people = 0;
-      
-      peopleCounter.innerHTML = `<span class="people-label">Осталось в живых:</span>${formatNumber(people)}`;
-      fragmentsEl.textContent = fragments;
-      
-      let stability = (people / MAX_PEOPLE) * 100;
-      statusEl.textContent = `Стабильность: ${stability.toFixed(2)}%`;
-      progressFill.style.width = `${stability}%`;
-
-      if (stability > 60) progressFill.style.background = '#00ff00';
-      else if (stability > 30) progressFill.style.background = '#ff9800';
-      else progressFill.style.background = '#ff0055';
-
-      if (stability < 50) body.style.background = 'linear-gradient(45deg, #1a0000, #000)';
-      if (stability < 20) body.style.background = 'linear-gradient(45deg, #330000, #000)';
-
-      lvlDmgText.textContent = levelDmg;
-      lvlAutoText.textContent = levelAuto;
-      lvlSpeedText.textContent = levelSpeed;
-      
-      buyDmgBtn.textContent = `Цена: ${costDmg} 💎`;
-      buyAutoBtn.textContent = `Цена: ${costAuto} 💎`;
-      buySpeedBtn.textContent = `Цена: ${costSpeed} 💎`;
-      
-      buyDmgBtn.disabled = fragments < costDmg;
-      buyAutoBtn.disabled = fragments < costAuto;
-      buySpeedBtn.disabled = fragments < costSpeed;
-
-      if (people <= 0 && !endScreen.classList.contains('active')) {
-        endScreen.classList.add('active');
-        apocBtn.style.display = 'none';
-        localStorage.removeItem('apocalypseSaveV7'); 
-      }
-    }
-
-    function spawnChaos() {
-      const emojis = ['☄️', '💀', '🔥', '💥', '☠️'];
-      const obj = document.createElement('div');
-      obj.className = 'flying-obj';
-      obj.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      obj.style.left = Math.random() * 90 + 'vw';
-      obj.style.animationDuration = (Math.random() * 0.8 + 0.5) + 's';
-      body.appendChild(obj);
-      setTimeout(() => obj.remove(), 1300);
-    }
-
-    function dealDamage(amount) {
-      if (people <= 0) return;
-      people -= amount;
-      
-      body.classList.add('shake');
-      setTimeout(() => body.classList.remove('shake'), 50);
-      
-      if (Math.random() > 0.6) spawnChaos();
-      
-      updateUI();
-      saveGame();
-    }
-
-    apocBtn.addEventListener('click', () => {
-      if (isBanned) return;
-
-      const now = Date.now();
-      const timeDiff = now - lastClickTime;
-      
-      if (timeDiff < minClickInterval) { 
-        warningText.classList.add('show');
+        document.getElementById('people-count').innerText = Math.max(0, people).toLocaleString('ru-RU');
+        document.getElementById('shards-count').innerText = shards.toLocaleString('ru-RU');
         
-        isBanned = true;
-        setTimeout(() => {
-          isBanned = false;
-          warningText.classList.remove('show');
+        // Обновляем кнопки в магазине
+        UPGRADES.forEach(up => {
+            const btn = document.getElementById('buy-btn-' + up.id);
+            if (btn) {
+                const price = Math.floor(up.basePrice * Math.pow(up.priceMult, upgradeLevels[up.id]));
+                btn.innerText = `${price} 💎`;
+                btn.disabled = shards < price;
+            }
+        });
+
+        if (people <= 0) {
+            document.getElementById('title').innerText = "МИР УНИЧТОЖЕН 💀";
+            document.getElementById('doom-btn').style.display = 'none';
+        }
+    }
+
+    function clickDoom() {
+        if (people <= 0) return;
+
+        // Простейший античит (не чаще 1 клика в 50мс)
+        const now = Date.now();
+        if (now - lastClickTime < 50) return; 
+        lastClickTime = now;
+
+        people -= clickPower;
+        shards += 1;
+        
+        if (navigator.vibrate) navigator.vibrate(20);
+        
+        updateUI();
+        saveGameToServer();
+    }
+
+    function startAutoLoop() {
+        setInterval(() => {
+            if (autoClickers > 0 && people > 0) {
+                people -= autoClickers;
+                shards += autoClickers;
+                updateUI();
+            }
         }, 1000);
         
-        return;
-      }
-      lastClickTime = now;
+        // Сохранение раз в 5 секунд, чтобы не спамить сервер
+        setInterval(() => {
+            if (people > 0 || shards > 0) saveGameToServer();
+        }, 5000);
+    }
 
-      dealDamage(clickDamage);
-      
-      clickCounter++;
-      if (clickCounter >= 5) {
-        fragments++;
-        clickCounter = 0;
-        updateUI();
-        saveGame();
-      }
-    });
+    function renderShop() {
+        const list = document.getElementById('shop-list');
+        list.innerHTML = '';
 
-    setInterval(() => {
-      if (autoDamage > 0 && people > 0) {
-        dealDamage(autoDamage);
-      }
-    }, 1000);
+        UPGRADES.forEach(up => {
+            const price = Math.floor(up.basePrice * Math.pow(up.priceMult, upgradeLevels[up.id]));
+            const el = document.createElement('div');
+            el.className = 'upgrade-item';
+            el.innerHTML = `
+                <div class="upgrade-info">
+                    <span class="upgrade-name">${up.name} (Ур. ${upgradeLevels[up.id]})</span>
+                    <span class="upgrade-desc">${up.desc}</span>
+                </div>
+                <button class="btn-buy" id="buy-btn-${up.id}" onclick="buyUpgrade('${up.id}')">${price} 💎</button>
+            `;
+            list.appendChild(el);
+        });
+    }
 
-    document.getElementById('btn-shop').addEventListener('click', () => shopModal.classList.add('active'));
-    document.getElementById('close-shop').addEventListener('click', () => shopModal.classList.remove('active'));
+    function buyUpgrade(id) {
+        const up = UPGRADES.find(u => u.id === id);
+        const price = Math.floor(up.basePrice * Math.pow(up.priceMult, upgradeLevels[id]));
 
-    buyDmgBtn.addEventListener('click', () => {
-      if (fragments >= costDmg) {
-        fragments -= costDmg;
-        clickDamage += 100000;
-        levelDmg++;
-        costDmg = Math.floor(costDmg * 1.5); 
-        updateUI();
-        saveGame();
-      }
-    });
+        if (shards >= price) {
+            shards -= price;
+            upgradeLevels[id] += 1;
+            up.effect(); // Применяем эффект
+            
+            updateUI();
+            saveGameToServer();
+        }
+    }
 
-    buyAutoBtn.addEventListener('click', () => {
-      if (fragments >= costAuto) {
-        fragments -= costAuto;
-        autoDamage += 50000;
-        levelAuto++;
-        costAuto = Math.floor(costAuto * 1.5); 
-        updateUI();
-        saveGame();
-      }
-    });
-
-    buySpeedBtn.addEventListener('click', () => {
-      if (fragments >= costSpeed) {
-        fragments -= costSpeed;
-        levelSpeed++;
-        minClickInterval = Math.max(50, minClickInterval - 30);
-        costSpeed = Math.floor(costSpeed * 2); 
-        updateUI();
-        saveGame();
-      }
-    });
-
-    document.getElementById('restart-btn').addEventListener('click', () => {
-      localStorage.removeItem('apocalypseSaveV7');
-      location.reload();
-    });
-
-    updateUI();
+    window.onload = initGame;
   </script>
 </body>
 </html>
