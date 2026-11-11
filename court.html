@@ -9,7 +9,6 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      /* Стильный фон со стенами в квадратах (неоновая сетка) */
       background-color: #080c14;
       background-image: 
         linear-gradient(rgba(79, 172, 254, 0.05) 1px, transparent 1px),
@@ -25,7 +24,7 @@
       perspective: 1000px;
     }
 
-    /* Затемнение по краям (виньетка) для атмосферы */
+    /* Затемнение по краям */
     body::after {
       content: '';
       position: fixed;
@@ -81,7 +80,6 @@
       z-index: 2;
     }
 
-    /* Луч света на подсудимого */
     .spotlight {
       position: absolute;
       top: -50px;
@@ -94,17 +92,17 @@
       z-index: 1;
     }
 
-    /* Публика (Сидящие люди) - Поднята выше и разделена на ряды */
+    /* Публика на фоне */
     .audience {
       position: absolute;
-      top: 18%; /* Подняли выше */
+      top: 18%;
       width: 90%;
       display: flex;
       flex-direction: column;
-      gap: 10px; /* Расстояние между рядами */
+      gap: 10px;
       pointer-events: none;
       z-index: 0;
-      opacity: 0.4;
+      opacity: 0.3;
       filter: blur(2px) brightness(0.6);
     }
     
@@ -113,36 +111,34 @@
       justify-content: space-around;
       font-size: 35px;
     }
-    .audience-row:nth-child(2) {
-      font-size: 30px;
-      opacity: 0.7;
-    }
+    .audience-row:nth-child(2) { font-size: 30px; opacity: 0.7; }
 
     /* --- ПОДСУДИМЫЙ --- */
     .defendant-area {
-      margin-top: 40px;
+      margin-top: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
       z-index: 2;
-      transition: 0.5s;
+      position: relative;
     }
 
     .defendant-avatar {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       background: #151b22;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 65px;
+      font-size: 60px;
       border: 3px solid #ff0055;
-      box-shadow: 0 0 40px rgba(255, 0, 85, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
+      box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
       margin-bottom: 15px;
       animation: float 3s ease-in-out infinite;
       position: relative;
       z-index: 2;
+      transition: filter 0.3s;
     }
 
     @keyframes float {
@@ -150,36 +146,7 @@
       50% { transform: translateY(-10px); }
     }
 
-    .crime-box {
-      background: rgba(20, 30, 40, 0.95);
-      border: 2px solid #4facfe;
-      border-radius: 15px;
-      padding: 15px;
-      width: 90%;
-      max-width: 320px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(79, 172, 254, 0.2);
-      backdrop-filter: blur(10px);
-      transform: translateZ(20px);
-      z-index: 2;
-    }
-
-    .crime-title {
-      color: #ff0055;
-      font-size: 15px;
-      font-weight: bold;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .crime-desc {
-      font-size: 14px;
-      color: #e0e0e0;
-      line-height: 1.4;
-    }
-
-    /* --- СТОЛ СУДЬИ И МОЛОТОК (2.5D) --- */
+    /* --- СТОЛ СУДЬИ (2.5D) --- */
     .desk-wrapper {
       position: relative;
       width: 100%;
@@ -194,7 +161,7 @@
 
     .desk-top {
       width: 330px;
-      height: 120px;
+      height: 130px;
       background: linear-gradient(135deg, #3a2518 0%, #1a110c 100%);
       border: 4px solid #5a3a22;
       border-radius: 10px;
@@ -207,7 +174,7 @@
     }
 
     .gavel-container {
-      transform: rotateX(-45deg) translateY(-30px);
+      transform: rotateX(-45deg) translateY(-20px);
       cursor: pointer;
       transition: 0.1s;
       position: relative;
@@ -215,12 +182,13 @@
     }
 
     .gavel {
-      font-size: 70px;
+      font-size: 60px;
       filter: drop-shadow(0 15px 10px rgba(0,0,0,0.8));
       transition: 0.1s;
       transform-origin: bottom left;
     }
 
+    /* Анимация удара молотком */
     .gavel-container.strike .gavel {
       animation: hitGavel 0.3s ease-in-out;
     }
@@ -231,6 +199,7 @@
       100% { transform: rotate(0deg) translateY(0); }
     }
 
+    /* Эффект вибрации стола */
     .desk-top.shake {
       animation: deskShake 0.3s ease-in-out;
     }
@@ -238,6 +207,59 @@
       0%, 100% { transform: rotateX(45deg) translateX(0); }
       25% { transform: rotateX(45deg) translateX(-5px); }
       75% { transform: rotateX(45deg) translateX(5px); }
+    }
+
+    /* --- ПАПКА С ДЕЛОМ НА СТОЛЕ --- */
+    .folder {
+      position: absolute;
+      width: 140px;
+      height: 90px;
+      background: #d4a373;
+      border-radius: 4px 8px 8px 8px;
+      transform: rotateX(-45deg) translateZ(5px) translateY(10px) rotateZ(-5deg);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 10px 8px;
+      left: 20px;
+      border: 1px solid #b5835a;
+    }
+    
+    .folder::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 50px;
+      height: 15px;
+      background: #d4a373;
+      border-radius: 5px 5px 0 0;
+      border: 1px solid #b5835a;
+      border-bottom: none;
+    }
+
+    .crime-title {
+      color: #cc0000;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1;
+      word-break: break-word;
+    }
+
+    .crime-desc {
+      font-size: 9px;
+      color: #222;
+      line-height: 1.1;
+      text-align: center;
+      font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
     }
 
     /* --- КНОПКИ ПРИГОВОРА --- */
@@ -284,7 +306,7 @@
     /* --- ЛОГ/РЕАКЦИЯ --- */
     .reaction-text {
       position: absolute;
-      top: 50%; /* Центрируем плашку ровно между столом и подсудимым */
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.5);
       background: rgba(10, 10, 10, 0.95);
@@ -326,13 +348,55 @@
       100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
     }
 
-    /* Анимация отправки в космос */
-    .fly-away {
-      animation: flyToSpace 1s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    /* --- НОВЫЕ АНИМАЦИИ ПРИГОВОРОВ --- */
+    
+    /* 1. В Космос (Ракета) */
+    .rocket-anim {
+      position: absolute;
+      font-size: 50px;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      z-index: 1;
     }
-    @keyframes flyToSpace {
-      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-      100% { transform: translateY(-800px) rotate(720deg) scale(0.1); opacity: 0; }
+    .launch-anim {
+      animation: launchToSpace 1.5s forwards cubic-bezier(0.55, 0.085, 0.68, 0.53);
+    }
+    @keyframes launchToSpace {
+      0% { transform: translate(-50%, 0) scale(0.5); opacity: 1; }
+      20% { transform: translate(-50%, 0) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -800px) scale(0.5) rotate(10deg); opacity: 0; }
+    }
+    .rocket-show { opacity: 1; transition: 0.2s; }
+
+    /* 2. Виновен (Полицейский уводит) */
+    .police-anim {
+      position: absolute;
+      font-size: 50px;
+      bottom: 10px;
+      right: -100px;
+      z-index: 3;
+      transition: 0.4s ease-out;
+    }
+    .police-show { right: -40px; }
+    
+    .arrest-anim {
+      animation: arrested 1.5s forwards ease-in-out;
+    }
+    @keyframes arrested {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      20% { transform: translate(-10px, 0) scale(1); opacity: 1; } /* Коп хватает */
+      100% { transform: translate(250px, 0) scale(0.8); opacity: 0; } /* Уводят */
+    }
+
+    /* 3. Оправдать (Исчезновение) */
+    .fade-out {
+      animation: fadeAway 1s forwards;
+    }
+    @keyframes fadeAway {
+      0% { transform: scale(1); opacity: 1; filter: blur(0px); }
+      100% { transform: scale(0.8); opacity: 0; filter: blur(10px); }
     }
 
   </style>
@@ -347,7 +411,7 @@
   <div class="courtroom">
     <div class="spotlight"></div>
 
-    <!-- Публика на фоне (теперь выше и в два ряда) -->
+    <!-- Публика -->
     <div class="audience">
       <div class="audience-row">
         <span>👨‍💼</span><span>👩‍⚖️</span><span>🐸</span><span>🧑‍💼</span><span>🦆</span>
@@ -358,16 +422,24 @@
     </div>
 
     <div class="defendant-area" id="defendant-area">
+      <!-- Место для полицейского -->
+      <div class="police-anim" id="police">👮‍♂️</div>
+      
+      <!-- Место для ракеты -->
+      <div class="rocket-anim" id="rocket">🚀</div>
+      
       <div class="defendant-avatar" id="defendant-emoji">🐸</div>
-      <div class="crime-box">
-        <div class="crime-title" id="crime-title">Дело №1</div>
-        <div class="crime-desc" id="crime-desc">Загрузка дела...</div>
-      </div>
     </div>
 
     <div class="desk-wrapper">
       <div class="desk-top" id="desk">
-        <div class="gavel-container" id="gavel-btn" onclick="strikeGavel()">
+        <!-- Раскрытая папка с делом -->
+        <div class="folder">
+          <div class="crime-title" id="crime-title">Дело №1</div>
+          <div class="crime-desc" id="crime-desc">Загрузка дела...</div>
+        </div>
+
+        <div class="gavel-container" id="gavel-btn">
           <div class="gavel">🔨</div>
         </div>
       </div>
@@ -389,58 +461,61 @@
   </div>
 
   <script>
-    // --- БАЗА ДАННЫХ (РАСШИРЕНА) ---
     const DEFENDANTS = [
       '🐸', '🐱', '🐕', '🧠', '💩', '🗿', '👽', '🦆', '🤖', '🐷', 
       '🦄', '🐔', '🐙', '🦖', '🐻', '🐼', '🐀', '🐒', '🦥', '🦦'
     ];
     
     const CRIMES = [
-      { title: "Кража века", desc: "Украл луну с неба и пытался продать её на Avito за 3 рубля." },
-      { title: "Нарушение порядка", desc: "Слишком громко молчал в общественной библиотеке." },
-      { title: "Код-преступление", desc: "Написал идеальный сайт, но использовал для этого Python." },
+      { title: "Кража века", desc: "Украл луну и продал на Avito за 3 рубля." },
+      { title: "Нарушение порядка", desc: "Слишком громко молчал в библиотеке." },
+      { title: "Код-преступление", desc: "Написал идеальный сайт на Python." },
       { title: "Мемный терроризм", desc: "Засорил общий чат баянами в 3 часа ночи." },
-      { title: "Оскорбление чувств", desc: "Громко заявил, что Скала (🗿) не имба и не тащит." },
-      { title: "Кибербуллинг", desc: "Обозвал квадратного кота из 'Управления Вселенной' круглым." },
-      { title: "Налоговое мошенничество", desc: "Уклонялся от уплаты налогов, притворяясь мусорным пакетом." },
-      { title: "Вандализм", desc: "Съел последний кусок пиццы в мире и не поделился." },
-      { title: "Шпионаж", desc: "Подглядывал за соседями через бинокль из туалетной бумаги." },
+      { title: "Оскорбление чувств", desc: "Заявил, что Скала (🗿) не имба." },
+      { title: "Кибербуллинг", desc: "Обозвал квадратного кота круглым." },
+      { title: "Мошенничество", desc: "Уклонялся от налогов, притворяясь пакетом." },
+      { title: "Вандализм", desc: "Съел последний кусок пиццы и не поделился." },
+      { title: "Шпионаж", desc: "Подглядывал в бинокль из туалетной бумаги." },
       { title: "Госизмена", desc: "Сказал, что Roblox лучше Minecraft." },
-      { title: "Незаконный стиль", desc: "Носил шляпу не по уставу и слишком модно выглядел." },
-      { title: "Газлайтинг", desc: "Убеждал всех, что трава на самом деле синяя." },
-      { title: "Использование читов", desc: "Включил X-Ray в Майнкрафте, чтобы найти алмазы." },
-      { title: "Разжигание споров", desc: "Написал пост, что картошка фри с майонезом лучше, чем с кетчупом." },
-      { title: "Слишком громкий смех", desc: "Смеялся с баяна из 2012 года в переполненном автобусе." },
-      { title: "Пиратство", desc: "Скачал фильм через торрент и раздавал его со скоростью 0.5 кб/с." },
-      { title: "Мошенничество", desc: "Собрал 100 купонов на бесплатную доставку и заказал 1 зернышко риса." },
-      { title: "Ересь", desc: "Публично заявил, что Шрек — это уже не смешно." },
-      { title: "Нарушение сна", desc: "Спамил звонками в 4 утра с просьбой отправить 100 рублей на киви." },
-      { title: "Утечка данных", desc: "Слил в сеть секретный рецепт соуса из бургерной." }
+      { title: "Незаконный стиль", desc: "Носил шляпу не по уставу." },
+      { title: "Газлайтинг", desc: "Убеждал всех, что трава синяя." },
+      { title: "Читерство", desc: "Включил X-Ray в Майнкрафте." },
+      { title: "Разжигание споров", desc: "Сказал, что фри с майонезом лучше." },
+      { title: "Громкий смех", desc: "Смеялся с баяна 2012 года в автобусе." },
+      { title: "Пиратство", desc: "Раздавал торрент со скоростью 0.5 кб/с." },
+      { title: "Ересь", desc: "Публично заявил, что Шрек — не смешно." },
+      { title: "Нарушение сна", desc: "Звонил в 4 утра с просьбой кинуть 100р." },
+      { title: "Утечка данных", desc: "Слил секретный рецепт соуса из бургерной." }
     ];
 
     const REACTIONS = {
       innocent: [
-        "Суд оправдал подсудимого! Отпущен с миром. (+10 🪙)",
-        "Невиновен! Судья поверил этим честным глазам. (+10 🪙)",
-        "Оправдан! Слишком милый, чтобы сидеть в тюрьме. (+10 🪙)"
+        "Оправдан! Отпущен с миром. (+10 🪙)",
+        "Невиновен! Поверили честным глазам. (+10 🪙)",
+        "Оправдан! Слишком милый для тюрьмы. (+10 🪙)"
       ],
       guilty: [
-        "Виновен! Отправлен в мемную тюрьму на 100 лет. (+20 🪙)",
-        "Приговор: строгий режим и просмотр только грустных мемов. (+20 🪙)",
-        "Виновен! Будет отрабатывать карму, чистя базы данных. (+20 🪙)"
+        "Виновен! В мемную тюрьму на 100 лет. (+20 🪙)",
+        "Строгий режим и грустные мемы. (+20 🪙)",
+        "Виновен! Будет чистить базы данных. (+20 🪙)"
       ],
       space: [
-        "В КОСМОС! Выслан на орбиту без скафандра. (+35 🪙)",
-        "Приговор: отправлен изучать черные дыры в 'Гравитации'. (+35 🪙)",
-        "В КОСМОС! Пусть ищет там свою луну. (+35 🪙)"
+        "В КОСМОС! Выслан на орбиту. (+35 🪙)",
+        "В КОСМОС! Пусть ищет черные дыры. (+35 🪙)",
+        "В КОСМОС! Без скафандра. (+35 🪙)"
       ]
     };
 
-    // --- ЛОГИКА ---
     let coins = 0;
-    let currentDefendant = '';
     let currentCrime = null;
     let canVerdict = true;
+
+    // Элементы
+    const elAvatar = document.getElementById('defendant-emoji');
+    const elRocket = document.getElementById('rocket');
+    const elPolice = document.getElementById('police');
+    const elGavel = document.getElementById('gavel-btn');
+    const elDesk = document.getElementById('desk');
 
     function loadGame() {
       const saved = localStorage.getItem('MEME_COURT_SAVE');
@@ -462,36 +537,40 @@
     }
 
     function nextCase() {
-      const avatar = document.getElementById('defendant-emoji');
-      avatar.classList.remove('fly-away');
-      avatar.style.filter = "";
+      // Сбрасываем все анимации и элементы
+      elAvatar.className = 'defendant-avatar';
+      elAvatar.innerText = '🐸';
+      elAvatar.style.filter = '';
+      
+      elRocket.className = 'rocket-anim';
+      elRocket.innerText = '🚀';
+      
+      elPolice.className = 'police-anim';
+      elPolice.innerText = '👮‍♂️';
+
       document.getElementById('reaction-text').classList.remove('show');
       
-      currentDefendant = DEFENDANTS[Math.floor(Math.random() * DEFENDANTS.length)];
+      // Рандомим
+      const randomDefendant = DEFENDANTS[Math.floor(Math.random() * DEFENDANTS.length)];
       currentCrime = CRIMES[Math.floor(Math.random() * CRIMES.length)];
       
-      avatar.innerText = currentDefendant;
+      elAvatar.innerText = randomDefendant;
       
-      setTimeout(() => {
-        document.getElementById('crime-title').innerText = currentCrime.title;
-        document.getElementById('crime-desc').innerText = currentCrime.desc;
-      }, 100);
+      document.getElementById('crime-title').innerText = currentCrime.title;
+      document.getElementById('crime-desc').innerText = currentCrime.desc;
 
       canVerdict = true;
     }
 
-    function strikeGavel() {
-      if (!canVerdict) return;
-      
-      const gavelContainer = document.getElementById('gavel-btn');
-      const desk = document.getElementById('desk');
-      
-      gavelContainer.classList.add('strike');
-      desk.classList.add('shake');
+    // Функция удара молотком
+    function strikeGavel(callback) {
+      elGavel.classList.add('strike');
+      elDesk.classList.add('shake');
       
       setTimeout(() => {
-        gavelContainer.classList.remove('strike');
-        desk.classList.remove('shake');
+        elGavel.classList.remove('strike');
+        elDesk.classList.remove('shake');
+        if (callback) callback(); // Вызываем коллбэк после удара
       }, 300);
     }
 
@@ -499,8 +578,12 @@
       if (!canVerdict) return; 
       canVerdict = false;
 
-      strikeGavel(); 
+      // Сначала бьем молотком, потом запускаем анимацию
+      strikeGavel(() => {
+        playVerdictAnimation(type);
+      });
 
+      // Начисляем монеты
       let reward = 0;
       if (type === 'innocent') reward = 10;
       if (type === 'guilty') reward = 20;
@@ -509,32 +592,43 @@
       coins += reward;
       updateCoinsUI();
       saveGame();
-
       showFloatingCoin(reward);
 
+      // Показываем текст реакции
       const reactionBox = document.getElementById('reaction-text');
       const reactionsList = REACTIONS[type];
       reactionBox.innerText = reactionsList[Math.floor(Math.random() * reactionsList.length)];
       
       setTimeout(() => {
         reactionBox.classList.add('show');
-      }, 300);
+      }, 400); // Чуть позже удара молотка
+    }
 
-      const avatar = document.getElementById('defendant-emoji');
+    function playVerdictAnimation(type) {
       if (type === 'space') {
+        // 1. КОСМОС: Ракета выезжает, подсудимый садится и улетает
+        elRocket.classList.add('rocket-show');
         setTimeout(() => {
-          avatar.classList.add('fly-away');
-        }, 500);
+          elAvatar.classList.add('launch-anim');
+        }, 200);
+        
       } else if (type === 'guilty') {
-        avatar.style.filter = "grayscale(1) brightness(0.5)";
-        avatar.innerText = "⛓️";
+        // 2. ВИНОВЕН: Полицейский выбегает и уводит
+        elPolice.classList.add('police-show');
+        setTimeout(() => {
+          elAvatar.classList.add('arrest-anim');
+          setTimeout(() => { elPolice.style.opacity = '0'; }, 800);
+        }, 300);
+
       } else if (type === 'innocent') {
-        avatar.style.filter = "drop-shadow(0 0 20px #00ff00)";
+        // 3. ОПРАВДАТЬ: Просто исчезает (растворяется)
+        elAvatar.classList.add('fade-out');
       }
 
+      // Через 2.5 секунды загружаем новое дело
       setTimeout(() => {
         nextCase();
-      }, 2500);
+      }, 2800);
     }
 
     function showFloatingCoin(amount) {
@@ -550,6 +644,11 @@
       
       setTimeout(() => coin.remove(), 1000);
     }
+
+    // Позволяем бить молотком просто так (по клику)
+    elGavel.onclick = () => {
+      if (canVerdict) strikeGavel();
+    };
 
     window.onload = () => {
       loadGame();
