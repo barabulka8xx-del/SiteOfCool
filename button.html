@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>НЕ НАЖИМАЙ!</title>
+  <title>🚀Наши Проекты🚀 | Опасная Кнопка</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
     
@@ -24,20 +24,33 @@
       position: relative;
     }
 
-    .container { z-index: 10; position: relative; transition: opacity 1s; }
+    /* Экран загрузки/ошибки */
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f0c29; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .loader { border: 4px solid #1a1a24; border-top: 4px solid #ff0055; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
+
+    .container { z-index: 10; position: relative; transition: opacity 1s; display: none; }
 
     h1 {
-      font-size: clamp(24px, 6vw, 40px);
-      margin-bottom: 50px;
+      font-size: clamp(20px, 5vw, 32px);
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 2px;
       text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,0,0,0.8);
       transition: all 0.3s ease;
     }
 
+    .stats {
+      font-size: 14px; color: #aaa; margin-bottom: 30px;
+      background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
     .btn {
       padding: 24px 48px;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 900;
       color: #fff;
       background: linear-gradient(45deg, #ff0000, #ff4b1f);
@@ -56,9 +69,7 @@
       box-shadow: 0 0 40px rgba(255,0,0,1), inset 0 0 20px rgba(255,255,255,0.6);
     }
 
-    .shake {
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-    }
+    .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes shake {
       10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-1deg); }
       20%, 80% { transform: translate3d(4px, 0, 0) rotate(1deg); }
@@ -66,70 +77,67 @@
       40%, 60% { transform: translate3d(8px, 0, 0) rotate(2deg); }
     }
 
-    .particle {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: explode 0.8s ease-out forwards;
-    }
-    @keyframes explode {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(0) translate(var(--x), var(--y)); opacity: 0; }
-    }
+    .particle { position: absolute; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; animation: explode 0.8s ease-out forwards; }
+    @keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0) translate(var(--x), var(--y)); opacity: 0; } }
 
-    #restart {
-      display: none;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: white;
-      color: black;
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: none;
-      z-index: 100;
-      position: relative;
-    }
-
-    /* --- СТИЛИ ДЛЯ КОТИКОВ --- */
     .cat {
-      position: absolute;
-      top: -50px; /* Начинаем чуть выше экрана */
-      font-size: 24px;
-      pointer-events: none; /* Чтобы не мешали нажимать кнопку перезапуска */
-      animation: fall linear forwards;
-      z-index: 50;
-      will-change: transform; /* Оптимизация анимации */
+      position: absolute; top: -50px; font-size: 24px; pointer-events: none;
+      animation: fall linear forwards; z-index: 50; will-change: transform;
     }
+    @keyframes fall { 0% { transform: translateY(0) rotate(0deg); } 100% { transform: translateY(110vh) rotate(360deg); } }
 
-    @keyframes fall {
-      0% { transform: translateY(0) rotate(0deg); }
-      100% { transform: translateY(110vh) rotate(360deg); }
+    .restart-btn {
+      display: none; margin-top: 20px; padding: 12px 25px;
+      background: #fff; color: #000; border: none; border-radius: 10px;
+      font-weight: bold; cursor: pointer; z-index: 100; position: relative;
+      text-decoration: none; font-size: 14px;
     }
   </style>
 </head>
 <body>
 
-  <div class="container" id="main-container">
-    <h1 id="warning-text">Пожалуйста, не нажимай эту кнопку.</h1>
-    <button class="btn" id="danger-btn">НЕ НАЖИМАТЬ</button>
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loading-screen">
+    <div class="loader" id="loader"></div>
+    <div id="error-msg">
+      ❌ Ошибка авторизации.<br>
+      <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
+    </div>
+    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
   </div>
-  
-  <a href="button.html" id="restart">Починить всё 🛠️</a>
+
+  <!-- ИГРА -->
+  <div class="container" id="main-container">
+    <h1 id="warning-text">Не нажимай эту кнопку.</h1>
+    <div class="stats" id="stats-display">Сломанных кнопок: 0</div>
+    <button class="btn" id="danger-btn">НЕ НАЖИМАТЬ</button>
+    <br>
+    <button class="restart-btn" id="restart">Починить всё 🛠️</button>
+  </div>
 
   <script>
-    const btn = document.getElementById('danger-btn');
-    const text = document.getElementById('warning-text');
-    const body = document.body;
-    const restart = document.getElementById('restart');
-    const container = document.getElementById('main-container');
-    
-    let count = 0;
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'button';
 
-    const messages = [
+    let token = localStorage.getItem('auth_token');
+    
+    // Состояние игры
+    let totalClicks = 0; // Всего кликов за все время
+    let currentLevel = 1; // Текущий уровень кнопки
+    let clicksThisLevel = 0; // Кликов на текущем уровне
+    let brokenButtons = 0; // Сколько раз сломали кнопку
+    
+    let btn = document.getElementById('danger-btn');
+    let text = document.getElementById('warning-text');
+    let body = document.body;
+    let restart = document.getElementById('restart');
+    let container = document.getElementById('main-container');
+    let statsDisplay = document.getElementById('stats-display');
+
+    // База сообщений и фонов
+    const allMessages = [
       "Пожалуйста, не нажимай эту кнопку.",
       "Я же попросил по-хорошему...",
       "Ты уверен, что тебе это нужно?",
@@ -141,7 +149,7 @@
       "💥 СИСТЕМА УНИЧТОЖЕНА 💥"
     ];
 
-    const bgColors = [
+    const allBgColors = [
       "linear-gradient(to bottom, #240b36, #c31432)",
       "linear-gradient(to bottom, #1f1c2c, #928dab)",
       "linear-gradient(to bottom, #200122, #6f0000)",
@@ -153,13 +161,91 @@
       "#ffffff"
     ];
 
+    // --- ЗАГРУЗКА ---
+    async function initGame() {
+        if (!token) { showError(); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) { showError(); return; }
+            
+            const data = await res.json();
+            totalClicks = data.totalClicks || 0;
+            currentLevel = data.currentLevel || 1;
+            clicksThisLevel = data.clicksThisLevel || 0;
+            brokenButtons = data.brokenButtons || 0;
+            
+            document.getElementById('loading-screen').style.display = 'none';
+            container.style.display = 'block';
+            
+            updateUI();
+            startAutoSave();
+
+        } catch (error) {
+            showError("Ошибка соединения с сервером.");
+        }
+    }
+
+    function showError(textMsg) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+        if (textMsg) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${textMsg}</span>`;
+        document.getElementById('btn-back').style.display = 'inline-block';
+    }
+
+    async function saveGameToServer() {
+        if (!token) return;
+        try {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ 
+                    totalClicks: totalClicks, 
+                    currentLevel: currentLevel, 
+                    clicksThisLevel: clicksThisLevel,
+                    brokenButtons: brokenButtons
+                })
+            });
+        } catch (e) {}
+    }
+
+    function startAutoSave() {
+        setInterval(saveGameToServer, 5000);
+    }
+
+    // --- ЛОГИКА ИГРЫ ---
+    function updateUI() {
+        statsDisplay.textContent = `Сломанных кнопок: ${brokenButtons} | Уровень: ${currentLevel}`;
+        
+        // Вычисляем, сколько кликов нужно для текущего уровня (становится сложнее)
+        let requiredClicks = Math.floor(5 + (currentLevel * 2.5));
+        
+        // Меняем текст кнопки в зависимости от прогресса
+        if (clicksThisLevel === 0) {
+            btn.textContent = "НЕ НАЖИМАТЬ";
+            text.textContent = "Не нажимай эту кнопку.";
+            body.style.background = allBgColors[0];
+        } else {
+            btn.textContent = `ЖМИ (${clicksThisLevel}/${requiredClicks})`;
+            
+            // Меняем фон в зависимости от прогресса
+            let bgIndex = Math.min(allBgColors.length - 1, Math.floor((clicksThisLevel / requiredClicks) * allBgColors.length));
+            body.style.background = allBgColors[bgIndex];
+            
+            // Меняем текст
+            let msgIndex = Math.min(allMessages.length - 1, Math.floor((clicksThisLevel / requiredClicks) * allMessages.length));
+            text.textContent = allMessages[msgIndex];
+        }
+    }
+
     function createExplosion(x, y) {
       const colors = ['#ff0000', '#ff4b1f', '#ffff00', '#ff00ff', '#00ffff'];
       for (let i = 0; i < 15; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
-        p.style.left = x + 'px';
-        p.style.top = y + 'px';
+        p.style.left = x + 'px'; p.style.top = y + 'px';
         p.style.background = colors[Math.floor(Math.random() * colors.length)];
         const angle = Math.random() * Math.PI * 2;
         const distance = 50 + Math.random() * 100;
@@ -170,86 +256,93 @@
       }
     }
 
-    // ФУНКЦИЯ СПАВНА 100 000 КОТИКОВ
-    function spawnCats() {
-      const totalCats = 100000;
-      const batchSize = 5000; // Создаем по 5000 за раз, чтобы браузер не завис
+    function spawnCats(amount) {
+      const batchSize = 1000;
       let created = 0;
-      
       const catIcons = ['🐱', '🐈', '🐈‍⬛', '😺', '😸', '😹', '😻'];
 
       function createBatch() {
         const fragment = document.createDocumentFragment();
-        
         for (let i = 0; i < batchSize; i++) {
           const cat = document.createElement('div');
-          cat.className = 'cat';
-          cat.innerText = catIcons[Math.floor(Math.random() * catIcons.length)];
-          
-          // Рандомная позиция по горизонтали и скорость падения
+          cat.className = 'cat'; cat.innerText = catIcons[Math.floor(Math.random() * catIcons.length)];
           cat.style.left = Math.random() * 100 + 'vw';
-          const fallDuration = 2 + Math.random() * 4; // От 2 до 6 секунд
-          cat.style.animationDuration = fallDuration + 's';
-          cat.style.animationDelay = Math.random() * 2 + 's'; // Небольшая задержка
-          cat.style.fontSize = (16 + Math.random() * 24) + 'px'; // Разный размер
-
+          cat.style.animationDuration = (2 + Math.random() * 4) + 's';
+          cat.style.animationDelay = Math.random() * 2 + 's';
+          cat.style.fontSize = (16 + Math.random() * 24) + 'px';
           fragment.appendChild(cat);
         }
-        
         body.appendChild(fragment);
         created += batchSize;
-
-        if (created < totalCats) {
-          // Запускаем следующую порцию через 50мс
-          setTimeout(createBatch, 50);
-        }
+        if (created < amount) setTimeout(createBatch, 50);
       }
-
       createBatch();
     }
 
+    // ОБРАБОТЧИК КЛИКА
     btn.addEventListener('click', (e) => {
-      if (navigator.vibrate) navigator.vibrate(count > 5 ? [100, 50, 100, 50, 200] : 50);
+      if (navigator.vibrate) navigator.vibrate(50);
       
       createExplosion(e.clientX, e.clientY);
-
       body.classList.add('shake');
       setTimeout(() => body.classList.remove('shake'), 400);
 
-      count++;
+      totalClicks++;
+      clicksThisLevel++;
+      
+      let requiredClicks = Math.floor(5 + (currentLevel * 2.5));
 
-      if (count < messages.length) {
-        text.textContent = messages[count];
-        body.style.background = bgColors[count];
-        
-        if (count === 1) btn.textContent = "Всё ещё не жми";
-        if (count === 3) btn.textContent = "Точно?";
-        if (count === 5) btn.textContent = "ПОСЛЕДНЕЕ КИМАНО";
-        if (count === 7) btn.textContent = "ЖМИ ЕСЛИ СМЕЛЫЙ";
-        
-        if (count > 4) {
-           btn.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`;
-        }
+      // Если накликали на новый уровень
+      if (clicksThisLevel >= requiredClicks) {
+          // СЛОМАЛИ КНОПКУ
+          brokenButtons++;
+          currentLevel++;
+          clicksThisLevel = 0;
+          
+          // Спавним котиков (количество растет с уровнем)
+          let catsToSpawn = Math.min(5000, currentLevel * 500); 
+          spawnCats(catsToSpawn);
+          
+          // Прячем кнопку на время
+          btn.style.display = 'none';
+          text.textContent = "Ты сломал интернет. Поздравляю! 🏆";
+          text.style.color = "#000";
+          restart.style.display = 'inline-block';
+          
+          setTimeout(() => {
+              // Возвращаем кнопку
+              btn.style.display = 'block';
+              text.style.color = "#fff";
+              restart.style.display = 'none';
+              updateUI();
+          }, 3000);
+          
+      } else {
+          // Просто клик
+          let randomOffsetX = (Math.random() * 40) - 20;
+          let randomOffsetY = (Math.random() * 40) - 20;
+          if (clicksThisLevel > 2) {
+             btn.style.transform = `translate(${randomOffsetX}px, ${randomOffsetY}px)`;
+          }
+          updateUI();
       }
-
-      // ФИНАЛ
-      if (count >= messages.length) {
-        btn.style.display = 'none';
-        text.textContent = "Ты сломал интернет. Поздравляю! 🏆";
-        text.style.color = "#000";
-        text.style.textShadow = "none";
-        
-        // Прячем контейнер с текстом, чтобы не мешал котикам
-        container.style.opacity = '0';
-        container.style.pointerEvents = 'none';
-
-        // Показываем кнопку перезапуска
-        restart.style.display = 'inline-block';
-
-        // ЗАПУСКАЕМ КОТИКОВ
-        spawnCats();
-      }
+      
+      saveGameToServer();
     });
+
+    // Кнопка "Починить" (сброс)
+    restart.addEventListener('click', () => {
+        if(confirm("Начать заново? Твой прогресс сломается!")) {
+            clicksThisLevel = 0;
+            updateUI();
+            btn.style.display = 'block';
+            text.style.color = "#fff";
+            restart.style.display = 'none';
+            saveGameToServer();
+        }
+    });
+
+    window.onload = initGame;
   </script>
 </body>
 </html>
