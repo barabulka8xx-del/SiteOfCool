@@ -8,32 +8,45 @@
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f2027; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
 
-    /* --- ЭКРАН АВТОРИЗАЦИИ --- */
+    /* ЭКРАН АВТОРИЗАЦИИ */
     #auth-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f2027; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .auth-box { background: #1a2a33; padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 350px; border: 2px solid #4facfe; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
     .auth-box h2 { margin-bottom: 15px; color: #4facfe; }
     .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #444; background: #0f2027; color: #fff; font-size: 16px; outline: none; }
     .auth-input:focus { border-color: #4facfe; }
     
-    /* Блок с правилами */
-    .auth-rules { text-align: left; font-size: 11px; color: #888; margin-bottom: 15px; padding: 0 5px; line-height: 1.4; }
-    .auth-rules span { color: #ff0055; font-weight: bold; }
+    #validation-rules { text-align: left; font-size: 12px; color: #888; margin-bottom: 15px; padding: 0 5px; line-height: 1.5; display: none; }
+    .val-item { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; transition: 0.2s; color: #ff0055; }
+    .val-item.valid { color: #00ff00; }
 
-    .btn-auth { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; margin-bottom: 10px; }
+    .btn-auth { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; margin-bottom: 10px; transition: 0.3s; }
+    .btn-auth:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-switch { background: transparent; color: #888; border: none; font-size: 14px; cursor: pointer; text-decoration: underline; }
-    #auth-error { color: #ff0055; font-size: 13px; margin-bottom: 10px; font-weight: bold; display: none; }
+    #auth-error { color: #ff0055; font-size: 14px; margin-bottom: 15px; font-weight: bold; display: none; padding: 10px; border: 1px solid #ff0055; border-radius: 8px; background: rgba(255, 0, 85, 0.1); line-height: 1.3; }
 
-    /* --- ОСТАЛЬНОЙ ИНТЕРФЕЙС --- */
+    /* ОСТАЛЬНОЙ ИНТЕРФЕЙС */
     .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; z-index: 10; }
-    .user-profile { display: flex; align-items: center; gap: 10px; background: rgba(79, 172, 254, 0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #4facfe; }
+    
+    .user-profile { display: flex; align-items: center; gap: 8px; background: rgba(79, 172, 254, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid #4facfe; cursor: pointer; transition: 0.2s; }
+    .user-profile:active { transform: scale(0.95); }
+    .user-avatar { font-size: 18px; }
     .user-name { font-size: 14px; font-weight: bold; color: #4facfe; }
-    .logout-btn { font-size: 12px; color: #ff0055; cursor: pointer; text-decoration: underline; }
-    .btn-info { width: 32px; height: 32px; border-radius: 50%; background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe; color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+
+    /* КОШЕЛЕК */
+    .wallet-area { display: flex; align-items: center; gap: 8px; }
+    .wallet { display: flex; align-items: center; gap: 5px; background: rgba(255, 215, 0, 0.1); padding: 5px 10px; border-radius: 20px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold; font-size: 15px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+    .wallet img { width: 20px; height: 20px; border-radius: 50%; }
+    
+    .btn-daily { background: #ffd700; color: #000; border: none; padding: 6px 10px; border-radius: 10px; font-weight: bold; font-size: 11px; cursor: pointer; animation: pulse 1.5s infinite; display: none; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+    
+    .btn-info { width: 32px; height: 32px; border-radius: 50%; background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe; color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; margin-left: 5px; }
     .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
 
     h1 { font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px; color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center; }
     .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
+    /* БАННЕРЫ (остались без изменений) */
     .banner { width: 100%; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
     .banner:active { transform: scale(0.98); }
     .banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
@@ -62,6 +75,7 @@
     .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
+    /* МОДАЛКИ */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(4px); overflow-y: auto; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #151b22; padding: 25px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; border: 2px solid #4facfe; border-bottom: none; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
@@ -70,20 +84,15 @@
     .modal-icon { font-size: 45px; }
     .modal-title { font-size: 22px; font-weight: bold; color: #fff; }
     .modal-desc { font-size: 13px; color: #aaa; line-height: 1.4; margin-bottom: 5px; }
-    .modal-date { font-size: 11px; color: #4facfe; font-weight: bold; background: rgba(79, 172, 254, 0.1); padding: 4px 10px; border-radius: 10px; border: 1px solid rgba(79, 172, 254, 0.3); margin-bottom: 10px; }
     .btn-play { background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
     .btn-close-modal { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
 
-    .about-content { text-align: left; width: 100%; font-size: 14px; color: #ccc; line-height: 1.5; }
-    .about-content h2 { color: #4facfe; font-size: 18px; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid rgba(79,172,254,0.3); padding-bottom: 5px;}
-    .about-content p { margin-bottom: 10px; }
-    .about-content ul { padding-left: 20px; margin-bottom: 10px; }
-    .about-content .check { color: #00ff00; font-weight: bold; }
-    .about-content .cross { color: #555; font-weight: bold; }
-    .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
-    .tech-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-    .support-box { background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe; border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px; }
-    .copyright { font-size: 11px; color: #666; text-align: center; margin-top: 20px; }
+    /* СТИЛИ ДЛЯ НАСТРОЕК ПРОФИЛЯ */
+    .avatar-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 15px; }
+    .avatar-option { font-size: 24px; padding: 10px; background: #0f2027; border: 2px solid #333; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+    .avatar-option.selected { border-color: #4facfe; background: rgba(79, 172, 254, 0.2); transform: scale(1.1); }
+    .settings-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #444; background: #0f2027; color: #fff; font-size: 16px; outline: none; }
+    .settings-label { align-self: flex-start; font-size: 12px; color: #888; margin-bottom: -5px; margin-left: 5px; }
   </style>
 </head>
 <body>
@@ -93,15 +102,13 @@
     <div class="auth-box">
       <h2 id="auth-title">Вход</h2>
       <div id="auth-error"></div>
-      <input type="text" id="auth-username" class="auth-input" placeholder="Логин">
-      <input type="password" id="auth-password" class="auth-input" placeholder="Пароль">
       
-      <!-- ПРАВИЛА РЕГИСТРАЦИИ -->
-      <div class="auth-rules" id="auth-rules" style="display: none;">
-        <span>Требования:</span><br>
-        • Логин: 3-20 символов (англ. буквы, цифры).<br>
-        • Пароль: минимум 6 символов.<br>
-        • Запрещен спам и создание ботов.
+      <input type="text" id="auth-username" class="auth-input" placeholder="Логин" oninput="validateInputs()">
+      <input type="password" id="auth-password" class="auth-input" placeholder="Пароль" oninput="validateInputs()">
+      
+      <div id="validation-rules">
+        <div class="val-item" id="val-login">❌ Логин: 3-20 символов (без пробелов)</div>
+        <div class="val-item" id="val-password">❌ Пароль: от 6 символов (без пробелов)</div>
       </div>
 
       <button class="btn-auth" id="auth-submit" onclick="submitAuth()">Войти</button>
@@ -113,16 +120,26 @@
   <div id="main-app" style="display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center;">
     
     <div class="top-nav">
-      <div class="user-profile">
-        <span class="user-name" id="user-display">Игрок</span>
-        <span class="logout-btn" onclick="logout()">Выйти</span>
+      <div class="user-profile" onclick="openSettings()">
+        <span class="user-avatar" id="user-avatar-display">😎</span>
+        <span class="user-name" id="user-name-display">Игрок</span>
       </div>
-      <div class="btn-info" onclick="openAbout()">i</div>
+      
+      <div class="wallet-area">
+        <button class="btn-daily" id="btn-daily" onclick="claimDaily()">Забрать 10</button>
+        <div class="wallet">
+          <!-- Убедись, что картинка memcoin.png лежит в корне репозитория -->
+          <img src="memcoin.png" alt="coin" onerror="this.style.display='none'">
+          <span id="global-coins-display">0</span>
+        </div>
+        <div class="btn-info" onclick="openAbout()">i</div>
+      </div>
     </div>
 
     <h1>🚀Наши Проекты🚀</h1>
 
     <div class="container">
+      <!-- ТОП БАННЕР -->
       <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">👑 ТОП ИГРА 👑</div>
@@ -132,6 +149,7 @@
         <div class="banner-icon-box"><div class="banner-icon">📈</div></div>
       </div>
 
+      <!-- НОВИНКА -->
       <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">🔥 НОВИНКА 🔥</div>
@@ -141,6 +159,7 @@
         <div class="banner-icon-box"><div class="banner-icon">⚖️</div></div>
       </div>
 
+      <!-- СЕТКА -->
       <div class="games-list">
         <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Карточная игра за столом.', '10.11.2026')">
           <div class="icon-box"><div class="game-icon">🃏</div></div>
@@ -182,36 +201,56 @@
     </div>
   </div>
 
-  <!-- МОДАЛКИ -->
+  <!-- МОДАЛКА ИГРЫ -->
   <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-icon-box"><div class="modal-icon" id="modal-icon">🎮</div></div>
       <div class="modal-title" id="modal-title">Название</div>
       <div class="modal-desc" id="modal-desc">Описание...</div>
-      <div class="modal-date" id="modal-date">⏱️ Обновлено</div>
       <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
       <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
     </div>
   </div>
 
+  <!-- МОДАЛКА НАСТРОЕК ПРОФИЛЯ -->
+  <div class="modal-overlay" id="settings-modal" onclick="closeSettings(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-title" style="margin-bottom: 10px;">⚙️ Настройки профиля</div>
+      
+      <div class="settings-label">Выбери аватарку:</div>
+      <div class="avatar-grid" id="avatar-grid">
+        <div class="avatar-option" onclick="selectAvatar(this, '😎')">😎</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '🐸')">🐸</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '🐱')">🐱</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '👽')">👽</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '🤖')">🤖</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '👑')">👑</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '🗿')">🗿</div>
+        <div class="avatar-option" onclick="selectAvatar(this, '🦄')">🦄</div>
+      </div>
+
+      <div class="settings-label">Отображаемое имя:</div>
+      <input type="text" id="settings-name" class="settings-input" placeholder="Новый ник" maxlength="20">
+      
+      <div class="settings-label">Новый пароль (если хочешь сменить):</div>
+      <input type="password" id="settings-password" class="settings-input" placeholder="Оставь пустым, чтобы не менять">
+      
+      <button class="btn-play" style="margin-top: 10px;" onclick="saveProfile()">Сохранить</button>
+      <button class="btn-close-modal" onclick="closeSettings(event)">Отмена</button>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА "О ПРОЕКТЕ" -->
   <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
-      <div class="about-content">
-        <p><b>Единая экосистема игр с общим аккаунтом.</b></p>
-        <h2>🧠 О проекте</h2>
-        <p>Мы используем Vanilla JavaScript (ES6+) для создания быстрых интерфейсов.</p>
-        <h2>🗺 Дорожная карта</h2>
-        <ul>
-          <li><span class="check">✔</span> Единая регистрация (JWT).</li>
-          <li><span class="check">✔</span> Синхронизация прогресса.</li>
-          <li><span class="cross">☐</span> Перевод остальных игр на сервер.</li>
-        </ul>
-        <div class="support-box">
-          <h3>✉️ Поддержка</h3>
+      <div style="text-align: left; width: 100%; font-size: 14px; color: #ccc; line-height: 1.5;">
+        <p><b>Единая экосистема игр с общим аккаунтом и валютой (Memcoin).</b></p>
+        <p>Зарабатывай мемкоины за достижения и открывай новые игры!</p>
+        <div style="background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe; border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px;">
           <p style="margin-bottom: 0;">Email: <a href="mailto:chesssupport.lord@gmail.com" style="color: #4facfe;">chesssupport.lord@gmail.com</a></p>
         </div>
-        <div class="copyright">© 2026 SiteOfCool. Все права защищены.</div>
+        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 20px;">© 2026 SiteOfCool. Все права защищены.</div>
       </div>
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
     </div>
@@ -226,37 +265,52 @@
     let currentUsername = localStorage.getItem('auth_username');
     let isRegisterMode = false;
     let currentGameUrl = '';
+    let selectedAvatar = '😎';
 
+    // --- АВТОРИЗАЦИЯ ---
     function toggleAuthMode() {
         isRegisterMode = !isRegisterMode;
         document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Вход';
         document.getElementById('auth-submit').innerText = isRegisterMode ? 'Создать аккаунт' : 'Войти';
         document.getElementById('auth-switch').innerText = isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
         document.getElementById('auth-error').style.display = 'none';
+        document.getElementById('validation-rules').style.display = isRegisterMode ? 'block' : 'none';
+        validateInputs();
+    }
+
+    function validateInputs() {
+        if (!isRegisterMode) {
+            document.getElementById('auth-submit').disabled = false;
+            document.getElementById('auth-submit').style.opacity = '1';
+            return;
+        }
+        const user = document.getElementById('auth-username').value;
+        const pass = document.getElementById('auth-password').value;
         
-        // Показываем/скрываем правила
-        document.getElementById('auth-rules').style.display = isRegisterMode ? 'block' : 'none';
+        const loginValid = /^[a-zA-Z0-9_]{3,20}$/.test(user);
+        const loginEl = document.getElementById('val-login');
+        if (loginValid) { loginEl.innerHTML = '✔️ Логин: 3-20 символов (без пробелов)'; loginEl.classList.add('valid'); } 
+        else { loginEl.innerHTML = '❌ Логин: 3-20 символов (без пробелов)'; loginEl.classList.remove('valid'); }
+
+        const passValid = pass.length >= 6 && !/\s/.test(pass);
+        const passEl = document.getElementById('val-password');
+        if (passValid) { passEl.innerHTML = '✔️ Пароль: от 6 символов (без пробелов)'; passEl.classList.add('valid'); } 
+        else { passEl.innerHTML = '❌ Пароль: от 6 символов (без пробелов)'; passEl.classList.remove('valid'); }
+
+        const btn = document.getElementById('auth-submit');
+        btn.disabled = !(loginValid && passValid);
+        btn.style.opacity = (loginValid && passValid) ? '1' : '0.5';
     }
 
     async function submitAuth() {
         const user = document.getElementById('auth-username').value.trim();
         const pass = document.getElementById('auth-password').value.trim();
         const err = document.getElementById('auth-error');
-        
         if (!user || !pass) { err.innerText = "Заполните все поля!"; err.style.display = 'block'; return; }
 
-        // Быстрая проверка на клиенте (чтобы не гонять запросы зря)
-        if (isRegisterMode) {
-            if (!/^[a-zA-Z0-9_]{3,20}$/.test(user)) {
-                err.innerText = "Логин: 3-20 символов (англ. буквы, цифры, _)"; err.style.display = 'block'; return;
-            }
-            if (pass.length < 6) {
-                err.innerText = "Пароль должен быть не менее 6 символов"; err.style.display = 'block'; return;
-            }
-        }
-
         const endpoint = isRegisterMode ? '/register' : '/login';
-        
+        err.style.display = 'none';
+
         try {
             const res = await fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
@@ -276,7 +330,7 @@
                 err.style.display = 'block';
             }
         } catch (e) {
-            err.innerText = "Сервер недоступен.";
+            err.innerHTML = "❌ ОШИБКА СЕРВЕРА<br><span style='font-size:11px; font-weight:normal; color:#aaa;'>Сервер выключен или нет связи.</span>";
             err.style.display = 'block';
         }
     }
@@ -287,11 +341,51 @@
         location.reload();
     }
 
+    // --- ПРОФИЛЬ И ВАЛЮТА ---
     function startApp() {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
-        document.getElementById('user-display').innerText = currentUsername;
-        loadCapital();
+        loadProfile();
+        loadCapital(); // Капитал из Биржи
+    }
+
+    async function loadProfile() {
+        try {
+            const res = await fetch(`${API_URL}/user/profile`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('user-name-display').innerText = data.displayName;
+                document.getElementById('user-avatar-display').innerText = data.avatar;
+                document.getElementById('global-coins-display').innerText = data.coins;
+                selectedAvatar = data.avatar;
+                
+                // Показываем кнопку ежедневного бонуса
+                if (data.canClaimDaily) {
+                    document.getElementById('btn-daily').style.display = 'block';
+                } else {
+                    document.getElementById('btn-daily').style.display = 'none';
+                }
+            }
+        } catch(e) { console.error('Ошибка загрузки профиля', e); }
+    }
+
+    async function claimDaily() {
+        try {
+            const res = await fetch(`${API_URL}/user/claim_daily`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('global-coins-display').innerText = data.newBalance;
+                document.getElementById('btn-daily').style.display = 'none';
+                alert("🎉 Вы получили 10 мемкоинов!");
+            } else {
+                alert(data.error);
+            }
+        } catch(e) { alert("Ошибка сервера"); }
     }
 
     async function loadCapital() {
@@ -305,24 +399,70 @@
                 if (data.portfolio && data.gamesData) {
                     for (const id in data.portfolio) {
                         const game = data.gamesData.find(g => g.id === id);
-                        if (game && data.portfolio[id].shares > 0) {
-                            netWorth += data.portfolio[id].shares * game.online;
-                        }
+                        if (game && data.portfolio[id].shares > 0) netWorth += data.portfolio[id].shares * game.online;
                     }
                 }
                 document.getElementById('banner-capital').innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
+            } else {
+                document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>Ошибка сервера</span>";
             }
         } catch(e) {
-            document.getElementById('banner-capital').innerText = "Ошибка загрузки";
+            document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>";
         }
     }
 
-    function openModal(url, title, icon, desc, date) {
+    // --- НАСТРОЙКИ ПРОФИЛЯ ---
+    function openSettings() {
+        document.getElementById('settings-name').value = document.getElementById('user-name-display').innerText;
+        // Подсвечиваем текущую аватарку
+        document.querySelectorAll('.avatar-option').forEach(el => {
+            if (el.innerText === selectedAvatar) el.classList.add('selected');
+            else el.classList.remove('selected');
+        });
+        document.getElementById('settings-modal').classList.add('active');
+    }
+
+    function closeSettings(event) {
+        if (event && event.target.id !== 'settings-modal') return;
+        document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function selectAvatar(el, emoji) {
+        document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedAvatar = emoji;
+    }
+
+    async function saveProfile() {
+        const newName = document.getElementById('settings-name').value.trim();
+        const newPass = document.getElementById('settings-password').value.trim();
+        
+        if (!newName) { alert("Ник не может быть пустым!"); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/user/update_profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ displayName: newName, avatar: selectedAvatar, newPassword: newPass || undefined })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert("Профиль успешно обновлен!");
+                closeSettings();
+                loadProfile(); // Обновляем данные в меню
+            } else {
+                alert(data.error);
+            }
+        } catch(e) { alert("Ошибка сервера при сохранении"); }
+    }
+
+    // --- МОДАЛКИ ИГР ---
+    function openModal(url, title, icon, desc) {
       currentGameUrl = url;
       document.getElementById('modal-title').textContent = title;
       document.getElementById('modal-icon').textContent = icon;
       document.getElementById('modal-desc').textContent = desc;
-      document.getElementById('modal-date').innerHTML = `⏱️ Обновлено: ${date || '10.11.2026'}`;
       document.getElementById('game-modal').classList.add('active');
     }
 
