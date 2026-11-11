@@ -121,6 +121,7 @@
       align-items: center;
       z-index: 2;
       position: relative;
+      width: 100%;
     }
 
     .defendant-avatar {
@@ -174,7 +175,7 @@
     }
 
     .gavel-container {
-      transform: rotateX(-45deg) translateY(-20px);
+      transform: rotateX(-45deg) translateY(-20px) translateX(40px);
       cursor: pointer;
       transition: 0.1s;
       position: relative;
@@ -209,20 +210,22 @@
       75% { transform: rotateX(45deg) translateX(5px); }
     }
 
-    /* --- ПАПКА С ДЕЛОМ НА СТОЛЕ --- */
+    /* --- ПАПКА С ДЕЛОМ (ЛИЦОМ К ЭКРАНУ) --- */
     .folder {
       position: absolute;
-      width: 140px;
-      height: 90px;
+      width: 160px;
+      height: 100px;
       background: #d4a373;
       border-radius: 4px 8px 8px 8px;
-      transform: rotateX(-45deg) translateZ(5px) translateY(10px) rotateZ(-5deg);
+      /* Убрали жесткий 3D-наклон, теперь она лежит ровно, но с легким наклоном для объема */
+      transform: rotateX(-25deg) translateZ(10px) translateX(-40px) translateY(10px) rotateZ(-3deg);
       box-shadow: 0 10px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
-      padding: 10px 8px;
-      left: 20px;
+      padding: 12px 10px;
+      left: 10px;
       border: 1px solid #b5835a;
+      z-index: 4;
     }
     
     .folder::before {
@@ -230,7 +233,7 @@
       position: absolute;
       top: -10px;
       left: 0;
-      width: 50px;
+      width: 60px;
       height: 15px;
       background: #d4a373;
       border-radius: 5px 5px 0 0;
@@ -240,25 +243,25 @@
 
     .crime-title {
       color: #cc0000;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 900;
       margin-bottom: 4px;
       text-transform: uppercase;
       text-align: center;
-      line-height: 1;
+      line-height: 1.1;
       word-break: break-word;
     }
 
     .crime-desc {
-      font-size: 9px;
+      font-size: 10px;
       color: #222;
-      line-height: 1.1;
+      line-height: 1.2;
       text-align: center;
       font-weight: bold;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
     }
 
@@ -348,7 +351,7 @@
       100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
     }
 
-    /* --- НОВЫЕ АНИМАЦИИ ПРИГОВОРОВ --- */
+    /* --- АНИМАЦИИ ПРИГОВОРОВ --- */
     
     /* 1. В Космос (Ракета) */
     .rocket-anim {
@@ -370,24 +373,25 @@
     }
     .rocket-show { opacity: 1; transition: 0.2s; }
 
-    /* 2. Виновен (Полицейский уводит) */
+    /* 2. Виновен (Полицейский и Арест) */
     .police-anim {
       position: absolute;
       font-size: 50px;
       bottom: 10px;
-      right: -100px;
+      right: -100px; /* Изначально за экраном справа */
       z-index: 3;
-      transition: 0.4s ease-out;
+      transition: right 0.4s ease-out; /* Выезжает плавно */
     }
-    .police-show { right: -40px; }
+    .police-show { right: -40px; } /* Останавливается рядом с подсудимым */
     
-    .arrest-anim {
-      animation: arrested 1.5s forwards ease-in-out;
+    /* Анимация совместного ухода */
+    .arrest-group-anim {
+      animation: arrestedGroup 1.5s forwards ease-in-out;
     }
-    @keyframes arrested {
+    @keyframes arrestedGroup {
       0% { transform: translate(0, 0) scale(1); opacity: 1; }
-      20% { transform: translate(-10px, 0) scale(1); opacity: 1; } /* Коп хватает */
-      100% { transform: translate(250px, 0) scale(0.8); opacity: 0; } /* Уводят */
+      20% { transform: translate(-10px, 0) scale(1); opacity: 1; }
+      100% { transform: translate(300px, 0) scale(0.8); opacity: 0; }
     }
 
     /* 3. Оправдать (Исчезновение) */
@@ -433,7 +437,7 @@
 
     <div class="desk-wrapper">
       <div class="desk-top" id="desk">
-        <!-- Раскрытая папка с делом -->
+        <!-- Раскрытая папка с делом (теперь лицом к экрану) -->
         <div class="folder">
           <div class="crime-title" id="crime-title">Дело №1</div>
           <div class="crime-desc" id="crime-desc">Загрузка дела...</div>
@@ -516,6 +520,7 @@
     const elPolice = document.getElementById('police');
     const elGavel = document.getElementById('gavel-btn');
     const elDesk = document.getElementById('desk');
+    const elDefArea = document.getElementById('defendant-area');
 
     function loadGame() {
       const saved = localStorage.getItem('MEME_COURT_SAVE');
@@ -537,20 +542,19 @@
     }
 
     function nextCase() {
-      // Сбрасываем все анимации и элементы
+      // Полный сброс всех элементов к изначальному состоянию
       elAvatar.className = 'defendant-avatar';
       elAvatar.innerText = '🐸';
       elAvatar.style.filter = '';
       
       elRocket.className = 'rocket-anim';
-      elRocket.innerText = '🚀';
-      
       elPolice.className = 'police-anim';
-      elPolice.innerText = '👮‍♂️';
+      
+      elDefArea.className = 'defendant-area'; // Сбрасываем группу ареста
 
       document.getElementById('reaction-text').classList.remove('show');
       
-      // Рандомим
+      // Рандомим нового подсудимого и дело
       const randomDefendant = DEFENDANTS[Math.floor(Math.random() * DEFENDANTS.length)];
       currentCrime = CRIMES[Math.floor(Math.random() * CRIMES.length)];
       
@@ -562,7 +566,6 @@
       canVerdict = true;
     }
 
-    // Функция удара молотком
     function strikeGavel(callback) {
       elGavel.classList.add('strike');
       elDesk.classList.add('shake');
@@ -570,7 +573,7 @@
       setTimeout(() => {
         elGavel.classList.remove('strike');
         elDesk.classList.remove('shake');
-        if (callback) callback(); // Вызываем коллбэк после удара
+        if (callback) callback(); 
       }, 300);
     }
 
@@ -578,12 +581,10 @@
       if (!canVerdict) return; 
       canVerdict = false;
 
-      // Сначала бьем молотком, потом запускаем анимацию
       strikeGavel(() => {
         playVerdictAnimation(type);
       });
 
-      // Начисляем монеты
       let reward = 0;
       if (type === 'innocent') reward = 10;
       if (type === 'guilty') reward = 20;
@@ -594,38 +595,36 @@
       saveGame();
       showFloatingCoin(reward);
 
-      // Показываем текст реакции
       const reactionBox = document.getElementById('reaction-text');
       const reactionsList = REACTIONS[type];
       reactionBox.innerText = reactionsList[Math.floor(Math.random() * reactionsList.length)];
       
       setTimeout(() => {
         reactionBox.classList.add('show');
-      }, 400); // Чуть позже удара молотка
+      }, 400); 
     }
 
     function playVerdictAnimation(type) {
       if (type === 'space') {
-        // 1. КОСМОС: Ракета выезжает, подсудимый садится и улетает
         elRocket.classList.add('rocket-show');
         setTimeout(() => {
           elAvatar.classList.add('launch-anim');
         }, 200);
         
       } else if (type === 'guilty') {
-        // 2. ВИНОВЕН: Полицейский выбегает и уводит
+        // 1. Полицейский выезжает
         elPolice.classList.add('police-show');
+        
+        // 2. Через полсекунды (когда он подъехал) они вместе уезжают
         setTimeout(() => {
-          elAvatar.classList.add('arrest-anim');
-          setTimeout(() => { elPolice.style.opacity = '0'; }, 800);
-        }, 300);
+          // Применяем анимацию ухода ко ВСЕЙ зоне (полицейский + подсудимый)
+          elDefArea.classList.add('arrest-group-anim');
+        }, 500);
 
       } else if (type === 'innocent') {
-        // 3. ОПРАВДАТЬ: Просто исчезает (растворяется)
         elAvatar.classList.add('fade-out');
       }
 
-      // Через 2.5 секунды загружаем новое дело
       setTimeout(() => {
         nextCase();
       }, 2800);
@@ -645,7 +644,6 @@
       setTimeout(() => coin.remove(), 1000);
     }
 
-    // Позволяем бить молотком просто так (по клику)
     elGavel.onclick = () => {
       if (canVerdict) strikeGavel();
     };
