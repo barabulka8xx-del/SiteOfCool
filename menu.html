@@ -177,7 +177,7 @@
 
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
-    /* --- МОДАЛЬНОЕ ОКНО (СНИЗУ, ПРЯМОУГОЛЬНОЕ) --- */
+    /* --- МОДАЛЬНОЕ ОКНО (СНИЗУ) --- */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center;
@@ -262,55 +262,62 @@
       </div>
     </div>
 
-    <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
-    <div class="banner banner-new" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!', '10.11.2026')">
+    <!-- 2. НОВИНКА (ГОЛУБАЯ) - ТЕПЕРЬ МЕМНЫЙ СУД -->
+    <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами в неоновом зале суда. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
       <div class="banner-info">
         <div class="banner-badge">🔥 НОВИНКА 🔥</div>
-        <div class="banner-title">Битва Мемов</div>
-        <div class="banner-desc">Карточная игра за столом с ботами.</div>
+        <div class="banner-title">Мемный Суд</div>
+        <div class="banner-desc">Сверши правосудие над мемами.</div>
       </div>
       <div class="banner-icon-box">
-        <div class="banner-icon">🃏</div>
+        <div class="banner-icon">⚖️</div>
       </div>
     </div>
 
-    <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
+    <!-- СЕТКА ОСТАЛЬНЫХ ИГР (ОТСОРТИРОВАНА ОТ НОВЫХ К СТАРЫМ) -->
     <div class="games-list">
       
-      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!', '10.11.2026')">
-        <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
-        <div class="game-title">Напиток-Миллионера</div>
-        <div class="game-desc">Генератор дорогих коктейлей.</div>
+      <!-- Битва Мемов (самая свежая из сетки) -->
+      <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!', '10.11.2026')">
+        <div class="icon-box"><div class="game-icon">🃏</div></div>
+        <div class="game-title">Битва Мемов</div>
+        <div class="game-desc">Карточная игра за столом.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '10.11.2026')">
-        <div class="icon-box"><div class="game-icon">😈🔴</div></div>
-        <div class="game-title">Опасная кнопка</div>
-        <div class="game-desc">То, что нельзя нажимать.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.', '10.11.2026')">
-        <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
-        <div class="game-title">Управление Вселенной</div>
-        <div class="game-desc">Квадратные коты и хаос.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '10.11.2026')">
-        <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
-        <div class="game-title">Генератор Отмазок</div>
-        <div class="game-desc">Железобетонные причины.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.', '10.11.2026')">
+      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.', '08.11.2026')">
         <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
         <div class="game-title">Гравитация</div>
         <div class="game-desc">Создавай планеты и черные дыры.</div>
       </div>
 
-      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.', '10.11.2026')">
+      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.', '05.11.2026')">
+        <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
+        <div class="game-title">Управление Вселенной</div>
+        <div class="game-desc">Квадратные коты и хаос.</div>
+      </div>
+
+      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.', '02.11.2026')">
         <div class="icon-box"><div class="game-icon">💣💥</div></div>
         <div class="game-title">Кнопка Апокалипсиса</div>
         <div class="game-desc">Уничтожь 8 миллиардов человек.</div>
+      </div>
+
+      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!', '01.11.2026')">
+        <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
+        <div class="game-title">Напиток-Миллионера</div>
+        <div class="game-desc">Генератор дорогих коктейлей.</div>
+      </div>
+
+      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '28.10.2026')">
+        <div class="icon-box"><div class="game-icon">😈🔴</div></div>
+        <div class="game-title">Опасная кнопка</div>
+        <div class="game-desc">То, что нельзя нажимать.</div>
+      </div>
+
+      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '20.10.2026')">
+        <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
+        <div class="game-title">Генератор Отмазок</div>
+        <div class="game-desc">Железобетонные причины.</div>
       </div>
 
     </div>
