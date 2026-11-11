@@ -16,45 +16,39 @@
       padding-bottom: 30px;
     }
 
-    /* --- ШАПКА (Старый стиль) --- */
+    /* --- ШАПКА (Компактная) --- */
     .header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(15, 32, 39, 0.95);
       backdrop-filter: blur(10px);
-      padding: 15px;
+      padding: 10px 15px;
       border-bottom: 1px solid rgba(79, 172, 254, 0.3);
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-      display: flex; flex-direction: column; gap: 10px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
 
-    .header-top {
-      display: flex; flex-direction: column;
-    }
-
-    .balance-label { font-size: 11px; color: #888; text-transform: uppercase; }
-    .balance-val { font-size: 28px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); transition: 0.2s; }
+    .balance-box { display: flex; flex-direction: column; }
+    .balance-label { font-size: 10px; color: #888; text-transform: uppercase; line-height: 1; margin-bottom: 2px; }
+    .balance-val { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); transition: 0.2s; line-height: 1; }
     .balance-val.negative { color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.3); }
 
-    .actions-bar {
-      display: flex; gap: 8px; width: 100%;
-    }
-
+    .actions-bar { display: flex; gap: 6px; }
     .btn-action {
-      flex: 1; padding: 12px 5px;
-      border: none; border-radius: 10px;
-      font-weight: bold; font-size: 13px; cursor: pointer;
-      transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 8px 12px; border: none; border-radius: 8px;
+      font-weight: bold; font-size: 11px; cursor: pointer;
+      transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;
+      white-space: nowrap;
     }
     .btn-action:active { transform: scale(0.95); }
     
     .btn-create { background: rgba(0, 255, 0, 0.15); color: #00ff00; border: 1px solid #00ff00; }
     .btn-create:disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; color: #555; background: rgba(0,0,0,0.2); }
-    .btn-reset { flex: 0.6; background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid #ff0055; }
+    .btn-reset { background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid #ff0055; }
 
-    /* --- СЕТКА ИГР (Старый стиль) --- */
+    /* --- СЕТКА ИГР --- */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
       gap: 12px;
       padding: 15px;
       max-width: 600px;
@@ -69,10 +63,10 @@
       display: flex; flex-direction: column; align-items: center;
       transition: 0.2s; position: relative; overflow: hidden;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      cursor: pointer;
     }
     .game-card:hover { border-color: #4facfe; transform: translateY(-3px); }
     
-    /* Стиль для твоей созданной игры */
     .game-card.custom-game {
       border: 2px dashed #ffeb3b;
       background: linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(32, 58, 67, 0.8));
@@ -89,30 +83,70 @@
     .game-price { font-size: 15px; font-weight: bold; color: #ffd700; margin-bottom: 10px; }
     
     .portfolio-info {
-      font-size: 11px; color: #aaa; margin-bottom: 10px; text-align: center;
+      font-size: 11px; color: #aaa; margin-bottom: 5px; text-align: center;
       background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px; width: 100%;
     }
 
-    .trade-controls {
-      display: flex; gap: 5px; width: 100%;
-    }
-    .btn-trade {
-      flex: 1; padding: 8px 0; border: none; border-radius: 8px;
-      font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.1s;
-      color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-    .btn-trade:active { transform: scale(0.9); }
-    .btn-buy { background: #00b09b; }
-    .btn-sell { background: #cb2d3e; }
-    .btn-trade:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
-    
     .btn-upgrade {
-      width: 100%; margin-top: 8px; padding: 8px 0; border: none; border-radius: 8px;
+      width: 100%; margin-top: 5px; padding: 8px 0; border: none; border-radius: 8px;
       background: linear-gradient(90deg, #8E2DE2, #4A00E0); color: #fff; font-weight: bold; font-size: 12px; cursor: pointer;
       box-shadow: 0 0 10px rgba(142, 45, 226, 0.5); transition: 0.2s;
     }
     .btn-upgrade:active { transform: scale(0.95); }
     .btn-upgrade:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* --- МОДАЛЬНОЕ ОКНО --- */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center;
+      z-index: 100; backdrop-filter: blur(8px); padding: 15px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-content {
+      background: #1a2a33; padding: 20px; border-radius: 20px;
+      width: 100%; max-width: 400px; border: 2px solid #4facfe;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      max-height: 90vh; overflow-y: auto;
+    }
+    @keyframes slideUp { from { transform: translateY(50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+    .modal-icon { font-size: 50px; }
+    .modal-title { font-size: 20px; font-weight: bold; }
+    
+    /* График */
+    .chart-container {
+      width: 100%; height: 120px; background: #0f2027;
+      border-radius: 12px; border: 1px solid #2c5364;
+      position: relative; overflow: hidden;
+    }
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .modal-stats { width: 100%; display: flex; justify-content: space-between; font-size: 13px; padding: 0 5px; }
+    .stat-item { display: flex; flex-direction: column; align-items: center; }
+    .stat-label { color: #888; font-size: 11px; }
+    .stat-val { font-weight: bold; font-size: 14px; }
+
+    .trade-controls { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
+    .btn-trade {
+      flex: 1; padding: 12px 0; border: none; border-radius: 10px;
+      font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.1s;
+      color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .btn-trade:active { transform: scale(0.95); }
+    .btn-buy { background: #00b09b; }
+    .btn-sell { background: #cb2d3e; }
+    .btn-trade:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+    
+    .btn-close-modal {
+      background: transparent; border: 1px solid #444; color: #ccc;
+      padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold;
+      width: 100%; cursor: pointer; margin-top: 5px; transition: 0.2s;
+    }
+    .btn-close-modal:active { background: #333; }
 
     /* ПЛАВАЮЩИЙ ТЕКСТ */
     .floating-income {
@@ -129,23 +163,56 @@
 <body>
 
   <div class="header">
-    <div class="header-top">
+    <div class="balance-box">
       <div class="balance-label">Баланс</div>
       <div class="balance-val" id="balance-display">0 💵</div>
     </div>
-
     <div class="actions-bar">
-      <button class="btn-action btn-create" onclick="createGame()" id="btn-create">➕ Создать игру</button>
+      <button class="btn-action btn-create" onclick="createGame()" id="btn-create">➕ Создать</button>
       <button class="btn-action btn-reset" onclick="resetGame()">🔄 Сброс</button>
     </div>
   </div>
 
   <div class="games-grid" id="games-grid"></div>
 
+  <!-- МОДАЛЬНОЕ ОКНО -->
+  <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-icon" id="modal-icon">🎮</div>
+      <div class="modal-title" id="modal-title">Название игры</div>
+      
+      <div class="chart-container">
+        <canvas id="game-chart"></canvas>
+      </div>
+      
+      <div class="modal-stats">
+        <div class="stat-item">
+          <span class="stat-label">Онлайн</span>
+          <span class="stat-val" id="modal-online">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Цена</span>
+          <span class="stat-val" id="modal-price" style="color: #ffd700;">0 💵</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">У тебя</span>
+          <span class="stat-val" id="modal-shares">0 шт.</span>
+        </div>
+      </div>
+
+      <div class="trade-controls">
+        <button class="btn-trade btn-buy" id="modal-btn-buy">Купить</button>
+        <button class="btn-trade btn-sell" id="modal-btn-sell">Продать</button>
+      </div>
+      
+      <button class="btn-close-modal" onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+
   <script>
     const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
+    let currentGameId = null;
 
-    // ПОЛНЫЙ СПИСОК 25 БАЗОВЫХ ИГР
     const BASE_GAMES = [
       { id: 'grow_a_garden', name: 'Grow a Garden', icon: '🌱', baseOnline: 1058604 },
       { id: 'dress_to_impress', name: 'Dress to Impress', icon: '👗', baseOnline: 473514 },
@@ -174,13 +241,7 @@
       { id: 'epic_minigames', name: 'Epic Minigames', icon: '🎮', baseOnline: 1000 }
     ];
 
-    let state = {
-      balance: 1000,
-      portfolio: {},
-      gamesData: [],
-      nextGamePrice: 10000 
-    };
-
+    let state = { balance: 1000, portfolio: {}, gamesData: [], nextGamePrice: 10000 };
     let gameLoopInterval = null;
 
     function init() {
@@ -188,30 +249,21 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          
-          // Восстанавливаем баланс и портфель
           state.balance = parsed.balance !== undefined ? parsed.balance : 1000;
           state.portfolio = parsed.portfolio || {};
           state.nextGamePrice = parsed.nextGamePrice !== undefined ? parsed.nextGamePrice : 10000;
           
-          // САМАЯ ВАЖНАЯ ПРОВЕРКА (АНТИ-БАГ):
-          // Если в сейве нет поля 'gamesData', или там меньше 25 игр, или первая игра не имеет поля 'name' 
-          // (что и вызывало undefined), мы стираем старые игры и грузим чистую базу.
           if (!parsed.gamesData || parsed.gamesData.length < 25 || !parsed.gamesData[0].name) {
-             console.warn("Сломанный сейв обнаружен. Восстанавливаем базу игр.");
              state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
              state.gamesData.forEach(g => g.online = g.baseOnline);
           } else {
             state.gamesData = parsed.gamesData;
           }
-          
         } catch(e) {
-          console.error("Ошибка парсинга сейва:", e);
           state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
           state.gamesData.forEach(g => g.online = g.baseOnline);
         }
       } else {
-        // Первый запуск
         state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
         state.gamesData.forEach(g => g.online = g.baseOnline);
       }
@@ -220,113 +272,187 @@
       startGameLoop();
     }
 
-    function saveGame() {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    }
+    function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
 
     function createGame() {
-      if (state.balance < state.nextGamePrice) {
-        alert(`Недостаточно средств! Нужно: ${state.nextGamePrice.toLocaleString('ru-RU')} 💵`);
-        return;
-      }
-
+      if (state.balance < state.nextGamePrice) { alert(`Недостаточно средств! Нужно: ${state.nextGamePrice.toLocaleString('ru-RU')} 💵`); return; }
       state.balance -= state.nextGamePrice;
-
       const newGameId = 'custom_' + Date.now();
-      const newGame = {
-        id: newGameId,
-        name: 'Твоя игра ' + (state.gamesData.filter(g => g.id.startsWith('custom_')).length + 1),
-        icon: '🛠️',
-        baseOnline: 100, 
-        online: 100,
-        isCustom: true,
-        upgrades: 0
-      };
-
-      state.gamesData.unshift(newGame); // Созданную игру ставим в начало
-      state.nextGamePrice += 50000; // Следующая игра +50к
-
-      updateUI();
-      saveGame();
+      state.gamesData.unshift({
+        id: newGameId, name: 'Твоя игра ' + (state.gamesData.filter(g => g.id.startsWith('custom_')).length + 1),
+        icon: '🛠️', baseOnline: 100, online: 100, isCustom: true, upgrades: 0
+      });
+      state.nextGamePrice += 50000;
+      updateUI(); saveGame();
     }
 
-    function upgradeGame(gameId) {
+    function upgradeGame(gameId, e) {
+      if(e) e.stopPropagation();
+      const game = state.gamesData.find(g => g.id === gameId);
+      if (!game) return;
+      const upgradeCost = state.nextGamePrice;
+      if (state.balance < upgradeCost) { alert(`Недостаточно средств для обновы! Нужно: ${upgradeCost.toLocaleString('ru-RU')} 💵`); return; }
+      state.balance -= upgradeCost;
+      game.upgrades = (game.upgrades || 0) + 1;
+      game.baseOnline += 10; game.online += 10;
+      updateUI(); saveGame();
+    }
+
+    // ЛОГИКА МОДАЛЬНОГО ОКНА
+    function openModal(gameId) {
+      currentGameId = gameId;
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
 
-      const upgradeCost = state.nextGamePrice;
+      document.getElementById('modal-icon').innerText = game.icon;
+      document.getElementById('modal-title').innerText = game.name;
+      updateModalData();
+      
+      document.getElementById('game-modal').classList.add('active');
+      drawChart(game);
+    }
 
-      if (state.balance < upgradeCost) {
-        alert(`Недостаточно средств для обновы! Нужно: ${upgradeCost.toLocaleString('ru-RU')} 💵`);
-        return;
+    function updateModalData() {
+      if (!currentGameId) return;
+      const game = state.gamesData.find(g => g.id === currentGameId);
+      if (!game) return;
+
+      const shares = state.portfolio[game.id] ? state.portfolio[game.id].shares : 0;
+      
+      document.getElementById('modal-online').innerText = game.online.toLocaleString('ru-RU');
+      document.getElementById('modal-price').innerText = game.online.toLocaleString('ru-RU') + ' 💵';
+      document.getElementById('modal-shares').innerText = shares + ' шт.';
+
+      const btnBuy = document.getElementById('modal-btn-buy');
+      const btnSell = document.getElementById('modal-btn-sell');
+
+      btnBuy.innerText = `Купить (${game.online.toLocaleString('ru-RU')})`;
+      btnBuy.disabled = state.balance < game.online;
+      
+      btnSell.disabled = shares === 0;
+
+      btnBuy.onclick = () => { buy(game.id); updateModalData(); };
+      btnSell.onclick = () => { sell(game.id); updateModalData(); };
+    }
+
+    function closeModal(event) {
+      if (event && event.target.id !== 'game-modal') return;
+      document.getElementById('game-modal').classList.remove('active');
+      currentGameId = null;
+    }
+
+    // ФУНКЦИЯ ОТРИСОВКИ ГРАФИКА
+    function drawChart(game) {
+      const canvas = document.getElementById('game-chart');
+      const ctx = canvas.getContext('2d');
+      
+      // Делаем canvas резким на мобилках
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      ctx.scale(2, 2);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      // Генерируем фейковые точки для графика (30 точек)
+      const points = [];
+      let currentVal = game.online;
+      for (let i = 0; i < 30; i++) {
+        // Небольшое колебание вокруг текущего онлайна
+        const noise = (Math.random() - 0.5) * (game.online * 0.05); 
+        points.push(currentVal + noise);
+        currentVal += noise;
+      }
+      // Последняя точка = текущий онлайн
+      points[points.length - 1] = game.online;
+
+      // Находим мин/макс для масштабирования
+      const maxVal = Math.max(...points) * 1.05;
+      const minVal = Math.min(...points) * 0.95;
+      const range = maxVal - minVal || 1;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Рисуем сетку
+      ctx.strokeStyle = 'rgba(79, 172, 254, 0.1)';
+      ctx.lineWidth = 1;
+      for(let i=1; i<4; i++) {
+        ctx.beginPath(); ctx.moveTo(0, h * i / 4); ctx.lineTo(w, h * i / 4); ctx.stroke();
       }
 
-      state.balance -= upgradeCost;
-      
-      game.upgrades = (game.upgrades || 0) + 1;
-      game.baseOnline += 10; 
-      game.online += 10;
+      // Рисуем линию
+      ctx.beginPath();
+      ctx.strokeStyle = game.online >= game.baseOnline ? '#00ff00' : '#ff0055';
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
 
-      updateUI();
-      saveGame();
+      points.forEach((val, i) => {
+        const x = (i / (points.length - 1)) * w;
+        const y = h - ((val - minVal) / range) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Заливка под графиком
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      if (game.online >= game.baseOnline) {
+        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.3)');
+        gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+      } else {
+        gradient.addColorStop(0, 'rgba(255, 0, 85, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 0, 85, 0)');
+      }
+      ctx.fillStyle = gradient;
+      ctx.fill();
     }
 
     function buy(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
-
       const price = game.online;
       if (state.balance < price) {
         showFloatIncome('-', price, '#ff0055', document.getElementById('balance-display'));
         return;
       }
-
       state.balance -= price;
       state.portfolio[gameId] = state.portfolio[gameId] || { shares: 0 };
       state.portfolio[gameId].shares += 1;
-
-      updateUI();
-      saveGame();
+      updateUI(); saveGame();
     }
 
     function sell(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
-
       if (!state.portfolio[gameId] || state.portfolio[gameId].shares <= 0) return;
-
       const price = game.online;
       state.balance += price;
       state.portfolio[gameId].shares -= 1;
-
-      updateUI();
-      saveGame();
+      updateUI(); saveGame();
     }
 
     function startGameLoop() {
       if (gameLoopInterval) clearInterval(gameLoopInterval);
-
       gameLoopInterval = setInterval(() => {
         let totalIncome = 0;
-
         state.gamesData.forEach(game => {
           if (game.isCustom) {
-            // Твои игры: 50 на 50 летят или падают
             const isFlying = Math.random() > 0.5;
-            
             if (isFlying) {
-              const income = Math.floor(Math.random() * 20) + 5; // +5 до +25
+              const income = Math.floor(Math.random() * 20) + 5;
               game.online += income;
               totalIncome += income;
             } else {
-              const loss = Math.floor(Math.random() * 15) + 5; // -5 до -20
+              const loss = Math.floor(Math.random() * 15) + 5;
               game.online = Math.max(1, game.online - loss);
               totalIncome -= loss;
             }
-            
             if (game.online < 1) game.online = 1;
           } else {
-            // Обычные игры просто колеблются
             const change = Math.floor(Math.random() * 21) - 10;
             game.online = Math.max(0, game.online + change);
           }
@@ -334,46 +460,42 @@
 
         if (totalIncome !== 0) {
           state.balance += totalIncome;
-          
           if (totalIncome > 0) {
              showFloatIncome('+', totalIncome, '#00ff00', document.getElementById('balance-display'));
           } else {
              showFloatIncome('', totalIncome, '#ff0055', document.getElementById('balance-display'));
           }
         }
-
+        
         updateUI();
+        if (currentGameId) { // Если открыто окно, обновляем в нем данные
+          updateModalData();
+          const game = state.gamesData.find(g => g.id === currentGameId);
+          if(game) drawChart(game); 
+        }
         saveGame();
-
-      }, 3000); // Каждые 3 секунды
+      }, 3000);
     }
 
     function updateUI() {
       const balEl = document.getElementById('balance-display');
       balEl.innerText = state.balance.toLocaleString('ru-RU') + ' 💵';
-      
-      if (state.balance < 0) {
-        balEl.classList.add('negative');
-      } else {
-        balEl.classList.remove('negative');
-      }
+      if (state.balance < 0) balEl.classList.add('negative');
+      else balEl.classList.remove('negative');
 
       const createBtn = document.getElementById('btn-create');
-      createBtn.innerText = `➕ Создать игру (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
-      if (state.balance < state.nextGamePrice) {
-        createBtn.disabled = true;
-      } else {
-        createBtn.disabled = false;
-      }
+      createBtn.innerText = `➕ Создать (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
+      createBtn.disabled = state.balance < state.nextGamePrice;
 
       const grid = document.getElementById('games-grid');
-      
       if (grid.children.length !== state.gamesData.length) {
         grid.innerHTML = '';
         state.gamesData.forEach(game => {
           const card = document.createElement('div');
           card.className = 'game-card' + (game.isCustom ? ' custom-game' : '');
           card.id = 'card-' + game.id;
+          // Добавляем клик на карточку для открытия модалки
+          card.onclick = () => openModal(game.id);
           grid.appendChild(card);
         });
       }
@@ -389,10 +511,7 @@
         if (game.isCustom) {
           const upgradeCost = state.nextGamePrice;
           customHTML = `
-            <div class="portfolio-info" style="color: #ffeb3b; margin-bottom: 5px; background: rgba(0,0,0,0.5); border: 1px solid #ffeb3b;">
-               ⚡ Актив: ${game.upgrades} обн.
-            </div>
-            <button class="btn-upgrade" onclick="upgradeGame('${game.id}')" ${state.balance < upgradeCost ? 'disabled' : ''}>
+            <button class="btn-upgrade" onclick="upgradeGame('${game.id}', event)" ${state.balance < upgradeCost ? 'disabled' : ''}>
               🚀 Обнова (${upgradeCost.toLocaleString('ru-RU')} 💵)
             </button>
           `;
@@ -408,10 +527,6 @@
           <div class="portfolio-info">
             Акции: ${shares} ${shares > 0 ? '✅' : '❌'}
           </div>
-          <div class="trade-controls">
-            <button class="btn-trade btn-buy" onclick="buy('${game.id}')">Купить</button>
-            <button class="btn-trade btn-sell" onclick="sell('${game.id}')" ${shares === 0 ? 'disabled' : ''}>Продать</button>
-          </div>
           ${customHTML}
         `;
       });
@@ -421,7 +536,6 @@
       const el = document.createElement('div');
       el.className = 'floating-income';
       el.style.color = color;
-      
       const text = prefix === '' ? amount.toLocaleString('ru-RU') : `${prefix}${amount.toLocaleString('ru-RU')} 💵`;
       el.innerText = text;
 
@@ -430,11 +544,8 @@
         el.style.left = rect.left + 'px';
         el.style.top = (rect.top - 20) + 'px';
       } else {
-        el.style.left = '50%';
-        el.style.top = '30%';
-        el.style.transform = 'translateX(-50%)';
+        el.style.left = '50%'; el.style.top = '30%'; el.style.transform = 'translateX(-50%)';
       }
-
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 1500);
     }
