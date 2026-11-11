@@ -3,43 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>🌌Управление Вселенной🌌</title>
+  <title>🚀Наши Проекты🚀 | Управление Вселенной</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: white; min-height: 100vh; display: flex; flex-direction: row; align-items: center; justify-content: center; overflow: hidden; transition: background 1s ease; }
+    
+    /* Экран загрузки */
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f2027; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .loader { border: 4px solid #1a1a24; border-top: 4px solid #4facfe; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      transition: background 1s ease;
-    }
-
-    #animation-layer {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      pointer-events: none; z-index: 50; 
-      overflow: hidden; 
-    }
-
-    /* --- КАТСЦЕНА И РЕЖИМ МИРА --- */
-    #world-view {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); 
-      z-index: 40; 
-      display: none; 
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.5s ease, background 1s ease;
-      overflow: hidden;
-    }
-
+    #animation-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; overflow: hidden; }
+    #world-view { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); z-index: 40; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease, background 1s ease; overflow: hidden; }
     #world-view.active { display: flex; opacity: 1; }
 
     .world-sky-day { background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%) !important; }
@@ -47,108 +24,34 @@
     .world-sky-night { background: linear-gradient(to bottom, #0f2027 0%, #203a43 100%) !important; }
     .world-sky-matrix { background: linear-gradient(to bottom, #000000 0%, #003300 100%) !important; }
 
-    .world-text {
-      position: absolute; top: 25%; font-size: 24px; font-weight: 700; text-align: center;
-      z-index: 100; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); color: #fff;
-      opacity: 0; animation: fadeInOut 2.5s forwards;
-      width: 100%; padding: 0 20px; pointer-events: none;
-    }
-    
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: scale(0.9); }
-      20% { opacity: 1; transform: scale(1); }
-      80% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.1); }
-    }
+    .world-text { position: absolute; top: 25%; font-size: 24px; font-weight: 700; text-align: center; z-index: 100; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); color: #fff; opacity: 0; animation: fadeInOut 2.5s forwards; width: 100%; padding: 0 20px; pointer-events: none; }
+    @keyframes fadeInOut { 0% { opacity: 0; transform: scale(0.9); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.1); } }
 
-    .close-world-btn {
-      position: absolute; top: 20px; right: 20px; z-index: 110;
-      background: rgba(255, 0, 85, 0.8); color: white;
-      border: none; padding: 10px 20px; border-radius: 20px;
-      font-weight: bold; cursor: pointer; backdrop-filter: blur(5px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      display: none; font-size: 14px;
-    }
+    .close-world-btn { position: absolute; top: 20px; right: 20px; z-index: 110; background: rgba(255, 0, 85, 0.8); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: none; font-size: 14px; }
     .close-world-btn.active { display: block; }
 
-    /* --- ГОРОД --- */
     .street-scene { position: absolute; bottom: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;}
     .road-surface { position: absolute; bottom: 0; width: 100%; height: 25%; background: #1a1a24; border-top: 4px solid #444; z-index: 2; transition: background 1s; }
-
     .trees-container { position: absolute; bottom: 5%; width: 100%; height: 100px; z-index: 3; display: flex; justify-content: space-around; align-items: flex-end; pointer-events: none; }
     .tree { font-size: 50px; transform: scale(0); transform-origin: bottom center; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .trees-container.active .tree { transform: scale(1); }
 
-    .buildings-back {
-      position: absolute; bottom: 25%; width: 100%; height: 200px; 
-      background: linear-gradient(to right, #1b263b, #2b2d42, #1b263b);
-      clip-path: polygon(0 100%, 0 30%, 5% 30%, 5% 60%, 15% 60%, 15% 10%, 25% 10%, 25% 80%, 40% 80%, 40% 20%, 55% 20%, 55% 50%, 65% 50%, 65% 40%, 80% 40%, 80% 90%, 90% 90%, 90% 30%, 100% 30%, 100% 100%);
-      opacity: 0.8;
-    }
+    .buildings-back { position: absolute; bottom: 25%; width: 100%; height: 200px; background: linear-gradient(to right, #1b263b, #2b2d42, #1b263b); clip-path: polygon(0 100%, 0 30%, 5% 30%, 5% 60%, 15% 60%, 15% 10%, 25% 10%, 25% 80%, 40% 80%, 40% 20%, 55% 20%, 55% 50%, 65% 50%, 65% 40%, 80% 40%, 80% 90%, 90% 90%, 90% 30%, 100% 30%, 100% 100%); opacity: 0.8; }
+    .buildings-front { position: absolute; bottom: 25%; width: 100%; height: 120px; background: #0d1117; clip-path: polygon(0 100%, 0 50%, 10% 50%, 10% 20%, 20% 20%, 20% 60%, 35% 60%, 35% 40%, 50% 40%, 50% 90%, 70% 90%, 70% 10%, 85% 10%, 85% 70%, 100% 70%, 100% 100%); background-image: radial-gradient(circle at 5% 70%, #ffcc00 3px, transparent 4px), radial-gradient(circle at 15% 60%, #00f2fe 3px, transparent 4px), radial-gradient(circle at 25% 80%, #ffcc00 3px, transparent 4px), radial-gradient(circle at 40% 50%, #ff69b4 3px, transparent 4px), radial-gradient(circle at 55% 70%, #ffcc00 3px, transparent 4px), radial-gradient(circle at 75% 30%, #00f2fe 3px, transparent 4px), radial-gradient(circle at 80% 60%, #ffcc00 3px, transparent 4px), radial-gradient(circle at 90% 80%, #ff69b4 3px, transparent 4px); background-size: 100% 100%; }
 
-    .buildings-front {
-      position: absolute; bottom: 25%; width: 100%; height: 120px; background: #0d1117;
-      clip-path: polygon(0 100%, 0 50%, 10% 50%, 10% 20%, 20% 20%, 20% 60%, 35% 60%, 35% 40%, 50% 40%, 50% 90%, 70% 90%, 70% 10%, 85% 10%, 85% 70%, 100% 70%, 100% 100%);
-      background-image: 
-        radial-gradient(circle at 5% 70%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 15% 60%, #00f2fe 3px, transparent 4px),
-        radial-gradient(circle at 25% 80%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 40% 50%, #ff69b4 3px, transparent 4px),
-        radial-gradient(circle at 55% 70%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 75% 30%, #00f2fe 3px, transparent 4px),
-        radial-gradient(circle at 80% 60%, #ffcc00 3px, transparent 4px),
-        radial-gradient(circle at 90% 80%, #ff69b4 3px, transparent 4px);
-      background-size: 100% 100%;
-    }
-
-    /* --- ИНТЕРФЕЙС --- */
-    .main-container {
-      display: flex; gap: 20px; z-index: 60; align-items: flex-start; justify-content: center;
-      width: 100%; padding: 20px; transition: opacity 0.5s ease;
-    }
+    .main-container { display: flex; gap: 20px; z-index: 60; align-items: flex-start; justify-content: center; width: 100%; padding: 20px; transition: opacity 0.5s ease; }
     .main-container.hidden { opacity: 0; pointer-events: none; display: none; }
 
-    .panel {
-      background: rgba(15, 25, 35, 0.8);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px;
-      border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      width: 90vw; max-width: 380px; max-height: 90vh; overflow-y: auto;
-    }
-
-    .news-panel {
-      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;
-      padding: 15px; width: 280px; max-height: 80vh; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    }
-
-    .news-panel h2 {
-      font-size: 14px; text-transform: uppercase; letter-spacing: 2px;
-      color: #ff0055; text-align: center; margin-bottom: 5px;
-      border-bottom: 2px solid #ff0055; padding-bottom: 10px;
-    }
-
-    .news-item {
-      font-size: 12px; line-height: 1.4; padding: 8px;
-      background: rgba(255, 255, 255, 0.05); border-left: 3px solid #4facfe;
-      border-radius: 4px; animation: slideIn 0.3s ease-out forwards;
-    }
-
-    .news-item.red-team {
-      border-left: 3px solid #ffd700; background: rgba(255, 215, 0, 0.1);
-      color: #ffd700; font-weight: bold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
-    }
+    .panel { background: rgba(15, 25, 35, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); width: 90vw; max-width: 380px; max-height: 90vh; overflow-y: auto; }
+    .news-panel { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 15px; width: 280px; max-height: 80vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+    .news-panel h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #ff0055; text-align: center; margin-bottom: 5px; border-bottom: 2px solid #ff0055; padding-bottom: 10px; }
+    .news-item { font-size: 12px; line-height: 1.4; padding: 8px; background: rgba(255, 255, 255, 0.05); border-left: 3px solid #4facfe; border-radius: 4px; animation: slideIn 0.3s ease-out forwards; }
+    .news-item.red-team { border-left: 3px solid #ffd700; background: rgba(255, 215, 0, 0.1); color: #ffd700; font-weight: bold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .news-item .press-name { font-weight: 900; color: #fff; margin-right: 5px; }
     .news-item.red-team .press-name { color: #ffd700; }
     @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-    /* ИСПРАВЛЕННЫЙ ЗАГОЛОВОК (С ЭМОДЗИ) */
-    h1 {
-      text-align: center; font-size: 20px; font-weight: 900; margin-bottom: 15px;
-      color: #fff; /* Белый цвет, чтобы эмодзи были видны */
-      text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe; /* Добавили свечение для красоты */
-    }
+    h1 { text-align: center; font-size: 20px; font-weight: 900; margin-bottom: 15px; color: #fff; text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe; }
 
     .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
     .toggle-row:last-child { border-bottom: none; }
@@ -156,15 +59,8 @@
 
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;}
     .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .slider:before {
-      position: absolute; content: ""; height: 16px; width: 16px;
-      left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%;
-    }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.2); }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: #fff; transition: .4s; border-radius: 50%; }
     
     #toggle-cats:checked + .slider { background-color: #ff9900; border-color: #ff9900; }
     #toggle-gravity:checked + .slider { background-color: #00f2fe; border-color: #00f2fe; }
@@ -179,22 +75,10 @@
 
     input:checked + .slider:before { transform: translateX(20px); }
 
-    .world-btn {
-      width: 100%; margin-top: 15px; padding: 12px;
-      background: linear-gradient(90deg, #00f2fe, #4facfe);
-      border: none; border-radius: 12px; color: #000;
-      font-weight: 900; font-size: 14px; cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
-      transition: transform 0.2s;
-    }
+    .world-btn { width: 100%; margin-top: 15px; padding: 12px; background: linear-gradient(90deg, #00f2fe, #4facfe); border: none; border-radius: 12px; color: #000; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4); transition: transform 0.2s; }
     .world-btn:active { transform: scale(0.95); }
 
-    /* --- КВАДРАТНЫЙ КОТ --- */
-    .modern-cat {
-      position: absolute; width: 60px; height: 60px;
-      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
+    .modern-cat { position: absolute; width: 60px; height: 60px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; }
     .cat-head { position: absolute; top: 0; left: 0; width: 40px; height: 40px; background-color: #ff9900; border-radius: 4px; }
     .cat-head::before, .cat-head::after { content: ''; position: absolute; top: -10px; width: 15px; height: 15px; background-color: #ff9900; border-radius: 2px; }
     .cat-head::before { left: 0; }
@@ -210,44 +94,27 @@
     .cat-paw-r { right: 15px; }
 
     .flying-item { position: absolute; font-size: 50px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); transition: transform 0.5s ease, opacity 0.5s ease; z-index: 100;}
-
-    .meteor-item {
-      font-size: 40px;
-      transform: rotate(180deg); 
-    }
-
-    .explosion {
-      position: absolute; font-size: 50px; z-index: 101;
-      animation: explode 0.5s ease-out forwards;
-    }
-    @keyframes explode {
-      0% { transform: scale(0.5); opacity: 1; }
-      100% { transform: scale(2); opacity: 0; }
-    }
+    .meteor-item { font-size: 40px; transform: rotate(180deg); }
+    .explosion { position: absolute; font-size: 50px; z-index: 101; animation: explode 0.5s ease-out forwards; }
+    @keyframes explode { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
 
     .run-anim { animation: runAcross linear forwards; }
     @keyframes runAcross { 0% { transform: translateX(-100px); } 100% { transform: translateX(100vw); } }
     .float-anim { animation: hover 2s ease-in-out infinite alternate; }
     @keyframes hover { 0% { transform: translateY(0) rotate(-15deg); } 100% { transform: translateY(-30px) rotate(15deg); } }
-    
     .meteor-fall { animation: meteorFall linear forwards; }
     @keyframes meteorFall { 0% { transform: translateY(0) rotate(180deg); } 100% { transform: translateY(75vh) rotate(180deg); } }
-    
     .fall-anim { animation: fallDown linear forwards; }
     @keyframes fallDown { 0% { transform: translateY(0); } 100% { transform: translateY(75vh); } }
-    
     .fly-up-anim { animation: flyUp linear forwards; }
     @keyframes flyUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-120vh) rotate(-360deg); opacity: 0; } }
-
     .fall-smooth-anim { animation: fallSmooth linear forwards; }
     @keyframes fallSmooth { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(75vh); opacity: 0; } }
-
     .dissolve-anim { animation: dissolve 1.5s ease-in forwards; }
     @keyframes dissolve { 0% { transform: scale(1); opacity: 1; filter: blur(0px); } 100% { transform: scale(0.5); opacity: 0; filter: blur(5px); } }
 
     .peace-glow { filter: drop-shadow(0 0 15px #ffd700) !important; }
     .peace-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%) !important; }
-
     .sky-day { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important; }
     .sky-sunset { background: linear-gradient(135deg, #2b1055, #7597de) !important; }
     .sky-night { background: linear-gradient(135deg, #000000, #434343) !important; }
@@ -261,6 +128,16 @@
   </style>
 </head>
 <body class="sky-day" id="main-body">
+
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loading-screen">
+    <div class="loader" id="loader"></div>
+    <div id="error-msg">
+      ❌ Ошибка авторизации.<br>
+      <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
+    </div>
+    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
+  </div>
 
   <div id="world-view" class="world-sky-day">
     <button class="close-world-btn" id="close-world-btn">Выйти из Мира ✖</button>
@@ -278,7 +155,7 @@
 
   <div id="animation-layer"></div>
 
-  <div class="main-container" id="main-ui">
+  <div class="main-container" id="main-ui" style="display: none;">
     <div class="panel">
       <h1>🌌Управление Вселенной🌌</h1>
 
@@ -304,7 +181,16 @@
       <h2>Лента событий</h2>
     </div>
   </div>
-    <script>
+
+  <script>
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'universe';
+
+    let token = localStorage.getItem('auth_token');
+    let isGameLoaded = false;
+
     const body = document.getElementById('main-body');
     const layer = document.getElementById('animation-layer');
     const newsFeed = document.getElementById('news-feed');
@@ -328,8 +214,88 @@
     const treesContainer = document.getElementById('trees-container');
 
     let intervals = { cats: null, pizza: null, fish: null, aliens: null, meteors: null, balloons: null };
-    const played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false, meteor: false, trees: false, balloons: false, peace: false };
+    let played = { cats: false, pizza: false, gravity: false, fish: false, aliens: false, sky: false, meteor: false, trees: false, balloons: false, peace: false };
+    let currentSkyState = 0;
     const isWorldMode = () => worldView.classList.contains('active') && mainUI.classList.contains('hidden');
+
+    // --- ЗАГРУЗКА ---
+    async function initGame() {
+        if (!token) { showError(); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 401 || res.status === 403) { showError(); return; }
+            
+            const data = await res.json();
+            
+            // Восстанавливаем состояние
+            if (data.toggles) {
+                catsToggle.checked = data.toggles.cats || false;
+                gravityToggle.checked = data.toggles.gravity !== false;
+                pizzaToggle.checked = data.toggles.pizza || false;
+                fishToggle.checked = data.toggles.fish || false;
+                alienToggle.checked = data.toggles.aliens || false;
+                meteorToggle.checked = data.toggles.meteor || false;
+                treesToggle.checked = data.toggles.trees || false;
+                balloonsToggle.checked = data.toggles.balloons || false;
+                peaceToggle.checked = data.toggles.peace || false;
+                
+                played = data.played || played;
+            }
+            if (data.skyState !== undefined) {
+                currentSkyState = data.skyState;
+                applySky(currentSkyState);
+            }
+
+            isGameLoaded = true;
+            document.getElementById('loading-screen').style.display = 'none';
+            mainUI.style.display = 'flex';
+
+            // Запускаем активные процессы
+            if (catsToggle.checked) startCats();
+            if (pizzaToggle.checked) startPizza();
+            if (fishToggle.checked) startFish();
+            if (alienToggle.checked) startAliens();
+            if (meteorToggle.checked) startMeteors();
+            if (balloonsToggle.checked) startBalloons();
+            if (treesToggle.checked) treesContainer.classList.add('active');
+            if (peaceToggle.checked) body.classList.add('peace-bg');
+
+        } catch (error) {
+            showError("Ошибка соединения с сервером.");
+        }
+    }
+
+    function showError(text) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+        if (text) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${text}</span>`;
+        document.getElementById('btn-back').style.display = 'inline-block';
+    }
+
+    async function saveGameToServer() {
+        if (!token || !isGameLoaded) return;
+        const toggles = {
+            cats: catsToggle.checked,
+            gravity: gravityToggle.checked,
+            pizza: pizzaToggle.checked,
+            fish: fishToggle.checked,
+            aliens: alienToggle.checked,
+            meteor: meteorToggle.checked,
+            trees: treesToggle.checked,
+            balloons: balloonsToggle.checked,
+            peace: peaceToggle.checked
+        };
+        try {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ toggles: toggles, played: played, skyState: currentSkyState })
+            });
+        } catch (e) {}
+    }
 
     // --- НОВОСТИ ---
     const pressList = [
@@ -360,7 +326,6 @@
       if (newsFeed.children.length > 11) newsFeed.removeChild(newsFeed.lastChild);
     }
 
-    // --- БАЗОВЫЕ ФУНКЦИИ ---
     const catHTML = `<div class="cat-head"><div class="cat-eye-l"></div><div class="cat-eye-r"></div><div class="cat-nose"></div></div><div class="cat-body"></div><div class="cat-tail"></div><div class="cat-paw-l"></div><div class="cat-paw-r"></div>`;
 
     function removeElement(el) {
@@ -384,7 +349,6 @@
       mainUI.classList.remove('hidden'); 
     });
 
-    // --- КАТСЦЕНЫ ---
     function showCutscene(text, duration = 2500) {
       if (isWorldMode()) return;
       
@@ -434,7 +398,6 @@
       intervals.cats = setInterval(() => {
         if (document.querySelectorAll('.modern-cat').length > 15) return;
         const cat = document.createElement('div'); cat.className = 'modern-cat'; cat.innerHTML = catHTML;
-        
         if (!gravityToggle.checked) { 
           cat.style.bottom = '-60px'; cat.style.left = (Math.random() * 90) + 'vw'; cat.classList.add('fly-up-anim'); cat.style.animationDuration = (Math.random() * 2 + 2) + 's'; 
           cat.addEventListener('animationend', () => cat.remove());
@@ -453,7 +416,6 @@
       intervals.pizza = setInterval(() => {
         if (document.querySelectorAll('.pizza-item').length > 30) return;
         const pizza = document.createElement('div'); pizza.className = 'flying-item pizza-item'; pizza.textContent = '🍕'; pizza.style.left = (Math.random() * 85 + 5) + 'vw';
-        
         if (gravityToggle.checked) { 
           pizza.style.top = '-60px'; pizza.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; pizza.classList.add('fall-anim'); 
           pizza.addEventListener('animationend', () => removeElement(pizza));
@@ -469,7 +431,6 @@
       intervals.fish = setInterval(() => {
         if (document.querySelectorAll('.fish-item').length > 30) return;
         const fish = document.createElement('div'); fish.className = 'flying-item fish-item'; fish.textContent = '🐟'; fish.style.left = (Math.random() * 85 + 5) + 'vw';
-        
         if (gravityToggle.checked) { 
           fish.style.top = '-60px'; fish.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; fish.classList.add('fall-anim'); 
           fish.addEventListener('animationend', () => removeElement(fish));
@@ -485,7 +446,6 @@
       intervals.aliens = setInterval(() => {
         if (document.querySelectorAll('.ufo-item').length > 10) return;
         const ufo = document.createElement('div'); ufo.className = 'flying-item ufo-item'; ufo.textContent = '🛸'; ufo.style.left = (Math.random() * 85 + 5) + 'vw';
-        
         if (gravityToggle.checked) { 
           ufo.style.top = (Math.random() * 50 + 10) + 'vh'; ufo.classList.add('float-anim'); 
         } else { 
@@ -496,31 +456,14 @@
       }, 2000);
     }
 
-    // ИСПРАВЛЕННЫЕ МЕТЕОРИТЫ (с взрывом и нормальным падением)
     function startMeteors() {
       intervals.meteors = setInterval(() => {
-        const meteor = document.createElement('div'); 
-        meteor.className = 'flying-item meteor-item'; 
-        meteor.textContent = '☄️'; 
-        meteor.style.left = (Math.random() * 85 + 5) + 'vw';
-        meteor.style.top = '-60px'; 
-        meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; 
-        meteor.classList.add('meteor-fall');
-        
-        // Когда метеорит долетает до низа (окончание анимации)
+        const meteor = document.createElement('div'); meteor.className = 'flying-item meteor-item'; meteor.textContent = '☄️'; meteor.style.left = (Math.random() * 85 + 5) + 'vw';
+        meteor.style.top = '-60px'; meteor.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's'; meteor.classList.add('meteor-fall');
         meteor.addEventListener('animationend', () => {
-          // Создаем взрыв
-          const explosion = document.createElement('div');
-          explosion.className = 'explosion';
-          explosion.textContent = '💥';
-          explosion.style.left = meteor.style.left;
-          explosion.style.top = '65vh'; // Примерно уровень земли
-          layer.appendChild(explosion);
-          
-          // Удаляем взрыв через полсекунды
+          const explosion = document.createElement('div'); explosion.className = 'explosion'; explosion.textContent = '💥';
+          explosion.style.left = meteor.style.left; explosion.style.top = '65vh'; layer.appendChild(explosion);
           setTimeout(() => explosion.remove(), 500);
-          
-          // Удаляем сам метеорит
           meteor.remove();
         });
         layer.appendChild(meteor);
@@ -531,109 +474,99 @@
       intervals.balloons = setInterval(() => {
         const balloon = document.createElement('div'); balloon.className = 'flying-item balloon-item'; balloon.textContent = '🎈'; balloon.style.left = (Math.random() * 85 + 5) + 'vw';
         balloon.style.bottom = '-60px'; balloon.style.animationDuration = (Math.random() * 3 + 2) + 's'; balloon.classList.add('fly-up-anim');
-        
         balloon.addEventListener('animationend', () => balloon.remove());
         layer.appendChild(balloon);
       }, 600);
     }
 
-    // --- ОБРАБОТЧИКИ ТУМБЛЕРОВ ---
+    // --- ТУМБЛЕРЫ ---
     meteorToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.meteor) { played.meteor = true; showCutscene("Конец света отменяется, но метеориты прилетели..."); addNews("Метеоритный дождь! Берегите головы!", "all"); }
-        startMeteors();
-      } else {
-        clearInterval(intervals.meteors);
-      }
+      if (e.target.checked) { if (!played.meteor) { played.meteor = true; showCutscene("Конец света отменяется, но метеориты прилетели..."); addNews("Метеоритный дождь! Берегите головы!", "all"); } startMeteors(); } 
+      else { clearInterval(intervals.meteors); }
+      saveGameToServer();
     });
 
     treesToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.trees) { played.trees = true; showCutscene("Время наводить порядок..."); addNews("Город стал зеленее! Экологи в восторге.", "trees"); }
-        treesContainer.classList.add('active');
-      } else {
-        treesContainer.classList.remove('active');
-      }
+      if (e.target.checked) { if (!played.trees) { played.trees = true; showCutscene("Время наводить порядок..."); addNews("Город стал зеленее! Экологи в восторге.", "trees"); } treesContainer.classList.add('active'); } 
+      else { treesContainer.classList.remove('active'); }
+      saveGameToServer();
     });
 
     balloonsToggle.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        if (!played.balloons) { played.balloons = true; showCutscene("Праздник к нам приходит..."); addNews("В небе появились воздушные шарики!", "balloons"); }
-        startBalloons();
-      } else {
-        clearInterval(intervals.balloons);
-        document.querySelectorAll('.balloon-item').forEach(b => b.remove());
-      }
+      if (e.target.checked) { if (!played.balloons) { played.balloons = true; showCutscene("Праздник к нам приходит..."); addNews("В небе появились воздушные шарики!", "balloons"); } startBalloons(); } 
+      else { clearInterval(intervals.balloons); document.querySelectorAll('.balloon-item').forEach(b => b.remove()); }
+      saveGameToServer();
     });
 
     peaceToggle.addEventListener('change', (e) => {
       if (e.target.checked) {
         if (!played.peace) { played.peace = true; showCutscene("Все конфликты урегулированы..."); addNews("Наступил мир во всем мире. Все обнимаются!", "all"); }
-        
         document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
           if (chk !== peaceToggle && chk !== skyToggle && chk !== catsToggle && chk !== gravityToggle) {
             if (chk.checked) { chk.checked = false; chk.dispatchEvent(new Event('change')); }
           }
         });
-
         document.querySelectorAll('.modern-cat, .flying-item').forEach(obj => {
-          obj.classList.add('peace-glow');
-          obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim');
-          obj.style.transition = 'all 1s ease';
-          if(obj.classList.contains('modern-cat')) {
-             obj.style.top = 'auto'; obj.style.bottom = '25%';
-          } else {
-             obj.style.top = '72vh'; 
-          }
+          obj.classList.add('peace-glow'); obj.classList.remove('run-anim', 'fall-anim', 'fly-up-anim', 'float-anim'); obj.style.transition = 'all 1s ease';
+          if(obj.classList.contains('modern-cat')) { obj.style.top = 'auto'; obj.style.bottom = '25%'; } else { obj.style.top = '72vh'; }
         });
-        
         body.classList.add('peace-bg');
-      } else {
-        document.querySelectorAll('.peace-glow').forEach(obj => obj.classList.remove('peace-glow'));
-        body.classList.remove('peace-bg');
-      }
+      } else { document.querySelectorAll('.peace-glow').forEach(obj => obj.classList.remove('peace-glow')); body.classList.remove('peace-bg'); }
+      saveGameToServer();
     });
 
     catsToggle.addEventListener('change', (e) => {
       if (e.target.checked) { if (!played.cats) { played.cats = true; showCutscene("Квадратные коты выходят на связь..."); addNews("Массовое появление котов.", "cats"); setTimeout(startCats, 2500); } else { startCats(); } } 
       else { clearInterval(intervals.cats); document.querySelectorAll('.modern-cat').forEach(c => c.remove()); }
+      saveGameToServer();
     });
 
     pizzaToggle.addEventListener('change', (e) => {
       if (e.target.checked) { if (!played.pizza) { played.pizza = true; showCutscene("Пицца вызывается на ковёр..."); addNews("Дождь из пиццы!", "pizza"); setTimeout(startPizza, 2500); } else { startPizza(); } } 
       else { clearInterval(intervals.pizza); document.querySelectorAll('.pizza-item').forEach(p => p.remove()); }
+      saveGameToServer();
     });
 
     fishToggle.addEventListener('change', (e) => {
       if (e.target.checked) { if (!played.fish) { played.fish = true; showCutscene("Рыбный шторм неизбежен..."); addNews("Пошёл рыбный дождь.", "fish"); setTimeout(startFish, 2500); } else { startFish(); } } 
       else { clearInterval(intervals.fish); document.querySelectorAll('.fish-item').forEach(f => f.remove()); }
+      saveGameToServer();
     });
 
     alienToggle.addEventListener('change', (e) => {
       if (e.target.checked) { if (!played.aliens) { played.aliens = true; showCutscene("Обнаружены НЛО..."); addNews("НЛО над городом!", "aliens"); setTimeout(startAliens, 2500); } else { startAliens(); } } 
       else { clearInterval(intervals.aliens); document.querySelectorAll('.ufo-item').forEach(u => u.remove()); }
+      saveGameToServer();
     });
 
     gravityToggle.addEventListener('change', (e) => {
-      if (!e.target.checked) {
-        if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Гравитация отключена!", "all"); }
-      }
+      if (!e.target.checked) { if (!played.gravity) { played.gravity = true; showCutscene("Гравитация отключена..."); addNews("Гравитация отключена!", "all"); } }
+      saveGameToServer();
     });
 
-    let skyState = 0; 
-    skyToggle.addEventListener('change', (e) => {
-      skyState = (skyState + 1) % 4;
+    function applySky(state) {
       body.classList.remove('sky-day', 'sky-sunset', 'sky-night', 'sky-matrix');
       worldView.classList.remove('world-sky-day', 'world-sky-sunset', 'world-sky-night', 'world-sky-matrix');
       
-      let skyName = "";
-      if (skyState === 0) { body.classList.add('sky-day'); worldView.classList.add('world-sky-day'); skyName = "День"; }
-      if (skyState === 1) { body.classList.add('sky-sunset'); worldView.classList.add('world-sky-sunset'); skyName = "Закат"; }
-      if (skyState === 2) { body.classList.add('sky-night'); worldView.classList.add('world-sky-night'); skyName = "Ночь"; }
-      if (skyState === 3) { body.classList.add('sky-matrix'); worldView.classList.add('world-sky-matrix'); skyName = "Матрица"; }
+      if (state === 0) { body.classList.add('sky-day'); worldView.classList.add('world-sky-day'); }
+      if (state === 1) { body.classList.add('sky-sunset'); worldView.classList.add('world-sky-sunset'); }
+      if (state === 2) { body.classList.add('sky-night'); worldView.classList.add('world-sky-night'); }
+      if (state === 3) { body.classList.add('sky-matrix'); worldView.classList.add('world-sky-matrix'); }
+    }
 
+    skyToggle.addEventListener('change', (e) => {
+      currentSkyState = (currentSkyState + 1) % 4;
+      applySky(currentSkyState);
+      
+      let skyName = ["День", "Закат", "Ночь", "Матрица"][currentSkyState];
       addNews(`Время суток изменилось на: ${skyName}.`, "all");
+      
+      // Сбрасываем чекбокс, чтобы можно было нажать снова
+      setTimeout(() => { e.target.checked = false; }, 100);
+      saveGameToServer();
     });
+
+    window.onload = initGame;
   </script>
 </body>
 </html>
