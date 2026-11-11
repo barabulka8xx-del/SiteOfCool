@@ -3,251 +3,103 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Битва Мемов 🃏</title>
+  <title>🚀Наши Проекты🚀 | Битва Мемов</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #050505; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1000px; perspective-origin: 50% 30%; }
     
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #050505;
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      perspective: 1000px;
-      perspective-origin: 50% 30%;
-    }
+    /* Экран загрузки/ошибки */
+    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    .loader { border: 4px solid #1a1a24; border-top: 4px solid #ff0055; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
 
-    /* --- МЕНЮ --- */
-    #menu {
-      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: radial-gradient(circle at center, #1a1a24 0%, #000 100%);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 1000;
-    }
+    /* Меню игры */
+    #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a1a24 0%, #000 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
     #menu h1 { font-size: 32px; margin-bottom: 10px; text-shadow: 0 0 20px #ff0055; color: #fff; }
     #menu p { color: #aaa; margin-bottom: 30px; font-size: 14px; }
-    .menu-btn {
-      background: rgba(255,255,255,0.05); border: 2px solid #4facfe; color: white;
-      padding: 15px 30px; margin: 10px; border-radius: 12px; font-size: 18px; font-weight: bold;
-      cursor: pointer; width: 250px; transition: 0.3s; backdrop-filter: blur(5px);
-    }
+    .menu-btn { background: rgba(255,255,255,0.05); border: 2px solid #4facfe; color: white; padding: 15px 30px; margin: 10px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 250px; transition: 0.3s; backdrop-filter: blur(5px); }
     .menu-btn:hover { background: #4facfe; color: #000; box-shadow: 0 0 20px #4facfe; transform: scale(1.05); }
 
-    /* --- ИГРОВОЕ ПОЛЕ --- */
-    #game-container {
-      width: 100vw; height: 100vh;
-      display: none; 
-      position: relative;
-      transform-style: preserve-3d;
-    }
-
-    /* ЛАМПА */
-    .lamp-container {
-      position: absolute; top: -20px; left: 50%; 
-      transform: translateX(-50%) translateZ(100px);
-      display: flex; flex-direction: column; align-items: center; z-index: 10;
-    }
+    /* Игровое поле */
+    #game-container { width: 100vw; height: 100vh; display: none; position: relative; transform-style: preserve-3d; }
+    .lamp-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%) translateZ(100px); display: flex; flex-direction: column; align-items: center; z-index: 10; }
     .lamp-wire { width: 4px; height: 60px; background: #222; }
     .lamp-shade { width: 90px; height: 45px; background: #111; border-radius: 45px 45px 0 0; border: 2px solid #333; border-bottom: none; }
     .lamp-bulb { width: 30px; height: 15px; background: #ffeb3b; border-radius: 50%; box-shadow: 0 0 40px #ffeb3b, 0 0 150px #ffeb3b; margin-top: -8px; }
-
-    /* 3D СТОЛ */
-    .table-wrapper {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%) rotateX(55deg);
-      transform-style: preserve-3d;
-      z-index: 2;
-    }
     
-    .table-top {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, #2a3b42 0%, #111 85%);
-      border-radius: 50%; 
-      border: 4px solid #3a5060; 
-      box-shadow: 0 15px 0 #151a1f, 0 30px 40px rgba(0,0,0,0.9);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      position: relative;
-      transform-style: preserve-3d;
-    }
-    
-    .table-text {
-      position: absolute; top: 20%;
-      font-size: 18px; font-weight: bold; color: rgba(255,255,255,0.3);
-      text-align: center; pointer-events: none; width: 200px;
-      transform: translateZ(1px);
-    }
+    .table-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotateX(55deg); transform-style: preserve-3d; z-index: 2; }
+    .table-top { width: 300px; height: 300px; background: radial-gradient(circle, #2a3b42 0%, #111 85%); border-radius: 50%; border: 4px solid #3a5060; box-shadow: 0 15px 0 #151a1f, 0 30px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transform-style: preserve-3d; }
+    .table-text { position: absolute; top: 20%; font-size: 18px; font-weight: bold; color: rgba(255,255,255,0.3); text-align: center; pointer-events: none; width: 200px; transform: translateZ(1px); }
+    .center-deck { position: absolute; width: 50px; height: 70px; background: linear-gradient(135deg, #1e3c72, #2a5298); border: 2px solid #4facfe; border-radius: 6px; box-shadow: 2px 2px 0 #111, 4px 4px 0 #111, 6px 6px 15px rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; font-size: 24px; transform: translateZ(2px); }
+    .played-cards-area { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; transform-style: preserve-3d; }
+    .played-card-anim { position: absolute; width: 60px; height: 85px; background: #203a43; border: 2px solid #4facfe; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 35px; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.8); animation: dropAndStay 2.5s forwards; }
+    @keyframes dropAndStay { 0% { transform: translateZ(150px) scale(1.5); opacity: 0; } 20% { transform: translateZ(5px) scale(1); opacity: 1; } 80% { transform: translateZ(5px) scale(1); opacity: 1; } 100% { transform: translateZ(0px) scale(0.8); opacity: 0; } }
 
-    .center-deck {
-      position: absolute;
-      width: 50px; height: 70px;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      border: 2px solid #4facfe; border-radius: 6px;
-      box-shadow: 2px 2px 0 #111, 4px 4px 0 #111, 6px 6px 15px rgba(0,0,0,0.9);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      transform: translateZ(2px);
-    }
-
-    .played-cards-area {
-      position: absolute;
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-      transform-style: preserve-3d;
-    }
-
-    .played-card-anim {
-      position: absolute;
-      width: 60px; height: 85px;
-      background: #203a43; border: 2px solid #4facfe; border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; font-size: 35px;
-      opacity: 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-      animation: dropAndStay 2.5s forwards;
-    }
-    
-    @keyframes dropAndStay {
-      0% { transform: translateZ(150px) scale(1.5); opacity: 0; }
-      20% { transform: translateZ(5px) scale(1); opacity: 1; }
-      80% { transform: translateZ(5px) scale(1); opacity: 1; }
-      100% { transform: translateZ(0px) scale(0.8); opacity: 0; }
-    }
-
-    /* --- ИГРОКИ --- */
-    .seat {
-      position: absolute; display: flex; flex-direction: column; align-items: center;
-      z-index: 5; transition: 0.3s;
-    }
-    
+    .seat { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 5; transition: 0.3s; }
     .seat-top { top: 8%; left: 50%; transform: translateX(-50%) scale(0.8); }
     .seat-left { top: 45%; left: 5%; transform: translateY(-50%) scale(0.9); }
     .seat-right { top: 45%; right: 5%; transform: translateY(-50%) scale(0.9); }
     .seat-bottom { bottom: 140px; left: 50%; transform: translateX(-50%) scale(1); }
 
-    .avatar-box {
-      position: relative; width: 65px; height: 65px;
-      background: #1a2a33; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 34px; border: 3px solid #4facfe;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 20px rgba(79, 172, 254, 0.5); 
-      margin-bottom: 5px; transition: 0.3s;
-    }
+    .avatar-box { position: relative; width: 65px; height: 65px; background: #1a2a33; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 34px; border: 3px solid #4facfe; box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 20px rgba(79, 172, 254, 0.5); margin-bottom: 5px; transition: 0.3s; }
     .avatar-box.enemy { border-color: #ff0055; box-shadow: 0 10px 20px rgba(0,0,0,0.9), 0 0 20px rgba(255, 0, 85, 0.5); }
-    
     .avatar-box.stunned { filter: grayscale(1) brightness(0.5); border-color: #888; }
     .avatar-box.stunned::after { content: '💫'; position: absolute; top: -15px; font-size: 22px; animation: spin 2s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    
     .avatar-box.dead { opacity: 0.3; filter: grayscale(1); border-color: #000; }
     .avatar-box.dead::before { content: '💀'; position: absolute; font-size: 36px; z-index: 2; }
-
-    .hp-bar-container {
-      width: 70px; height: 14px; background: #111; border-radius: 7px;
-      overflow: hidden; border: 2px solid #000; position: relative;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.8);
-    }
+    .hp-bar-container { width: 70px; height: 14px; background: #111; border-radius: 7px; overflow: hidden; border: 2px solid #000; position: relative; box-shadow: 0 5px 10px rgba(0,0,0,0.8); }
     .hp-fill { height: 100%; width: 100%; background: #00ff00; transition: width 0.3s, background 0.3s; }
     .hp-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
-
-    .bot-deck {
-      display: flex; margin-top: 5px; position: relative; height: 20px; width: 50px; justify-content: center;
-    }
-    .bot-card {
-      position: absolute;
-      width: 16px; height: 24px;
-      background: linear-gradient(135deg, #8b0000, #ff0055);
-      border: 1px solid #fff; border-radius: 3px;
-      box-shadow: 1px 2px 4px rgba(0,0,0,0.9);
-    }
+    .bot-deck { display: flex; margin-top: 5px; position: relative; height: 20px; width: 50px; justify-content: center; }
+    .bot-card { position: absolute; width: 16px; height: 24px; background: linear-gradient(135deg, #8b0000, #ff0055); border: 1px solid #fff; border-radius: 3px; box-shadow: 1px 2px 4px rgba(0,0,0,0.9); }
     .bot-card:nth-child(1) { transform: rotate(-15deg) translateX(-10px); }
     .bot-card:nth-child(2) { transform: rotate(-5deg) translateX(-3px); }
     .bot-card:nth-child(3) { transform: rotate(5deg) translateX(3px); }
     .bot-card:nth-child(4) { transform: rotate(15deg) translateX(10px); }
 
-    /* ПАНЕЛЬ ОПИСАНИЯ */
-    .card-info-panel {
-      position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 320px;
-      background: rgba(15, 25, 35, 0.95); border: 2px solid #ffeb3b;
-      border-radius: 12px; padding: 10px; text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-      opacity: 0; pointer-events: none; transition: 0.3s;
-      z-index: 30;
-    }
+    .card-info-panel { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 320px; background: rgba(15, 25, 35, 0.95); border: 2px solid #ffeb3b; border-radius: 12px; padding: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 30; }
     .card-info-panel.active { opacity: 1; transform: translateX(-50%) translateY(-10px); }
-    
     .info-title { color: #ffeb3b; font-size: 15px; font-weight: bold; margin-bottom: 3px; }
     .info-desc { color: #fff; font-size: 12px; line-height: 1.3; }
     .info-hint { color: #4facfe; font-size: 10px; margin-top: 5px; font-style: italic;}
 
-    /* РУКА ИГРОКА */
-    .player-hand {
-      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 5px; z-index: 20; 
-      transition: bottom 0.4s ease;
-    }
-    
-    .card {
-      width: 75px; height: 110px;
-      background: rgba(30, 45, 55, 0.95); backdrop-filter: blur(10px);
-      border: 2px solid #4facfe; border-radius: 10px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 10px rgba(79, 172, 254, 0.3);
-      transition: 0.2s; position: relative;
-      transform-origin: bottom center;
-    }
-    
+    .player-hand { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 20; transition: bottom 0.4s ease; }
+    .card { width: 75px; height: 110px; background: rgba(30, 45, 55, 0.95); backdrop-filter: blur(10px); border: 2px solid #4facfe; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 10px rgba(79, 172, 254, 0.3); transition: 0.2s; position: relative; transform-origin: bottom center; }
     .card:nth-child(1) { transform: rotateZ(-10deg) translateY(5px); }
     .card:nth-child(2) { transform: rotateZ(-5deg); }
     .card:nth-child(3) { transform: rotateZ(0deg); }
     .card:nth-child(4) { transform: rotateZ(5deg); }
     .card:nth-child(5) { transform: rotateZ(10deg) translateY(5px); }
-
-    .card:hover { 
-      transform: rotateZ(0deg) translateY(-20px) scale(1.05); 
-      box-shadow: 0 15px 30px rgba(0,0,0,0.9), 0 0 25px #4facfe; z-index: 25;
-      border-color: #fff;
-    }
-    .card.selected { 
-      transform: rotateZ(0deg) translateY(-30px) scale(1.1); 
-      border-color: #ffeb3b; box-shadow: 0 0 30px #ffeb3b; z-index: 26;
-    }
-    
+    .card:hover { transform: rotateZ(0deg) translateY(-20px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.9), 0 0 25px #4facfe; z-index: 25; border-color: #fff; }
+    .card.selected { transform: rotateZ(0deg) translateY(-30px) scale(1.1); border-color: #ffeb3b; box-shadow: 0 0 30px #ffeb3b; z-index: 26; }
     .card-icon { font-size: 32px; margin-bottom: 5px; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.8)); }
     .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; padding: 0 5px;}
 
-    /* ПРИЦЕЛ */
-    .target-overlay {
-      position: absolute; width: 100%; height: 100%; border: 3px dashed #ff0055; border-radius: 50%;
-      z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; 
-      top: 0; left: 0; box-sizing: border-box;
-    }
+    .target-overlay { position: absolute; width: 100%; height: 100%; border: 3px dashed #ff0055; border-radius: 50%; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; top: 0; left: 0; box-sizing: border-box; }
     @keyframes pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.1); opacity: 1; } }
 
-    /* АНИМАЦИИ УРОНА */
-    .floating-text {
-      position: absolute; font-size: 26px; font-weight: 900; pointer-events: none;
-      animation: floatUp 1.5s ease-out forwards; z-index: 100; text-shadow: 2px 2px 0 #000, 0 0 15px currentColor;
-    }
+    .floating-text { position: absolute; font-size: 26px; font-weight: 900; pointer-events: none; animation: floatUp 1.5s ease-out forwards; z-index: 100; text-shadow: 2px 2px 0 #000, 0 0 15px currentColor; }
     @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 1; transform: translateY(-20px) scale(1.2); } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
-    /* ЛОГ ИГРЫ */
-    .game-log {
-      position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 320px; text-align: center; font-size: 13px; color: #4facfe; font-weight: bold; z-index: 10;
-      text-shadow: 1px 1px 4px #000; background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 10px;
-      border: 1px solid rgba(79, 172, 254, 0.5); box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-      transition: opacity 0.3s;
-    }
+    .game-log { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 320px; text-align: center; font-size: 13px; color: #4facfe; font-weight: bold; z-index: 10; text-shadow: 1px 1px 4px #000; background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(79, 172, 254, 0.5); box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: opacity 0.3s; }
   </style>
 </head>
 <body>
 
-  <div id="menu">
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <div id="loading-screen">
+    <div class="loader" id="loader"></div>
+    <div id="error-msg">
+      ❌ Ошибка авторизации.<br>
+      <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
+    </div>
+    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
+  </div>
+
+  <!-- МЕНЮ ИГРЫ -->
+  <div id="menu" style="display: none;">
     <h1>🃏 Битва Мемов</h1>
     <p>Медленная тактика за 3D-столом</p>
     <button class="menu-btn" onclick="startGame(2)">Дуэль (1 на 1)</button>
@@ -255,6 +107,7 @@
     <button class="menu-btn" onclick="startGame(4)">Королевская битва (1 на 3)</button>
   </div>
 
+  <!-- ИГРА -->
   <div id="game-container">
     <div class="lamp-container">
       <div class="lamp-wire"></div>
@@ -264,7 +117,6 @@
 
     <div class="game-log" id="game-log">Нажми на карту, чтобы прочитать описание</div>
 
-    <!-- Объемный стол -->
     <div class="table-wrapper">
       <div class="table-top">
         <div class="table-text" id="table-text">Ожидание...</div>
@@ -288,6 +140,14 @@
   </div>
 
   <script>
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'cards';
+
+    let token = localStorage.getItem('auth_token');
+    let wins = 0; // Количество побед для ачивки
+
     const CARDS_LIB = [
       { id: 'rock', name: 'Скала', icon: '🗿', dmg: 0, heal: 0, shield: 15, desc: 'Дает 15 брони.' },
       { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: '5 урона + яд (3 хода).' },
@@ -309,61 +169,53 @@
     let playerHand = [];
     let gameMode = 0;
 
-    function saveGame() {
-      if (players.length === 0) return;
-      const state = {
-        players: players,
-        currentTurn: currentTurn,
-        playerHand: playerHand,
-        gameMode: gameMode
-      };
-      localStorage.setItem('memeBattleSave', JSON.stringify(state));
+    // --- ЗАГРУЗКА ---
+    async function initGame() {
+        if (!token) {
+            showError();
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (res.status === 401 || res.status === 403) { showError(); return; }
+            
+            const data = await res.json();
+            wins = data.wins || 0;
+            
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+        } catch (error) {
+            showError("Ошибка соединения с сервером.");
+        }
     }
 
-    function loadGame() {
-      const saved = localStorage.getItem('memeBattleSave');
-      if (!saved) return false;
-
-      try {
-        const state = JSON.parse(saved);
-        players = state.players;
-        currentTurn = state.currentTurn;
-        playerHand = state.playerHand;
-        gameMode = state.gameMode;
-
-        // Восстановление совместимости (если старые сохранения без poisonTurns)
-        players.forEach(p => { if (p.poisonTurns === undefined) p.poisonTurns = 0; });
-
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
-
-        const botSeats = ['seat-1', 'seat-2', 'seat-3'];
-        for (let i = 1; i < players.length; i++) {
-          document.getElementById(botSeats[i-1]).style.display = 'flex';
-        }
-        for (let i = players.length - 1; i < 3; i++) {
-          document.getElementById(botSeats[i]).style.display = 'none';
-        }
-
-        updateUI();
-        renderHand();
-        document.getElementById('table-text').innerText = "Игра восстановлена!";
-        
-        if (currentTurn !== 0) {
-          document.getElementById('table-text').innerText = `Ход ${players[currentTurn].name}...`;
-          setTimeout(() => botPlay(currentTurn), 1500);
-        }
-
-        return true;
-      } catch(e) {
-        console.error(e);
-        return false;
-      }
+    function showError(text) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+        if (text) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${text}</span>`;
+        document.getElementById('btn-back').style.display = 'inline-block';
     }
 
+    async function saveGameToServer() {
+        if (!token) return;
+        try {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ wins: wins })
+            });
+        } catch (error) {}
+    }
+
+    // --- ЛОГИКА ИГРЫ ---
     function startGame(numPlayers) {
-      localStorage.removeItem('memeBattleSave'); 
-      
       document.getElementById('menu').style.display = 'none';
       document.getElementById('game-container').style.display = 'block';
       
@@ -387,7 +239,6 @@
       playerHand = [];
       drawCards(4);
       updateUI();
-      saveGame();
       nextTurn();
     }
 
@@ -399,17 +250,13 @@
         }
       }
       renderHand();
-      saveGame();
     }
 
     function renderHand() {
       const handEl = document.getElementById('player-hand');
       handEl.innerHTML = '';
       
-      if (playerHand.length === 0) {
-         drawCards(1);
-         return;
-      }
+      if (playerHand.length === 0) { drawCards(1); return; }
 
       playerHand.forEach((card, index) => {
         const cardEl = document.createElement('div');
@@ -425,14 +272,10 @@
 
     function selectCard(index) {
       if (currentTurn !== 0) return; 
-      if (players[0].status.includes('stun')) {
-        log("Ты в стане и не можешь ходить!");
-        return;
-      }
+      if (players[0].status.includes('stun')) { log("Ты в стане и не можешь ходить!"); return; }
 
       const card = playerHand[index];
 
-      // Если карта уже выбрана, снимаем выделение
       if (selectedCardIndex === index) {
         hideCardInfo();
         return;
@@ -445,14 +288,12 @@
       document.getElementById('info-desc').innerText = card.desc;
       document.getElementById('card-info').classList.add('active');
 
-      // Если карта требует цели (урон или стан)
       if (card.dmg > 0 || card.stun) {
         document.getElementById('info-hint').innerText = "Выбери цель для атаки (нажми на прицел).";
         isTargeting = true;
         document.getElementById('table-text').innerText = "Выбери цель!";
-        updateUI(); // Обновляем интерфейс, чтобы появились прицелы
+        updateUI(); 
       } else {
-        // Если карта мирная (лечение, броня), применяем сразу без второго клика
         applyCard(card, 0, index);
       }
     }
@@ -462,7 +303,7 @@
       selectedCardIndex = -1;
       isTargeting = false;
       document.getElementById('table-text').innerText = "Твой ход";
-      updateUI(); // Убираем прицелы
+      updateUI(); 
     }
 
     function showPlayedCard(card) {
@@ -475,109 +316,64 @@
     }
 
     function applyCard(card, targetIndex, handIndex) {
-      // Защита от случайного вызова карты урона без выбора цели
       if (!isTargeting && (card.dmg > 0 || card.stun)) return; 
 
       hideCardInfo(); 
-      
       const attacker = players[0];
       const target = players[targetIndex];
 
-      // Исправлен лог, теперь нет "Ты играешь против Ты"
-      if (targetIndex === 0) {
-        log(`Ты применяешь ${card.name}!`);
-      } else {
-        log(`Ты играешь ${card.name} против ${target.name}!`);
-      }
+      if (targetIndex === 0) { log(`Ты применяешь ${card.name}!`); } 
+      else { log(`Ты играешь ${card.name} против ${target.name}!`); }
       
       showPlayedCard(card);
 
-      if (card.heal) {
-        attacker.hp = Math.min(attacker.maxHp, attacker.hp + card.heal);
-        showFloatText(attacker, `+${card.heal}`, '#00ff00');
-      }
-      if (card.shield) {
-        attacker.shield += card.shield;
-        showFloatText(attacker, `🛡️ +${card.shield}`, '#4facfe');
-      }
+      if (card.heal) { attacker.hp = Math.min(attacker.maxHp, attacker.hp + card.heal); showFloatText(attacker, `+${card.heal}`, '#00ff00'); }
+      if (card.shield) { attacker.shield += card.shield; showFloatText(attacker, `🛡️ +${card.shield}`, '#4facfe'); }
       if (card.dmg) {
         let damage = card.dmg;
         if (target.shield > 0 && card.id !== 'skull') {
           const absorbed = Math.min(target.shield, damage);
-          target.shield -= absorbed;
-          damage -= absorbed;
+          target.shield -= absorbed; damage -= absorbed;
           showFloatText(target, `🛡️ -${absorbed}`, '#4facfe');
         }
         target.hp -= damage;
         if (damage > 0) showFloatText(target, `-${damage}`, '#ff0055');
       }
-      if (card.selfDmg) {
-        attacker.hp -= card.selfDmg;
-        showFloatText(attacker, `-${card.selfDmg}`, '#ff0055');
-      }
-      if (card.id === 'cat' && attacker.hp < 20) {
-        attacker.hp += 15;
-        showFloatText(attacker, `+15`, '#00ff00');
-      }
-      if (card.stun) {
-        target.status.push('stun');
-        showFloatText(target, `💫 СТАН`, '#ffeb3b');
-      }
-      if (card.poison) {
-        target.poisonTurns = 3; // Яд теперь висит 3 хода, а не вечно
-        showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0');
-      }
-      if (card.id === 'brain') {
-        drawCards(1);
-      }
+      if (card.selfDmg) { attacker.hp -= card.selfDmg; showFloatText(attacker, `-${card.selfDmg}`, '#ff0055'); }
+      if (card.id === 'cat' && attacker.hp < 20) { attacker.hp += 15; showFloatText(attacker, `+15`, '#00ff00'); }
+      if (card.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
+      if (card.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
+      if (card.id === 'brain') { drawCards(1); }
 
       playerHand.splice(handIndex, 1);
       drawCards(1);
       renderHand();
-
       checkDeaths();
       updateUI();
-      saveGame(); 
       
-      if (!checkGameOver()) {
-        setTimeout(nextTurn, 2500);
-      }
+      if (!checkGameOver()) { setTimeout(nextTurn, 2500); }
     }
 
     function nextTurn() {
       if (checkGameOver()) return;
-
       currentTurn++;
       if (currentTurn >= players.length) currentTurn = 0;
-      
-      if (!players[currentTurn].alive) {
-        nextTurn();
-        return;
-      }
+      if (!players[currentTurn].alive) { nextTurn(); return; }
 
       updateUI();
-      saveGame(); 
-
       if (currentTurn === 0) {
         document.getElementById('table-text').innerText = "Твой ход";
-        document.getElementById('info-hint').innerText = "Нажми на карту.";
-        
         if (players[0].status.includes('stun')) {
            log("Ты пропускаешь ход из-за стана!");
            players[0].status = players[0].status.filter(s => s !== 'stun');
-           setTimeout(nextTurn, 2500);
-           return;
+           setTimeout(nextTurn, 2500); return;
         }
-        
-        // Обработка яда игрока
         if (players[0].poisonTurns > 0) {
-           players[0].hp -= 5;
-           players[0].poisonTurns--;
+           players[0].hp -= 5; players[0].poisonTurns--;
            showFloatText(players[0], `☠️ -5`, '#a020f0');
            checkDeaths();
            if (!players[0].alive) { checkGameOver(); return; }
         }
-
       } else {
         document.getElementById('table-text').innerText = `Ход ${players[currentTurn].name}...`;
         setTimeout(() => botPlay(currentTurn), 2000);
@@ -586,18 +382,13 @@
 
     function botPlay(index) {
       const bot = players[index];
-      
       if (bot.status.includes('stun')) {
         log(`${bot.name} пропускает ход (стан)!`);
         bot.status = bot.status.filter(s => s !== 'stun');
-        setTimeout(nextTurn, 2500);
-        return;
+        setTimeout(nextTurn, 2500); return;
       }
-      
-      // Обработка яда бота
       if (bot.poisonTurns > 0) {
-        bot.hp -= 5;
-        bot.poisonTurns--;
+        bot.hp -= 5; bot.poisonTurns--;
         showFloatText(bot, `☠️ -5`, '#a020f0');
         checkDeaths();
         if (!bot.alive) { setTimeout(nextTurn, 2500); return; }
@@ -612,62 +403,32 @@
 
       const validTargets = players.filter(p => p.id !== bot.id && p.alive);
       let target = validTargets[Math.floor(Math.random() * validTargets.length)];
-      
       if (!target) { setTimeout(nextTurn, 2500); return; }
 
-      if (target.id === bot.id) {
-        log(`${bot.name} применяет ${cardToPlay.name}!`);
-      } else {
-        log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
-      }
-      
+      log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
       showPlayedCard(cardToPlay);
 
-      if (cardToPlay.heal) {
-        bot.hp = Math.min(bot.maxHp, bot.hp + cardToPlay.heal);
-        showFloatText(bot, `+${cardToPlay.heal}`, '#00ff00');
-      }
-      if (cardToPlay.shield) {
-        bot.shield += cardToPlay.shield;
-        showFloatText(bot, `🛡️ +${cardToPlay.shield}`, '#4facfe');
-      }
+      if (cardToPlay.heal) { bot.hp = Math.min(bot.maxHp, bot.hp + cardToPlay.heal); showFloatText(bot, `+${cardToPlay.heal}`, '#00ff00'); }
+      if (cardToPlay.shield) { bot.shield += cardToPlay.shield; showFloatText(bot, `🛡️ +${cardToPlay.shield}`, '#4facfe'); }
       if (cardToPlay.dmg) {
         let dmg = cardToPlay.dmg;
         if (target.shield > 0 && cardToPlay.id !== 'skull') {
            const abs = Math.min(target.shield, dmg);
-           target.shield -= abs;
-           dmg -= abs;
+           target.shield -= abs; dmg -= abs;
            showFloatText(target, `🛡️ -${abs}`, '#4facfe');
         }
         target.hp -= dmg;
         if (dmg > 0) showFloatText(target, `-${dmg}`, '#ff0055');
       }
-      if (cardToPlay.stun) {
-        target.status.push('stun');
-        showFloatText(target, `💫 СТАН`, '#ffeb3b');
-      }
-      if (cardToPlay.poison) {
-        target.poisonTurns = 3;
-        showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0');
-      }
+      if (cardToPlay.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
+      if (cardToPlay.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
 
-      checkDeaths();
-      updateUI();
-      saveGame(); 
-
-      if (!checkGameOver()) {
-        setTimeout(nextTurn, 2500);
-      }
+      checkDeaths(); updateUI();
+      if (!checkGameOver()) { setTimeout(nextTurn, 2500); }
     }
 
     function checkDeaths() {
-      players.forEach(p => {
-        if (p.hp <= 0 && p.alive) {
-          p.hp = 0;
-          p.alive = false;
-          log(`💀 ${p.name} уничтожен!`);
-        }
-      });
+      players.forEach(p => { if (p.hp <= 0 && p.alive) { p.hp = 0; p.alive = false; log(`💀 ${p.name} уничтожен!`); } });
     }
 
     function checkGameOver() {
@@ -677,75 +438,15 @@
       if (!playerAlive) {
         document.getElementById('table-text').innerText = "ТЫ ПРОИГРАЛ 💀";
         document.getElementById('table-text').style.color = "#ff0055";
-        localStorage.removeItem('memeBattleSave'); 
+        
+        // Кнопка возврата в меню
+        document.getElementById('game-log').innerHTML = `<button onclick="location.reload()" style="background:#ff0055; border:none; color:#fff; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:10px; cursor:pointer;">Вернуться в меню</button>`;
         return true;
       }
       if (aliveBots === 0) {
         document.getElementById('table-text').innerText = "ТЫ ПОБЕДИЛ! 👑";
         document.getElementById('table-text').style.color = "#ffd700";
-        localStorage.removeItem('memeBattleSave'); 
-        return true;
-      }
-      return false;
-    }
-
-    function updateUI() {
-      players.forEach((p, index) => {
-        let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
-        const seatEl = document.getElementById(seatId);
-        if (!seatEl) return;
-
-        let deckHTML = '';
-        if (p.isBot && p.alive) {
-           deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`;
-        }
-
-        // Генерация прицела прямо в интерфейсе (исправляет исчезновение)
-        let overlayHTML = '';
-        if (isTargeting && p.isBot && p.alive) {
-            overlayHTML = `<div class="target-overlay" onclick="event.stopPropagation(); applyCard(playerHand[selectedCardIndex], ${index}, selectedCardIndex)"></div>`;
-        }
-
-        seatEl.innerHTML = `
-          <div class="avatar-box ${p.isBot ? 'enemy' : ''} ${p.status.includes('stun') ? 'stunned' : ''} ${!p.alive ? 'dead' : ''}">
-            ${overlayHTML}
-            ${p.icon}
-          </div>
-          <div class="hp-bar-container">
-            <div class="hp-fill" style="width: ${(p.hp/p.maxHp)*100}%; background: ${p.hp > 20 ? '#00ff00' : '#ff0055'}"></div>
-            <div class="hp-text">${p.hp} HP ${p.shield > 0 ? '🛡️'+p.shield : ''}</div>
-          </div>
-          ${deckHTML}
-        `;
-      });
-    }
-
-    function showFloatText(target, text, color) {
-      const index = players.indexOf(target);
-      let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
-      const seat = document.getElementById(seatId);
-      if (!seat) return;
-
-      const float = document.createElement('div');
-      float.className = 'floating-text';
-      float.style.color = color;
-      float.innerText = text;
-      
-      seat.appendChild(float);
-      setTimeout(() => float.remove(), 1500);
-    }
-
-    function log(msg) {
-      document.getElementById('game-log').innerText = msg;
-    }
-
-    window.onload = () => {
-      const isLoaded = loadGame();
-      if (!isLoaded) {
-        document.getElementById('menu').style.display = 'flex';
-        document.getElementById('game-container').style.display = 'none';
-      }
-    };
-  </script>
-</body>
-</html>
+        
+        wins += 1;
+        saveGameToServer(); // Сохраняем победу на сервер!
+        
