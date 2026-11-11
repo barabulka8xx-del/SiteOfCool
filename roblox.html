@@ -16,7 +16,7 @@
       padding-bottom: 30px;
     }
 
-    /* --- ШАПКА --- */
+    /* --- ШАПКА (Старый стиль) --- */
     .header {
       position: sticky; top: 0; z-index: 50;
       background: rgba(15, 32, 39, 0.95);
@@ -28,14 +28,11 @@
     }
 
     .header-top {
-      display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .balance-box {
       display: flex; flex-direction: column;
     }
+
     .balance-label { font-size: 11px; color: #888; text-transform: uppercase; }
-    .balance-val { font-size: 24px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); transition: 0.2s; }
+    .balance-val { font-size: 28px; font-weight: bold; color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.3); transition: 0.2s; }
     .balance-val.negative { color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.3); }
 
     .actions-bar {
@@ -43,21 +40,21 @@
     }
 
     .btn-action {
-      flex: 1; padding: 10px 5px;
+      flex: 1; padding: 12px 5px;
       border: none; border-radius: 10px;
-      font-weight: bold; font-size: 12px; cursor: pointer;
+      font-weight: bold; font-size: 13px; cursor: pointer;
       transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
     }
     .btn-action:active { transform: scale(0.95); }
     
-    .btn-reset { flex: 0.6; background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
-    .btn-create { flex: 1.4; background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid #00ff00; }
+    .btn-create { background: rgba(0, 255, 0, 0.15); color: #00ff00; border: 1px solid #00ff00; }
     .btn-create:disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; color: #555; background: rgba(0,0,0,0.2); }
+    .btn-reset { flex: 0.6; background: rgba(255, 0, 85, 0.15); color: #ff0055; border: 1px solid #ff0055; }
 
-    /* --- СЕТКА ИГР --- */
+    /* --- СЕТКА ИГР (Старый стиль) --- */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 12px;
       padding: 15px;
       max-width: 600px;
@@ -75,6 +72,7 @@
     }
     .game-card:hover { border-color: #4facfe; transform: translateY(-3px); }
     
+    /* Стиль для твоей созданной игры */
     .game-card.custom-game {
       border: 2px dashed #ffeb3b;
       background: linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(32, 58, 67, 0.8));
@@ -132,10 +130,8 @@
 
   <div class="header">
     <div class="header-top">
-      <div class="balance-box">
-        <div class="balance-label">Баланс</div>
-        <div class="balance-val" id="balance-display">0 💵</div>
-      </div>
+      <div class="balance-label">Баланс</div>
+      <div class="balance-val" id="balance-display">0 💵</div>
     </div>
 
     <div class="actions-bar">
@@ -149,7 +145,7 @@
   <script>
     const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
 
-    // ПОЛНЫЙ СПИСОК 25 БАЗОВЫХ ИГР (восстановлено)
+    // ПОЛНЫЙ СПИСОК 25 БАЗОВЫХ ИГР
     const BASE_GAMES = [
       { id: 'grow_a_garden', name: 'Grow a Garden', icon: '🌱', baseOnline: 1058604 },
       { id: 'dress_to_impress', name: 'Dress to Impress', icon: '👗', baseOnline: 473514 },
@@ -192,12 +188,17 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
+          
+          // Восстанавливаем баланс и портфель
           state.balance = parsed.balance !== undefined ? parsed.balance : 1000;
           state.portfolio = parsed.portfolio || {};
           state.nextGamePrice = parsed.nextGamePrice !== undefined ? parsed.nextGamePrice : 10000;
           
-          if (!parsed.gamesData || parsed.gamesData.length < 25) {
-             // Если сейв старый и в нем нет 25 игр, берем базу
+          // САМАЯ ВАЖНАЯ ПРОВЕРКА (АНТИ-БАГ):
+          // Если в сейве нет поля 'gamesData', или там меньше 25 игр, или первая игра не имеет поля 'name' 
+          // (что и вызывало undefined), мы стираем старые игры и грузим чистую базу.
+          if (!parsed.gamesData || parsed.gamesData.length < 25 || !parsed.gamesData[0].name) {
+             console.warn("Сломанный сейв обнаружен. Восстанавливаем базу игр.");
              state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
              state.gamesData.forEach(g => g.online = g.baseOnline);
           } else {
@@ -205,10 +206,12 @@
           }
           
         } catch(e) {
+          console.error("Ошибка парсинга сейва:", e);
           state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
           state.gamesData.forEach(g => g.online = g.baseOnline);
         }
       } else {
+        // Первый запуск
         state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
         state.gamesData.forEach(g => g.online = g.baseOnline);
       }
@@ -240,10 +243,8 @@
         upgrades: 0
       };
 
-      state.gamesData.unshift(newGame); // Созданную игру ставим в начало сетки
-      
-      // Увеличиваем цену следующей игры на 50к
-      state.nextGamePrice += 50000;
+      state.gamesData.unshift(newGame); // Созданную игру ставим в начало
+      state.nextGamePrice += 50000; // Следующая игра +50к
 
       updateUI();
       saveGame();
@@ -310,15 +311,15 @@
 
         state.gamesData.forEach(game => {
           if (game.isCustom) {
-            // Логика для твоих игр: летит вверх или падает вниз
+            // Твои игры: 50 на 50 летят или падают
             const isFlying = Math.random() > 0.5;
             
             if (isFlying) {
-              const income = Math.floor(Math.random() * 20) + 5; // Генерит от 5 до 25
+              const income = Math.floor(Math.random() * 20) + 5; // +5 до +25
               game.online += income;
               totalIncome += income;
             } else {
-              const loss = Math.floor(Math.random() * 15) + 5; // Теряет от 5 до 20
+              const loss = Math.floor(Math.random() * 15) + 5; // -5 до -20
               game.online = Math.max(1, game.online - loss);
               totalIncome -= loss;
             }
@@ -344,7 +345,7 @@
         updateUI();
         saveGame();
 
-      }, 3000); // Тик каждые 3 секунды
+      }, 3000); // Каждые 3 секунды
     }
 
     function updateUI() {
@@ -358,7 +359,7 @@
       }
 
       const createBtn = document.getElementById('btn-create');
-      createBtn.innerText = `➕ Создать (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
+      createBtn.innerText = `➕ Создать игру (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
       if (state.balance < state.nextGamePrice) {
         createBtn.disabled = true;
       } else {
