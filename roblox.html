@@ -230,11 +230,21 @@
   <audio id="event-sound" src="picpopyl.mp3" preload="auto"></audio>
 
   <script>
-    const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
-    let currentGameId = null;
+    // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; // ВАЖНО: HTTP!
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
 
-    // Звук
-    const sound = document.getElementById('event-sound');
+    let playerId = localStorage.getItem('playerId');
+    if (!playerId) {
+        playerId = 'player_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('playerId', playerId);
+    }
+
+    let state = { balance: 1000, portfolio: {}, gamesData: [], nextGamePrice: 10000 };
+    let gameLoopInterval = null;
+    let isGameLoaded = false;
+    let currentGameId = null;
 
     const BASE_GAMES = [
       { id: 'grow_a_garden', name: 'Grow a Garden', icon: '🌱', baseOnline: 1058604 },
@@ -264,40 +274,61 @@
       { id: 'flood_escape', name: 'Flood Escape 2', icon: '🌊', baseOnline: 5 }
     ];
 
-    let state = { balance: 1000, portfolio: {}, gamesData: [], nextGamePrice: 10000 };
-    let gameLoopInterval = null;
-
-    function init() {
-      const saved = localStorage.getItem(SAVE_KEY);
-      if (saved) {
+    // --- 2. ФУНКЦИИ РАБОТЫ С СЕРВЕРОМ ---
+    async function loadGameFromServer() {
         try {
-          const parsed = JSON.parse(saved);
-          state.balance = parsed.balance !== undefined ? parsed.balance : 1000;
-          state.portfolio = parsed.portfolio || {};
-          state.nextGamePrice = parsed.nextGamePrice !== undefined ? parsed.nextGamePrice : 10000;
-          
-          if (!parsed.gamesData || parsed.gamesData.length < BASE_GAMES.length || !parsed.gamesData[0].name) {
-             state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
-             state.gamesData.forEach(g => g.online = g.baseOnline);
-          } else {
-            state.gamesData = parsed.gamesData;
-          }
-        } catch(e) {
-          state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
-          state.gamesData.forEach(g => g.online = g.baseOnline);
+            const response = await fetch(`${API_URL}/load/${playerId}`);
+            if (!response.ok) throw new Error('Ошибка сети');
+            
+            const data = await response.json();
+            
+            state.balance = data.balance;
+            state.portfolio = data.portfolio;
+            state.nextGamePrice = data.nextGamePrice;
+            
+            // Восстанавливаем игры (если сервер не отдал, берем базовые)
+            if (!data.gamesData || data.gamesData.length < BASE_GAMES.length) {
+                state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+                state.gamesData.forEach(g => g.online = g.baseOnline);
+            } else {
+                state.gamesData = data.gamesData;
+            }
+            
+            isGameLoaded = true;
+            updateUI();
+            startGameLoop();
+            startEventLoop();
+            console.log("Игра загружена с сервера!");
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            alert('Не удалось подключиться к серверу. Включен офлайн-режим (прогресс не сохранится).');
+            state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+            state.gamesData.forEach(g => g.online = g.baseOnline);
+            updateUI();
+            startGameLoop();
         }
-      } else {
-        state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
-        state.gamesData.forEach(g => g.online = g.baseOnline);
-      }
-
-      updateUI();
-      startGameLoop();
-      startEventLoop();
     }
 
-    function saveGame() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+    async function saveGameToServer() {
+        if (!isGameLoaded) return;
+        try {
+            await fetch(`${API_URL}/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: playerId,
+                    balance: state.balance,
+                    portfolio: state.portfolio,
+                    nextGamePrice: state.nextGamePrice,
+                    gamesData: state.gamesData
+                })
+            });
+        } catch (error) {
+            console.error('Ошибка сохранения:', error);
+        }
+    }
 
+    // --- 3. ИГРОВАЯ ЛОГИКА ---
     function createGame() {
       if (state.balance < state.nextGamePrice) { alert(`Недостаточно средств! Нужно: ${state.nextGamePrice.toLocaleString('ru-RU')} 💵`); return; }
       state.balance -= state.nextGamePrice;
@@ -307,7 +338,7 @@
         icon: '🛠️', baseOnline: 100, online: 100, isCustom: true, upgrades: 0
       });
       state.nextGamePrice += 50000;
-      updateUI(); saveGame();
+      updateUI(); saveGameToServer();
     }
 
     function upgradeGame(gameId, e) {
@@ -319,18 +350,16 @@
       state.balance -= upgradeCost;
       game.upgrades = (game.upgrades || 0) + 1;
       game.baseOnline += 10; game.online += 10;
-      updateUI(); saveGame();
+      updateUI(); saveGameToServer();
     }
 
     function openModal(gameId) {
       currentGameId = gameId;
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
-
       document.getElementById('modal-icon').innerText = game.icon;
       document.getElementById('modal-title').innerText = game.name;
       updateModalData();
-      
       document.getElementById('game-modal').classList.add('active');
       drawChart(game);
     }
@@ -339,21 +368,15 @@
       if (!currentGameId) return;
       const game = state.gamesData.find(g => g.id === currentGameId);
       if (!game) return;
-
       const shares = state.portfolio[game.id] ? state.portfolio[game.id].shares : 0;
-      
       document.getElementById('modal-online').innerText = game.online.toLocaleString('ru-RU');
       document.getElementById('modal-price').innerText = game.online.toLocaleString('ru-RU') + ' 💵';
       document.getElementById('modal-shares').innerText = shares + ' шт.';
-
       const btnBuy = document.getElementById('modal-btn-buy');
       const btnSell = document.getElementById('modal-btn-sell');
-
       btnBuy.innerText = `Купить (${game.online.toLocaleString('ru-RU')})`;
       btnBuy.disabled = state.balance < game.online;
-      
       btnSell.disabled = shares === 0;
-
       btnBuy.onclick = () => { buy(game.id); updateModalData(); };
       btnSell.onclick = () => { sell(game.id); updateModalData(); };
     }
@@ -366,16 +389,14 @@
 
     function drawChart(game) {
       const canvas = document.getElementById('game-chart');
+      if(!canvas) return;
       const ctx = canvas.getContext('2d');
-      
       const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = rect.width * 2;
       canvas.height = rect.height * 2;
       ctx.scale(2, 2);
-
       const w = rect.width;
       const h = rect.height;
-
       const points = [];
       let currentVal = game.online;
       for (let i = 0; i < 30; i++) {
@@ -384,86 +405,59 @@
         currentVal += noise;
       }
       points[points.length - 1] = game.online;
-
       const maxVal = Math.max(...points) * 1.05;
       const minVal = Math.min(...points) * 0.95;
       const range = maxVal - minVal || 1;
-
       ctx.clearRect(0, 0, w, h);
-
       ctx.strokeStyle = 'rgba(79, 172, 254, 0.1)';
       ctx.lineWidth = 1;
-      for(let i=1; i<4; i++) {
-        ctx.beginPath(); ctx.moveTo(0, h * i / 4); ctx.lineTo(w, h * i / 4); ctx.stroke();
-      }
-
+      for(let i=1; i<4; i++) { ctx.beginPath(); ctx.moveTo(0, h * i / 4); ctx.lineTo(w, h * i / 4); ctx.stroke(); }
       ctx.beginPath();
       ctx.strokeStyle = game.online >= game.baseOnline ? '#00ff00' : '#ff0055';
       ctx.lineWidth = 3;
       ctx.lineJoin = 'round';
-
       points.forEach((val, i) => {
         const x = (i / (points.length - 1)) * w;
         const y = h - ((val - minVal) / range) * h;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       });
       ctx.stroke();
-
-      ctx.lineTo(w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
+      ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
       const gradient = ctx.createLinearGradient(0, 0, 0, h);
       if (game.online >= game.baseOnline) {
-        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.3)');
-        gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
+        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.3)'); gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
       } else {
-        gradient.addColorStop(0, 'rgba(255, 0, 85, 0.3)');
-        gradient.addColorStop(1, 'rgba(255, 0, 85, 0)');
+        gradient.addColorStop(0, 'rgba(255, 0, 85, 0.3)'); gradient.addColorStop(1, 'rgba(255, 0, 85, 0)');
       }
-      ctx.fillStyle = gradient;
-      ctx.fill();
+      ctx.fillStyle = gradient; ctx.fill();
     }
 
     function buy(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
       const price = game.online;
-      if (state.balance < price) {
-        showFloatIncome('-', price, '#ff0055', document.getElementById('modal-content-box'));
-        return;
-      }
+      if (state.balance < price) { showFloatIncome('-', price, '#ff0055', document.getElementById('modal-content-box')); return; }
       state.balance -= price;
       state.portfolio[gameId] = state.portfolio[gameId] || { shares: 0, avgBuyPrice: 0 };
-      
       const port = state.portfolio[gameId];
       const totalCost = (port.avgBuyPrice * port.shares) + price;
       port.shares += 1;
       port.avgBuyPrice = totalCost / port.shares;
-
-      updateUI(); saveGame();
+      updateUI(); saveGameToServer();
     }
 
     function sell(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
-      
       const port = state.portfolio[gameId];
       if (!port || port.shares <= 0) return;
-
       const price = game.online;
       const profit = price - (port.avgBuyPrice || 0);
-      
       state.balance += price;
       port.shares -= 1;
-
-      if (profit > 0) {
-        showFloatIncome('+', profit, '#00ff00', document.getElementById('modal-content-box'), true);
-      } else if (profit < 0) {
-        showFloatIncome('', profit, '#ff0055', document.getElementById('modal-content-box'), true);
-      }
-
-      updateUI(); saveGame();
+      if (profit > 0) showFloatIncome('+', profit, '#00ff00', document.getElementById('modal-content-box'), true);
+      else if (profit < 0) showFloatIncome('', profit, '#ff0055', document.getElementById('modal-content-box'), true);
+      updateUI(); saveGameToServer();
     }
 
     function startGameLoop() {
@@ -473,68 +467,41 @@
         state.gamesData.forEach(game => {
           if (game.isCustom) {
             const isFlying = Math.random() > 0.5;
-            if (isFlying) {
-              const income = Math.floor(Math.random() * 20) + 5;
-              game.online += income;
-              totalIncome += income;
-            } else {
-              const loss = Math.floor(Math.random() * 15) + 5;
-              game.online = Math.max(1, game.online - loss);
-              totalIncome -= loss;
-            }
+            if (isFlying) { const income = Math.floor(Math.random() * 20) + 5; game.online += income; totalIncome += income; } 
+            else { const loss = Math.floor(Math.random() * 15) + 5; game.online = Math.max(1, game.online - loss); totalIncome -= loss; }
             if (game.online < 1) game.online = 1;
           } else {
             const change = Math.floor(Math.random() * 21) - 10;
             game.online = Math.max(0, game.online + change);
           }
         });
-
         if (totalIncome !== 0) {
           state.balance += totalIncome;
-          if (totalIncome > 0) {
-             showFloatIncome('+', totalIncome, '#00ff00', document.getElementById('balance-display'));
-          } else {
-             showFloatIncome('', totalIncome, '#ff0055', document.getElementById('balance-display'));
-          }
+          if (totalIncome > 0) showFloatIncome('+', totalIncome, '#00ff00', document.getElementById('balance-display'));
+          else showFloatIncome('', totalIncome, '#ff0055', document.getElementById('balance-display'));
         }
-        
         updateUI();
-        if (currentGameId) {
-          updateModalData();
-          const game = state.gamesData.find(g => g.id === currentGameId);
-          if(game) drawChart(game); 
-        }
-        saveGame();
+        if (currentGameId) { updateModalData(); const game = state.gamesData.find(g => g.id === currentGameId); if(game) drawChart(game); }
+        saveGameToServer(); 
       }, 3000);
     }
 
     function startEventLoop() {
-      setInterval(() => {
-        if (Math.random() < 0.3) {
-          triggerEvent();
-        }
-      }, 10000);
+      setInterval(() => { if (Math.random() < 0.3) { triggerEvent(); } }, 10000);
     }
 
     function triggerEvent() {
       const validGames = state.gamesData.filter(g => !g.isCustom);
       if (validGames.length === 0) return;
-      
       const game = validGames[Math.floor(Math.random() * validGames.length)];
       const isPeak = Math.random() > 0.5;
-      
       const eventBanner = document.getElementById('event-banner');
-      
-      // ПРОИГРЫВАЕМ ЗВУК
-      if (sound) {
-        sound.currentTime = 0; // Сбрасываем на начало
-        sound.play().catch(e => console.log("Браузер заблокировал звук до первого клика"));
-      }
-
+      const sound = document.getElementById('event-sound');
+      if (sound) { sound.currentTime = 0; sound.play().catch(e => {}); }
       if (isPeak) {
         const multiplier = 5 + Math.floor(Math.random() * 5);
         game.online = Math.floor(game.online * multiplier);
-        eventBanner.innerText = `👑 ПИК ПОПУЛЯРНОСТИ: ${game.name.toUpperCase()}! 👑`;
+        eventBanner.innerText = `👑 ПИК: ${game.name.toUpperCase()}! 👑`;
         eventBanner.style.background = 'linear-gradient(135deg, #f5af19, #f12711)';
       } else {
         const multiplier = 2 + Math.floor(Math.random() * 2);
@@ -542,32 +509,20 @@
         eventBanner.innerText = `🔥 ХАЙП: ${game.name.toUpperCase()}! 🔥`;
         eventBanner.style.background = 'linear-gradient(135deg, #ffd700, #ff8c00)';
       }
-
       eventBanner.classList.add('show');
-      
       updateUI();
-      if (currentGameId) {
-        updateModalData();
-        const currentG = state.gamesData.find(g => g.id === currentGameId);
-        if(currentG) drawChart(currentG);
-      }
-      saveGame();
-
-      setTimeout(() => {
-        eventBanner.classList.remove('show');
-      }, 4000);
+      if (currentGameId) { updateModalData(); const currentG = state.gamesData.find(g => g.id === currentGameId); if(currentG) drawChart(currentG); }
+      saveGameToServer();
+      setTimeout(() => { eventBanner.classList.remove('show'); }, 4000);
     }
 
     function updateUI() {
       const balEl = document.getElementById('balance-display');
       balEl.innerText = state.balance.toLocaleString('ru-RU') + ' 💵';
-      if (state.balance < 0) balEl.classList.add('negative');
-      else balEl.classList.remove('negative');
-
+      if (state.balance < 0) balEl.classList.add('negative'); else balEl.classList.remove('negative');
       const createBtn = document.getElementById('btn-create');
       createBtn.innerText = `➕ Создать (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
       createBtn.disabled = state.balance < state.nextGamePrice;
-
       const grid = document.getElementById('games-grid');
       if (grid.children.length !== state.gamesData.length) {
         grid.innerHTML = '';
@@ -579,34 +534,22 @@
           grid.appendChild(card);
         });
       }
-
       state.gamesData.forEach(game => {
         const card = document.getElementById('card-' + game.id);
         if (!card) return;
-
         const shares = state.portfolio[game.id] ? state.portfolio[game.id].shares : 0;
         const isUp = game.online >= game.baseOnline; 
-
         let customHTML = '';
         if (game.isCustom) {
           const upgradeCost = state.nextGamePrice;
-          customHTML = `
-            <button class="btn-upgrade" onclick="upgradeGame('${game.id}', event)" ${state.balance < upgradeCost ? 'disabled' : ''}>
-              🚀 Обнова (${upgradeCost.toLocaleString('ru-RU')} 💵)
-            </button>
-          `;
+          customHTML = `<button class="btn-upgrade" onclick="upgradeGame('${game.id}', event)" ${state.balance < upgradeCost ? 'disabled' : ''}>🚀 Обнова (${upgradeCost.toLocaleString('ru-RU')} 💵)</button>`;
         }
-
         card.innerHTML = `
           <div class="game-icon">${game.icon}</div>
           <div class="game-name">${game.name}</div>
-          <div class="game-online ${isUp ? 'trend-up' : 'trend-down'}">
-            ${game.online.toLocaleString('ru-RU')} ${isUp ? '▲' : '▼'}
-          </div>
+          <div class="game-online ${isUp ? 'trend-up' : 'trend-down'}">${game.online.toLocaleString('ru-RU')} ${isUp ? '▲' : '▼'}</div>
           <div class="game-price">Цена: ${game.online.toLocaleString('ru-RU')}</div>
-          <div class="portfolio-info">
-            Акции: ${shares} ${shares > 0 ? '✅' : '❌'}
-          </div>
+          <div class="portfolio-info">Акции: ${shares} ${shares > 0 ? '✅' : '❌'}</div>
           ${customHTML}
         `;
       });
@@ -618,36 +561,24 @@
       el.style.color = color;
       const text = prefix === '' ? amount.toLocaleString('ru-RU') : `${prefix}${amount.toLocaleString('ru-RU')} 💵`;
       el.innerText = text;
-
-      if (isModal && targetEl) {
-        el.style.left = '50%';
-        el.style.top = '40%';
-        el.style.transform = 'translate(-50%, 0)';
-      } else if (targetEl) {
-        const rect = targetEl.getBoundingClientRect();
-        el.style.left = rect.left + 'px';
-        el.style.top = (rect.top - 20) + 'px';
-      } else {
-        el.style.left = '50%'; el.style.top = '30%'; el.style.transform = 'translateX(-50%)';
-      }
-      
-      if (isModal && targetEl) {
-         targetEl.appendChild(el);
-      } else {
-         document.body.appendChild(el);
-      }
-      
+      if (isModal && targetEl) { el.style.left = '50%'; el.style.top = '40%'; el.style.transform = 'translate(-50%, 0)'; } 
+      else if (targetEl) { const rect = targetEl.getBoundingClientRect(); el.style.left = rect.left + 'px'; el.style.top = (rect.top - 20) + 'px'; } 
+      else { el.style.left = '50%'; el.style.top = '30%'; el.style.transform = 'translateX(-50%)'; }
+      if (isModal && targetEl) targetEl.appendChild(el); else document.body.appendChild(el);
       setTimeout(() => el.remove(), 1500);
     }
 
     function resetGame() {
-      if (confirm("Ты уверен, что хочешь полностью сбросить прогресс?")) {
-        localStorage.removeItem(SAVE_KEY);
+      if (confirm("Сбросить весь прогресс? Это действие необратимо!")) {
+        state.balance = 1000; state.portfolio = {}; state.nextGamePrice = 10000;
+        state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+        state.gamesData.forEach(g => g.online = g.baseOnline);
+        saveGameToServer();
         location.reload();
       }
     }
 
-    window.onload = init;
+    window.onload = loadGameFromServer;
   </script>
 </body>
 </html>
