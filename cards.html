@@ -450,3 +450,50 @@
         wins += 1;
         saveGameToServer(); // Сохраняем победу на сервер!
         
+        document.getElementById('game-log').innerHTML = `<button onclick="location.reload()" style="background:#ffd700; border:none; color:#000; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:10px; cursor:pointer;">Забрать награду</button>`;
+        return true;
+      }
+      return false;
+    }
+
+    function updateUI() {
+      players.forEach((p, index) => {
+        let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
+        const seatEl = document.getElementById(seatId);
+        if (!seatEl) return;
+
+        let deckHTML = '';
+        if (p.isBot && p.alive) { deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`; }
+        let overlayHTML = '';
+        if (isTargeting && p.isBot && p.alive) { overlayHTML = `<div class="target-overlay" onclick="event.stopPropagation(); applyCard(playerHand[selectedCardIndex], ${index}, selectedCardIndex)"></div>`; }
+
+        seatEl.innerHTML = `
+          <div class="avatar-box ${p.isBot ? 'enemy' : ''} ${p.status.includes('stun') ? 'stunned' : ''} ${!p.alive ? 'dead' : ''}">
+            ${overlayHTML} ${p.icon}
+          </div>
+          <div class="hp-bar-container">
+            <div class="hp-fill" style="width: ${(p.hp/p.maxHp)*100}%; background: ${p.hp > 20 ? '#00ff00' : '#ff0055'}"></div>
+            <div class="hp-text">${p.hp} HP ${p.shield > 0 ? '🛡️'+p.shield : ''}</div>
+          </div>
+          ${deckHTML}
+        `;
+      });
+    }
+
+    function showFloatText(target, text, color) {
+      const index = players.indexOf(target);
+      let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
+      const seat = document.getElementById(seatId);
+      if (!seat) return;
+      const float = document.createElement('div');
+      float.className = 'floating-text'; float.style.color = color; float.innerText = text;
+      seat.appendChild(float);
+      setTimeout(() => float.remove(), 1500);
+    }
+
+    function log(msg) { document.getElementById('game-log').innerText = msg; }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>
