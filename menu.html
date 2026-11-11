@@ -19,454 +19,330 @@
       overflow-x: hidden;
     }
 
-    /* --- ВЕРХНЯЯ ПАНЕЛЬ С КНОПКОЙ ИНФО --- */
+    /* --- СТИЛИ АВТОРИЗАЦИИ --- */
+    #auth-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f2027; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .auth-box { background: #1a2a33; padding: 30px 20px; border-radius: 20px; width: 100%; max-width: 350px; border: 2px solid #4facfe; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
+    .auth-box h2 { margin-bottom: 20px; color: #4facfe; }
+    .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0f2027; color: #fff; font-size: 16px; outline: none; }
+    .auth-input:focus { border-color: #4facfe; }
+    .btn-auth { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; margin-bottom: 10px; }
+    .btn-switch { background: transparent; color: #888; border: none; font-size: 14px; cursor: pointer; text-decoration: underline; }
+    #auth-error { color: #ff0055; font-size: 14px; margin-bottom: 10px; font-weight: bold; display: none; }
+
+    /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
     .top-nav {
       width: 100%;
       max-width: 500px;
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: -10px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
       z-index: 10;
     }
 
-    .btn-info {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: rgba(79, 172, 254, 0.2);
-      border: 1px solid #4facfe;
-      color: #4facfe;
-      font-size: 18px;
-      font-weight: bold;
-      font-family: serif; /* Чтобы "i" выглядела красиво */
+    .user-profile {
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 0 10px rgba(79, 172, 254, 0.2);
+      gap: 10px;
+      background: rgba(79, 172, 254, 0.1);
+      padding: 5px 15px;
+      border-radius: 20px;
+      border: 1px solid #4facfe;
+    }
+    .user-name { font-size: 14px; font-weight: bold; color: #4facfe; }
+    .logout-btn { font-size: 12px; color: #ff0055; cursor: pointer; text-decoration: underline; }
+
+    .btn-info {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe;
+      color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: 0.2s;
     }
     .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
 
     h1 {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      margin-top: 10px;
-      color: #fff;
-      text-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
-      text-align: center;
+      font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px;
+      color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center;
     }
 
-    .container {
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      padding-bottom: 40px;
-    }
+    .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
-    /* --- ОБЩИЕ СТИЛИ ДЛЯ БАННЕРОВ --- */
-    .banner {
-      width: 100%;
-      border-radius: 20px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-decoration: none;
-      position: relative;
-      overflow: hidden;
-      transition: 0.3s;
-      cursor: pointer;
-    }
+    /* --- БАННЕРЫ И КАРТОЧКИ --- */
+    .banner { width: 100%; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
     .banner:active { transform: scale(0.98); }
-
-    .banner::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%; width: 200%; height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-      transform: rotate(45deg);
-      animation: shine 3s infinite;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) rotate(45deg); }
-    }
-
-    .banner-info {
-      display: flex;
-      flex-direction: column;
-      z-index: 2;
-    }
-
-    .banner-badge {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-    }
-
-    .banner-title {
-      font-size: 22px;
-      font-weight: bold;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-
-    .banner-desc {
-      font-size: 12px;
-      margin-top: 5px;
-    }
-
-    .banner-icon-box {
-      width: 70px;
-      height: 70px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-    }
-
+    .banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+    @keyframes shine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+    .banner-info { display: flex; flex-direction: column; z-index: 2; }
+    .banner-badge { font-size: 12px; font-weight: 900; letter-spacing: 1px; margin-bottom: 5px; text-transform: uppercase; }
+    .banner-title { font-size: 22px; font-weight: bold; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    .banner-desc { font-size: 12px; margin-top: 5px; }
+    .banner-icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
     .banner-icon { font-size: 40px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
 
-    /* --- ТОП (ЗОЛОТОЙ) --- */
-    .banner-top {
-      background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%);
-      border: 2px solid #fff;
-      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
-      color: #000;
-    }
+    .banner-top { background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%); border: 2px solid #fff; box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3); color: #000; }
     .banner-top .banner-badge { color: #3e2723; }
     .banner-top .banner-desc { color: #3e2723; font-weight: 500; }
     .banner-top .banner-icon-box { background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1); }
 
-    /* --- НОВИНКА (ГОЛУБОЙ) --- */
-    .banner-new {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      border: 2px solid #4facfe;
-      box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
-      color: #fff;
-    }
+    .banner-new { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 2px solid #4facfe; box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3); color: #fff; }
     .banner-new .banner-badge { color: #4facfe; }
     .banner-new .banner-desc { color: #ccc; }
     .banner-new .banner-icon-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(79, 172, 254, 0.3); }
 
-    /* --- СЕТКА ИГР --- */
-    .games-list {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-    }
-
-    .game-card {
-      background: #203a43;
-      border-radius: 15px;
-      padding: 15px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid #2c5364;
-      transition: 0.2s;
-      cursor: pointer;
-      color: white;
-    }
-    
+    .games-list { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .game-card { background: #203a43; border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid #2c5364; transition: 0.2s; cursor: pointer; color: white; }
     .game-card:hover { border-color: #4facfe; transform: scale(1.03); }
-
-    .icon-box {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #2c5364, #203a43);
-      border-radius: 16px; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .game-icon {
-      font-size: 22px; 
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-      display: flex;
-      gap: 2px;
-    }
-
+    .icon-box { width: 60px; height: 60px; background: linear-gradient(135deg, #2c5364, #203a43); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+    .game-icon { font-size: 22px; display: flex; gap: 2px; }
     .game-title { font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 5px; }
     .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
-
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
-    /* --- МОДАЛЬНЫЕ ОКНА (ОБЩИЕ) --- */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center;
-      z-index: 100; backdrop-filter: blur(4px);
-      overflow-y: auto; 
-    }
+    /* --- МОДАЛЬНЫЕ ОКНА --- */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(4px); overflow-y: auto; }
     .modal-overlay.active { display: flex; }
-
-    .modal-content {
-      background: #151b22; padding: 25px 20px; 
-      padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); 
-      border-radius: 20px 20px 0 0; 
-      width: 100%; max-width: 500px; 
-      border: 2px solid #4facfe; border-bottom: none;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      text-align: center;
-      box-shadow: 0 -10px 30px rgba(79, 172, 254, 0.2);
-      max-height: 90vh; 
-      max-height: 90dvh; 
-      overflow-y: auto; 
-    }
+    .modal-content { background: #151b22; padding: 25px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; border: 2px solid #4facfe; border-bottom: none; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-    .modal-icon-box {
-      width: 80px; height: 80px;
-      background: linear-gradient(135deg, #2c5364, #203a43);
-      border-radius: 20px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 5px;
-      flex-shrink: 0; 
-    }
-    .modal-icon { font-size: 45px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); display: flex; gap: 5px; }
-
+    
+    .modal-icon-box { width: 80px; height: 80px; background: linear-gradient(135deg, #2c5364, #203a43); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 5px; flex-shrink: 0; }
+    .modal-icon { font-size: 45px; }
     .modal-title { font-size: 22px; font-weight: bold; color: #fff; }
     .modal-desc { font-size: 13px; color: #aaa; line-height: 1.4; margin-bottom: 5px; }
-    
-    .modal-date {
-      font-size: 11px; color: #4facfe; font-weight: bold;
-      background: rgba(79, 172, 254, 0.1); padding: 4px 10px; border-radius: 10px;
-      border: 1px solid rgba(79, 172, 254, 0.3);
-      margin-bottom: 10px; display: flex; align-items: center; gap: 5px;
-    }
+    .modal-date { font-size: 11px; color: #4facfe; font-weight: bold; background: rgba(79, 172, 254, 0.1); padding: 4px 10px; border-radius: 10px; border: 1px solid rgba(79, 172, 254, 0.3); margin-bottom: 10px; }
+    .btn-play { background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
+    .btn-close-modal { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
 
-    .btn-play {
-      background: linear-gradient(90deg, #00f2fe, #4facfe);
-      color: #000; border: none; padding: 15px; border-radius: 12px;
-      font-size: 18px; font-weight: bold; width: 100%; cursor: pointer;
-      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4); transition: 0.2s;
-      flex-shrink: 0;
-    }
-    .btn-play:active { transform: scale(0.95); }
-
-    .btn-close-modal {
-      background: transparent; border: 1px solid #444; color: #ccc;
-      padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold;
-      width: 100%; cursor: pointer; transition: 0.2s;
-      flex-shrink: 0;
-    }
-    .btn-close-modal:active { background: #333; }
-
-    /* --- СТИЛИ ДЛЯ ОКНА "О ПРОЕКТЕ" (README) --- */
-    .about-content {
-      text-align: left;
-      width: 100%;
-      font-size: 14px;
-      color: #ccc;
-      line-height: 1.5;
-    }
+    /* --- ОКНО "О ПРОЕКТЕ" --- */
+    .about-content { text-align: left; width: 100%; font-size: 14px; color: #ccc; line-height: 1.5; }
     .about-content h2 { color: #4facfe; font-size: 18px; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid rgba(79,172,254,0.3); padding-bottom: 5px;}
-    .about-content h3 { color: #fff; font-size: 15px; margin-top: 12px; margin-bottom: 6px; }
     .about-content p { margin-bottom: 10px; }
     .about-content ul { padding-left: 20px; margin-bottom: 10px; }
-    .about-content li { margin-bottom: 5px; }
     .about-content .check { color: #00ff00; font-weight: bold; }
     .about-content .cross { color: #555; font-weight: bold; }
-    
     .tech-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
-    .tech-badge {
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold;
-    }
-
-    .support-box {
-      background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe;
-      border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px;
-    }
-    .support-box a { color: #4facfe; text-decoration: none; font-weight: bold; }
+    .tech-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    .support-box { background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe; border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px; }
     .copyright { font-size: 11px; color: #666; text-align: center; margin-top: 20px; }
-
   </style>
 </head>
 <body>
 
-  <!-- Кнопка Инфо -->
-  <div class="top-nav">
-    <div class="btn-info" onclick="openAbout()">i</div>
+  <!-- ЭКРАН АВТОРИЗАЦИИ -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h2 id="auth-title">Вход в SiteOfCool</h2>
+      <div id="auth-error"></div>
+      <input type="text" id="auth-username" class="auth-input" placeholder="Логин">
+      <input type="password" id="auth-password" class="auth-input" placeholder="Пароль">
+      <button class="btn-auth" id="auth-submit" onclick="submitAuth()">Войти</button>
+      <button class="btn-switch" id="auth-switch" onclick="toggleAuthMode()">Нет аккаунта? Зарегистрироваться</button>
+    </div>
   </div>
 
-  <h1>🚀Наши Проекты🚀</h1>
-
-  <div class="container">
-
-    <!-- 1. ТОП БАННЕР (ЗОЛОТОЙ) -->
-    <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
-      <div class="banner-info">
-        <div class="banner-badge">👑 ТОП ИГРА 👑</div>
-        <div class="banner-title">Роблокс-Биржа</div>
-        <div class="banner-desc" id="banner-capital">Покупай акции и следи за онлайном.</div>
+  <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+  <div id="main-app" style="display: none; width: 100%; max-width: 500px; flex-direction: column; align-items: center;">
+    
+    <div class="top-nav">
+      <div class="user-profile">
+        <span class="user-name" id="user-display">Игрок</span>
+        <span class="logout-btn" onclick="logout()">Выйти</span>
       </div>
-      <div class="banner-icon-box">
-        <div class="banner-icon">📈</div>
-      </div>
+      <div class="btn-info" onclick="openAbout()">i</div>
     </div>
 
-    <!-- 2. НОВИНКА (ГОЛУБАЯ) -->
-    <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами в неоновом зале суда. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
-      <div class="banner-info">
-        <div class="banner-badge">🔥 НОВИНКА 🔥</div>
-        <div class="banner-title">Мемный Суд</div>
-        <div class="banner-desc">Сверши правосудие над мемами.</div>
+    <h1>🚀Наши Проекты🚀</h1>
+
+    <div class="container">
+      <!-- ТОП БАННЕР -->
+      <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
+        <div class="banner-info">
+          <div class="banner-badge">👑 ТОП ИГРА 👑</div>
+          <div class="banner-title">Роблокс-Биржа</div>
+          <div class="banner-desc" id="banner-capital">Загрузка капитала...</div>
+        </div>
+        <div class="banner-icon-box"><div class="banner-icon">📈</div></div>
       </div>
-      <div class="banner-icon-box">
-        <div class="banner-icon">⚖️</div>
+
+      <!-- НОВИНКА -->
+      <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
+        <div class="banner-info">
+          <div class="banner-badge">🔥 НОВИНКА 🔥</div>
+          <div class="banner-title">Мемный Суд</div>
+          <div class="banner-desc">Сверши правосудие над мемами.</div>
+        </div>
+        <div class="banner-icon-box"><div class="banner-icon">⚖️</div></div>
       </div>
+
+      <!-- СЕТКА -->
+      <div class="games-list">
+        <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Карточная игра за столом.', '10.11.2026')">
+          <div class="icon-box"><div class="game-icon">🃏</div></div>
+          <div class="game-title">Битва Мемов</div>
+          <div class="game-desc">Карточная игра.</div>
+        </div>
+        <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты.', '08.11.2026')">
+          <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
+          <div class="game-title">Гравитация</div>
+          <div class="game-desc">Планеты и дыры.</div>
+        </div>
+        <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Квадратные коты.', '05.11.2026')">
+          <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
+          <div class="game-title">Вселенная</div>
+          <div class="game-desc">Квадратные коты.</div>
+        </div>
+        <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь мир.', '02.11.2026')">
+          <div class="icon-box"><div class="game-icon">💣💥</div></div>
+          <div class="game-title">Апокалипсис</div>
+          <div class="game-desc">8 миллиардов.</div>
+        </div>
+        <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Коктейли.', '01.11.2026')">
+          <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
+          <div class="game-title">Напиток</div>
+          <div class="game-desc">Дорогие коктейли.</div>
+        </div>
+        <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Ловушка.', '28.10.2026')">
+          <div class="icon-box"><div class="game-icon">😈🔴</div></div>
+          <div class="game-title">Кнопка</div>
+          <div class="game-desc">Не нажимать.</div>
+        </div>
+        <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Причины.', '20.10.2026')">
+          <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
+          <div class="game-title">Отмазки</div>
+          <div class="game-desc">Для работы.</div>
+        </div>
+      </div>
+      <div class="footer">Создано с любовью и котами 🐈</div>
     </div>
-
-    <!-- СЕТКА ОСТАЛЬНЫХ ИГР -->
-    <div class="games-list">
-      
-      <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Атмосферная карточная игра за столом. Используй мемные карты, накладывай стан (ДПС) и уничтожь ботов!', '10.11.2026')">
-        <div class="icon-box"><div class="game-icon">🃏</div></div>
-        <div class="game-title">Битва Мемов</div>
-        <div class="game-desc">Карточная игра за столом.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты тапами, сталкивай их, сливай в огромные шары и превращай в черные дыры с магнитом и режимом хаоса.', '08.11.2026')">
-        <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
-        <div class="game-title">Гравитация</div>
-        <div class="game-desc">Создавай планеты и черные дыры.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Полный контроль над миром: квадратные коты, метеориты, НЛО, смена времени суток и режим наблюдателя.', '05.11.2026')">
-        <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
-        <div class="game-title">Управление Вселенной</div>
-        <div class="game-desc">Квадратные коты и хаос.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь 8 миллиардов человек на планете. Тапай по кнопке, покупай улучшения за осколки и запускай автокликер.', '02.11.2026')">
-        <div class="icon-box"><div class="game-icon">💣💥</div></div>
-        <div class="game-title">Кнопка Апокалипсиса</div>
-        <div class="game-desc">Уничтожь 8 миллиардов человек.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Сгенерируй случайный коктейль, который пахнет деньгами. Чем больше пьешь, тем абсурднее становится цена!', '01.11.2026')">
-        <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
-        <div class="game-title">Напиток-Миллионера</div>
-        <div class="game-desc">Генератор дорогих коктейлей.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '28.10.2026')">
-        <div class="icon-box"><div class="game-icon">😈🔴</div></div>
-        <div class="game-title">Опасная кнопка</div>
-        <div class="game-desc">То, что нельзя нажимать.</div>
-      </div>
-
-      <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '20.10.2026')">
-        <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
-        <div class="game-title">Генератор Отмазок</div>
-        <div class="game-desc">Железобетонные причины.</div>
-      </div>
-
-    </div>
-
-    <div class="footer">
-      Создано с любовью и котами 🐈
-    </div>
-
   </div>
 
-  <!-- ОКНО ОПИСАНИЯ ИГРЫ -->
+  <!-- МОДАЛЬНОЕ ОКНО ИГРЫ -->
   <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
-    <div class="modal-content" id="modal-content">
-      <div class="modal-icon-box">
-        <div class="modal-icon" id="modal-icon">🎮</div>
-      </div>
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-icon-box"><div class="modal-icon" id="modal-icon">🎮</div></div>
       <div class="modal-title" id="modal-title">Название</div>
-      <div class="modal-desc" id="modal-desc">Описание игры...</div>
-      <div class="modal-date" id="modal-date">⏱️ Обновлено: 10.11.2026</div>
+      <div class="modal-desc" id="modal-desc">Описание...</div>
+      <div class="modal-date" id="modal-date">⏱️ Обновлено</div>
       <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
       <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
     </div>
   </div>
 
-  <!-- ОКНО "О ПРОЕКТЕ" (README) -->
+  <!-- ОКНО "О ПРОЕКТЕ" -->
   <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
-    <div class="modal-content" id="about-content-box" style="border-color: #ffd700;" onclick="event.stopPropagation()">
-      
+    <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
-      
       <div class="about-content">
-        <p><b>Экосистема интерактивных веб-приложений, симуляторов и мини-игр.</b></p>
-        <p>Коллекция из 9 уникальных проектов, написанных на чистом стеке без использования сторонних фреймворков.</p>
-
+        <p><b>Единая экосистема игр с общим аккаунтом.</b></p>
         <h2>🧠 О проекте</h2>
-        <p><b>SiteOfCool</b> — это комплексная экосистема браузерных игр и интерактивных симуляторов.</p>
-        <p>Главная философия проекта — доказать, что для создания качественного, красивого и сложного пользовательского интерфейса (UI) не обязательно использовать тяжелые фреймворки. Вся экосистема работает на <b>Vanilla JavaScript (ES6+)</b>, что обеспечивает:</p>
-        <ul>
-          <li><b>Мгновенную загрузку:</b> Никаких этапов сборки и тяжелых бандлов.</li>
-          <li><b>Минимальное потребление памяти:</b> Прямая работа с DOM-деревом.</li>
-          <li><b>Глубокое понимание веба:</b> Каждая анимация и каждый расчет написаны вручную.</li>
-        </ul>
-
-        <h2>🎨 Ключевые особенности</h2>
-        <ul>
-          <li><b>Современный UI/UX:</b> Темные темы, неоновые свечения, эффекты Glassmorphism и 3D-трансформации.</li>
-          <li><b>Умный State Management:</b> Прогресс сохраняется локально в браузере. Для каждой игры используются изолированные хранилища.</li>
-          <li><b>Оптимизация:</b> Работа с Canvas API для графиков и использование DocumentFragment для массового спавна объектов (без зависаний).</li>
-          <li><b>Mobile-First:</b> Все интерфейсы адаптированы под сенсорные экраны.</li>
-        </ul>
-
+        <p>Мы используем Vanilla JavaScript (ES6+) для создания быстрых и красивых интерфейсов без тяжелых фреймворков.</p>
         <h2>🗺 Дорожная карта</h2>
         <ul>
-          <li><span class="check">✔</span> Запуск базовой версии Роблокс-Биржи.</li>
-          <li><span class="check">✔</span> Внедрение 3D-карточной игры (Битва Мемов).</li>
-          <li><span class="check">✔</span> Разработка Мемного Суда с анимациями.</li>
-          <li><span class="cross">☐</span> Глобальный рефакторинг CSS в global.css.</li>
-          <li><span class="cross">☐</span> Кросс-игровая интеграция валюты.</li>
-          <li><span class="cross">☐</span> PWA (Установка приложений на рабочий стол).</li>
+          <li><span class="check">✔</span> Единая регистрация (JWT).</li>
+          <li><span class="check">✔</span> Синхронизация прогресса в Бирже и Суде.</li>
+          <li><span class="cross">☐</span> Перевод остальных игр на сервер.</li>
         </ul>
-
-        <h2>🛠 Технологии</h2>
-        <div class="tech-badges">
-          <span class="tech-badge" style="color: #E34F26;">HTML5</span>
-          <span class="tech-badge" style="color: #1572B6;">CSS3</span>
-          <span class="tech-badge" style="color: #F7DF1E;">JavaScript</span>
-          <span class="tech-badge" style="color: #fff;">Canvas API</span>
-        </div>
-
         <div class="support-box">
           <h3>✉️ Поддержка</h3>
-          <p style="margin-bottom: 0;">По всем вопросам: <a href="mailto:chesssupport.lord@gmail.com">chesssupport.lord@gmail.com</a></p>
+          <p style="margin-bottom: 0;">Email: <a href="mailto:chesssupport.lord@gmail.com" style="color: #4facfe;">chesssupport.lord@gmail.com</a></p>
         </div>
-
-        <div class="copyright">
-          © 2026 SiteOfCool. Все права защищены.<br>
-          Копирование материалов без согласия автора запрещено.
-        </div>
+        <div class="copyright">© 2026 SiteOfCool. Все права защищены.</div>
       </div>
-
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
     </div>
   </div>
 
   <script>
-    // --- ЛОГИКА МОДАЛЬНЫХ ОКОН ---
+    const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+
+    let token = localStorage.getItem('auth_token');
+    let currentUsername = localStorage.getItem('auth_username');
+    let isRegisterMode = false;
     let currentGameUrl = '';
 
+    // --- АВТОРИЗАЦИЯ ---
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Вход в SiteOfCool';
+        document.getElementById('auth-submit').innerText = isRegisterMode ? 'Создать аккаунт' : 'Войти';
+        document.getElementById('auth-switch').innerText = isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
+        document.getElementById('auth-error').style.display = 'none';
+    }
+
+    async function submitAuth() {
+        const user = document.getElementById('auth-username').value.trim();
+        const pass = document.getElementById('auth-password').value.trim();
+        const err = document.getElementById('auth-error');
+        if (!user || !pass) { err.innerText = "Заполните все поля!"; err.style.display = 'block'; return; }
+
+        const endpoint = isRegisterMode ? '/register' : '/login';
+        
+        try {
+            const res = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                token = data.token;
+                currentUsername = data.username;
+                localStorage.setItem('auth_token', token);
+                localStorage.setItem('auth_username', currentUsername);
+                startApp();
+            } else {
+                err.innerText = data.error || "Ошибка входа";
+                err.style.display = 'block';
+            }
+        } catch (e) {
+            err.innerText = "Сервер недоступен.";
+            err.style.display = 'block';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_username');
+        location.reload();
+    }
+
+    // --- ЗАПУСК ПРИЛОЖЕНИЯ ---
+    function startApp() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'flex';
+        document.getElementById('user-display').innerText = currentUsername;
+        
+        // Загружаем капитал из Биржи
+        loadCapital();
+    }
+
+    async function loadCapital() {
+        try {
+            const res = await fetch(`${API_URL}/game/load/roblox`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                let netWorth = data.balance !== undefined ? data.balance : 1000;
+                if (data.portfolio && data.gamesData) {
+                    for (const id in data.portfolio) {
+                        const game = data.gamesData.find(g => g.id === id);
+                        if (game && data.portfolio[id].shares > 0) {
+                            netWorth += data.portfolio[id].shares * game.online;
+                        }
+                    }
+                }
+                document.getElementById('banner-capital').innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
+            }
+        } catch(e) {
+            document.getElementById('banner-capital').innerText = "Ошибка загрузки капитала";
+        }
+    }
+
+    // --- МОДАЛЬНЫЕ ОКНА ---
     function openModal(url, title, icon, desc, date) {
       currentGameUrl = url;
       document.getElementById('modal-title').textContent = title;
@@ -477,9 +353,7 @@
     }
 
     function closeModal(event) {
-      if (event) {
-        if (event.target.id !== 'game-modal' && !event.target.classList.contains('btn-close-modal')) return;
-      }
+      if (event && event.target.id !== 'game-modal') return;
       document.getElementById('game-modal').classList.remove('active');
     }
 
@@ -487,40 +361,21 @@
       if (currentGameUrl) window.location.href = currentGameUrl;
     };
 
-    // Логика окна "О проекте"
-    function openAbout() {
-      document.getElementById('about-modal').classList.add('active');
-    }
-
+    function openAbout() { document.getElementById('about-modal').classList.add('active'); }
     function closeAbout(event) {
-      if (event) {
-        if (event.target.id !== 'about-modal' && !event.target.classList.contains('btn-close-modal')) return;
-      }
+      if (event && event.target.id !== 'about-modal') return;
       document.getElementById('about-modal').classList.remove('active');
     }
 
-    // --- КАПИТАЛ ДЛЯ РОБЛОКС-БИРЖИ ---
-    const savedData = localStorage.getItem('ROBLOX_EXCHANGE_ALPHA_SAVE');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        if (data.balance !== undefined) {
-          let netWorth = data.balance;
-          if (data.portfolio && data.gamesData) {
-             for (const id in data.portfolio) {
-                const game = data.gamesData.find(g => g.id === id);
-                if (game && data.portfolio[id].shares > 0) {
-                   netWorth += data.portfolio[id].shares * game.online;
-                }
-             }
-          }
-          const bannerDesc = document.getElementById('banner-capital');
-          if (bannerDesc) {
-             bannerDesc.innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
-          }
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    window.onload = () => {
+        if (token && currentUsername) {
+            startApp();
+        } else {
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
         }
-      } catch(e){}
-    }
+    };
   </script>
 </body>
 </html>
