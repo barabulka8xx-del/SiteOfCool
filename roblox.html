@@ -39,27 +39,25 @@
     .balance-val.negative { color: #ff0055; text-shadow: 0 0 10px rgba(255,0,85,0.3); }
 
     .actions-bar {
-      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;
+      display: flex; gap: 8px; width: 100%;
     }
-    .actions-bar::-webkit-scrollbar { display: none; }
 
     .btn-action {
-      flex: 1; min-width: 120px;
-      padding: 10px;
+      flex: 1; padding: 10px 5px;
       border: none; border-radius: 10px;
       font-weight: bold; font-size: 12px; cursor: pointer;
       transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
     }
     .btn-action:active { transform: scale(0.95); }
     
-    .btn-reset { background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
-    .btn-create { background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid #00ff00; }
-    .btn-create:disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; color: #555; }
+    .btn-reset { flex: 0.6; background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
+    .btn-create { flex: 1.4; background: rgba(0, 255, 0, 0.2); color: #00ff00; border: 1px solid #00ff00; }
+    .btn-create:disabled { opacity: 0.4; cursor: not-allowed; border-color: #555; color: #555; background: rgba(0,0,0,0.2); }
 
     /* --- СЕТКА ИГР --- */
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
       gap: 12px;
       padding: 15px;
       max-width: 600px;
@@ -77,7 +75,6 @@
     }
     .game-card:hover { border-color: #4facfe; transform: translateY(-3px); }
     
-    /* Стиль для твоей созданной игры */
     .game-card.custom-game {
       border: 2px dashed #ffeb3b;
       background: linear-gradient(135deg, rgba(255, 235, 59, 0.1), rgba(32, 58, 67, 0.8));
@@ -103,12 +100,13 @@
     }
     .btn-trade {
       flex: 1; padding: 8px 0; border: none; border-radius: 8px;
-      font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.1s;
+      font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.1s;
       color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
     .btn-trade:active { transform: scale(0.9); }
     .btn-buy { background: #00b09b; }
     .btn-sell { background: #cb2d3e; }
+    .btn-trade:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
     
     .btn-upgrade {
       width: 100%; margin-top: 8px; padding: 8px 0; border: none; border-radius: 8px;
@@ -116,8 +114,9 @@
       box-shadow: 0 0 10px rgba(142, 45, 226, 0.5); transition: 0.2s;
     }
     .btn-upgrade:active { transform: scale(0.95); }
+    .btn-upgrade:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ПЛАВАЮЩИЙ ТЕКСТ (ДЛЯ ПРИБЫЛИ/УБЫТКА) */
+    /* ПЛАВАЮЩИЙ ТЕКСТ */
     .floating-income {
       position: fixed; font-size: 20px; font-weight: bold; pointer-events: none;
       animation: floatUp 1.5s ease-out forwards; z-index: 999; text-shadow: 2px 2px 0 #000;
@@ -150,7 +149,7 @@
   <script>
     const SAVE_KEY = 'ROBLOX_EXCHANGE_ALPHA_SAVE';
 
-    // Базовые игры
+    // ПОЛНЫЙ СПИСОК 25 БАЗОВЫХ ИГР (восстановлено)
     const BASE_GAMES = [
       { id: 'grow_a_garden', name: 'Grow a Garden', icon: '🌱', baseOnline: 1058604 },
       { id: 'dress_to_impress', name: 'Dress to Impress', icon: '👗', baseOnline: 473514 },
@@ -161,15 +160,29 @@
       { id: 'doors', name: 'Doors', icon: '🚪', baseOnline: 150000 },
       { id: 'piggy', name: 'Piggy', icon: '🐷', baseOnline: 120000 },
       { id: 'arsenal', name: 'Arsenal', icon: '🔫', baseOnline: 90000 },
-      { id: 'jailbreak', name: 'Jailbreak', icon: '🚓', baseOnline: 80000 }
-      // ... остальные базовые игры (сокращено для читаемости, система работает с любым кол-вом)
+      { id: 'jailbreak', name: 'Jailbreak', icon: '🚓', baseOnline: 80000 },
+      { id: 'murder_mystery', name: 'Murder Mystery 2', icon: '🔪', baseOnline: 65000 },
+      { id: 'pet_simulator', name: 'Pet Simulator X', icon: '🐾', baseOnline: 55000 },
+      { id: 'bee_swarm', name: 'Bee Swarm Simulator', icon: '🐝', baseOnline: 45000 },
+      { id: 'tower_defense', name: 'Tower Defense', icon: '🏰', baseOnline: 35000 },
+      { id: 'royale_high', name: 'Royale High', icon: '👑', baseOnline: 30000 },
+      { id: 'da_hood', name: 'Da Hood', icon: '🏙️', baseOnline: 25000 },
+      { id: 'bloxburg', name: 'Welcome to Bloxburg', icon: '🏘️', baseOnline: 20000 },
+      { id: 'mm2', name: 'MM2', icon: '🔫', baseOnline: 15000 },
+      { id: 'shindo_life', name: 'Shindo Life', icon: '👁️', baseOnline: 12000 },
+      { id: 'all_star_tower', name: 'All Star Tower Defense', icon: '⭐', baseOnline: 10000 },
+      { id: 'saber_simulator', name: 'Saber Simulator', icon: '⚔️', baseOnline: 8000 },
+      { id: 'mining_simulator', name: 'Mining Simulator', icon: '⛏️', baseOnline: 6000 },
+      { id: 'speed_run', name: 'Speed Run 4', icon: '🏃', baseOnline: 4000 },
+      { id: 'natural_disaster', name: 'Natural Disaster Survival', icon: '🌪️', baseOnline: 2000 },
+      { id: 'epic_minigames', name: 'Epic Minigames', icon: '🎮', baseOnline: 1000 }
     ];
 
     let state = {
       balance: 1000,
-      portfolio: {}, // { gameId: { shares: 0 } }
-      gamesData: [], // Тут храним ВСЕ игры (и базовые, и созданные)
-      nextGamePrice: 10000 // Стартовая цена создания
+      portfolio: {},
+      gamesData: [],
+      nextGamePrice: 10000 
     };
 
     let gameLoopInterval = null;
@@ -179,25 +192,23 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          
-          // ЗАЩИТА: Если ключи не совпадают с новой структурой, восстанавливаем базу
           state.balance = parsed.balance !== undefined ? parsed.balance : 1000;
           state.portfolio = parsed.portfolio || {};
           state.nextGamePrice = parsed.nextGamePrice !== undefined ? parsed.nextGamePrice : 10000;
           
-          // Если массив игр пуст или сломан, берем базовые
-          if (!parsed.gamesData || parsed.gamesData.length === 0) {
-            state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+          if (!parsed.gamesData || parsed.gamesData.length < 25) {
+             // Если сейв старый и в нем нет 25 игр, берем базу
+             state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+             state.gamesData.forEach(g => g.online = g.baseOnline);
           } else {
             state.gamesData = parsed.gamesData;
           }
           
         } catch(e) {
-          console.error("Сейв сломан, создаем новый.");
           state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
+          state.gamesData.forEach(g => g.online = g.baseOnline);
         }
       } else {
-        // Первый запуск
         state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
         state.gamesData.forEach(g => g.online = g.baseOnline);
       }
@@ -210,7 +221,6 @@
       localStorage.setItem(SAVE_KEY, JSON.stringify(state));
     }
 
-    // Функция для создания своей игры
     function createGame() {
       if (state.balance < state.nextGamePrice) {
         alert(`Недостаточно средств! Нужно: ${state.nextGamePrice.toLocaleString('ru-RU')} 💵`);
@@ -224,29 +234,26 @@
         id: newGameId,
         name: 'Твоя игра ' + (state.gamesData.filter(g => g.id.startsWith('custom_')).length + 1),
         icon: '🛠️',
-        baseOnline: 100, // Начальный онлайн
+        baseOnline: 100, 
         online: 100,
-        trend: 'up',
         isCustom: true,
         upgrades: 0
       };
 
-      state.gamesData.push(newGame);
+      state.gamesData.unshift(newGame); // Созданную игру ставим в начало сетки
       
       // Увеличиваем цену следующей игры на 50к
       state.nextGamePrice += 50000;
 
       updateUI();
       saveGame();
-      startGameLoop(); // Перезапускаем цикл, чтобы новая игра начала генерить доход
     }
 
-    // Улучшение (Обнова) своей игры
     function upgradeGame(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
 
-      const upgradeCost = state.nextGamePrice; // Цена обновы = цене следующей игры
+      const upgradeCost = state.nextGamePrice;
 
       if (state.balance < upgradeCost) {
         alert(`Недостаточно средств для обновы! Нужно: ${upgradeCost.toLocaleString('ru-RU')} 💵`);
@@ -255,7 +262,6 @@
 
       state.balance -= upgradeCost;
       
-      // Апгрейд: даем +10 к активу (базовому онлайну) и немного подкидываем текущий онлайн
       game.upgrades = (game.upgrades || 0) + 1;
       game.baseOnline += 10; 
       game.online += 10;
@@ -264,14 +270,13 @@
       saveGame();
     }
 
-    // Покупка/продажа акций
     function buy(gameId) {
       const game = state.gamesData.find(g => g.id === gameId);
       if (!game) return;
 
       const price = game.online;
       if (state.balance < price) {
-        showFloatIncome('-', price, '#ff0055', event.target);
+        showFloatIncome('-', price, '#ff0055', document.getElementById('balance-display'));
         return;
       }
 
@@ -297,7 +302,6 @@
       saveGame();
     }
 
-    // --- ГЛАВНЫЙ ЦИКЛ ---
     function startGameLoop() {
       if (gameLoopInterval) clearInterval(gameLoopInterval);
 
@@ -305,24 +309,20 @@
         let totalIncome = 0;
 
         state.gamesData.forEach(game => {
-          // Если это твоя игра, она генерит доход/убыток
           if (game.isCustom) {
-            // Шанс 50/50 упасть или полететь
+            // Логика для твоих игр: летит вверх или падает вниз
             const isFlying = Math.random() > 0.5;
             
             if (isFlying) {
-              // Летит: онлайн растет, прибыль идет в карман
-              const income = Math.floor(Math.random() * 5) + 1;
+              const income = Math.floor(Math.random() * 20) + 5; // Генерит от 5 до 25
               game.online += income;
               totalIncome += income;
             } else {
-              // Падает: онлайн падает, убыток уходит в минус баланса
-              const loss = Math.floor(Math.random() * 5) + 1;
+              const loss = Math.floor(Math.random() * 15) + 5; // Теряет от 5 до 20
               game.online = Math.max(1, game.online - loss);
               totalIncome -= loss;
             }
             
-            // Не даем онлайну уйти ниже нуля
             if (game.online < 1) game.online = 1;
           } else {
             // Обычные игры просто колеблются
@@ -331,11 +331,9 @@
           }
         });
 
-        // Применяем общий доход/убыток к балансу
         if (totalIncome !== 0) {
           state.balance += totalIncome;
           
-          // Показываем визуальный эффект
           if (totalIncome > 0) {
              showFloatIncome('+', totalIncome, '#00ff00', document.getElementById('balance-display'));
           } else {
@@ -346,13 +344,13 @@
         updateUI();
         saveGame();
 
-      }, 3000); // Каждые 3 секунды (для теста, можно увеличить)
+      }, 3000); // Тик каждые 3 секунды
     }
 
-    // --- ОТРИСОВКА ИНТЕРФЕЙСА ---
     function updateUI() {
       const balEl = document.getElementById('balance-display');
       balEl.innerText = state.balance.toLocaleString('ru-RU') + ' 💵';
+      
       if (state.balance < 0) {
         balEl.classList.add('negative');
       } else {
@@ -360,7 +358,7 @@
       }
 
       const createBtn = document.getElementById('btn-create');
-      createBtn.innerText = `➕ Создать игру (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
+      createBtn.innerText = `➕ Создать (${state.nextGamePrice.toLocaleString('ru-RU')} 💵)`;
       if (state.balance < state.nextGamePrice) {
         createBtn.disabled = true;
       } else {
@@ -369,7 +367,6 @@
 
       const grid = document.getElementById('games-grid');
       
-      // Если сетки нет (первый рендер), создаем карточки
       if (grid.children.length !== state.gamesData.length) {
         grid.innerHTML = '';
         state.gamesData.forEach(game => {
@@ -380,24 +377,21 @@
         });
       }
 
-      // Обновляем данные внутри карточек (чтобы не пересоздавать DOM каждый тик)
       state.gamesData.forEach(game => {
         const card = document.getElementById('card-' + game.id);
         if (!card) return;
 
         const shares = state.portfolio[game.id] ? state.portfolio[game.id].shares : 0;
-        
-        // Определяем тренд для стрелочки
-        const isUp = game.online >= game.baseOnline; // Условный тренд
+        const isUp = game.online >= game.baseOnline; 
 
         let customHTML = '';
         if (game.isCustom) {
-          const upgradeCost = state.nextGamePrice; // Цена обнова = цена новой игры
+          const upgradeCost = state.nextGamePrice;
           customHTML = `
-            <div class="portfolio-info" style="color: #ffeb3b; margin-bottom: 5px;">
-               ⚡ Актив: ${game.upgrades} обнов
+            <div class="portfolio-info" style="color: #ffeb3b; margin-bottom: 5px; background: rgba(0,0,0,0.5); border: 1px solid #ffeb3b;">
+               ⚡ Актив: ${game.upgrades} обн.
             </div>
-            <button class="btn-upgrade" onclick="upgradeGame('${game.id}')">
+            <button class="btn-upgrade" onclick="upgradeGame('${game.id}')" ${state.balance < upgradeCost ? 'disabled' : ''}>
               🚀 Обнова (${upgradeCost.toLocaleString('ru-RU')} 💵)
             </button>
           `;
@@ -422,7 +416,6 @@
       });
     }
 
-    // Всплывающий текст прибыли/убытка
     function showFloatIncome(prefix, amount, color, targetEl) {
       const el = document.createElement('div');
       el.className = 'floating-income';
@@ -431,7 +424,6 @@
       const text = prefix === '' ? amount.toLocaleString('ru-RU') : `${prefix}${amount.toLocaleString('ru-RU')} 💵`;
       el.innerText = text;
 
-      // Позиционируем возле целевого элемента
       if (targetEl) {
         const rect = targetEl.getBoundingClientRect();
         el.style.left = rect.left + 'px';
