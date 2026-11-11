@@ -6,69 +6,34 @@
   <title>🚀Наши Проекты🚀</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #0f2027;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 15px;
-      overflow-x: hidden;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f2027; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
 
-    /* --- СТИЛИ АВТОРИЗАЦИИ --- */
+    /* --- ЭКРАН АВТОРИЗАЦИИ --- */
     #auth-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f2027; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .auth-box { background: #1a2a33; padding: 30px 20px; border-radius: 20px; width: 100%; max-width: 350px; border: 2px solid #4facfe; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
-    .auth-box h2 { margin-bottom: 20px; color: #4facfe; }
-    .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0f2027; color: #fff; font-size: 16px; outline: none; }
+    .auth-box { background: #1a2a33; padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 350px; border: 2px solid #4facfe; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
+    .auth-box h2 { margin-bottom: 15px; color: #4facfe; }
+    .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #444; background: #0f2027; color: #fff; font-size: 16px; outline: none; }
     .auth-input:focus { border-color: #4facfe; }
+    
+    /* Блок с правилами */
+    .auth-rules { text-align: left; font-size: 11px; color: #888; margin-bottom: 15px; padding: 0 5px; line-height: 1.4; }
+    .auth-rules span { color: #ff0055; font-weight: bold; }
+
     .btn-auth { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; margin-bottom: 10px; }
     .btn-switch { background: transparent; color: #888; border: none; font-size: 14px; cursor: pointer; text-decoration: underline; }
-    #auth-error { color: #ff0055; font-size: 14px; margin-bottom: 10px; font-weight: bold; display: none; }
+    #auth-error { color: #ff0055; font-size: 13px; margin-bottom: 10px; font-weight: bold; display: none; }
 
-    /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
-    .top-nav {
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      z-index: 10;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(79, 172, 254, 0.1);
-      padding: 5px 15px;
-      border-radius: 20px;
-      border: 1px solid #4facfe;
-    }
+    /* --- ОСТАЛЬНОЙ ИНТЕРФЕЙС --- */
+    .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; z-index: 10; }
+    .user-profile { display: flex; align-items: center; gap: 10px; background: rgba(79, 172, 254, 0.1); padding: 5px 15px; border-radius: 20px; border: 1px solid #4facfe; }
     .user-name { font-size: 14px; font-weight: bold; color: #4facfe; }
     .logout-btn { font-size: 12px; color: #ff0055; cursor: pointer; text-decoration: underline; }
-
-    .btn-info {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe;
-      color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: 0.2s;
-    }
+    .btn-info { width: 32px; height: 32px; border-radius: 50%; background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe; color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
     .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
 
-    h1 {
-      font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px;
-      color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center;
-    }
-
+    h1 { font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px; color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center; }
     .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
-    /* --- БАННЕРЫ И КАРТОЧКИ --- */
     .banner { width: 100%; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
     .banner:active { transform: scale(0.98); }
     .banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
@@ -79,12 +44,10 @@
     .banner-desc { font-size: 12px; margin-top: 5px; }
     .banner-icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
     .banner-icon { font-size: 40px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-
     .banner-top { background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%); border: 2px solid #fff; box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3); color: #000; }
     .banner-top .banner-badge { color: #3e2723; }
     .banner-top .banner-desc { color: #3e2723; font-weight: 500; }
     .banner-top .banner-icon-box { background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1); }
-
     .banner-new { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 2px solid #4facfe; box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3); color: #fff; }
     .banner-new .banner-badge { color: #4facfe; }
     .banner-new .banner-desc { color: #ccc; }
@@ -99,12 +62,10 @@
     .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
-    /* --- МОДАЛЬНЫЕ ОКНА --- */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(4px); overflow-y: auto; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #151b22; padding: 25px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; border: 2px solid #4facfe; border-bottom: none; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    
     .modal-icon-box { width: 80px; height: 80px; background: linear-gradient(135deg, #2c5364, #203a43); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 5px; flex-shrink: 0; }
     .modal-icon { font-size: 45px; }
     .modal-title { font-size: 22px; font-weight: bold; color: #fff; }
@@ -113,7 +74,6 @@
     .btn-play { background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
     .btn-close-modal { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
 
-    /* --- ОКНО "О ПРОЕКТЕ" --- */
     .about-content { text-align: left; width: 100%; font-size: 14px; color: #ccc; line-height: 1.5; }
     .about-content h2 { color: #4facfe; font-size: 18px; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid rgba(79,172,254,0.3); padding-bottom: 5px;}
     .about-content p { margin-bottom: 10px; }
@@ -128,13 +88,22 @@
 </head>
 <body>
 
-  <!-- ЭКРАН АВТОРИЗАЦИИ -->
+  <!-- ЭКРАН ВХОДА -->
   <div id="auth-screen">
     <div class="auth-box">
-      <h2 id="auth-title">Вход в SiteOfCool</h2>
+      <h2 id="auth-title">Вход</h2>
       <div id="auth-error"></div>
       <input type="text" id="auth-username" class="auth-input" placeholder="Логин">
       <input type="password" id="auth-password" class="auth-input" placeholder="Пароль">
+      
+      <!-- ПРАВИЛА РЕГИСТРАЦИИ -->
+      <div class="auth-rules" id="auth-rules" style="display: none;">
+        <span>Требования:</span><br>
+        • Логин: 3-20 символов (англ. буквы, цифры).<br>
+        • Пароль: минимум 6 символов.<br>
+        • Запрещен спам и создание ботов.
+      </div>
+
       <button class="btn-auth" id="auth-submit" onclick="submitAuth()">Войти</button>
       <button class="btn-switch" id="auth-switch" onclick="toggleAuthMode()">Нет аккаунта? Зарегистрироваться</button>
     </div>
@@ -154,7 +123,6 @@
     <h1>🚀Наши Проекты🚀</h1>
 
     <div class="container">
-      <!-- ТОП БАННЕР -->
       <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">👑 ТОП ИГРА 👑</div>
@@ -164,7 +132,6 @@
         <div class="banner-icon-box"><div class="banner-icon">📈</div></div>
       </div>
 
-      <!-- НОВИНКА -->
       <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">🔥 НОВИНКА 🔥</div>
@@ -174,7 +141,6 @@
         <div class="banner-icon-box"><div class="banner-icon">⚖️</div></div>
       </div>
 
-      <!-- СЕТКА -->
       <div class="games-list">
         <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Карточная игра за столом.', '10.11.2026')">
           <div class="icon-box"><div class="game-icon">🃏</div></div>
@@ -216,7 +182,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ИГРЫ -->
+  <!-- МОДАЛКИ -->
   <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-icon-box"><div class="modal-icon" id="modal-icon">🎮</div></div>
@@ -228,18 +194,17 @@
     </div>
   </div>
 
-  <!-- ОКНО "О ПРОЕКТЕ" -->
   <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
       <div class="about-content">
         <p><b>Единая экосистема игр с общим аккаунтом.</b></p>
         <h2>🧠 О проекте</h2>
-        <p>Мы используем Vanilla JavaScript (ES6+) для создания быстрых и красивых интерфейсов без тяжелых фреймворков.</p>
+        <p>Мы используем Vanilla JavaScript (ES6+) для создания быстрых интерфейсов.</p>
         <h2>🗺 Дорожная карта</h2>
         <ul>
           <li><span class="check">✔</span> Единая регистрация (JWT).</li>
-          <li><span class="check">✔</span> Синхронизация прогресса в Бирже и Суде.</li>
+          <li><span class="check">✔</span> Синхронизация прогресса.</li>
           <li><span class="cross">☐</span> Перевод остальных игр на сервер.</li>
         </ul>
         <div class="support-box">
@@ -262,20 +227,33 @@
     let isRegisterMode = false;
     let currentGameUrl = '';
 
-    // --- АВТОРИЗАЦИЯ ---
     function toggleAuthMode() {
         isRegisterMode = !isRegisterMode;
-        document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Вход в SiteOfCool';
+        document.getElementById('auth-title').innerText = isRegisterMode ? 'Регистрация' : 'Вход';
         document.getElementById('auth-submit').innerText = isRegisterMode ? 'Создать аккаунт' : 'Войти';
         document.getElementById('auth-switch').innerText = isRegisterMode ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
         document.getElementById('auth-error').style.display = 'none';
+        
+        // Показываем/скрываем правила
+        document.getElementById('auth-rules').style.display = isRegisterMode ? 'block' : 'none';
     }
 
     async function submitAuth() {
         const user = document.getElementById('auth-username').value.trim();
         const pass = document.getElementById('auth-password').value.trim();
         const err = document.getElementById('auth-error');
+        
         if (!user || !pass) { err.innerText = "Заполните все поля!"; err.style.display = 'block'; return; }
+
+        // Быстрая проверка на клиенте (чтобы не гонять запросы зря)
+        if (isRegisterMode) {
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(user)) {
+                err.innerText = "Логин: 3-20 символов (англ. буквы, цифры, _)"; err.style.display = 'block'; return;
+            }
+            if (pass.length < 6) {
+                err.innerText = "Пароль должен быть не менее 6 символов"; err.style.display = 'block'; return;
+            }
+        }
 
         const endpoint = isRegisterMode ? '/register' : '/login';
         
@@ -309,13 +287,10 @@
         location.reload();
     }
 
-    // --- ЗАПУСК ПРИЛОЖЕНИЯ ---
     function startApp() {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
         document.getElementById('user-display').innerText = currentUsername;
-        
-        // Загружаем капитал из Биржи
         loadCapital();
     }
 
@@ -338,11 +313,10 @@
                 document.getElementById('banner-capital').innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
             }
         } catch(e) {
-            document.getElementById('banner-capital').innerText = "Ошибка загрузки капитала";
+            document.getElementById('banner-capital').innerText = "Ошибка загрузки";
         }
     }
 
-    // --- МОДАЛЬНЫЕ ОКНА ---
     function openModal(url, title, icon, desc, date) {
       currentGameUrl = url;
       document.getElementById('modal-title').textContent = title;
@@ -367,7 +341,6 @@
       document.getElementById('about-modal').classList.remove('active');
     }
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
     window.onload = () => {
         if (token && currentUsername) {
             startApp();
