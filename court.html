@@ -9,11 +9,13 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      /* Фон в виде темных стен/панелей суда */
-      background-color: #0d111a;
+      /* Стильный фон со стенами в квадратах (неоновая сетка) */
+      background-color: #080c14;
       background-image: 
-        linear-gradient(to bottom, #161c2b 0%, #0a0c10 100%),
-        repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.02) 60px, rgba(255,255,255,0.02) 62px);
+        linear-gradient(rgba(79, 172, 254, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 172, 254, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      background-position: center;
       color: white;
       height: 100dvh;
       overflow: hidden;
@@ -21,6 +23,16 @@
       flex-direction: column;
       align-items: center;
       perspective: 1000px;
+    }
+
+    /* Затемнение по краям (виньетка) для атмосферы */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+      pointer-events: none;
+      z-index: 1;
     }
 
     /* --- ШАПКА --- */
@@ -66,6 +78,7 @@
       justify-content: space-between;
       position: relative;
       padding-bottom: 20px;
+      z-index: 2;
     }
 
     /* Луч света на подсудимого */
@@ -76,28 +89,38 @@
       transform: translateX(-50%);
       width: 250px;
       height: 250px;
-      background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(79, 172, 254, 0.2) 0%, transparent 70%);
       pointer-events: none;
       z-index: 1;
     }
 
-    /* Сидящие люди (публика) на фоне */
+    /* Публика (Сидящие люди) - Поднята выше и разделена на ряды */
     .audience {
       position: absolute;
-      bottom: 35%;
-      width: 100%;
+      top: 18%; /* Подняли выше */
+      width: 90%;
       display: flex;
-      justify-content: space-around;
-      font-size: 40px;
-      opacity: 0.25;
+      flex-direction: column;
+      gap: 10px; /* Расстояние между рядами */
       pointer-events: none;
       z-index: 0;
-      filter: blur(1.5px) brightness(0.7);
+      opacity: 0.4;
+      filter: blur(2px) brightness(0.6);
+    }
+    
+    .audience-row {
+      display: flex;
+      justify-content: space-around;
+      font-size: 35px;
+    }
+    .audience-row:nth-child(2) {
+      font-size: 30px;
+      opacity: 0.7;
     }
 
     /* --- ПОДСУДИМЫЙ --- */
     .defendant-area {
-      margin-top: 20px;
+      margin-top: 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -106,16 +129,16 @@
     }
 
     .defendant-avatar {
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
       background: #151b22;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 60px;
+      font-size: 65px;
       border: 3px solid #ff0055;
-      box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
+      box-shadow: 0 0 40px rgba(255, 0, 85, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
       margin-bottom: 15px;
       animation: float 3s ease-in-out infinite;
       position: relative;
@@ -128,14 +151,14 @@
     }
 
     .crime-box {
-      background: rgba(30, 45, 55, 0.95);
-      border: 1px solid #4facfe;
+      background: rgba(20, 30, 40, 0.95);
+      border: 2px solid #4facfe;
       border-radius: 15px;
       padding: 15px;
       width: 90%;
-      max-width: 300px;
+      max-width: 320px;
       text-align: center;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px rgba(79, 172, 254, 0.2);
       backdrop-filter: blur(10px);
       transform: translateZ(20px);
       z-index: 2;
@@ -143,15 +166,16 @@
 
     .crime-title {
       color: #ff0055;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       margin-bottom: 5px;
       text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .crime-desc {
-      font-size: 13px;
-      color: #ccc;
+      font-size: 14px;
+      color: #e0e0e0;
       line-height: 1.4;
     }
 
@@ -163,19 +187,19 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      margin-top: 20px;
+      margin-top: 10px;
       transform-style: preserve-3d;
       z-index: 5;
     }
 
     .desk-top {
-      width: 320px;
+      width: 330px;
       height: 120px;
       background: linear-gradient(135deg, #3a2518 0%, #1a110c 100%);
       border: 4px solid #5a3a22;
       border-radius: 10px;
       transform: rotateX(45deg);
-      box-shadow: 0 20px 0 #110a07, 0 40px 30px rgba(0,0,0,0.9);
+      box-shadow: 0 20px 0 #110a07, 0 40px 40px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.8);
       position: relative;
       display: flex;
       justify-content: center;
@@ -197,7 +221,6 @@
       transform-origin: bottom left;
     }
 
-    /* Анимация удара молотком */
     .gavel-container.strike .gavel {
       animation: hitGavel 0.3s ease-in-out;
     }
@@ -208,7 +231,6 @@
       100% { transform: rotate(0deg) translateY(0); }
     }
 
-    /* Эффект вибрации стола при ударе */
     .desk-top.shake {
       animation: deskShake 0.3s ease-in-out;
     }
@@ -262,10 +284,10 @@
     /* --- ЛОГ/РЕАКЦИЯ --- */
     .reaction-text {
       position: absolute;
-      top: 40%;
+      top: 50%; /* Центрируем плашку ровно между столом и подсудимым */
       left: 50%;
       transform: translate(-50%, -50%) scale(0.5);
-      background: rgba(0,0,0,0.95);
+      background: rgba(10, 10, 10, 0.95);
       border: 2px solid #ffeb3b;
       padding: 20px;
       border-radius: 15px;
@@ -277,9 +299,9 @@
       pointer-events: none;
       transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       z-index: 100;
-      width: 80%;
+      width: 85%;
       max-width: 300px;
-      box-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
+      box-shadow: 0 0 40px rgba(255, 235, 59, 0.4);
     }
 
     .reaction-text.show {
@@ -325,13 +347,14 @@
   <div class="courtroom">
     <div class="spotlight"></div>
 
-    <!-- Публика на фоне -->
+    <!-- Публика на фоне (теперь выше и в два ряда) -->
     <div class="audience">
-      <span>👨‍💼</span>
-      <span>👩‍⚖️</span>
-      <span>🐸</span>
-      <span>🧑‍💼</span>
-      <span>🦆</span>
+      <div class="audience-row">
+        <span>👨‍💼</span><span>👩‍⚖️</span><span>🐸</span><span>🧑‍💼</span><span>🦆</span>
+      </div>
+      <div class="audience-row">
+        <span>👽</span><span>🐱</span><span>💩</span><span>🐕</span><span>🗿</span>
+      </div>
     </div>
 
     <div class="defendant-area" id="defendant-area">
@@ -366,8 +389,11 @@
   </div>
 
   <script>
-    // --- БАЗА ДАННЫХ ДЕЛ И ПЕРСОНАЖЕЙ ---
-    const DEFENDANTS = ['🐸', '🐱', '🐕', '🧠', '💩', '🗿', '👽', '🦆'];
+    // --- БАЗА ДАННЫХ (РАСШИРЕНА) ---
+    const DEFENDANTS = [
+      '🐸', '🐱', '🐕', '🧠', '💩', '🗿', '👽', '🦆', '🤖', '🐷', 
+      '🦄', '🐔', '🐙', '🦖', '🐻', '🐼', '🐀', '🐒', '🦥', '🦦'
+    ];
     
     const CRIMES = [
       { title: "Кража века", desc: "Украл луну с неба и пытался продать её на Avito за 3 рубля." },
@@ -378,8 +404,18 @@
       { title: "Кибербуллинг", desc: "Обозвал квадратного кота из 'Управления Вселенной' круглым." },
       { title: "Налоговое мошенничество", desc: "Уклонялся от уплаты налогов, притворяясь мусорным пакетом." },
       { title: "Вандализм", desc: "Съел последний кусок пиццы в мире и не поделился." },
-      { title: "Шпионаж", desc: "Подглядывал за соседями через бинокль, сделанный из туалетной бумаги." },
-      { title: "Государственная измена", desc: "Сказал, что Roblox лучше Minecraft." }
+      { title: "Шпионаж", desc: "Подглядывал за соседями через бинокль из туалетной бумаги." },
+      { title: "Госизмена", desc: "Сказал, что Roblox лучше Minecraft." },
+      { title: "Незаконный стиль", desc: "Носил шляпу не по уставу и слишком модно выглядел." },
+      { title: "Газлайтинг", desc: "Убеждал всех, что трава на самом деле синяя." },
+      { title: "Использование читов", desc: "Включил X-Ray в Майнкрафте, чтобы найти алмазы." },
+      { title: "Разжигание споров", desc: "Написал пост, что картошка фри с майонезом лучше, чем с кетчупом." },
+      { title: "Слишком громкий смех", desc: "Смеялся с баяна из 2012 года в переполненном автобусе." },
+      { title: "Пиратство", desc: "Скачал фильм через торрент и раздавал его со скоростью 0.5 кб/с." },
+      { title: "Мошенничество", desc: "Собрал 100 купонов на бесплатную доставку и заказал 1 зернышко риса." },
+      { title: "Ересь", desc: "Публично заявил, что Шрек — это уже не смешно." },
+      { title: "Нарушение сна", desc: "Спамил звонками в 4 утра с просьбой отправить 100 рублей на киви." },
+      { title: "Утечка данных", desc: "Слил в сеть секретный рецепт соуса из бургерной." }
     ];
 
     const REACTIONS = {
@@ -426,8 +462,6 @@
     }
 
     function nextCase() {
-      // ИСПРАВЛЕНО: Убрана проверка if (!canVerdict), из-за которой игра зависала
-      
       const avatar = document.getElementById('defendant-emoji');
       avatar.classList.remove('fly-away');
       avatar.style.filter = "";
@@ -443,7 +477,6 @@
         document.getElementById('crime-desc').innerText = currentCrime.desc;
       }, 100);
 
-      // Разрешаем выносить следующий приговор
       canVerdict = true;
     }
 
@@ -464,7 +497,7 @@
 
     function giveVerdict(type) {
       if (!canVerdict) return; 
-      canVerdict = false; // Блокируем клики, пока идет анимация
+      canVerdict = false;
 
       strikeGavel(); 
 
