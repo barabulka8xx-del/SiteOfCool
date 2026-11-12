@@ -839,13 +839,12 @@
         }
     }
 
-    // --- ФУНКЦИЯ ЗАКРЫТИЯ КЕЙСА (РЕШАЕТ БАГ) ---
+    // --- ЗАКРЫТИЕ КЕЙСА ---
     function closeCaseModal(event) {
         if (event && event.target.id !== 'case-modal' && !event.target.classList.contains('btn-close-modal')) return;
         
         document.getElementById('case-modal').classList.remove('active');
         
-        // Сбрасываем анимацию на случай, если она зависла
         const strip = document.getElementById('case-strip');
         strip.style.transition = 'none';
         strip.style.transform = 'translateX(0)';
