@@ -123,6 +123,7 @@
     let coins = 0;
     let currentCrime = null;
     let canVerdict = true;
+    let spaceCount = 0; // Счетчик отправок в космос
 
     const elAvatar = document.getElementById('defendant-emoji');
     const elRocket = document.getElementById('rocket');
@@ -252,7 +253,13 @@
       coins += reward;
       updateCoinsUI();
       saveGameToServer();
-      
+      // Логика для ачивки "Строгий судья"
+if (type === 'space') {
+    spaceCount++;
+    if (spaceCount === 10) {
+        unlockAchievement('court_space', '🔨', 'Строгий судья');
+    }
+}
       const coinEl = document.createElement('div');
       coinEl.className = 'floating-coin';
       coinEl.innerText = `+${reward} 🪙`;
@@ -274,5 +281,56 @@
 
     window.onload = initGame;
   </script>
+  <style>
+  #achievement-toast {
+      position: fixed; top: 20px; right: -350px; width: 300px;
+      background: rgba(30, 45, 55, 0.95); border: 2px solid #ffd700;
+      border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 215, 0, 0.3);
+      z-index: 9999; transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+  }
+  #achievement-toast.show { right: 20px; }
+  .toast-icon { font-size: 35px; }
+  .toast-title { color: #ffd700; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-bottom: 2px; }
+  .toast-name { color: #fff; font-weight: bold; font-size: 16px; }
+</style>
+
+<div id="achievement-toast">
+  <div class="toast-icon" id="toast-icon">🏆</div>
+  <div>
+      <div class="toast-title">Ачивка получена!</div>
+      <div class="toast-name" id="toast-name">Название</div>
+  </div>
+</div>
+
+<script>
+  function showAchievementToast(icon, name) {
+      const toast = document.getElementById('achievement-toast');
+      document.getElementById('toast-icon').innerText = icon;
+      document.getElementById('toast-name').innerText = name;
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+          toast.classList.remove('show');
+      }, 4000);
+  }
+
+  async function unlockAchievement(achievementId, icon, name) {
+      if (!token) return;
+      try {
+          const res = await fetch(`${API_URL}/user/claim_achievement`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+              body: JSON.stringify({ achievementId: achievementId })
+          });
+          
+          if (res.ok) {
+              showAchievementToast(icon, name);
+          }
+      } catch(e) { console.error(e); }
+  }
+</script>
 </body>
 </html>
