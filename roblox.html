@@ -229,17 +229,14 @@
   <!-- АУДИО -->
   <audio id="event-sound" src="pikpopyl.mp3" preload="auto"></audio>
 
-  <script>
+    <script>
     // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
     const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
-    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; // ВАЖНО: HTTP!
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
     const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
+    const GAME_ID = 'roblox';
 
-    let playerId = localStorage.getItem('playerId');
-    if (!playerId) {
-        playerId = 'player_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('playerId', playerId);
-    }
+    let token = localStorage.getItem('auth_token');
 
     let state = { balance: 1000, portfolio: {}, gamesData: [], nextGamePrice: 10000 };
     let gameLoopInterval = null;
@@ -276,17 +273,31 @@
 
     // --- 2. ФУНКЦИИ РАБОТЫ С СЕРВЕРОМ ---
     async function loadGameFromServer() {
+        if (!token) {
+            alert('Вы не авторизованы! Пожалуйста, войдите в аккаунт в главном меню.');
+            window.location.href = 'menu.html';
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_URL}/load/${playerId}`);
+            const response = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (response.status === 401 || response.status === 403) {
+                alert('Сессия истекла. Войдите заново.');
+                window.location.href = 'menu.html';
+                return;
+            }
+
             if (!response.ok) throw new Error('Ошибка сети');
             
             const data = await response.json();
             
-            state.balance = data.balance;
-            state.portfolio = data.portfolio;
-            state.nextGamePrice = data.nextGamePrice;
+            state.balance = data.balance !== undefined ? data.balance : 1000;
+            state.portfolio = data.portfolio || {};
+            state.nextGamePrice = data.nextGamePrice !== undefined ? data.nextGamePrice : 10000;
             
-            // Восстанавливаем игры (если сервер не отдал, берем базовые)
             if (!data.gamesData || data.gamesData.length < BASE_GAMES.length) {
                 state.gamesData = JSON.parse(JSON.stringify(BASE_GAMES));
                 state.gamesData.forEach(g => g.online = g.baseOnline);
@@ -298,7 +309,6 @@
             updateUI();
             startGameLoop();
             startEventLoop();
-            console.log("Игра загружена с сервера!");
         } catch (error) {
             console.error('Ошибка загрузки:', error);
             alert('Не удалось подключиться к серверу. Включен офлайн-режим (прогресс не сохранится).');
@@ -310,13 +320,15 @@
     }
 
     async function saveGameToServer() {
-        if (!isGameLoaded) return;
+        if (!isGameLoaded || !token) return;
         try {
-            await fetch(`${API_URL}/save`, {
+            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify({
-                    id: playerId,
                     balance: state.balance,
                     portfolio: state.portfolio,
                     nextGamePrice: state.nextGamePrice,
