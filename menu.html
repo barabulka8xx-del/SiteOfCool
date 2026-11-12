@@ -355,8 +355,7 @@
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
     </div>
   </div>
-
-    <script>
+  <script>
     const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
     const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
     const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
@@ -377,13 +376,15 @@
     let lastRollType = null;
 
     const ALL_AVATARS = ['😎', '🐸', '🐱', '👽', '🤖', '👑', '🗿', '🦄', '🐶', '🦊', '🐼', '💀'];
+    
+    // Ачивки с описаниями
     const ACHIEVEMENTS_LIST = [
-        { id: 'first_game', icon: '🕹️', name: 'Мультигеймер' },
-        { id: 'daily_7', icon: '📅', name: 'Верный фанат' },
-        { id: 'roblox_million', icon: '💼', name: 'Уолл-Стрит' },
-        { id: 'court_space', icon: '🔨', name: 'Строгий судья' },
-        { id: 'clicker_10k', icon: '🖱️', name: 'Мастер клика' },
-        { id: 'cats_100k', icon: '🐱', name: 'Кошатник' }
+        { id: 'first_game', icon: '🕹️', name: 'Мультигеймер', desc: 'Зайти в 5 разных игр' },
+        { id: 'daily_7', icon: '📅', name: 'Верный фанат', desc: 'Забрать бонус 7 дней подряд' },
+        { id: 'roblox_million', icon: '💼', name: 'Уолл-Стрит', desc: 'Заработать 1 млн на Бирже' },
+        { id: 'court_space', icon: '🔨', name: 'Строгий судья', desc: 'Отправить 10 мемов в космос' },
+        { id: 'clicker_10k', icon: '🖱️', name: 'Мастер клика', desc: '10 000 кликов в Апокалипсисе' },
+        { id: 'cats_100k', icon: '🐱', name: 'Кошатник', desc: 'Вызвать 100 000 котиков' }
     ];
 
     // --- АВТОРИЗАЦИЯ ---
@@ -559,6 +560,24 @@
         } catch(e) { document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>"; }
     }
 
+    // --- ВЫДАЧА АЧИВОК ---
+    // Вызывай эту функцию из игр, когда игрок выполняет условие!
+    async function unlockAchievement(achievementId) {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/user/claim_achievement`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ achievementId: achievementId })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert(`🏆 Ачивка получена! +20 мемкоинов.`);
+                loadProfile(); // Обновит баланс и список ачивок
+            }
+        } catch(e) { console.error(e); }
+    }
+
     // --- НАСТРОЙКИ ПРОФИЛЯ ---
     function openSettings(tab = 'profile') {
         document.getElementById('settings-username').value = currentUsername;
@@ -574,9 +593,7 @@
         document.getElementById('settings-modal').classList.add('active');
     }
 
-    // ИСПРАВЛЕННАЯ КНОПКА ЗАКРЫТЬ
     function closeSettings(event) {
-        // Если клик был по фону (overlay) или по кнопке закрытия - закрываем
         if (event && event.target.id !== 'settings-modal' && !event.target.classList.contains('btn-close-modal')) return;
         document.getElementById('settings-modal').classList.remove('active');
     }
@@ -617,7 +634,11 @@
             const isUnlocked = userAchievements.includes(ach.id);
             const el = document.createElement('div');
             el.className = `ach-item ${isUnlocked ? 'unlocked' : ''}`;
-            el.innerHTML = `<div class="ach-icon">${ach.icon}</div><div class="ach-name">${ach.name}</div>`;
+            el.innerHTML = `
+                <div class="ach-icon">${ach.icon}</div>
+                <div class="ach-name">${ach.name}</div>
+                <div style="font-size:9px; color:#888; margin-top:3px;">${ach.desc}</div>
+            `;
             grid.appendChild(el);
         });
     }
@@ -784,7 +805,4 @@
     };
   </script>
 </body>
-</html>
-
-</body>
-</html>
+  </html>
