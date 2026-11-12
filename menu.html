@@ -27,7 +27,7 @@
     /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
     .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; z-index: 10; }
     
-    .user-profile { display: flex; align-items: center; gap: 8px; background: rgba(79, 172, 254, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid #4facfe; cursor: pointer; transition: 0.2s; max-width: 60%; }
+    .user-profile { display: flex; align-items: center; gap: 8px; background: rgba(79, 172, 254, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid #4facfe; cursor: pointer; transition: 0.2s; max-width: 50%; }
     .user-profile:active { transform: scale(0.95); }
     .user-avatar { font-size: 18px; }
     .user-name-box { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: bold; color: #4facfe; transition: 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -93,7 +93,7 @@
     }
     .floating-shop-btn:active { transform: scale(0.95); }
 
-    /* --- МОДАЛКИ (ЦЕНТР) --- */
+    /* --- МОДАЛКИ --- */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(8px); padding: 20px; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #151b22; padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 450px; border: 2px solid #4facfe; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
@@ -147,7 +147,7 @@
     .chance-equip-btn { background: #4facfe; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; }
     .chance-item.unlocked .chance-equip-btn { display: block; }
 
-    /* --- КЕЙС CS:GO (ОТДЕЛЬНОЕ ОКНО) --- */
+    /* --- КЕЙС CS:GO --- */
     .case-modal-content { background: #151b22; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; border: 2px solid #ffd700; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); position: relative; }
     .case-container {
         position: relative; width: 100%; height: 100px; background: #0a0f14;
@@ -191,15 +191,14 @@
         <div class="user-name-box" id="user-name-display">Игрок</div>
       </div>
       
-      <button onclick="logout()" style="background: rgba(255, 0, 85, 0.15); border: 1px solid #ff0055; color: #ff0055; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: bold; cursor: pointer; margin-left: 5px;">Выйти</button>
-      
       <div class="wallet-area">
         <button class="btn-daily" id="btn-daily" onclick="claimDaily()">Забрать 10</button>
         <div class="wallet">
           <img src="memcoin.png" alt="coin" onerror="this.style.display='none'">
           <span id="global-coins-display">0</span>
         </div>
-        <div class="btn-info" onclick="openAbout()">i</div>
+        <div class="btn-info" onclick="openLeaderboard()" style="font-size: 16px;">🏆</div>
+        <button onclick="logout()" style="background: rgba(255, 0, 85, 0.15); border: 1px solid #ff0055; color: #ff0055; border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: bold; cursor: pointer; margin-left: 5px;">Выйти</button>
       </div>
     </div>
 
@@ -345,6 +344,23 @@
       </div>
       <!-- Кнопка закрытия на случай зависания -->
       <button class="btn-close-modal" onclick="closeCaseModal()" style="margin-top: 15px;">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА ТАБЛИЦЫ ЛИДЕРОВ -->
+  <div class="modal-overlay" id="leaderboard-modal" onclick="closeLeaderboard(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color: #ffd700;">
+      <div class="modal-title" style="color: #ffd700; margin-bottom: 15px;">🏆 Топ Игроков</div>
+      
+      <div id="leaderboard-list" style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+        <p style="text-align: center; color: #888;">Загрузка...</p>
+      </div>
+      
+      <div style="margin-top: 15px; font-size: 12px; color: #888; text-align: center;">
+        Обновление через: <span id="leaderboard-timer" style="color: #4facfe; font-weight: bold;">15:00</span>
+      </div>
+
+      <button class="btn-close-modal" onclick="closeLeaderboard(event)" style="margin-top: 15px;">Закрыть</button>
     </div>
   </div>
 
@@ -506,7 +522,6 @@
                 document.getElementById('user-avatar-display').innerText = data.avatar;
                 document.getElementById('global-coins-display').innerText = data.coins;
                 
-                // Отрисовка имени и титула
                 const nameEl = document.getElementById('user-name-display');
                 nameEl.innerHTML = ''; 
                 nameEl.innerText = data.displayName || data.username; 
@@ -682,7 +697,9 @@
     }
 
     function closeSettings(event) {
-        if (event && event.target.id !== 'settings-modal' && !event.target.classList.contains('btn-close-modal')) return;
+        if (event) {
+            if (event.target.id !== 'settings-modal' && !event.target.closest('.btn-close-modal')) return;
+        }
         document.getElementById('settings-modal').classList.remove('active');
     }
 
@@ -746,7 +763,9 @@
     }
 
     function closeShop(event) {
-        if (event && event.target.id !== 'shop-modal' && !event.target.classList.contains('btn-close-modal')) return;
+        if (event) {
+            if (event.target.id !== 'shop-modal' && !event.target.closest('.btn-close-modal')) return;
+        }
         document.getElementById('shop-modal').classList.remove('active');
     }
 
@@ -839,15 +858,116 @@
         }
     }
 
-    // --- ЗАКРЫТИЕ КЕЙСА ---
     function closeCaseModal(event) {
-        if (event && event.target.id !== 'case-modal' && !event.target.classList.contains('btn-close-modal')) return;
+        if (event) {
+            if (event.target.id !== 'case-modal' && !event.target.closest('.btn-close-modal')) return;
+        }
         
         document.getElementById('case-modal').classList.remove('active');
         
         const strip = document.getElementById('case-strip');
         strip.style.transition = 'none';
         strip.style.transform = 'translateX(0)';
+    }
+
+    // --- ТАБЛИЦА ЛИДЕРОВ ---
+    let leaderboardInterval = null;
+    let timerInterval = null;
+
+    function openLeaderboard() {
+        document.getElementById('leaderboard-modal').classList.add('active');
+        loadLeaderboard();
+        
+        if (leaderboardInterval) clearInterval(leaderboardInterval);
+        leaderboardInterval = setInterval(loadLeaderboard, 900000); // 15 минут
+        
+        startLeaderboardTimer();
+    }
+
+    function closeLeaderboard(event) {
+        if (event) {
+            if (event.target.id !== 'leaderboard-modal' && !event.target.closest('.btn-close-modal')) return;
+        }
+        document.getElementById('leaderboard-modal').classList.remove('active');
+        clearInterval(leaderboardInterval);
+        clearInterval(timerInterval);
+    }
+
+    async function loadLeaderboard() {
+        try {
+            const res = await fetch(`${API_URL}/leaderboard`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            
+            const list = document.getElementById('leaderboard-list');
+            if (!res.ok || !data.leaderboard) {
+                list.innerHTML = '<p style="text-align:center; color:#ff0055;">Ошибка загрузки</p>';
+                return;
+            }
+
+            list.innerHTML = '';
+            data.leaderboard.forEach((player, index) => {
+                const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+                const rankColor = rankColors[index] || '#888';
+                
+                let titleHtml = '';
+                if (player.title) {
+                    let styleClass = '';
+                    if (player.title_style === 'bold') styleClass = 'title-bold';
+                    if (player.title_style === 'italic') styleClass = 'title-italic';
+                    if (player.title_style === 'uppercase') styleClass = 'title-uppercase';
+                    if (player.title_style === 'outline') styleClass = 'title-outline';
+                    
+                    let colorStyle = `color: ${player.title_color};`;
+                    if (player.title_color.startsWith('neon_')) {
+                        styleClass += ' neon-text';
+                        colorStyle = player.title_color === 'neon_pink' ? 'color: #ff00ff;' : player.title_color === 'neon_cyan' ? 'color: #00ffff;' : 'color: #ffd700;';
+                    }
+                    
+                    titleHtml = `<span class="user-title ${styleClass}" style="${colorStyle}">${player.title}</span>`;
+                }
+
+                list.innerHTML += `
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border-left: 4px solid ${rankColor};">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-weight: bold; color: ${rankColor}; font-size: 16px; width: 20px;">#${index + 1}</span>
+                            <span style="font-size: 20px;">${player.avatar}</span>
+                            <div style="display: flex; flex-direction: column;">
+                                <span style="font-weight: bold; font-size: 14px;">${player.display_name || 'Игрок'}</span>
+                                ${titleHtml}
+                            </div>
+                        </div>
+                        <div style="font-weight: bold; color: #ffd700; display: flex; align-items: center; gap: 4px;">
+                            ${player.global_coins} <img src="memcoin.png" style="width: 14px; height: 14px;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function startLeaderboardTimer() {
+        let timeLeft = 900; // 15 минут
+        const timerEl = document.getElementById('leaderboard-timer');
+        
+        if (timerInterval) clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerEl.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timeLeft = 900;
+                loadLeaderboard();
+                startLeaderboardTimer();
+            }
+        }, 1000);
     }
 
     // --- МОДАЛКИ ИГР ---
@@ -860,7 +980,9 @@
     }
 
     function closeModal(event) {
-      if (event && event.target.id !== 'game-modal') return;
+      if (event) {
+          if (event.target.id !== 'game-modal' && !event.target.closest('.btn-close-modal')) return;
+      }
       document.getElementById('game-modal').classList.remove('active');
     }
 
@@ -869,7 +991,13 @@
     };
 
     function openAbout() { document.getElementById('about-modal').classList.add('active'); }
-    function closeAbout(event) { if (event && event.target.id !== 'about-modal') return; document.getElementById('about-modal').classList.remove('active'); }
+    
+    function closeAbout(event) {
+        if (event) {
+            if (event.target.id !== 'about-modal' && !event.target.closest('.btn-close-modal')) return;
+        }
+        document.getElementById('about-modal').classList.remove('active');
+    }
 
     window.onload = () => {
         if (token && currentUsername) {
