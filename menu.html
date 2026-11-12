@@ -30,7 +30,15 @@
     .user-profile { display: flex; align-items: center; gap: 8px; background: rgba(79, 172, 254, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid #4facfe; cursor: pointer; transition: 0.2s; }
     .user-profile:active { transform: scale(0.95); }
     .user-avatar { font-size: 18px; }
-    .user-name { font-size: 14px; font-weight: bold; color: #4facfe; }
+    .user-name-box { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: bold; color: #4facfe; transition: 0.3s; }
+    
+    /* Стили титула */
+    .user-title { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);}
+    .neon-text { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+    .title-bold { font-weight: 900; }
+    .title-italic { font-style: italic; }
+    .title-uppercase { text-transform: uppercase; }
+    .title-outline { -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0 #000; }
 
     /* КОШЕЛЕК */
     .wallet-area { display: flex; align-items: center; gap: 8px; }
@@ -46,7 +54,7 @@
     h1 { font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px; color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center; }
     .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
-    /* --- БАННЕРЫ --- */
+    /* БАННЕРЫ */
     .banner { width: 100%; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
     .banner:active { transform: scale(0.98); }
     .banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
@@ -57,14 +65,15 @@
     .banner-desc { font-size: 12px; margin-top: 5px; }
     .banner-icon-box { width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: inset 0 0 15px rgba(0,0,0,0.5); }
     .banner-icon { font-size: 40px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+    
     .banner-top { background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 50%, #b38728 100%); border: 2px solid #fff; box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3); color: #000; }
-    .banner-top .banner-badge { color: #3e2723; }
-    .banner-top .banner-desc { color: #3e2723; font-weight: 500; }
-    .banner-top .banner-icon-box { background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1); }
+    .banner-top .banner-badge { color: #3e2723; } .banner-top .banner-desc { color: #3e2723; font-weight: 500; } .banner-top .banner-icon-box { background: rgba(255,255,255,0.4); border: 1px solid rgba(0,0,0,0.1); }
+    
     .banner-new { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border: 2px solid #4facfe; box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3); color: #fff; }
-    .banner-new .banner-badge { color: #4facfe; }
-    .banner-new .banner-desc { color: #ccc; }
-    .banner-new .banner-icon-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(79, 172, 254, 0.3); }
+    .banner-new .banner-badge { color: #4facfe; } .banner-new .banner-desc { color: #ccc; } .banner-new .banner-icon-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(79, 172, 254, 0.3); }
+
+    .shop-banner { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); border: 2px solid #b06ef7; box-shadow: 0 10px 25px rgba(142, 45, 226, 0.4); color: #fff; }
+    .shop-banner .banner-badge { color: #e0c3fc; } .shop-banner .banner-icon-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(176, 110, 247, 0.3); }
 
     .games-list { width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
     .game-card { background: #203a43; border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 1px solid #2c5364; transition: 0.2s; cursor: pointer; color: white; }
@@ -76,7 +85,7 @@
     .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
 
     /* --- МОДАЛКИ --- */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(4px); overflow-y: auto; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(8px); overflow-y: auto; }
     .modal-overlay.active { display: flex; }
     .modal-content { background: #151b22; padding: 25px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; border: 2px solid #4facfe; border-bottom: none; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -107,26 +116,27 @@
 
     /* Ачивки */
     .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; width: 100%; }
-    .ach-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.5; }
-    .ach-item.unlocked { opacity: 1; border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+    .ach-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.5; filter: grayscale(1); transition: 0.3s; }
+    .ach-item.unlocked { opacity: 1; filter: grayscale(0); border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .ach-icon { font-size: 24px; margin-bottom: 5px; }
     .ach-name { font-size: 10px; font-weight: bold; color: #ccc; line-height: 1.2; }
 
     /* Магазин */
-    .shop-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 15px; width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .shop-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 15px; width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .shop-info { display: flex; flex-direction: column; text-align: left; }
     .shop-title { font-weight: bold; font-size: 15px; color: #fff; }
     .shop-desc { font-size: 11px; color: #888; }
     .btn-buy { background: #ffd700; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
-    .btn-buy:active { transform: scale(0.95); }
     .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    /* Шансы */
+    .chances-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+    .chances-list { display: none; width: 100%; background: #0f2027; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: left;}
+    .chance-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #333; }
+    .chance-item.unlocked { color: #00ff00; }
 
-    /* Стили для титулов */
-    .neon-text { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
-    .title-bold { font-weight: 900; }
-    .title-italic { font-style: italic; }
-    .title-uppercase { text-transform: uppercase; }
-    .title-outline { -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0 #000; }
+    /* Анимация рулетки */
+    .rolling-text { font-size: 18px; font-weight: bold; color: #ffd700; height: 25px; text-align: center; margin: 10px 0; }
   </style>
 </head>
 <body>
@@ -156,7 +166,7 @@
     <div class="top-nav">
       <div class="user-profile" onclick="openSettings()">
         <span class="user-avatar" id="user-avatar-display">😎</span>
-        <span class="user-name" id="user-name-display">Игрок</span>
+        <div class="user-name-box" id="user-name-display">Игрок</div>
       </div>
       
       <div class="wallet-area">
@@ -172,7 +182,8 @@
     <h1>🚀Наши Проекты🚀</h1>
 
     <div class="container">
-      <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр, следи за графиком онлайна и зарабатывай миллионы. Лови моменты Хайпа и Пика популярности!', '10.11.2026')">
+      <!-- ТОП БАННЕР -->
+      <div class="banner banner-top" onclick="openModal('roblox.html', 'Роблокс-Биржа', '📈', 'Покупай акции игр...', '10.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">👑 ТОП ИГРА 👑</div>
           <div class="banner-title">Роблокс-Биржа</div>
@@ -181,7 +192,8 @@
         <div class="banner-icon-box"><div class="banner-icon">📈</div></div>
       </div>
 
-      <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие над мемными персонажами. Выноси приговоры, зарабатывай монеты и отправляй Жабу в космос!', '11.11.2026')">
+      <!-- НОВИНКА -->
+      <div class="banner banner-new" onclick="openModal('court.html', 'Мемный Суд', '⚖️', 'Верши правосудие...', '11.11.2026')">
         <div class="banner-info">
           <div class="banner-badge">🔥 НОВИНКА 🔥</div>
           <div class="banner-title">Мемный Суд</div>
@@ -190,42 +202,25 @@
         <div class="banner-icon-box"><div class="banner-icon">⚖️</div></div>
       </div>
 
+      <!-- МАГАЗИН -->
+      <div class="banner shop-banner" onclick="openSettings('shop')">
+        <div class="banner-info">
+          <div class="banner-badge">💰 ЭКОНОМИКА 💰</div>
+          <div class="banner-title">Магазин Титулов</div>
+          <div class="banner-desc">Крути рулетки и кастомизируй ник!</div>
+        </div>
+        <div class="banner-icon-box"><div class="banner-icon">🛒</div></div>
+      </div>
+
+      <!-- СЕТКА -->
       <div class="games-list">
-        <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', 'Карточная игра за столом.', '10.11.2026')">
-          <div class="icon-box"><div class="game-icon">🃏</div></div>
-          <div class="game-title">Битва Мемов</div>
-          <div class="game-desc">Карточная игра.</div>
-        </div>
-        <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', 'Создавай планеты.', '08.11.2026')">
-          <div class="icon-box"><div class="game-icon">🌌🪐</div></div>
-          <div class="game-title">Гравитация</div>
-          <div class="game-desc">Планеты и дыры.</div>
-        </div>
-        <div class="game-card" onclick="openModal('universe.html', 'Управление Вселенной', '🌌🎛️', 'Квадратные коты.', '05.11.2026')">
-          <div class="icon-box"><div class="game-icon">🌌🎛️</div></div>
-          <div class="game-title">Вселенная</div>
-          <div class="game-desc">Квадратные коты.</div>
-        </div>
-        <div class="game-card" onclick="openModal('apocalypse.html', 'Кнопка Апокалипсиса', '💣💥', 'Уничтожь мир.', '02.11.2026')">
-          <div class="icon-box"><div class="game-icon">💣💥</div></div>
-          <div class="game-title">Апокалипсис</div>
-          <div class="game-desc">8 миллиардов.</div>
-        </div>
-        <div class="game-card" onclick="openModal('index.html', 'Напиток-Миллионера', '🤑🍹', 'Коктейли.', '01.11.2026')">
-          <div class="icon-box"><div class="game-icon">🤑🍹</div></div>
-          <div class="game-title">Напиток</div>
-          <div class="game-desc">Дорогие коктейли.</div>
-        </div>
-        <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Ловушка.', '28.10.2026')">
-          <div class="icon-box"><div class="game-icon">😈🔴</div></div>
-          <div class="game-title">Кнопка</div>
-          <div class="game-desc">Не нажимать.</div>
-        </div>
-        <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Причины.', '20.10.2026')">
-          <div class="icon-box"><div class="game-icon">🗣️📜</div></div>
-          <div class="game-title">Отмазки</div>
-          <div class="game-desc">Для работы.</div>
-        </div>
+        <div class="game-card" onclick="openModal('cards.html', 'Битва Мемов', '🃏', '...', '10.11.2026')"><div class="icon-box"><div class="game-icon">🃏</div></div><div class="game-title">Битва Мемов</div><div class="game-desc">Карточная игра.</div></div>
+        <div class="game-card" onclick="openModal('gravity.html', 'Гравитация', '🌌🪐', '...', '08.11.2026')"><div class="icon-box"><div class="game-icon">🌌🪐</div></div><div class="game-title">Гравитация</div><div class="game-desc">Планеты и дыры.</div></div>
+        <div class="game-card" onclick="openModal('universe.html', 'Вселенная', '🌌🎛️', '...', '05.11.2026')"><div class="icon-box"><div class="game-icon">🌌🎛️</div></div><div class="game-title">Вселенная</div><div class="game-desc">Квадратные коты.</div></div>
+        <div class="game-card" onclick="openModal('apocalypse.html', 'Апокалипсис', '💣💥', '...', '02.11.2026')"><div class="icon-box"><div class="game-icon">💣💥</div></div><div class="game-title">Апокалипсис</div><div class="game-desc">8 миллиардов.</div></div>
+        <div class="game-card" onclick="openModal('index.html', 'Напиток', '🤑🍹', '...', '01.11.2026')"><div class="icon-box"><div class="game-icon">🤑🍹</div></div><div class="game-title">Напиток</div><div class="game-desc">Лимонады.</div></div>
+        <div class="game-card" onclick="openModal('button.html', 'Кнопка', '😈🔴', '...', '28.10.2026')"><div class="icon-box"><div class="game-icon">😈🔴</div></div><div class="game-title">Кнопка</div><div class="game-desc">Не нажимать.</div></div>
+        <div class="game-card" onclick="openModal('excuse.html', 'Отмазки', '🗣️📜', '...', '20.10.2026')"><div class="icon-box"><div class="game-icon">🗣️📜</div></div><div class="game-title">Отмазки</div><div class="game-desc">Для работы.</div></div>
       </div>
       <div class="footer">Создано с любовью и котами 🐈</div>
     </div>
@@ -234,21 +229,20 @@
   <!-- МОДАЛКА ИГРЫ -->
   <div class="modal-overlay" id="game-modal" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-icon-box" style="font-size: 45px; margin-bottom: 10px;" id="modal-icon">🎮</div>
+      <div class="modal-icon-box" style="font-size: 45px;" id="modal-icon">🎮</div>
       <div class="modal-title" id="modal-title">Название</div>
-      <div class="modal-desc" id="modal-desc" style="color:#aaa; font-size:13px; margin-bottom:15px;">Описание...</div>
+      <div class="modal-desc" id="modal-desc" style="color:#aaa; font-size:13px;">Описание...</div>
       <button class="btn-play" id="modal-btn-play">Играть 🚀</button>
       <button class="btn-close-modal" onclick="closeModal(event)">Закрыть</button>
     </div>
   </div>
 
-  <!-- МОДАЛКА ПРОФИЛЯ (С ВКЛАДКАМИ) -->
+  <!-- МОДАЛКА ПРОФИЛЯ -->
   <div class="modal-overlay" id="settings-modal" onclick="closeSettings(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       
       <div class="modal-title" style="margin-bottom: 15px;">👤 Личный кабинет</div>
 
-      <!-- Вкладки -->
       <div class="tabs">
         <button class="tab-btn active" id="tab-btn-profile" onclick="switchTab('profile')">⚙️ Профиль</button>
         <button class="tab-btn" id="tab-btn-achievements" onclick="switchTab('achievements')">🏆 Ачивки</button>
@@ -259,56 +253,78 @@
       <div class="tab-content active" id="tab-content-profile">
         <div class="settings-label">Аватарки (20 🪙 за новую):</div>
         <div class="avatar-grid" id="avatar-grid"></div>
-
         <div class="settings-label">Логин (навсегда):</div>
         <input type="text" id="settings-username" class="settings-input" disabled>
-
-        <div class="settings-label">Отображаемое имя:</div>
-        <input type="text" id="settings-name" class="settings-input" placeholder="Новый ник" maxlength="20">
-        
+        <div class="settings-label">Имя:</div>
+        <input type="text" id="settings-name" class="settings-input" maxlength="20">
         <div class="settings-label">Старый пароль:</div>
-        <input type="password" id="settings-old-password" class="settings-input" placeholder="Для смены пароля">
-        
+        <input type="password" id="settings-old-password" class="settings-input">
         <div class="settings-label">Новый пароль:</div>
-        <input type="password" id="settings-new-password" class="settings-input" placeholder="Оставь пустым">
-        
-        <button class="btn-play" style="margin-top: 10px;" onclick="saveProfile()">Сохранить изменения</button>
+        <input type="password" id="settings-new-password" class="settings-input">
+        <button class="btn-play" style="margin-top: 10px;" onclick="saveProfile()">Сохранить</button>
       </div>
 
       <!-- ВКЛАДКА 2: АЧИВКИ -->
       <div class="tab-content" id="tab-content-achievements">
-        <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Выполняй задания в играх и получай мемкоины!</p>
-        <div class="achievements-grid" id="achievements-grid">
-          <!-- Генерируется через JS -->
-        </div>
+        <div class="achievements-grid" id="achievements-grid"></div>
       </div>
 
       <!-- ВКЛАДКА 3: МАГАЗИН -->
       <div class="tab-content" id="tab-content-shop">
-        <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Крути рулетки, чтобы получить крутой титул!</p>
         
-        <div class="shop-item">
-          <div class="shop-info">
-            <span class="shop-title">🎲 Рулетка Имени</span>
-            <span class="shop-desc">Случайный титул для ника</span>
-          </div>
-          <button class="btn-buy" onclick="rollTitle('name')">35 🪙</button>
+        <div style="background: rgba(0,0,0,0.4); width: 100%; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 12px; color: #aaa;">Текущий титул:</div>
+            <div id="current-title-display" style="font-size: 16px; font-weight: bold; color: #fff;">Нет</div>
         </div>
 
+        <!-- РУЛЕТКА ИМЕНИ -->
         <div class="shop-item">
-          <div class="shop-info">
-            <span class="shop-title">🎨 Рулетка Цвета</span>
-            <span class="shop-desc">Случайный цвет (есть неон!)</span>
-          </div>
-          <button class="btn-buy" onclick="rollTitle('color')">35 🪙</button>
+          <div class="shop-info"><span class="shop-title">🎲 Имя</span><span class="shop-desc">Случайный титул</span></div>
+          <button class="btn-buy" onclick="rollTitle('name', event)">35 🪙</button>
+        </div>
+        <button class="chances-btn" onclick="toggleChances('name')">Показать шансы ▼</button>
+        <div class="chances-list" id="chances-name">
+            <div class="chance-item" data-val="Новичок"><span>Новичок</span><span>40%</span></div>
+            <div class="chance-item" data-val="Мемер"><span>Мемер</span><span>30%</span></div>
+            <div class="chance-item" data-val="Судья"><span>Судья</span><span>15%</span></div>
+            <div class="chance-item" data-val="Босс Биржи"><span>Босс Биржи</span><span>10%</span></div>
+            <div class="chance-item" data-val="Повелитель Мемов"><span>Повелитель Мемов</span><span>4%</span></div>
+            <div class="chance-item" data-val="БОГ САЙТА"><span>БОГ САЙТА</span><span>1%</span></div>
         </div>
 
+        <!-- РУЛЕТКА ЦВЕТА -->
         <div class="shop-item">
-          <div class="shop-info">
-            <span class="shop-title">✨ Рулетка Стиля</span>
-            <span class="shop-desc">Жирный, курсив, капс...</span>
-          </div>
-          <button class="btn-buy" onclick="rollTitle('style')">35 🪙</button>
+          <div class="shop-info"><span class="shop-title">🎨 Цвет</span><span class="shop-desc">Краска для титула</span></div>
+          <button class="btn-buy" onclick="rollTitle('color', event)">35 🪙</button>
+        </div>
+        <button class="chances-btn" onclick="toggleChances('color')">Показать шансы ▼</button>
+        <div class="chances-list" id="chances-color">
+            <div class="chance-item" data-val="#ffffff"><span>Белый</span><span>40%</span></div>
+            <div class="chance-item" data-val="#aaaaaa"><span>Серый</span><span>30%</span></div>
+            <div class="chance-item" data-val="#ff0055"><span>Красный</span><span>10%</span></div>
+            <div class="chance-item" data-val="#8E2DE2"><span>Фиолетовый</span><span>10%</span></div>
+            <div class="chance-item" data-val="neon_pink"><span style="color:#ff00ff;">Неон Розовый</span><span>5%</span></div>
+            <div class="chance-item" data-val="neon_cyan"><span style="color:#00ffff;">Неон Голубой</span><span>4%</span></div>
+            <div class="chance-item" data-val="neon_gold"><span style="color:#ffd700;">Неон Золотой</span><span>1%</span></div>
+        </div>
+
+        <!-- РУЛЕТКА СТИЛЯ -->
+        <div class="shop-item">
+          <div class="shop-info"><span class="shop-title">✨ Стиль</span><span class="shop-desc">Шрифт титула</span></div>
+          <button class="btn-buy" onclick="rollTitle('style', event)">35 🪙</button>
+        </div>
+        <button class="chances-btn" onclick="toggleChances('style')">Показать шансы ▼</button>
+        <div class="chances-list" id="chances-style">
+            <div class="chance-item" data-val="normal"><span>Обычный</span><span>40%</span></div>
+            <div class="chance-item" data-val="bold"><span style="font-weight:bold;">Жирный</span><span>30%</span></div>
+            <div class="chance-item" data-val="italic"><span style="font-style:italic;">Курсив</span><span>15%</span></div>
+            <div class="chance-item" data-val="uppercase"><span style="text-transform:uppercase;">КАПС</span><span>10%</span></div>
+            <div class="chance-item" data-val="glow"><span style="text-shadow: 0 0 5px #fff;">Свечение</span><span>4%</span></div>
+            <div class="chance-item" data-val="outline"><span style="-webkit-text-stroke: 1px #000;">Обводка</span><span>1%</span></div>
+        </div>
+
+        <div id="roll-animation-box" style="display: none; width: 100%; margin-top: 10px; text-align: center;">
+            <div class="rolling-text" id="rolling-text">...</div>
         </div>
 
         <div id="roll-result" style="margin-top: 15px; width: 100%; display: none; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.05); text-align: center;">
@@ -321,22 +337,7 @@
       <button class="btn-close-modal" onclick="closeSettings(event)" style="margin-top: 15px;">Закрыть</button>
     </div>
   </div>
-
-  <!-- МОДАЛКА "О ПРОЕКТЕ" -->
-  <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
-      <div style="text-align: left; width: 100%; font-size: 14px; color: #ccc; line-height: 1.5;">
-        <p><b>Единая экосистема игр с общим аккаунтом и валютой (Memcoin).</b></p>
-        <div style="background: rgba(79, 172, 254, 0.1); border: 1px solid #4facfe; border-radius: 10px; padding: 12px; text-align: center; margin-top: 15px;">
-          <p style="margin-bottom: 0;">Email: <a href="mailto:chesssupport.lord@gmail.com" style="color: #4facfe;">chesssupport.lord@gmail.com</a></p>
-        </div>
-        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 20px;">© 2026 SiteOfCool. Все права защищены.</div>
-      </div>
-      <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
-    </div>
-  </div>
-  <script>
+    <script>
     const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
     const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
     const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
@@ -346,26 +347,24 @@
     let isRegisterMode = false;
     let currentGameUrl = '';
     
-    // Данные пользователя
     let userCoins = 0;
     let userUnlockedAvatars = ['😎'];
     let userAchievements = [];
     let selectedAvatar = '😎';
-    
-    // Состояние рулетки
+    let userTitles = [];
+    let userColors = ['#ffffff'];
+    let userStyles = ['normal'];
     let lastWonItem = null;
     let lastRollType = null;
 
     const ALL_AVATARS = ['😎', '🐸', '🐱', '👽', '🤖', '👑', '🗿', '🦄', '🐶', '🦊', '🐼', '💀'];
-
-    // --- АЧИВКИ ---
     const ACHIEVEMENTS_LIST = [
-        { id: 'first_game', icon: '🕹️', name: 'Мультигеймер', desc: 'Зайти в 5 разных игр' },
-        { id: 'daily_7', icon: '📅', name: 'Верный фанат', desc: 'Забрать бонус 7 дней подряд' },
-        { id: 'roblox_million', icon: '💼', name: 'Уолл-Стрит', desc: 'Заработать 1 млн на Бирже' },
-        { id: 'court_space', icon: '🔨', name: 'Строгий судья', desc: 'Отправить 10 мемов в космос' },
-        { id: 'clicker_10k', icon: '🖱️', name: 'Мастер клика', desc: '10 000 кликов в Апокалипсисе' },
-        { id: 'cats_100k', icon: '🐱', name: 'Кошатник', desc: 'Вызвать 100 000 котиков' }
+        { id: 'first_game', icon: '🕹️', name: 'Мультигеймер' },
+        { id: 'daily_7', icon: '📅', name: 'Верный фанат' },
+        { id: 'roblox_million', icon: '💼', name: 'Уолл-Стрит' },
+        { id: 'court_space', icon: '🔨', name: 'Строгий судья' },
+        { id: 'clicker_10k', icon: '🖱️', name: 'Мастер клика' },
+        { id: 'cats_100k', icon: '🐱', name: 'Кошатник' }
     ];
 
     // --- АВТОРИЗАЦИЯ ---
@@ -442,7 +441,7 @@
         location.reload();
     }
 
-    // --- ПРОФИЛЬ И ЗАГРУЗКА ---
+    // --- ЗАГРУЗКА И ОТРИСОВКА ---
     function startApp() {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'flex';
@@ -457,73 +456,74 @@
             });
             if (res.ok) {
                 const data = await res.json();
-                
                 userCoins = data.coins;
                 userUnlockedAvatars = data.unlockedAvatars || ['😎'];
                 userAchievements = data.achievements || [];
                 selectedAvatar = data.avatar;
+                userTitles = data.unlockedTitles || [];
+                userColors = data.unlockedColors || ['#ffffff'];
+                userStyles = data.unlockedStyles || ['normal'];
                 
-                // Отрисовка шапки
                 document.getElementById('user-avatar-display').innerText = data.avatar;
                 document.getElementById('global-coins-display').innerText = data.coins;
                 
-                // Отрисовка имени с учетом титула
+                // Отрисовка имени и титула
                 const nameEl = document.getElementById('user-name-display');
-                nameEl.innerText = data.displayName;
-                nameEl.style.color = data.titleColor;
+                nameEl.innerHTML = data.displayName; // Сначала ник
                 
-                // Сброс старых классов
-                nameEl.className = 'user-name'; 
-                
-                // Применение стилей
-                if (data.titleStyle === 'bold') nameEl.classList.add('title-bold');
-                if (data.titleStyle === 'italic') nameEl.classList.add('title-italic');
-                if (data.titleStyle === 'uppercase') nameEl.classList.add('title-uppercase');
-                if (data.titleStyle === 'outline') nameEl.classList.add('title-outline');
-                
-                // Неон
-                if (data.titleColor.startsWith('neon_')) {
-                    nameEl.classList.add('neon-text');
-                    if (data.titleColor === 'neon_pink') nameEl.style.color = '#ff00ff';
-                    if (data.titleColor === 'neon_cyan') nameEl.style.color = '#00ffff';
-                    if (data.titleColor === 'neon_gold') nameEl.style.color = '#ffd700';
-                }
-
-                // Показ кнопки бонуса
-                if (data.canClaimDaily) {
-                    document.getElementById('btn-daily').style.display = 'block';
+                if (data.title) { // Если есть титул
+                    const titleSpan = document.createElement('span');
+                    titleSpan.className = 'user-title';
+                    titleSpan.innerText = data.title;
+                    titleSpan.style.color = data.titleColor;
+                    if (data.titleStyle === 'bold') titleSpan.classList.add('title-bold');
+                    if (data.titleStyle === 'italic') titleSpan.classList.add('title-italic');
+                    if (data.titleStyle === 'uppercase') titleSpan.classList.add('title-uppercase');
+                    if (data.titleStyle === 'outline') titleSpan.classList.add('title-outline');
+                    if (data.titleColor.startsWith('neon_')) {
+                        titleSpan.classList.add('neon-text');
+                        if (data.titleColor === 'neon_pink') titleSpan.style.color = '#ff00ff';
+                        if (data.titleColor === 'neon_cyan') titleSpan.style.color = '#00ffff';
+                        if (data.titleColor === 'neon_gold') titleSpan.style.color = '#ffd700';
+                    }
+                    nameEl.appendChild(titleSpan);
+                    
+                    // Обновляем отображение в магазине
+                    const currTitle = document.getElementById('current-title-display');
+                    currTitle.innerText = data.title;
+                    currTitle.style.color = titleSpan.style.color;
+                    currTitle.className = titleSpan.className;
                 } else {
-                    document.getElementById('btn-daily').style.display = 'none';
+                    document.getElementById('current-title-display').innerText = "Нет";
+                    document.getElementById('current-title-display').style.color = "#fff";
+                    document.getElementById('current-title-display').className = "";
                 }
 
-                // Если открыт профиль, обновляем аватарки и ачивки
+                if (data.canClaimDaily) { document.getElementById('btn-daily').style.display = 'block'; } else { document.getElementById('btn-daily').style.display = 'none'; }
+                
                 renderAvatars();
                 renderAchievements();
+                updateChancesVisuals();
             }
         } catch(e) { console.error('Ошибка загрузки профиля', e); }
     }
 
     async function claimDaily() {
         try {
-            const res = await fetch(`${API_URL}/user/claim_daily`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await fetch(`${API_URL}/user/claim_daily`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
             const data = await res.json();
             if (res.ok) {
                 document.getElementById('global-coins-display').innerText = data.newBalance;
                 document.getElementById('btn-daily').style.display = 'none';
                 alert("🎉 Вы получили 10 мемкоинов!");
-                loadProfile(); // Обновляем данные
+                loadProfile();
             } else { alert(data.error); }
         } catch(e) { alert("Ошибка сервера"); }
     }
 
     async function loadCapital() {
         try {
-            const res = await fetch(`${API_URL}/game/load/roblox`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const res = await fetch(`${API_URL}/game/load/roblox`, { headers: { 'Authorization': `Bearer ${token}` } });
             if (res.ok) {
                 const data = await res.json();
                 let netWorth = data.balance !== undefined ? data.balance : 1000;
@@ -534,21 +534,21 @@
                     }
                 }
                 document.getElementById('banner-capital').innerHTML = `Капитал: <b style="font-size:14px;">${Math.floor(netWorth).toLocaleString('ru-RU')} 💵</b>`;
+            } else {
+                document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>Ошибка сервера</span>";
             }
-        } catch(e) {
-            document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>";
-        }
+        } catch(e) { document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>"; }
     }
 
-    // --- НАСТРОЙКИ ПРОФИЛЯ (ВКЛАДКИ) ---
-    function openSettings() {
+    // --- НАСТРОЙКИ ПРОФИЛЯ ---
+    function openSettings(tab = 'profile') {
         document.getElementById('settings-username').value = currentUsername;
         document.getElementById('settings-name').value = document.getElementById('user-name-display').innerText;
         document.getElementById('settings-old-password').value = '';
         document.getElementById('settings-new-password').value = '';
         document.getElementById('roll-result').style.display = 'none';
-        
-        switchTab('profile');
+        document.getElementById('roll-animation-box').style.display = 'none';
+        switchTab(tab);
         document.getElementById('settings-modal').classList.add('active');
     }
 
@@ -560,16 +560,13 @@
     function switchTab(tab) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        
         document.getElementById(`tab-btn-${tab}`).classList.add('active');
         document.getElementById(`tab-content-${tab}`).classList.add('active');
     }
 
-    // --- АВАТАРКИ ---
     function renderAvatars() {
         const grid = document.getElementById('avatar-grid');
         grid.innerHTML = '';
-        
         ALL_AVATARS.forEach(emoji => {
             const isUnlocked = userUnlockedAvatars.includes(emoji);
             const el = document.createElement('div');
@@ -589,25 +586,18 @@
         selectedAvatar = emoji;
     }
 
-    // --- АЧИВКИ ---
     function renderAchievements() {
         const grid = document.getElementById('achievements-grid');
         grid.innerHTML = '';
-
         ACHIEVEMENTS_LIST.forEach(ach => {
             const isUnlocked = userAchievements.includes(ach.id);
             const el = document.createElement('div');
             el.className = `ach-item ${isUnlocked ? 'unlocked' : ''}`;
-            el.innerHTML = `
-                <div class="ach-icon">${ach.icon}</div>
-                <div class="ach-name">${ach.name}</div>
-                <div style="font-size:8px; color:#888; margin-top:3px;">${ach.desc}</div>
-            `;
+            el.innerHTML = `<div class="ach-icon">${ach.icon}</div><div class="ach-name">${ach.name}</div>`;
             grid.appendChild(el);
         });
     }
 
-    // --- СОХРАНЕНИЕ ПРОФИЛЯ ---
     async function saveProfile() {
         const newName = document.getElementById('settings-name').value.trim();
         const oldPass = document.getElementById('settings-old-password').value.trim();
@@ -620,27 +610,36 @@
             const res = await fetch(`${API_URL}/user/update_profile`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ 
-                    displayName: newName, 
-                    avatar: selectedAvatar, 
-                    oldPassword: oldPass || undefined,
-                    newPassword: newPass || undefined 
-                })
+                body: JSON.stringify({ displayName: newName, avatar: selectedAvatar, oldPassword: oldPass || undefined, newPassword: newPass || undefined })
             });
             const data = await res.json();
-            
             if (res.ok) {
                 alert("Профиль обновлен!");
-                loadProfile(); 
+                loadProfile();
             } else {
                 alert(data.error);
             }
         } catch(e) { alert("Ошибка сервера"); }
     }
 
-    // --- МАГАЗИН (РУЛЕТКИ) ---
-    async function rollTitle(type) {
+    // --- МАГАЗИН ---
+    function toggleChances(type) {
+        const box = document.getElementById('chances-' + type);
+        box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function updateChancesVisuals() {
+        document.querySelectorAll('#chances-name .chance-item').forEach(el => { if(userTitles.includes(el.dataset.val)) el.classList.add('unlocked'); });
+        document.querySelectorAll('#chances-color .chance-item').forEach(el => { if(userColors.includes(el.dataset.val)) el.classList.add('unlocked'); });
+        document.querySelectorAll('#chances-style .chance-item').forEach(el => { if(userStyles.includes(el.dataset.val)) el.classList.add('unlocked'); });
+    }
+
+    async function rollTitle(type, e) {
         if (!confirm("Потратить 35 мемкоинов на прокрутку?")) return;
+
+        const btn = e.target;
+        btn.disabled = true;
+        btn.innerText = "Крутим...";
 
         try {
             const res = await fetch(`${API_URL}/shop/roll`, {
@@ -649,88 +648,85 @@
                 body: JSON.stringify({ type: type })
             });
             const data = await res.json();
-            
-            if (res.ok) {
-                userCoins = data.newBalance;
-                document.getElementById('global-coins-display').innerText = userCoins;
-                
-                lastWonItem = data.item;
-                lastRollType = type;
-                
-                const resultBox = document.getElementById('roll-result');
-                const resultText = document.getElementById('roll-result-text');
-                
-                resultBox.style.display = 'block';
-                
-                if (type === 'name') {
-                    resultText.innerText = data.item.value;
-                    resultText.style.color = '#fff';
-                } else if (type === 'color') {
-                    resultText.innerText = data.item.name;
-                    // Предпросмотр цвета
-                    if (data.item.value.startsWith('neon_')) {
-                         resultText.style.color = data.item.value === 'neon_pink' ? '#ff00ff' : data.item.value === 'neon_cyan' ? '#00ffff' : '#ffd700';
-                         resultText.style.textShadow = '0 0 10px currentColor';
-                    } else {
-                        resultText.style.color = data.item.value;
-                        resultText.style.textShadow = 'none';
-                    }
-                } else if (type === 'style') {
-                    resultText.innerText = data.item.name;
-                    resultText.style.color = '#fff';
-                    resultText.style.textShadow = 'none';
-                    resultText.className = ''; // Сброс
-                    if (data.item.value === 'bold') resultText.classList.add('title-bold');
-                    if (data.item.value === 'italic') resultText.classList.add('title-italic');
-                    if (data.item.value === 'uppercase') resultText.classList.add('title-uppercase');
-                    if (data.item.value === 'outline') resultText.classList.add('title-outline');
-                }
+            if (!res.ok) { alert(data.error || "Ошибка"); return; }
 
-                if (data.isDuplicate) {
-                    alert("Тебе выпал дубликат! Но ты можешь надеть его.");
+            userCoins = data.newBalance;
+            document.getElementById('global-coins-display').innerText = userCoins;
+            
+            lastWonItem = data.item;
+            lastRollType = type;
+            
+            const resultBox = document.getElementById('roll-result');
+            const resultText = document.getElementById('roll-result-text');
+            const animBox = document.getElementById('roll-animation-box');
+            const animText = document.getElementById('rolling-text');
+            
+            resultBox.style.display = 'none';
+            animBox.style.display = 'block';
+            
+            let counter = 0;
+            const rollInterval = setInterval(() => {
+                counter++;
+                if (counter > 15) {
+                    clearInterval(rollInterval);
+                    animBox.style.display = 'none';
+                    resultBox.style.display = 'block';
+                    
+                    if (type === 'name') { resultText.innerText = data.item.value; resultText.style.color = '#fff'; resultText.style.textShadow = 'none'; }
+                    else if (type === 'color') {
+                        resultText.innerText = data.item.name;
+                        if (data.item.value.startsWith('neon_')) {
+                            resultText.style.color = data.item.value === 'neon_pink' ? '#ff00ff' : data.item.value === 'neon_cyan' ? '#00ffff' : '#ffd700';
+                            resultText.style.textShadow = '0 0 10px currentColor';
+                        } else {
+                            resultText.style.color = data.item.value;
+                            resultText.style.textShadow = 'none';
+                        }
+                    }
+                    else if (type === 'style') { resultText.innerText = data.item.name; resultText.className = 'title-' + data.item.value; }
+                    
+                    if (data.isDuplicate) alert("Тебе выпал дубликат!");
+                    loadProfile(); 
+                } else {
+                    const tempArr = ['БОГ САЙТА', 'Новичок', 'Судья', 'Неон Голубой', 'Жирный', 'Курсив'];
+                    animText.innerText = tempArr[Math.floor(Math.random() * tempArr.length)];
                 }
-                
-                loadProfile(); // Обновляем БД (там сохранились новые разблокировки)
-            } else {
-                alert(data.error);
-            }
-        } catch(e) { alert("Ошибка сервера"); }
+            }, 100);
+
+        } catch (e) {
+            alert("Ошибка сети!");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "35 🪙";
+        }
     }
 
     async function equipWonTitle() {
         if (!lastWonItem || !lastRollType) return;
-
-        // Получаем текущие данные
-        const currentName = document.getElementById('user-name-display').innerText;
-        
-        let newTitle = currentName;
-        let newColor = document.getElementById('user-name-display').style.color;
-        let newStyle = 'normal';
-
-        // Костыль для парсинга стилей (так как мы не храним их в DOM)
-        const nameEl = document.getElementById('user-name-display');
-        if (nameEl.classList.contains('title-bold')) newStyle = 'bold';
-        if (nameEl.classList.contains('title-italic')) newStyle = 'italic';
-        if (nameEl.classList.contains('title-uppercase')) newStyle = 'uppercase';
-        if (nameEl.classList.contains('title-outline')) newStyle = 'outline';
-
-        if (lastRollType === 'name') newTitle = lastWonItem.value;
-        if (lastRollType === 'color') newColor = lastWonItem.value;
-        if (lastRollType === 'style') newStyle = lastWonItem.value;
-
         try {
-            const res = await fetch(`${API_URL}/user/equip_title`, {
+            const res = await fetch(`${API_URL}/user/profile`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const prof = await res.json();
+            
+            let newTitle = prof.title || '';
+            let newColor = prof.titleColor || '#ffffff';
+            let newStyle = prof.titleStyle || 'normal';
+
+            if (lastRollType === 'name') newTitle = lastWonItem.value;
+            if (lastRollType === 'color') newColor = lastWonItem.value;
+            if (lastRollType === 'style') newStyle = lastWonItem.value;
+
+            const updateRes = await fetch(`${API_URL}/user/equip_title`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ title: newTitle, color: newColor, style: newStyle })
             });
             
-            if (res.ok) {
+            if (updateRes.ok) {
                 document.getElementById('roll-result').style.display = 'none';
-                loadProfile(); // Перезагружаем, чтобы применилось
+                loadProfile();
                 alert("Титул надет!");
             }
-        } catch(e) { alert("Ошибка сервера"); }
+        } catch (e) { alert("Ошибка сервера"); }
     }
 
     // --- МОДАЛКИ ИГР ---
@@ -752,12 +748,8 @@
     };
 
     function openAbout() { document.getElementById('about-modal').classList.add('active'); }
-    function closeAbout(event) {
-      if (event && event.target.id !== 'about-modal') return;
-      document.getElementById('about-modal').classList.remove('active');
-    }
+    function closeAbout(event) { if (event && event.target.id !== 'about-modal') return; document.getElementById('about-modal').classList.remove('active'); }
 
-    // --- ИНИЦИАЛИЗАЦИЯ ---
     window.onload = () => {
         if (token && currentUsername) {
             startApp();
