@@ -148,7 +148,7 @@
     .chance-item.unlocked .chance-equip-btn { display: block; }
 
     /* --- КЕЙС CS:GO (ОТДЕЛЬНОЕ ОКНО) --- */
-    .case-modal-content { background: #151b22; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; border: 2px solid #ffd700; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); }
+    .case-modal-content { background: #151b22; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; border: 2px solid #ffd700; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); position: relative; }
     .case-container {
         position: relative; width: 100%; height: 100px; background: #0a0f14;
         border: 2px solid #444; border-radius: 10px; overflow: hidden;
@@ -331,9 +331,9 @@
   </div>
 
   <!-- МОДАЛКА КЕЙСА (ПО ЦЕНТРУ ЭКРАНА) -->
-  <div class="modal-overlay" id="case-modal">
-    <div class="case-modal-content">
-      <div class="modal-title" style="color: #ffd700; margin-bottom: 15px; font-size: 18px;">Крутим...</div>
+  <div class="modal-overlay" id="case-modal" onclick="closeCaseModal(event)">
+    <div class="case-modal-content" onclick="event.stopPropagation()">
+      <div class="modal-title" id="case-title" style="color: #ffd700; margin-bottom: 15px; font-size: 18px;">Крутим...</div>
       <div class="case-container" id="case-container">
           <div class="case-pointer"></div>
           <div class="case-strip" id="case-strip"></div>
@@ -341,8 +341,10 @@
       <div id="roll-result" style="display: none; text-align: center; width: 100%;">
         <div style="font-size: 14px; margin-bottom: 5px; color: #aaa;">Ты выбил:</div>
         <div id="roll-result-text" style="font-size: 22px; font-weight: bold; margin-bottom: 15px;"></div>
-        <button class="btn-play" onclick="document.getElementById('case-modal').classList.remove('active')">Забрать</button>
+        <button class="btn-play" onclick="closeCaseModal()">Забрать</button>
       </div>
+      <!-- Кнопка закрытия на случай зависания -->
+      <button class="btn-close-modal" onclick="closeCaseModal()" style="margin-top: 15px;">Закрыть</button>
     </div>
   </div>
 
@@ -737,9 +739,9 @@
         } catch(e) { alert("Ошибка сервера"); }
     }
 
-    // --- МАГАЗИН (ОТДЕЛЬНОЕ ОКНО) ---
+    // --- МАГАЗИН ---
     function openShop() {
-        loadProfile(); // Обновляем данные перед открытием
+        loadProfile();
         document.getElementById('shop-modal').classList.add('active');
     }
 
@@ -768,7 +770,6 @@
             userCoins = data.newBalance;
             document.getElementById('global-coins-display').innerText = userCoins;
             
-            // Открываем окно кейса по центру
             const caseModal = document.getElementById('case-modal');
             const caseBox = document.getElementById('case-container');
             const strip = document.getElementById('case-strip');
@@ -776,6 +777,7 @@
             
             resultBox.style.display = 'none';
             caseModal.classList.add('active');
+            document.getElementById('case-title').innerText = "Крутим...";
 
             strip.innerHTML = '';
             strip.style.transition = 'none';
@@ -795,9 +797,8 @@
                 strip.appendChild(el);
             }
 
-            // Ждем, пока окно отрисуется, и запускаем анимацию
             setTimeout(() => {
-                const itemWidth = 90; // Ширина элемента + отступы
+                const itemWidth = 90; 
                 const containerWidth = caseBox.offsetWidth;
                 const centerOffset = (containerWidth / 2) - (itemWidth / 2);
                 const targetOffset = centerOffset - (25 * itemWidth);
@@ -806,10 +807,9 @@
                 strip.style.transform = `translateX(${targetOffset}px)`;
             }, 100);
 
-            // Показываем результат после анимации
             setTimeout(async () => {
                 resultBox.style.display = 'block';
-                document.querySelector('#case-modal .modal-title').innerText = "Твой выигрыш!";
+                document.getElementById('case-title').innerText = "Твой выигрыш!";
                 
                 const resultText = document.getElementById('roll-result-text');
                 if (type === 'name') { resultText.innerText = data.item.value; resultText.style.color = '#fff'; resultText.style.textShadow = 'none'; }
@@ -827,7 +827,6 @@
                 
                 if (data.isDuplicate) alert("Тебе выпал дубликат!");
                 
-                // Автоматическая экипировка
                 await equipSpecific(type, data.item.value || data.item.name);
                 
             }, 3700);
@@ -838,6 +837,18 @@
             btn.disabled = false;
             btn.innerText = "35 🪙";
         }
+    }
+
+    // --- ФУНКЦИЯ ЗАКРЫТИЯ КЕЙСА (РЕШАЕТ БАГ) ---
+    function closeCaseModal(event) {
+        if (event && event.target.id !== 'case-modal' && !event.target.classList.contains('btn-close-modal')) return;
+        
+        document.getElementById('case-modal').classList.remove('active');
+        
+        // Сбрасываем анимацию на случай, если она зависла
+        const strip = document.getElementById('case-strip');
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateX(0)';
     }
 
     // --- МОДАЛКИ ИГР ---
@@ -872,6 +883,3 @@
   </script>
 </body>
 </html>
-
-</body>
-                                                                                                                                                                                                                                                                                                                                                                                              </html>
