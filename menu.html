@@ -93,11 +93,11 @@
     }
     .floating-shop-btn:active { transform: scale(0.95); }
 
-    /* --- МОДАЛКИ --- */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(8px); overflow-y: auto; }
+    /* --- МОДАЛКИ (ЦЕНТР) --- */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(8px); padding: 20px; }
     .modal-overlay.active { display: flex; }
-    .modal-content { background: #151b22; padding: 25px 20px; padding-bottom: calc(25px + env(safe-area-inset-bottom, 20px)); border-radius: 20px 20px 0 0; width: 100%; max-width: 500px; border: 2px solid #4facfe; border-bottom: none; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-content { background: #151b22; padding: 25px 20px; border-radius: 20px; width: 100%; max-width: 450px; border: 2px solid #4facfe; display: flex; flex-direction: column; align-items: center; gap: 12px; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; max-height: 90vh; overflow-y: auto; }
+    @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .modal-title { font-size: 22px; font-weight: bold; color: #fff; }
     .btn-play { background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; border: none; padding: 15px; border-radius: 12px; font-size: 18px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
     .btn-close-modal { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; flex-shrink: 0; }
@@ -147,33 +147,18 @@
     .chance-equip-btn { background: #4facfe; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; }
     .chance-item.unlocked .chance-equip-btn { display: block; }
 
-    /* --- КЕЙС CS:GO --- */
+    /* --- КЕЙС CS:GO (ОТДЕЛЬНОЕ ОКНО) --- */
+    .case-modal-content { background: #151b22; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; border: 2px solid #ffd700; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); }
     .case-container {
-        position: relative; width: 100%; height: 80px; background: #0a0f14;
+        position: relative; width: 100%; height: 100px; background: #0a0f14;
         border: 2px solid #444; border-radius: 10px; overflow: hidden;
-        margin-bottom: 15px; display: none;
+        margin-bottom: 20px;
     }
-    .case-strip {
-        display: flex; height: 100%; align-items: center;
-        position: absolute; left: 0; top: 0;
-    }
-    .case-item {
-        width: 60px; height: 60px; margin: 0 5px; border-radius: 8px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: bold; color: #fff;
-        background: #1a2a33; border: 2px solid #333;
-        flex-shrink: 0; position: relative; text-align: center; padding: 2px;
-    }
+    .case-strip { display: flex; height: 100%; align-items: center; position: absolute; left: 0; top: 0; }
+    .case-item { width: 80px; height: 80px; margin: 0 5px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #fff; background: #1a2a33; border: 2px solid #333; flex-shrink: 0; position: relative; text-align: center; padding: 2px; }
     .case-item.rarity-4 { border-color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.5); }
-    
-    .case-pointer {
-        position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-        width: 4px; height: 100%; background: #ffeb3b; z-index: 10;
-        box-shadow: 0 0 10px #ffeb3b;
-    }
-    .case-pointer::before {
-        content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: #ffeb3b; font-size: 12px;
-    }
+    .case-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #ffeb3b; z-index: 10; box-shadow: 0 0 10px #ffeb3b; }
+    .case-pointer::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: #ffeb3b; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -256,7 +241,7 @@
   </div>
 
   <!-- ПЛАВАЮЩАЯ КНОПКА МАГАЗИНА -->
-  <button class="floating-shop-btn" onclick="openSettings('shop')">
+  <button class="floating-shop-btn" onclick="openShop()">
     <span>🛒</span> Магазин
   </button>
 
@@ -271,17 +256,15 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ПРОФИЛЯ -->
+  <!-- МОДАЛКА ПРОФИЛЯ (БЕЗ МАГАЗИНА) -->
   <div class="modal-overlay" id="settings-modal" onclick="closeSettings(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       
       <div class="modal-title" style="margin-bottom: 15px;">👤 Личный кабинет</div>
 
-      <!-- УБРАЛИ ВКЛАДКУ МАГАЗИН -->
       <div class="tabs">
         <button class="tab-btn active" id="tab-btn-profile" onclick="switchTab('profile')">⚙️ Профиль</button>
         <button class="tab-btn" id="tab-btn-achievements" onclick="switchTab('achievements')">🏆 Ачивки</button>
-        <button class="tab-btn" id="tab-btn-shop" onclick="switchTab('shop')">🛒 Магазин</button>
       </div>
 
       <!-- ВКЛАДКА 1: ПРОФИЛЬ -->
@@ -304,50 +287,62 @@
         <div class="achievements-grid" id="achievements-grid"></div>
       </div>
 
-      <!-- ВКЛАДКА 3: МАГАЗИН -->
-      <div class="tab-content" id="tab-content-shop">
-        
-        <div style="background: rgba(0,0,0,0.4); width: 100%; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 12px; color: #aaa;">Текущий титул:</div>
-            <div id="current-title-display" style="font-size: 16px; font-weight: bold; color: #fff;">Нет</div>
-        </div>
+      <button class="btn-close-modal" onclick="closeSettings(event)" style="margin-top: 15px;">Закрыть</button>
+    </div>
+  </div>
 
-        <!-- РУЛЕТКА ИМЕНИ -->
-        <div class="shop-item">
-          <div class="shop-info"><span class="shop-title">🎲 Имя</span><span class="shop-desc">Случайный титул</span></div>
-          <button class="btn-buy" onclick="rollTitle('name', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
-        </div>
-        <button class="chances-btn" onclick="toggleChances('name')">Показать шансы ▼</button>
-        <div class="chances-list" id="chances-name"></div>
-
-        <!-- РУЛЕТКА ЦВЕТА -->
-        <div class="shop-item">
-          <div class="shop-info"><span class="shop-title">🎨 Цвет</span><span class="shop-desc">Краска для титула</span></div>
-          <button class="btn-buy" onclick="rollTitle('color', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
-        </div>
-        <button class="chances-btn" onclick="toggleChances('color')">Показать шансы ▼</button>
-        <div class="chances-list" id="chances-color"></div>
-
-        <!-- РУЛЕТКА СТИЛЯ -->
-        <div class="shop-item">
-          <div class="shop-info"><span class="shop-title">✨ Стиль</span><span class="shop-desc">Шрифт титула</span></div>
-          <button class="btn-buy" onclick="rollTitle('style', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
-        </div>
-        <button class="chances-btn" onclick="toggleChances('style')">Показать шансы ▼</button>
-        <div class="chances-list" id="chances-style"></div>
-
-        <div class="case-container" id="case-container">
-            <div class="case-pointer"></div>
-            <div class="case-strip" id="case-strip"></div>
-        </div>
-
-        <div id="roll-result" style="margin-top: 15px; width: 100%; display: none; padding: 15px; border-radius: 10px; background: rgba(255,255,255,0.05); text-align: center;">
-          <div style="font-size: 14px; margin-bottom: 5px; color: #aaa;">Ты выбил:</div>
-          <div id="roll-result-text" style="font-size: 20px; font-weight: bold; margin-bottom: 10px;"></div>
-        </div>
+  <!-- МОДАЛКА МАГАЗИНА (ОТДЕЛЬНАЯ, ПО ЦЕНТРУ) -->
+  <div class="modal-overlay" id="shop-modal" onclick="closeShop(event)">
+    <div class="modal-content" onclick="event.stopPropagation()" style="border-color: #8E2DE2;">
+      
+      <div class="modal-title" style="color: #b06ef7; margin-bottom: 15px;">🛒 Магазин Титулов</div>
+      
+      <div style="background: rgba(0,0,0,0.4); width: 100%; padding: 10px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 12px; color: #aaa;">Текущий титул:</div>
+          <div id="current-title-display" style="font-size: 16px; font-weight: bold; color: #fff;">Нет</div>
       </div>
 
-      <button class="btn-close-modal" onclick="closeSettings(event)" style="margin-top: 15px;">Закрыть</button>
+      <!-- РУЛЕТКА ИМЕНИ -->
+      <div class="shop-item">
+        <div class="shop-info"><span class="shop-title">🎲 Имя</span><span class="shop-desc">Случайный титул</span></div>
+        <button class="btn-buy" onclick="rollTitle('name', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
+      </div>
+      <button class="chances-btn" onclick="toggleChances('name')">Показать шансы ▼</button>
+      <div class="chances-list" id="chances-name"></div>
+
+      <!-- РУЛЕТКА ЦВЕТА -->
+      <div class="shop-item">
+        <div class="shop-info"><span class="shop-title">🎨 Цвет</span><span class="shop-desc">Краска для титула</span></div>
+        <button class="btn-buy" onclick="rollTitle('color', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
+      </div>
+      <button class="chances-btn" onclick="toggleChances('color')">Показать шансы ▼</button>
+      <div class="chances-list" id="chances-color"></div>
+
+      <!-- РУЛЕТКА СТИЛЯ -->
+      <div class="shop-item">
+        <div class="shop-info"><span class="shop-title">✨ Стиль</span><span class="shop-desc">Шрифт титула</span></div>
+        <button class="btn-buy" onclick="rollTitle('style', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
+      </div>
+      <button class="chances-btn" onclick="toggleChances('style')">Показать шансы ▼</button>
+      <div class="chances-list" id="chances-style"></div>
+
+      <button class="btn-close-modal" onclick="closeShop(event)" style="margin-top: 15px;">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА КЕЙСА (ПО ЦЕНТРУ ЭКРАНА) -->
+  <div class="modal-overlay" id="case-modal">
+    <div class="case-modal-content">
+      <div class="modal-title" style="color: #ffd700; margin-bottom: 15px; font-size: 18px;">Крутим...</div>
+      <div class="case-container" id="case-container">
+          <div class="case-pointer"></div>
+          <div class="case-strip" id="case-strip"></div>
+      </div>
+      <div id="roll-result" style="display: none; text-align: center; width: 100%;">
+        <div style="font-size: 14px; margin-bottom: 5px; color: #aaa;">Ты выбил:</div>
+        <div id="roll-result-text" style="font-size: 22px; font-weight: bold; margin-bottom: 15px;"></div>
+        <button class="btn-play" onclick="document.getElementById('case-modal').classList.remove('active')">Забрать</button>
+      </div>
     </div>
   </div>
 
@@ -364,7 +359,9 @@
       </div>
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 20px;">Закрыть</button>
     </div>
-      <script>
+  </div>
+
+    <script>
     const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
     const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
     const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
@@ -398,7 +395,6 @@
         { id: 'create_game', icon: '🛠️', name: 'Создатель', desc: 'Создать свою игру на Бирже', reward: 30 }
     ];
 
-    // Все возможные предметы для отрисовки списка шансов
     const ALL_ITEMS = {
         name: [ { val: "Новичок", chance: 40 }, { val: "Мемер", chance: 30 }, { val: "Судья", chance: 15 }, { val: "Босс Биржи", chance: 10 }, { val: "Повелитель Мемов", chance: 4 }, { val: "БОГ САЙТА", chance: 1 } ],
         color: [ { val: "#ffffff", name: "Белый", chance: 40 }, { val: "#aaaaaa", name: "Серый", chance: 30 }, { val: "#ff0055", name: "Красный", chance: 10 }, { val: "#8E2DE2", name: "Фиолетовый", chance: 10 }, { val: "neon_pink", name: "Неон Розовый", chance: 5 }, { val: "neon_cyan", name: "Неон Голубой", chance: 4 }, { val: "neon_gold", name: "Неон Золотой", chance: 1 } ],
@@ -544,7 +540,7 @@
                 
                 renderAvatars();
                 renderAchievements();
-                renderChances(); // Отрисовка списков шансов с кнопками
+                renderChances();
             }
         } catch(e) { console.error('Ошибка загрузки профиля', e); }
     }
@@ -597,9 +593,8 @@
         });
     }
 
-    // --- ШАНСЫ (СПИСОК ВЕЩЕЙ) ---
+    // --- ШАНСЫ ---
     function renderChances() {
-        // Имена
         let htmlName = '';
         ALL_ITEMS.name.forEach(item => {
             const isOwned = userTitles.includes(item.val);
@@ -615,7 +610,6 @@
         });
         document.getElementById('chances-name').innerHTML = htmlName;
 
-        // Цвета
         let htmlColor = '';
         ALL_ITEMS.color.forEach(item => {
             const isOwned = userColors.includes(item.val);
@@ -631,7 +625,6 @@
         });
         document.getElementById('chances-color').innerHTML = htmlColor;
 
-        // Стили
         let htmlStyle = '';
         ALL_ITEMS.style.forEach(item => {
             const isOwned = userStyles.includes(item.val);
@@ -653,7 +646,6 @@
         box.style.display = box.style.display === 'block' ? 'none' : 'block';
     }
 
-    // --- ЭКИПИРОВКА ИЗ СПИСКА ---
     async function equipSpecific(type, value) {
         let newTitle = currentTitle;
         let newColor = currentColor;
@@ -670,7 +662,7 @@
                 body: JSON.stringify({ title: newTitle, color: newColor, style: newStyle })
             });
             if (res.ok) {
-                loadProfile(); // Обновляем и перерисовываем всё
+                loadProfile();
             }
         } catch(e) { alert("Ошибка сервера"); }
     }
@@ -683,8 +675,6 @@
         
         document.getElementById('settings-old-password').value = '';
         document.getElementById('settings-new-password').value = '';
-        document.getElementById('roll-result').style.display = 'none';
-        document.getElementById('case-container').style.display = 'none';
         switchTab(tab);
         document.getElementById('settings-modal').classList.add('active');
     }
@@ -747,7 +737,18 @@
         } catch(e) { alert("Ошибка сервера"); }
     }
 
-    // --- РУЛЕТКА ---
+    // --- МАГАЗИН (ОТДЕЛЬНОЕ ОКНО) ---
+    function openShop() {
+        loadProfile(); // Обновляем данные перед открытием
+        document.getElementById('shop-modal').classList.add('active');
+    }
+
+    function closeShop(event) {
+        if (event && event.target.id !== 'shop-modal' && !event.target.classList.contains('btn-close-modal')) return;
+        document.getElementById('shop-modal').classList.remove('active');
+    }
+
+    // --- РУЛЕТКА (КЕЙС) ---
     async function rollTitle(type, e) {
         if (!confirm("Потратить 35 мемкоинов на прокрутку?")) return;
 
@@ -767,12 +768,14 @@
             userCoins = data.newBalance;
             document.getElementById('global-coins-display').innerText = userCoins;
             
-            const resultBox = document.getElementById('roll-result');
+            // Открываем окно кейса по центру
+            const caseModal = document.getElementById('case-modal');
             const caseBox = document.getElementById('case-container');
             const strip = document.getElementById('case-strip');
+            const resultBox = document.getElementById('roll-result');
             
             resultBox.style.display = 'none';
-            caseBox.style.display = 'block';
+            caseModal.classList.add('active');
 
             strip.innerHTML = '';
             strip.style.transition = 'none';
@@ -792,19 +795,21 @@
                 strip.appendChild(el);
             }
 
+            // Ждем, пока окно отрисуется, и запускаем анимацию
             setTimeout(() => {
-                const itemWidth = 70; 
+                const itemWidth = 90; // Ширина элемента + отступы
                 const containerWidth = caseBox.offsetWidth;
                 const centerOffset = (containerWidth / 2) - (itemWidth / 2);
                 const targetOffset = centerOffset - (25 * itemWidth);
 
                 strip.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)';
                 strip.style.transform = `translateX(${targetOffset}px)`;
-            }, 50);
+            }, 100);
 
+            // Показываем результат после анимации
             setTimeout(async () => {
-                caseBox.style.display = 'none';
                 resultBox.style.display = 'block';
+                document.querySelector('#case-modal .modal-title').innerText = "Твой выигрыш!";
                 
                 const resultText = document.getElementById('roll-result-text');
                 if (type === 'name') { resultText.innerText = data.item.value; resultText.style.color = '#fff'; resultText.style.textShadow = 'none'; }
@@ -822,11 +827,10 @@
                 
                 if (data.isDuplicate) alert("Тебе выпал дубликат!");
                 
-                // АВТОМАТИЧЕСКАЯ ЭКИПИРОВКА (чтобы не потерять)
-                await equipSpecific(type, data.item.value || data.item.name); // Передаем выигранное значение
+                // Автоматическая экипировка
+                await equipSpecific(type, data.item.value || data.item.name);
                 
-                loadProfile(); 
-            }, 3600);
+            }, 3700);
 
         } catch (e) {
             alert("Ошибка сети!");
@@ -868,3 +872,6 @@
   </script>
 </body>
 </html>
+
+</body>
+                                                                                                                                                                                                                                                                                                                                                                                              </html>
