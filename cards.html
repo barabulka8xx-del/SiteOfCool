@@ -2,28 +2,35 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
   <title>🚀Наши Проекты🚀 | Битва Мемов</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #050505; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1000px; perspective-origin: 50% 30%; }
-    
-    /* Экран загрузки/ошибки */
-    #loading-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #050505; color: white; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1000px; perspective-origin: 50% 30%; }
+
+    /* === ЭКРАН ЗАГРУЗКИ === */
+    #loading-screen { position: fixed; inset: 0; background: #050505; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
     .loader { border: 4px solid #1a1a24; border-top: 4px solid #ff0055; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; }
-    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; }
+    #error-msg { color: #ff0055; font-size: 16px; font-weight: bold; display: none; margin-bottom: 15px; max-width: 320px; line-height: 1.4; }
+    .btn-back { background: #ff0055; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; font-size: 14px; display: none; }
 
-    /* Меню игры */
-    #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, #1a1a24 0%, #000 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-    #menu h1 { font-size: 32px; margin-bottom: 10px; text-shadow: 0 0 20px #ff0055; color: #fff; }
-    #menu p { color: #aaa; margin-bottom: 30px; font-size: 14px; }
-    .menu-btn { background: rgba(255,255,255,0.05); border: 2px solid #4facfe; color: white; padding: 15px 30px; margin: 10px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; width: 250px; transition: 0.3s; backdrop-filter: blur(5px); }
-    .menu-btn:hover { background: #4facfe; color: #000; box-shadow: 0 0 20px #4facfe; transform: scale(1.05); }
+    /* === МЕНЮ ИГРЫ === */
+    #menu { position: absolute; inset: 0; background: radial-gradient(circle at center, #1a1a24 0%, #000 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; overflow-y: auto; }
+    #menu h1 { font-size: 32px; margin-bottom: 6px; text-shadow: 0 0 20px #ff0055; color: #fff; text-align: center; }
+    #menu .subtitle { color: #aaa; margin-bottom: 20px; font-size: 13px; text-align: center; }
+    .menu-btn { background: rgba(255,255,255,0.05); border: 2px solid #4facfe; color: white; padding: 15px 30px; margin: 6px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; width: 260px; max-width: 90vw; transition: 0.3s; backdrop-filter: blur(5px); }
+    .menu-btn:active { transform: scale(0.96); background: rgba(79,172,254,0.2); }
+    .menu-btn.secondary { border-color: #8E2DE2; font-size: 14px; padding: 12px 20px; }
+    .menu-btn.secondary:active { background: rgba(142,45,226,0.2); }
+    .menu-stats { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .stat-chip { background: rgba(79,172,254,0.1); border: 1px solid #4facfe; border-radius: 20px; padding: 5px 12px; font-size: 12px; color: #4facfe; font-weight: bold; }
+    .stat-chip.win { border-color: #00ff88; color: #00ff88; background: rgba(0,255,136,0.1); }
+    .stat-chip.lose { border-color: #ff0055; color: #ff0055; background: rgba(255,0,85,0.1); }
 
-    /* Игровое поле */
-    #game-container { width: 100vw; height: 100vh; display: none; position: relative; transform-style: preserve-3d; }
+    /* === ИГРОВОЕ ПОЛЕ === */
+    #game-container { width: 100vw; height: 100vh; height: 100dvh; display: none; position: relative; transform-style: preserve-3d; }
     .lamp-container { position: absolute; top: -20px; left: 50%; transform: translateX(-50%) translateZ(100px); display: flex; flex-direction: column; align-items: center; z-index: 10; }
     .lamp-wire { width: 4px; height: 60px; background: #222; }
     .lamp-shade { width: 90px; height: 45px; background: #111; border-radius: 45px 45px 0 0; border: 2px solid #333; border-bottom: none; }
@@ -50,7 +57,7 @@
     .avatar-box.dead { opacity: 0.3; filter: grayscale(1); border-color: #000; }
     .avatar-box.dead::before { content: '💀'; position: absolute; font-size: 36px; z-index: 2; }
     .hp-bar-container { width: 70px; height: 14px; background: #111; border-radius: 7px; overflow: hidden; border: 2px solid #000; position: relative; box-shadow: 0 5px 10px rgba(0,0,0,0.8); }
-    .hp-fill { height: 100%; width: 100%; background: #00ff00; transition: width 0.3s, background 0.3s; }
+    .hp-fill { height: 100%; width: 100%; background: #00ff00; transition: width 0.4s ease, background 0.4s; }
     .hp-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
     .bot-deck { display: flex; margin-top: 5px; position: relative; height: 20px; width: 50px; justify-content: center; }
     .bot-card { position: absolute; width: 16px; height: 24px; background: linear-gradient(135deg, #8b0000, #ff0055); border: 1px solid #fff; border-radius: 3px; box-shadow: 1px 2px 4px rgba(0,0,0,0.9); }
@@ -59,31 +66,73 @@
     .bot-card:nth-child(3) { transform: rotate(5deg) translateX(3px); }
     .bot-card:nth-child(4) { transform: rotate(15deg) translateX(10px); }
 
-    .card-info-panel { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 320px; background: rgba(15, 25, 35, 0.95); border: 2px solid #ffeb3b; border-radius: 12px; padding: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 30; }
+    /* === ПАНЕЛЬ ИНФО КАРТЫ === */
+    .card-info-panel { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 320px; background: rgba(15, 25, 35, 0.95); border: 2px solid #ffeb3b; border-radius: 12px; padding: 10px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transition: 0.3s; z-index: 30; backdrop-filter: blur(10px); }
     .card-info-panel.active { opacity: 1; transform: translateX(-50%) translateY(-10px); }
     .info-title { color: #ffeb3b; font-size: 15px; font-weight: bold; margin-bottom: 3px; }
     .info-desc { color: #fff; font-size: 12px; line-height: 1.3; }
-    .info-hint { color: #4facfe; font-size: 10px; margin-top: 5px; font-style: italic;}
+    .info-hint { color: #4facfe; font-size: 10px; margin-top: 5px; font-style: italic; }
 
-    .player-hand { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 20; transition: bottom 0.4s ease; }
-    .card { width: 75px; height: 110px; background: rgba(30, 45, 55, 0.95); backdrop-filter: blur(10px); border: 2px solid #4facfe; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 10px rgba(79, 172, 254, 0.3); transition: 0.2s; position: relative; transform-origin: bottom center; }
+    /* === РУКА ИГРОКА === */
+    .player-hand { position: absolute; bottom: max(10px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 20; transition: bottom 0.4s ease; padding: 0 5px; }
+    .card { width: 75px; height: 110px; background: rgba(30, 45, 55, 0.95); backdrop-filter: blur(10px); border: 2px solid #4facfe; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 0 10px rgba(79, 172, 254, 0.3); transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s; position: relative; transform-origin: bottom center; }
     .card:nth-child(1) { transform: rotateZ(-10deg) translateY(5px); }
     .card:nth-child(2) { transform: rotateZ(-5deg); }
     .card:nth-child(3) { transform: rotateZ(0deg); }
     .card:nth-child(4) { transform: rotateZ(5deg); }
     .card:nth-child(5) { transform: rotateZ(10deg) translateY(5px); }
-    .card:hover { transform: rotateZ(0deg) translateY(-20px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.9), 0 0 25px #4facfe; z-index: 25; border-color: #fff; }
+    .card:active { transform: rotateZ(0deg) translateY(-15px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.9), 0 0 25px #4facfe; z-index: 25; border-color: #fff; }
     .card.selected { transform: rotateZ(0deg) translateY(-30px) scale(1.1); border-color: #ffeb3b; box-shadow: 0 0 30px #ffeb3b; z-index: 26; }
     .card-icon { font-size: 32px; margin-bottom: 5px; filter: drop-shadow(0 4px 5px rgba(0,0,0,0.8)); }
-    .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; padding: 0 5px;}
+    .card-name { font-size: 9px; font-weight: bold; text-align: center; line-height: 1.1; padding: 0 5px; }
 
-    .target-overlay { position: absolute; width: 100%; height: 100%; border: 3px dashed #ff0055; border-radius: 50%; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; top: 0; left: 0; box-sizing: border-box; }
+    /* === ЦЕЛЬ === */
+    .target-overlay { position: absolute; inset: 0; border: 3px dashed #ff0055; border-radius: 50%; z-index: 15; cursor: crosshair; animation: pulse 0.8s infinite alternate; box-sizing: border-box; }
     @keyframes pulse { from { transform: scale(1); opacity: 0.7; } to { transform: scale(1.1); opacity: 1; } }
 
+    /* === ВСПЛЫВАЮЩИЙ ТЕКСТ === */
     .floating-text { position: absolute; font-size: 26px; font-weight: 900; pointer-events: none; animation: floatUp 1.5s ease-out forwards; z-index: 100; text-shadow: 2px 2px 0 #000, 0 0 15px currentColor; }
     @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { opacity: 1; transform: translateY(-20px) scale(1.2); } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
+    /* === ЛОГ === */
     .game-log { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 320px; text-align: center; font-size: 13px; color: #4facfe; font-weight: bold; z-index: 10; text-shadow: 1px 1px 4px #000; background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(79, 172, 254, 0.5); box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: opacity 0.3s; }
+
+    /* === ТОСТЫ === */
+    .toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 8px; width: 90%; max-width: 340px; pointer-events: none; }
+    .toast { background: rgba(15, 25, 35, 0.97); border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: bold; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.8); border-left: 4px solid #4facfe; backdrop-filter: blur(10px); animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 8px; }
+    .toast.success { border-left-color: #00ff88; box-shadow: 0 10px 30px rgba(0,255,136,0.3); }
+    .toast.error { border-left-color: #ff0055; box-shadow: 0 10px 30px rgba(255,0,85,0.3); }
+    .toast.achievement { border-left-color: #ffd700; box-shadow: 0 10px 30px rgba(255,215,0,0.4); background: linear-gradient(90deg, rgba(255,215,0,0.15), rgba(15,25,35,0.97)); }
+    .toast.out { animation: toastOut 0.3s forwards; }
+    @keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes toastOut { to { transform: translateY(-20px); opacity: 0; } }
+
+    /* === ЭКРАН ИСТОРИИ === */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); z-index: 1500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: #151b22; border: 2px solid #8E2DE2; border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 60px rgba(142,45,226,0.3); }
+    @keyframes zoomIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-box h2 { text-align: center; font-size: 20px; color: #b06ef7; margin-bottom: 5px; }
+    .history-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 10px 12px; border-radius: 10px; border-left: 4px solid #555; font-size: 13px; }
+    .history-item.win { border-left-color: #00ff88; }
+    .history-item.lose { border-left-color: #ff0055; }
+    .history-item .h-result { font-weight: bold; }
+    .history-item .h-date { color: #666; font-size: 11px; }
+    .history-empty { color: #666; text-align: center; padding: 20px; font-size: 13px; }
+    .btn-close { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s; }
+    .btn-close:active { background: #333; }
+
+    /* === ИГРОВОЙ ЭКРАН "ИГРА ОКОНЧЕНА" === */
+    .game-over-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .game-over-overlay.active { display: flex; }
+    .game-over-box { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .game-over-title { font-size: 42px; font-weight: 900; text-shadow: 0 0 30px currentColor; }
+    .game-over-title.win { color: #ffd700; }
+    .game-over-title.lose { color: #ff0055; }
+    .game-over-sub { color: #aaa; font-size: 14px; }
+    .btn-play-again { background: linear-gradient(90deg, #00f2fe, #4facfe); color: #000; border: none; padding: 15px 40px; border-radius: 12px; font-size: 17px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(79,172,254,0.4); }
+    .btn-play-again:active { transform: scale(0.96); }
+    .btn-menu { background: transparent; border: 1px solid #444; color: #ccc; padding: 12px 40px; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -95,19 +144,26 @@
       ❌ Ошибка авторизации.<br>
       <span style="font-size:12px; color:#aaa; font-weight:normal;">Войдите в аккаунт в главном меню.</span>
     </div>
-    <a href="menu.html" class="btn-back" id="btn-back" style="display:none;">В меню</a>
+    <a href="menu.html" class="btn-back" id="btn-back">В меню</a>
   </div>
 
   <!-- МЕНЮ ИГРЫ -->
-  <div id="menu" style="display: none;">
+  <div id="menu">
     <h1>🃏 Битва Мемов</h1>
-    <p>Медленная тактика за 3D-столом</p>
-    <button class="menu-btn" onclick="startGame(2)">Дуэль (1 на 1)</button>
-    <button class="menu-btn" onclick="startGame(3)">Тройная угроза (1 на 2)</button>
-    <button class="menu-btn" onclick="startGame(4)">Королевская битва (1 на 3)</button>
+    <p class="subtitle">Медленная тактика за 3D-столом</p>
+    <button class="menu-btn" onclick="startGame(2)">⚔️ Дуэль (1 на 1)</button>
+    <button class="menu-btn" onclick="startGame(3)">🔥 Тройная угроза (1 на 2)</button>
+    <button class="menu-btn" onclick="startGame(4)">👑 Королевская битва (1 на 3)</button>
+    <button class="menu-btn secondary" onclick="openHistory()">📜 История матчей</button>
+    <button class="menu-btn secondary" onclick="location.href='menu.html'">🚪 Выйти в меню</button>
+    <div class="menu-stats">
+      <div class="stat-chip win" id="stat-wins">🏆 Побед: 0</div>
+      <div class="stat-chip lose" id="stat-losses">💀 Поражений: 0</div>
+      <div class="stat-chip" id="stat-streak">🔥 Серия: 0</div>
+    </div>
   </div>
 
-  <!-- ИГРА -->
+  <!-- ИГРОВОЕ ПОЛЕ -->
   <div id="game-container">
     <div class="lamp-container">
       <div class="lamp-wire"></div>
@@ -137,363 +193,584 @@
     </div>
 
     <div class="player-hand" id="player-hand"></div>
+
+    <!-- ЭКРАН КОНЦА ИГРЫ -->
+    <div class="game-over-overlay" id="game-over-overlay">
+      <div class="game-over-box">
+        <div class="game-over-title" id="game-over-title">ПОБЕДА</div>
+        <div class="game-over-sub" id="game-over-sub">Ты разнёс ботов!</div>
+        <button class="btn-play-again" onclick="backToMenu()">🎮 Играть снова</button>
+        <button class="btn-menu" onclick="location.href='menu.html'">🏠 В главное меню</button>
+      </div>
+    </div>
   </div>
 
-  <script>
+  <!-- ТОСТЫ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- МОДАЛКА ИСТОРИИ -->
+  <div class="modal-overlay" id="history-modal" onclick="closeHistory(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h2>📜 История матчей</h2>
+      <div id="history-list"></div>
+      <button class="btn-close" onclick="closeHistory()">Закрыть</button>
+    </div>
+  </div>
+
+    <script>
+    // ============================================================
+    // 🃏 БИТВА МЕМОВ — Логика + Сервер + Ачивки
+    // ============================================================
     const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
-    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api'; 
+    const WAIFLY_SERVER = 'http://node.waifly.com:27490/api';
     const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
     const GAME_ID = 'cards';
+    const FETCH_TIMEOUT = 8000;
 
     let token = localStorage.getItem('auth_token');
-    let wins = 0; // Количество побед для ачивки
 
+    // === СОСТОЯНИЕ ===
+    let state = {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+        achievements: [],
+        history: []
+    };
+    let isLoaded = false;
+
+    const ACHIEVEMENTS = {
+        'cards_first_win': { icon: '🃏', name: 'Первая кровь', reward: 5 },
+        'cards_streak_3':  { icon: '🔥', name: 'Трилогия', reward: 10 },
+        'cards_streak_5':  { icon: '💀', name: 'Неудержимый', reward: 15 }
+    };
+
+    // === БИБЛИОТЕКА КАРТ ===
     const CARDS_LIB = [
-      { id: 'rock', name: 'Скала', icon: '🗿', dmg: 0, heal: 0, shield: 15, desc: 'Дает 15 брони.' },
-      { id: 'frog', name: 'Жаба', icon: '🐸', dmg: 5, poison: 3, desc: '5 урона + яд (3 хода).' },
-      { id: 'pizza', name: 'Пицца', icon: '🍕', dmg: 0, heal: 15, desc: 'Лечит 15 HP.' },
-      { id: 'poop', name: 'Какашка', icon: '💩', dmg: 15, selfDmg: 5, desc: '15 урона, 5 себе.' },
-      { id: 'ufo', name: 'НЛО', icon: '👽', dmg: 10, heal: 10, desc: '10 урона, лечит 10.' },
-      { id: 'cat', name: 'Кот', icon: '🐱', dmg: 10, desc: '10 урона. Лечит при HP<20.' },
-      { id: 'bomb', name: 'Бомба', icon: '💣', dmg: 30, desc: '30 урона.' },
-      { id: 'stun', name: 'ДПС (Стан)', icon: '⚡', stun: true, desc: 'Пропуск хода врага.' },
-      { id: 'skull', name: 'Череп', icon: '💀', dmg: 20, desc: '20 урона (игнор брони).' },
-      { id: 'doge', name: 'Доге', icon: '🐕', dmg: 12, desc: '12 урона.' },
-      { id: 'brain', name: 'Мозг', icon: '🧠', heal: 5, desc: 'Лечит 5, дает карту.' }
+      { id: 'rock',  name: 'Скала',   icon: '🗿', dmg: 0,  heal: 0,  shield: 15, desc: 'Дает 15 брони.' },
+      { id: 'frog',  name: 'Жаба',    icon: '🐸', dmg: 5,  poison: 3, desc: '5 урона + яд (3 хода).' },
+      { id: 'pizza', name: 'Пицца',   icon: '🍕', dmg: 0,  heal: 15, desc: 'Лечит 15 HP.' },
+      { id: 'poop',  name: 'Какашка', icon: '💩', dmg: 15, selfDmg: 5, desc: '15 урона, 5 себе.' },
+      { id: 'ufo',   name: 'НЛО',     icon: '👽', dmg: 10, heal: 10, desc: '10 урона, лечит 10.' },
+      { id: 'cat',   name: 'Кот',     icon: '🐱', dmg: 10, desc: '10 урона. Лечит 15 при HP<20.' },
+      { id: 'bomb',  name: 'Бомба',   icon: '💣', dmg: 30, desc: '30 урона.' },
+      { id: 'stun',  name: 'ДПС (Стан)', icon: '⚡', stun: true, desc: 'Пропуск хода врага.' },
+      { id: 'skull', name: 'Череп',   icon: '💀', dmg: 20, desc: '20 урона (игнор брони).' },
+      { id: 'doge',  name: 'Доге',    icon: '🐕', dmg: 12, desc: '12 урона.' },
+      { id: 'brain', name: 'Мозг',    icon: '🧠', heal: 5, desc: 'Лечит 5, дает карту.' }
     ];
 
+    // === ИГРОВОЕ СОСТОЯНИЕ ===
     let players = [];
     let currentTurn = 0;
     let isTargeting = false;
     let selectedCardIndex = -1;
     let playerHand = [];
-    let gameMode = 0;
+    let gameOver = false;
 
-    // --- ЗАГРУЗКА ---
-    async function initGame() {
-        if (!token) {
-            showError();
-            return;
-        }
+    // ============================================================
+    // 🍞 ТОСТЫ
+    // ============================================================
+    function showToast(text, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.innerText = text;
+        container.appendChild(toast);
+        setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    // ============================================================
+    // 🌐 FETCH С ТАЙМАУТОМ
+    // ============================================================
+    async function fetchWithTimeout(url, opts = {}) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+        try {
+            const res = await fetch(url, { ...opts, signal: controller.signal });
+            return res;
+        } finally { clearTimeout(timer); }
+    }
+
+    // ============================================================
+    // 📡 ЗАГРУЗКА С СЕРВЕРА
+    // ============================================================
+    async function loadGameFromServer() {
+        if (!token) { showError(); return; }
 
         try {
-            const res = await fetch(`${API_URL}/game/load/${GAME_ID}`, {
+            const res = await fetchWithTimeout(`${API_URL}/game/load/${GAME_ID}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
+
             if (res.status === 401 || res.status === 403) { showError(); return; }
-            
+
             const data = await res.json();
-            wins = data.wins || 0;
-            
+            if (data && typeof data === 'object') {
+                state.wins = data.wins || 0;
+                state.losses = data.losses || 0;
+                state.draws = data.draws || 0;
+                state.currentStreak = data.currentStreak || 0;
+                state.bestStreak = data.bestStreak || 0;
+                state.achievements = Array.isArray(data.achievements) ? data.achievements : [];
+                state.history = Array.isArray(data.history) ? data.history : [];
+            }
+
+            isLoaded = true;
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('menu').style.display = 'flex';
-        } catch (error) {
-            showError("Ошибка соединения с сервером.");
+            updateMenuStats();
+        } catch (e) {
+            console.error('Ошибка загрузки:', e);
+            // Офлайн-режим: играем без сохранения
+            isLoaded = false;
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('menu').style.display = 'flex';
+            showToast('⚠️ Офлайн-режим (прогресс не сохранится)', 'error');
         }
     }
 
-    function showError(text) {
+    function showError() {
         document.getElementById('loader').style.display = 'none';
         document.getElementById('error-msg').style.display = 'block';
-        if (text) document.getElementById('error-msg').innerHTML += `<br><span style="font-size:12px; color:#aaa;">${text}</span>`;
         document.getElementById('btn-back').style.display = 'inline-block';
     }
 
     async function saveGameToServer() {
-        if (!token) return;
+        if (!token || !isLoaded) return;
         try {
-            await fetch(`${API_URL}/game/save/${GAME_ID}`, {
+            await fetchWithTimeout(`${API_URL}/game/save/${GAME_ID}`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ wins: wins })
+                body: JSON.stringify(state)
             });
-        } catch (error) {}
+        } catch (e) { console.error('Ошибка сохранения:', e); }
     }
 
-    // --- ЛОГИКА ИГРЫ ---
+    // ============================================================
+    // 🏆 АЧИВКИ
+    // ============================================================
+    async function claimAchievement(id) {
+        if (state.achievements.includes(id)) return;
+        const meta = ACHIEVEMENTS[id];
+        if (!meta) return;
+
+        try {
+            const res = await fetchWithTimeout(`${API_URL}/user/claim_achievement`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ achievementId: id })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                state.achievements.push(id);
+                showToast(`${meta.icon} ${meta.name}! +${meta.reward} 🪙`, 'achievement');
+            } else {
+                console.warn('Ачивка не выдана:', data.error);
+            }
+        } catch (e) { console.error('Ачивка:', e); }
+    }
+
+    function checkAchievements() {
+        if (state.wins >= 1) claimAchievement('cards_first_win');
+        if (state.currentStreak >= 3) claimAchievement('cards_streak_3');
+        if (state.currentStreak >= 5) claimAchievement('cards_streak_5');
+    }
+
+    // ============================================================
+    // 🎮 СТАРТ ИГРЫ
+    // ============================================================
     function startGame(numPlayers) {
-      document.getElementById('menu').style.display = 'none';
-      document.getElementById('game-container').style.display = 'block';
-      
-      gameMode = numPlayers;
-      players = [];
-      players.push({ id: 'you', name: 'Ты', icon: '😎', hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: false, alive: true, status: [] });
-      
-      const botIcons = ['😈', '🤖', '👽'];
-      const botSeats = ['seat-1', 'seat-2', 'seat-3'];
-      
-      for (let i = 0; i < numPlayers - 1; i++) {
-        players.push({ id: 'bot'+i, name: 'Бот '+(i+1), icon: botIcons[i], hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: true, alive: true, status: [] });
-        document.getElementById(botSeats[i]).style.display = 'flex';
-      }
-      
-      for (let i = numPlayers - 1; i < 3; i++) {
-        document.getElementById(botSeats[i]).style.display = 'none';
-      }
+        gameOver = false;
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        document.getElementById('game-over-overlay').classList.remove('active');
 
-      currentTurn = 0;
-      playerHand = [];
-      drawCards(4);
-      updateUI();
-      nextTurn();
+        players = [];
+        players.push({ id: 'you', name: 'Ты', icon: '😎', hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: false, alive: true, status: [] });
+
+        const botIcons = ['😈', '🤖', '👽'];
+        const botSeats = ['seat-1', 'seat-2', 'seat-3'];
+
+        for (let i = 0; i < numPlayers - 1; i++) {
+            players.push({ id: 'bot'+i, name: 'Бот '+(i+1), icon: botIcons[i], hp: 50, maxHp: 50, shield: 0, poisonTurns: 0, isBot: true, alive: true, status: [] });
+            document.getElementById(botSeats[i]).style.display = 'flex';
+        }
+        for (let i = numPlayers - 1; i < 3; i++) {
+            document.getElementById(botSeats[i]).style.display = 'none';
+        }
+
+        currentTurn = 0;
+        playerHand = [];
+        drawCards(4);
+        updateUI();
+        nextTurn();
     }
 
+    function backToMenu() {
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('menu').style.display = 'flex';
+        document.getElementById('game-over-overlay').classList.remove('active');
+        updateMenuStats();
+    }
+
+    // ============================================================
+    // 🃏 КАРТЫ В РУКЕ
+    // ============================================================
     function drawCards(count) {
-      for (let i = 0; i < count; i++) {
-        if (playerHand.length < 6) { 
-          const randomCard = CARDS_LIB[Math.floor(Math.random() * CARDS_LIB.length)];
-          playerHand.push({ ...randomCard, uid: Math.random() });
+        for (let i = 0; i < count; i++) {
+            if (playerHand.length < 6) {
+                const randomCard = CARDS_LIB[Math.floor(Math.random() * CARDS_LIB.length)];
+                playerHand.push({ ...randomCard, uid: Math.random() });
+            }
         }
-      }
-      renderHand();
+        renderHand();
     }
 
     function renderHand() {
-      const handEl = document.getElementById('player-hand');
-      handEl.innerHTML = '';
-      
-      if (playerHand.length === 0) { drawCards(1); return; }
+        const handEl = document.getElementById('player-hand');
+        handEl.innerHTML = '';
+        if (playerHand.length === 0) { drawCards(1); return; }
 
-      playerHand.forEach((card, index) => {
-        const cardEl = document.createElement('div');
-        cardEl.className = 'card' + (index === selectedCardIndex ? ' selected' : '');
-        cardEl.innerHTML = `
-          <div class="card-icon">${card.icon}</div>
-          <div class="card-name">${card.name}</div>
-        `;
-        cardEl.onclick = () => selectCard(index);
-        handEl.appendChild(cardEl);
-      });
+        playerHand.forEach((card, index) => {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card' + (index === selectedCardIndex ? ' selected' : '');
+            cardEl.innerHTML = `
+              <div class="card-icon">${card.icon}</div>
+              <div class="card-name">${card.name}</div>
+            `;
+            cardEl.onclick = () => selectCard(index);
+            handEl.appendChild(cardEl);
+        });
     }
 
     function selectCard(index) {
-      if (currentTurn !== 0) return; 
-      if (players[0].status.includes('stun')) { log("Ты в стане и не можешь ходить!"); return; }
+        if (currentTurn !== 0 || gameOver) return;
+        if (players[0].status.includes('stun')) { log("Ты в стане и не можешь ходить!"); return; }
 
-      const card = playerHand[index];
+        const card = playerHand[index];
+        if (selectedCardIndex === index) { hideCardInfo(); return; }
 
-      if (selectedCardIndex === index) {
-        hideCardInfo();
-        return;
-      }
+        selectedCardIndex = index;
+        renderHand();
 
-      selectedCardIndex = index;
-      renderHand();
-      
-      document.getElementById('info-title').innerText = card.icon + ' ' + card.name;
-      document.getElementById('info-desc').innerText = card.desc;
-      document.getElementById('card-info').classList.add('active');
+        document.getElementById('info-title').innerText = card.icon + ' ' + card.name;
+        document.getElementById('info-desc').innerText = card.desc;
+        document.getElementById('card-info').classList.add('active');
 
-      if (card.dmg > 0 || card.stun) {
-        document.getElementById('info-hint').innerText = "Выбери цель для атаки (нажми на прицел).";
-        isTargeting = true;
-        document.getElementById('table-text').innerText = "Выбери цель!";
-        updateUI(); 
-      } else {
-        applyCard(card, 0, index);
-      }
+        if (card.dmg > 0 || card.stun) {
+            document.getElementById('info-hint').innerText = "Выбери цель для атаки (нажми на прицел).";
+            isTargeting = true;
+            document.getElementById('table-text').innerText = "Выбери цель!";
+            updateUI();
+        } else {
+            applyCard(card, 0, index);
+        }
     }
 
     function hideCardInfo() {
-      document.getElementById('card-info').classList.remove('active');
-      selectedCardIndex = -1;
-      isTargeting = false;
-      document.getElementById('table-text').innerText = "Твой ход";
-      updateUI(); 
+        document.getElementById('card-info').classList.remove('active');
+        selectedCardIndex = -1;
+        isTargeting = false;
+        document.getElementById('table-text').innerText = "Твой ход";
+        updateUI();
     }
 
     function showPlayedCard(card) {
-      const area = document.getElementById('played-cards-area');
-      const cardEl = document.createElement('div');
-      cardEl.className = 'played-card-anim';
-      cardEl.innerHTML = card.icon;
-      area.appendChild(cardEl);
-      setTimeout(() => cardEl.remove(), 2500);
+        const area = document.getElementById('played-cards-area');
+        const el = document.createElement('div');
+        el.className = 'played-card-anim';
+        el.innerHTML = card.icon;
+        area.appendChild(el);
+        setTimeout(() => el.remove(), 2500);
     }
 
+    // ============================================================
+    // ⚔️ ПРИМЕНЕНИЕ КАРТЫ
+    // ============================================================
     function applyCard(card, targetIndex, handIndex) {
-      if (!isTargeting && (card.dmg > 0 || card.stun)) return; 
+        if (!isTargeting && (card.dmg > 0 || card.stun)) return;
 
-      hideCardInfo(); 
-      const attacker = players[0];
-      const target = players[targetIndex];
+        hideCardInfo();
+        const attacker = players[0];
+        const target = players[targetIndex];
 
-      if (targetIndex === 0) { log(`Ты применяешь ${card.name}!`); } 
-      else { log(`Ты играешь ${card.name} против ${target.name}!`); }
-      
-      showPlayedCard(card);
+        if (targetIndex === 0) log(`Ты применяешь ${card.name}!`);
+        else log(`Ты играешь ${card.name} против ${target.name}!`);
 
-      if (card.heal) { attacker.hp = Math.min(attacker.maxHp, attacker.hp + card.heal); showFloatText(attacker, `+${card.heal}`, '#00ff00'); }
-      if (card.shield) { attacker.shield += card.shield; showFloatText(attacker, `🛡️ +${card.shield}`, '#4facfe'); }
-      if (card.dmg) {
-        let damage = card.dmg;
-        if (target.shield > 0 && card.id !== 'skull') {
-          const absorbed = Math.min(target.shield, damage);
-          target.shield -= absorbed; damage -= absorbed;
-          showFloatText(target, `🛡️ -${absorbed}`, '#4facfe');
+        showPlayedCard(card);
+
+        if (card.heal) { attacker.hp = Math.min(attacker.maxHp, attacker.hp + card.heal); showFloatText(attacker, `+${card.heal}`, '#00ff00'); }
+        if (card.shield) { attacker.shield += card.shield; showFloatText(attacker, `🛡️ +${card.shield}`, '#4facfe'); }
+        if (card.dmg) {
+            let damage = card.dmg;
+            if (target.shield > 0 && card.id !== 'skull') {
+                const absorbed = Math.min(target.shield, damage);
+                target.shield -= absorbed; damage -= absorbed;
+                showFloatText(target, `🛡️ -${absorbed}`, '#4facfe');
+            }
+            target.hp -= damage;
+            if (damage > 0) showFloatText(target, `-${damage}`, '#ff0055');
         }
-        target.hp -= damage;
-        if (damage > 0) showFloatText(target, `-${damage}`, '#ff0055');
-      }
-      if (card.selfDmg) { attacker.hp -= card.selfDmg; showFloatText(attacker, `-${card.selfDmg}`, '#ff0055'); }
-      if (card.id === 'cat' && attacker.hp < 20) { attacker.hp += 15; showFloatText(attacker, `+15`, '#00ff00'); }
-      if (card.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
-      if (card.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
-      if (card.id === 'brain') { drawCards(1); }
+        if (card.selfDmg) { attacker.hp -= card.selfDmg; showFloatText(attacker, `-${card.selfDmg}`, '#ff0055'); }
+        if (card.id === 'cat' && attacker.hp < 20) { attacker.hp += 15; showFloatText(attacker, `+15`, '#00ff00'); }
+        if (card.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
+        if (card.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
+        if (card.id === 'brain') { drawCards(1); }
 
-      playerHand.splice(handIndex, 1);
-      drawCards(1);
-      renderHand();
-      checkDeaths();
-      updateUI();
-      
-      if (!checkGameOver()) { setTimeout(nextTurn, 2500); }
+        playerHand.splice(handIndex, 1);
+        drawCards(1);
+        renderHand();
+        checkDeaths();
+        updateUI();
+
+        if (!checkGameOver()) setTimeout(nextTurn, 2500);
     }
 
+    // ============================================================
+    // 🔄 ХОДЫ
+    // ============================================================
     function nextTurn() {
-      if (checkGameOver()) return;
-      currentTurn++;
-      if (currentTurn >= players.length) currentTurn = 0;
-      if (!players[currentTurn].alive) { nextTurn(); return; }
+        if (gameOver) return;
+        currentTurn++;
+        if (currentTurn >= players.length) currentTurn = 0;
+        if (!players[currentTurn].alive) { nextTurn(); return; }
 
-      updateUI();
-      if (currentTurn === 0) {
-        document.getElementById('table-text').innerText = "Твой ход";
-        if (players[0].status.includes('stun')) {
-           log("Ты пропускаешь ход из-за стана!");
-           players[0].status = players[0].status.filter(s => s !== 'stun');
-           setTimeout(nextTurn, 2500); return;
+        updateUI();
+        if (currentTurn === 0) {
+            document.getElementById('table-text').innerText = "Твой ход";
+            if (players[0].status.includes('stun')) {
+                log("Ты пропускаешь ход из-за стана!");
+                players[0].status = players[0].status.filter(s => s !== 'stun');
+                setTimeout(nextTurn, 2500); return;
+            }
+            if (players[0].poisonTurns > 0) {
+                players[0].hp -= 5; players[0].poisonTurns--;
+                showFloatText(players[0], `☠️ -5`, '#a020f0');
+                checkDeaths();
+                if (!players[0].alive) { checkGameOver(); return; }
+            }
+        } else {
+            document.getElementById('table-text').innerText = `Ход ${players[currentTurn].name}...`;
+            setTimeout(() => botPlay(currentTurn), 2000);
         }
-        if (players[0].poisonTurns > 0) {
-           players[0].hp -= 5; players[0].poisonTurns--;
-           showFloatText(players[0], `☠️ -5`, '#a020f0');
-           checkDeaths();
-           if (!players[0].alive) { checkGameOver(); return; }
-        }
-      } else {
-        document.getElementById('table-text').innerText = `Ход ${players[currentTurn].name}...`;
-        setTimeout(() => botPlay(currentTurn), 2000);
-      }
     }
 
     function botPlay(index) {
-      const bot = players[index];
-      if (bot.status.includes('stun')) {
-        log(`${bot.name} пропускает ход (стан)!`);
-        bot.status = bot.status.filter(s => s !== 'stun');
-        setTimeout(nextTurn, 2500); return;
-      }
-      if (bot.poisonTurns > 0) {
-        bot.hp -= 5; bot.poisonTurns--;
-        showFloatText(bot, `☠️ -5`, '#a020f0');
-        checkDeaths();
-        if (!bot.alive) { setTimeout(nextTurn, 2500); return; }
-      }
+        if (gameOver) return;
+        const bot = players[index];
+        if (!bot || !bot.alive) { setTimeout(nextTurn, 1500); return; }
 
-      let cardToPlay = null;
-      if (bot.hp < 20 && Math.random() < 0.6) cardToPlay = CARDS_LIB.find(c => c.id === 'pizza');
-      if (!cardToPlay) {
-         const attackCards = CARDS_LIB.filter(c => c.dmg > 0 || c.stun);
-         cardToPlay = attackCards[Math.floor(Math.random() * attackCards.length)];
-      }
-
-      const validTargets = players.filter(p => p.id !== bot.id && p.alive);
-      let target = validTargets[Math.floor(Math.random() * validTargets.length)];
-      if (!target) { setTimeout(nextTurn, 2500); return; }
-
-      log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
-      showPlayedCard(cardToPlay);
-
-      if (cardToPlay.heal) { bot.hp = Math.min(bot.maxHp, bot.hp + cardToPlay.heal); showFloatText(bot, `+${cardToPlay.heal}`, '#00ff00'); }
-      if (cardToPlay.shield) { bot.shield += cardToPlay.shield; showFloatText(bot, `🛡️ +${cardToPlay.shield}`, '#4facfe'); }
-      if (cardToPlay.dmg) {
-        let dmg = cardToPlay.dmg;
-        if (target.shield > 0 && cardToPlay.id !== 'skull') {
-           const abs = Math.min(target.shield, dmg);
-           target.shield -= abs; dmg -= abs;
-           showFloatText(target, `🛡️ -${abs}`, '#4facfe');
+        if (bot.status.includes('stun')) {
+            log(`${bot.name} пропускает ход (стан)!`);
+            bot.status = bot.status.filter(s => s !== 'stun');
+            setTimeout(nextTurn, 2500); return;
         }
-        target.hp -= dmg;
-        if (dmg > 0) showFloatText(target, `-${dmg}`, '#ff0055');
-      }
-      if (cardToPlay.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
-      if (cardToPlay.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
+        if (bot.poisonTurns > 0) {
+            bot.hp -= 5; bot.poisonTurns--;
+            showFloatText(bot, `☠️ -5`, '#a020f0');
+            checkDeaths();
+            if (!bot.alive) { setTimeout(nextTurn, 2500); return; }
+        }
 
-      checkDeaths(); updateUI();
-      if (!checkGameOver()) { setTimeout(nextTurn, 2500); }
+        let cardToPlay = null;
+        if (bot.hp < 20 && Math.random() < 0.6) cardToPlay = CARDS_LIB.find(c => c.id === 'pizza');
+        if (!cardToPlay) {
+            const attackCards = CARDS_LIB.filter(c => c.dmg > 0 || c.stun);
+            cardToPlay = attackCards[Math.floor(Math.random() * attackCards.length)];
+        }
+
+        const validTargets = players.filter(p => p.id !== bot.id && p.alive);
+        const target = validTargets[Math.floor(Math.random() * validTargets.length)];
+        if (!target) { setTimeout(nextTurn, 2500); return; }
+
+        log(`${bot.name} играет ${cardToPlay.name} против ${target.name}!`);
+        showPlayedCard(cardToPlay);
+
+        if (cardToPlay.heal) { bot.hp = Math.min(bot.maxHp, bot.hp + cardToPlay.heal); showFloatText(bot, `+${cardToPlay.heal}`, '#00ff00'); }
+        if (cardToPlay.shield) { bot.shield += cardToPlay.shield; showFloatText(bot, `🛡️ +${cardToPlay.shield}`, '#4facfe'); }
+        if (cardToPlay.dmg) {
+            let dmg = cardToPlay.dmg;
+            if (target.shield > 0 && cardToPlay.id !== 'skull') {
+                const abs = Math.min(target.shield, dmg);
+                target.shield -= abs; dmg -= abs;
+                showFloatText(target, `🛡️ -${abs}`, '#4facfe');
+            }
+            target.hp -= dmg;
+            if (dmg > 0) showFloatText(target, `-${dmg}`, '#ff0055');
+        }
+        if (cardToPlay.stun) { target.status.push('stun'); showFloatText(target, `💫 СТАН`, '#ffeb3b'); }
+        if (cardToPlay.poison) { target.poisonTurns = 3; showFloatText(target, `☠️ ОТРАВЛЕН`, '#a020f0'); }
+
+        checkDeaths(); updateUI();
+        if (!checkGameOver()) setTimeout(nextTurn, 2500);
     }
 
     function checkDeaths() {
-      players.forEach(p => { if (p.hp <= 0 && p.alive) { p.hp = 0; p.alive = false; log(`💀 ${p.name} уничтожен!`); } });
+        players.forEach(p => {
+            if (p.hp <= 0 && p.alive) {
+                p.hp = 0; p.alive = false;
+                log(`💀 ${p.name} уничтожен!`);
+            }
+        });
     }
 
+    // ============================================================
+    // 🏁 КОНЕЦ ИГРЫ
+    // ============================================================
     function checkGameOver() {
-      const aliveBots = players.filter(p => p.alive && p.isBot).length;
-      const playerAlive = players[0].alive;
+        const aliveBots = players.filter(p => p.alive && p.isBot).length;
+        const playerAlive = players[0].alive;
 
-      if (!playerAlive) {
-        document.getElementById('table-text').innerText = "ТЫ ПРОИГРАЛ 💀";
-        document.getElementById('table-text').style.color = "#ff0055";
-        
-        // Кнопка возврата в меню
-        document.getElementById('game-log').innerHTML = `<button onclick="location.reload()" style="background:#ff0055; border:none; color:#fff; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:10px; cursor:pointer;">Вернуться в меню</button>`;
-        return true;
-      }
-      if (aliveBots === 0) {
-        document.getElementById('table-text').innerText = "ТЫ ПОБЕДИЛ! 👑";
-        document.getElementById('table-text').style.color = "#ffd700";
-        
-        wins += 1;
-        saveGameToServer(); // Сохраняем победу на сервер!
-        
-        document.getElementById('game-log').innerHTML = `<button onclick="location.reload()" style="background:#ffd700; border:none; color:#000; padding:10px 20px; border-radius:10px; font-weight:bold; margin-top:10px; cursor:pointer;">Забрать награду</button>`;
-        return true;
-      }
-      return false;
+        if (!playerAlive) {
+            gameOver = true;
+            state.losses++;
+            state.currentStreak = 0;
+            addHistory('lose', players.length);
+            saveGameToServer();
+
+            const overlay = document.getElementById('game-over-overlay');
+            const title = document.getElementById('game-over-title');
+            const sub = document.getElementById('game-over-sub');
+            title.innerText = 'ПОРАЖЕНИЕ 💀';
+            title.className = 'game-over-title lose';
+            sub.innerText = 'Боты оказались сильнее...';
+            overlay.classList.add('active');
+            return true;
+        }
+        if (aliveBots === 0) {
+            gameOver = true;
+            state.wins++;
+            state.currentStreak++;
+            if (state.currentStreak > state.bestStreak) state.bestStreak = state.currentStreak;
+            addHistory('win', players.length);
+            saveGameToServer();
+            checkAchievements();
+            saveGameToServer();
+
+            const overlay = document.getElementById('game-over-overlay');
+            const title = document.getElementById('game-over-title');
+            const sub = document.getElementById('game-over-sub');
+            title.innerText = 'ПОБЕДА 👑';
+            title.className = 'game-over-title win';
+            sub.innerText = `Серия побед: ${state.currentStreak} 🔥`;
+            overlay.classList.add('active');
+            return true;
+        }
+        return false;
     }
 
+    function addHistory(result, mode) {
+        state.history.unshift({
+            result: result,
+            mode: mode,
+            date: new Date().toISOString()
+        });
+        if (state.history.length > 10) state.history = state.history.slice(0, 10);
+    }
+
+    // ============================================================
+    // 🎨 UI
+    // ============================================================
     function updateUI() {
-      players.forEach((p, index) => {
-        let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
-        const seatEl = document.getElementById(seatId);
-        if (!seatEl) return;
+        players.forEach((p, index) => {
+            const seatId = index === 0 ? 'seat-player' : 'seat-' + index;
+            const seatEl = document.getElementById(seatId);
+            if (!seatEl) return;
 
-        let deckHTML = '';
-        if (p.isBot && p.alive) { deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`; }
-        let overlayHTML = '';
-        if (isTargeting && p.isBot && p.alive) { overlayHTML = `<div class="target-overlay" onclick="event.stopPropagation(); applyCard(playerHand[selectedCardIndex], ${index}, selectedCardIndex)"></div>`; }
+            let deckHTML = '';
+            if (p.isBot && p.alive) {
+                deckHTML = `<div class="bot-deck"><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div><div class="bot-card"></div></div>`;
+            }
+            let overlayHTML = '';
+            if (isTargeting && p.isBot && p.alive) {
+                overlayHTML = `<div class="target-overlay" onclick="event.stopPropagation(); applyCard(playerHand[selectedCardIndex], ${index}, selectedCardIndex)"></div>`;
+            }
 
-        seatEl.innerHTML = `
-          <div class="avatar-box ${p.isBot ? 'enemy' : ''} ${p.status.includes('stun') ? 'stunned' : ''} ${!p.alive ? 'dead' : ''}">
-            ${overlayHTML} ${p.icon}
-          </div>
-          <div class="hp-bar-container">
-            <div class="hp-fill" style="width: ${(p.hp/p.maxHp)*100}%; background: ${p.hp > 20 ? '#00ff00' : '#ff0055'}"></div>
-            <div class="hp-text">${p.hp} HP ${p.shield > 0 ? '🛡️'+p.shield : ''}</div>
-          </div>
-          ${deckHTML}
-        `;
-      });
+            seatEl.innerHTML = `
+              <div class="avatar-box ${p.isBot ? 'enemy' : ''} ${p.status.includes('stun') ? 'stunned' : ''} ${!p.alive ? 'dead' : ''}">
+                ${overlayHTML} ${p.icon}
+              </div>
+              <div class="hp-bar-container">
+                <div class="hp-fill" style="width: ${(p.hp/p.maxHp)*100}%; background: ${p.hp > 20 ? '#00ff00' : '#ff0055'}"></div>
+                <div class="hp-text">${p.hp} HP ${p.shield > 0 ? '🛡️'+p.shield : ''}</div>
+              </div>
+              ${deckHTML}
+            `;
+        });
     }
 
     function showFloatText(target, text, color) {
-      const index = players.indexOf(target);
-      let seatId = index === 0 ? 'seat-player' : 'seat-' + index;
-      const seat = document.getElementById(seatId);
-      if (!seat) return;
-      const float = document.createElement('div');
-      float.className = 'floating-text'; float.style.color = color; float.innerText = text;
-      seat.appendChild(float);
-      setTimeout(() => float.remove(), 1500);
+        const index = players.indexOf(target);
+        const seatId = index === 0 ? 'seat-player' : 'seat-' + index;
+        const seat = document.getElementById(seatId);
+        if (!seat) return;
+        const float = document.createElement('div');
+        float.className = 'floating-text';
+        float.style.color = color;
+        float.innerText = text;
+        seat.appendChild(float);
+        setTimeout(() => float.remove(), 1500);
     }
 
     function log(msg) { document.getElementById('game-log').innerText = msg; }
 
-    window.onload = initGame;
+    function updateMenuStats() {
+        document.getElementById('stat-wins').innerText = `🏆 Побед: ${state.wins}`;
+        document.getElementById('stat-losses').innerText = `💀 Поражений: ${state.losses}`;
+        document.getElementById('stat-streak').innerText = `🔥 Серия: ${state.currentStreak}`;
+    }
+
+    // ============================================================
+    // 📜 ИСТОРИЯ МАТЧЕЙ
+    // ============================================================
+    function openHistory() {
+        renderHistory();
+        document.getElementById('history-modal').classList.add('active');
+    }
+
+    function closeHistory(e) {
+        if (e && e.target.id !== 'history-modal') return;
+        document.getElementById('history-modal').classList.remove('active');
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        list.innerHTML = '';
+        if (!state.history || state.history.length === 0) {
+            list.innerHTML = '<div class="history-empty">Пока пусто. Сыграй первый матч! 🎮</div>';
+            return;
+        }
+        const modeNames = { 2: 'Дуэль', 3: 'Тройная угроза', 4: 'Королевская битва' };
+        state.history.forEach(h => {
+            const item = document.createElement('div');
+            item.className = 'history-item ' + h.result;
+            const resText = h.result === 'win' ? '👑 Победа' : '💀 Поражение';
+            const date = new Date(h.date);
+            const dateStr = `${date.getDate().toString().padStart(2,'0')}.${(date.getMonth()+1).toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+            item.innerHTML = `
+              <div>
+                <div class="h-result">${resText}</div>
+                <div class="h-date">${modeNames[h.mode] || 'Матч'}</div>
+              </div>
+              <div class="h-date">${dateStr}</div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    // ============================================================
+    // 🚀 СТАРТ
+    // ============================================================
+    window.onload = loadGameFromServer;
   </script>
 </body>
 </html>
