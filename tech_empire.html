@@ -8,83 +8,107 @@
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #080b10; color: white; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
 
-    /* --- ПЛАШКА ДЛЯ ПОВОРОТА --- */
+    /* ПЛАШКА ПОВОРОТА */
     .rotate-warning { position: fixed; inset: 0; background: #080b10; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
     .rotate-warning .icon { font-size: 50px; margin-bottom: 20px; animation: rotateAnim 2s infinite; }
     @keyframes rotateAnim { 0% { transform: rotate(0); } 50% { transform: rotate(90deg); } 100% { transform: rotate(0); } }
     @media (orientation: portrait) { body.is-mobile .rotate-warning { display: flex; } }
 
-    /* --- ШАПКА --- */
-    .top-bar { height: 55px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    /* ШАПКА */
+    .top-bar { height: 55px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 100; }
     .stat-box { display: flex; gap: 10px; align-items: center; }
     .stat { display: flex; flex-direction: column; }
     .stat-label { font-size: 9px; color: #6c8196; text-transform: uppercase; font-weight: 700; }
-    .stat-val { font-size: 14px; font-weight: 900; color: #00ff88; text-shadow: 0 0 10px rgba(0,255,136,0.3); }
-    .stat-val.rp { color: #8E2DE2; text-shadow: 0 0 10px rgba(142,45,226,0.3); }
+    .stat-val { font-size: 14px; font-weight: 900; color: #00ff88; }
+    .stat-val.rp { color: #8E2DE2; }
+    .stat-val.month { color: #4facfe; }
     
     .btn-icon { background: rgba(255,255,255,0.1); border: 1px solid #2a3b4c; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 16px; }
 
-    /* --- 3D КАНВАС --- */
+    /* 3D КАНВАС */
     #game-container { flex: 1; position: relative; outline: none; background: #000; overflow: hidden; }
     canvas { display: block; width: 100%; height: 100%; }
 
-    /* --- МЕНЮ СТРОЙКИ --- */
-    .build-panel { position: absolute; bottom: -100%; left: 0; width: 100%; background: #111a22; border-top: 2px solid #1f2d3d; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); z-index: 200; display: flex; flex-direction: column; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); padding-bottom: env(safe-area-inset-bottom); }
-    .build-panel.active { bottom: 0; }
+    /* ВЕРХНЯЯ ПАНЕЛЬ ПРОГРЕССА */
+    .top-progress { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(17, 26, 34, 0.9); border: 1px solid #2a3b4c; border-radius: 10px; padding: 8px; z-index: 50; display: flex; flex-direction: column; gap: 5px; }
+    .prog-info { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; }
+    .prog-bar-bg { width: 100%; height: 8px; background: #000; border-radius: 4px; overflow: hidden; }
+    .prog-bar-fill { height: 100%; width: 0%; background: #00ff88; transition: width 0.3s; }
 
+    /* МЕНЮ СТРОЙКИ */
+    .build-panel { position: absolute; bottom: -100%; left: 0; width: 100%; background: #111a22; border-top: 2px solid #1f2d3d; transition: bottom 0.3s; z-index: 200; display: flex; flex-direction: column; border-radius: 20px 20px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+    .build-panel.active { bottom: 0; }
     .build-header { padding: 12px 15px; border-bottom: 1px solid #1f2d3d; display: flex; justify-content: space-between; align-items: center; }
-    .build-title { font-weight: 900; font-size: 15px; color: #fff; }
     .btn-done { background: #00ff88; color: #000; border: none; padding: 6px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; }
-    
     .build-items { display: flex; gap: 12px; padding: 15px; overflow-x: auto; }
     .build-items::-webkit-scrollbar { display: none; }
-    .item { flex-shrink: 0; width: 110px; background: #0a0f14; border: 1px solid #2a3b4c; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; align-items: center; }
-    .item:active { transform: scale(0.95); border-color: #00ff88; }
-    .item.selected { border-color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.3); background: #11221a; }
-    .item.demolish.selected { border-color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.3); background: #221115; }
+    .item { flex-shrink: 0; width: 110px; background: #0a0f14; border: 1px solid #2a3b4c; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; align-items: center; position: relative; overflow: hidden; }
+    .item.selected { border-color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .item.demolish.selected { border-color: #ff0055; }
     
-    .icon-desk { width: 60px; height: 40px; position: relative; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-    .icon-desk .monitor { width: 30px; height: 22px; background: #000; border: 2px solid #555; border-radius: 4px; position: relative; margin-bottom: 2px; }
-    .icon-desk .monitor::after { content:''; position: absolute; inset: 2px; background: #00ff88; opacity: 0.8; }
-    .icon-desk .board { width: 50px; height: 6px; background: #8b5a2b; border-radius: 2px; border-bottom: 2px solid #5a3a1b; }
+    .icon-desk { width: 60px; height: 40px; position: relative; margin-bottom: 8px; }
+    .icon-desk .monitor { width: 30px; height: 22px; background: #000; border: 2px solid #555; position: absolute; top: 0; left: 15px; }
+    .icon-desk .monitor::after { content:''; position: absolute; inset: 2px; background: #00ff88; }
+    .icon-desk .board { width: 50px; height: 6px; background: #8b5a2b; position: absolute; bottom: 0; left: 5px; }
+    
+    /* Новый стол в меню */
+    .icon-desk-modern .monitor { width: 36px; height: 20px; border-color: #4facfe; left: 12px; border-radius: 2px; }
+    .icon-desk-modern .monitor::after { background: #4facfe; }
+    .icon-desk-modern .board { background: #ddd; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
 
-    .icon-demolish { width: 40px; height: 40px; background: #ff0055; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-bottom: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-
-    .item-title { font-size: 11px; font-weight: 900; color: #fff; margin-bottom: 4px; text-align: center; }
+    .icon-demolish { width: 40px; height: 40px; background: #ff0055; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-bottom: 8px; }
+    .item-title { font-size: 11px; font-weight: 900; text-align: center; margin-bottom: 4px; }
     .item-price { font-size: 12px; font-weight: 900; color: #ffd700; }
 
-    /* --- ПАНЕЛЬ СОТРУДНИКОВ --- */
+    /* ПАНЕЛЬ КОМАНДЫ */
     .team-panel { position: fixed; inset: 0; background: #0d141c; z-index: 300; display: none; flex-direction: column; }
     .team-panel.active { display: flex; }
-    
-    .team-header { height: 60px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; flex-shrink: 0; }
-    .team-title { font-size: 18px; font-weight: 900; color: #fff; }
-    
-    .team-tabs { display: flex; gap: 10px; padding: 15px; flex-shrink: 0; overflow-x: auto; }
-    .team-tab { flex: 1; background: #1f2d3d; border: 1px solid #2a3b4c; color: #aaa; padding: 10px; border-radius: 10px; font-weight: 900; font-size: 13px; cursor: pointer; text-align: center; white-space: nowrap; }
+    .team-header { height: 60px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+    .team-tabs { display: flex; gap: 5px; padding: 10px; overflow-x: auto; }
+    .team-tab { flex: 1; background: #1f2d3d; border: 1px solid #2a3b4c; color: #aaa; padding: 8px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; white-space: nowrap; }
     .team-tab.active { background: rgba(79, 172, 254, 0.2); border-color: #4facfe; color: #4facfe; }
     .team-tab.fixer.active { background: rgba(255, 0, 85, 0.2); border-color: #ff0055; color: #ff0055; }
-
+    .team-tab.myteam.active { background: rgba(255, 215, 0, 0.2); border-color: #ffd700; color: #ffd700; }
+    
     .team-list { flex: 1; overflow-y: auto; padding: 0 15px 20px 15px; display: flex; flex-direction: column; gap: 10px; }
-    
-    .candidate-card { background: #151f2b; border: 1px solid #2a3b4c; border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
-    .cand-avatar { width: 50px; height: 50px; background: #0a0f14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; border: 2px solid #333; }
+    .candidate-card { background: #151f2b; border: 1px solid #2a3b4c; border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 10px; }
+    .cand-avatar { width: 45px; height: 45px; background: #0a0f14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 2px solid #333; flex-shrink: 0; }
     .cand-info { flex: 1; }
-    .cand-name { font-weight: 900; font-size: 16px; color: #fff; margin-bottom: 4px; }
-    .cand-role { font-size: 12px; color: #aaa; margin-bottom: 6px; }
-    .cand-stars { color: #ffd700; font-size: 12px; letter-spacing: 2px; margin-bottom: 6px; }
-    .cand-salary { font-size: 13px; font-weight: 900; color: #00ff88; }
+    .cand-name { font-weight: 900; font-size: 14px; color: #fff; margin-bottom: 2px; }
+    .cand-role { font-size: 11px; color: #aaa; }
+    .cand-stars { color: #ffd700; font-size: 12px; letter-spacing: 2px; }
+    .cand-salary { font-size: 12px; font-weight: 900; color: #00ff88; }
+    .btn-action { background: #4facfe; color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
+    .btn-action.upgrade { background: #ffd700; margin-top: 5px; width: 100%; }
+    .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+    /* НИЖНЯЯ ПАНЕЛЬ */
+    .bottom-bar { height: 65px; background: #111a22; border-top: 2px solid #1f2d3d; display: flex; justify-content: center; gap: 10px; align-items: center; padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+    .main-btn { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 13px; flex: 1; max-width: 140px; cursor: pointer; text-align: center; }
+    .main-btn.team { background: linear-gradient(135deg, #8E2DE2, #4A00E0); color: #fff; }
+    .main-btn.design { background: linear-gradient(135deg, #00ff88, #00cc6a); color: #000; }
+
+    /* ДИЗАЙН-СТУДИЯ (Фуллскрин) */
+    .design-studio { position: fixed; inset: 0; background: #060a0f; z-index: 400; display: none; flex-direction: column; }
+    .design-studio.active { display: flex; }
+    .ds-header { height: 60px; background: #111a22; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; border-bottom: 1px solid #2a3b4c; }
+    .ds-title { font-size: 16px; font-weight: 900; }
+    .ds-body { flex: 1; display: flex; overflow: hidden; }
     
-    .btn-hire { background: #4facfe; color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; }
-    .btn-hire:disabled { background: #333; color: #666; cursor: not-allowed; }
-
-    /* --- НИЖНЯЯ ПАНЕЛЬ --- */
-    .bottom-bar { height: 65px; background: #111a22; border-top: 2px solid #1f2d3d; display: flex; justify-content: center; gap: 10px; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-    .main-btn { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #000; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 13px; display: flex; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); flex: 1; max-width: 140px; justify-content: center; }
-    .main-btn.team { background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 5px 20px rgba(142,45,226,0.4); color: #fff; }
-    .main-btn:active { transform: scale(0.95); }
-
-    .hint { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #00ff88; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 50; display: none; border: 1px solid #00ff88; text-align: center; width: 90%; max-width: 300px; }
+    .ds-preview { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle, #101922 0%, #060a0f 100%); }
+    .ds-ui { width: 45%; max-width: 400px; background: #0d141c; border-left: 1px solid #2a3b4c; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+    
+    .ds-step-title { font-size: 20px; font-weight: 900; margin-bottom: 5px; }
+    .ds-step-desc { font-size: 12px; color: #aaa; margin-bottom: 15px; }
+    
+    .ds-option { background: #151f2b; border: 1px solid #2a3b4c; border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .ds-option.selected { border-color: #4facfe; background: rgba(79, 172, 254, 0.1); }
+    .ds-opt-name { font-weight: bold; font-size: 13px; }
+    .ds-opt-price { font-weight: 900; color: #00ff88; font-size: 13px; }
+    
+    .ds-footer { height: 60px; border-top: 1px solid #2a3b4c; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; background: #111a22; }
+    
+    .hint { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #00ff88; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 50; display: none; border: 1px solid #00ff88; }
     .hint.active { display: block; }
   </style>
 </head>
@@ -92,8 +116,7 @@
 
   <div class="rotate-warning">
     <div class="icon">📱</div>
-    <div style="font-size: 20px; font-weight: 900; color: #4facfe; margin-bottom: 10px;">Поверни телефон</div>
-    <div style="font-size: 14px; color: #aaa;">Для лучшего 3D-обзора играй в горизонтальном режиме</div>
+    <div style="font-size: 20px; font-weight: 900; color: #4facfe;">Поверни телефон</div>
   </div>
 
   <div class="top-bar">
@@ -106,17 +129,19 @@
         <span class="stat-label">Исследования</span>
         <span class="stat-val rp" id="ui-rp">0 RP</span>
       </div>
+      <div class="stat">
+        <span class="stat-label">Месяц</span>
+        <span class="stat-val month" id="ui-month">1</span>
+      </div>
     </div>
-    <div style="display:flex; gap:10px; align-items:center;">
-        <div class="stat">
-            <span class="stat-label">Столы / Люди</span>
-            <span class="stat-val" id="ui-desks" style="color:#fff; text-shadow:none;">0 / 0</span>
-        </div>
-        <button class="btn-icon" onclick="toggleFullscreen()">⛶</button>
-    </div>
+    <button class="btn-icon" onclick="toggleFullscreen()">⛶</button>
   </div>
 
   <div id="game-container">
+    <div class="top-progress">
+      <div class="prog-info"><span>Сборка: Нет</span><span id="ui-progress-text">0%</span></div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="ui-progress-bar"></div></div>
+    </div>
     <div class="hint" id="build-hint">Тапни по полу</div>
   </div>
 
@@ -127,16 +152,18 @@
       <button class="btn-done" onclick="closeBuildMenu()">Done</button>
     </div>
     <div class="build-items">
-      <!-- Стол -->
-      <div class="item" id="item-desk" onclick="selectItem('desk', 15000)">
-        <div class="icon-desk">
-          <div class="monitor"></div>
-          <div class="board"></div>
-        </div>
-        <div class="item-title">Рабочий стол</div>
+      <!-- Старый стол -->
+      <div class="item" id="item-crt" onclick="selectItem('crt', 15000)">
+        <div class="icon-desk"><div class="monitor"></div><div class="board"></div></div>
+        <div class="item-title">Старый стол</div>
         <div class="item-price">$15.0K</div>
       </div>
-      
+      <!-- Новый стеклянный стол -->
+      <div class="item" id="item-modern" onclick="selectItem('modern', 45000)">
+        <div class="icon-desk icon-desk-modern"><div class="monitor"></div><div class="board"></div></div>
+        <div class="item-title">Стеклянный стол</div>
+        <div class="item-price">$45.0K</div>
+      </div>
       <!-- Снос -->
       <div class="item demolish" id="item-demolish" onclick="selectItem('demolish', 0)">
         <div class="icon-demolish">🗑️</div>
@@ -149,51 +176,124 @@
   <!-- ПАНЕЛЬ КОМАНДЫ -->
   <div class="team-panel" id="team-panel">
     <div class="team-header">
-      <div class="team-title">👥 Найм сотрудников</div>
+      <div class="team-title">👥 Управление</div>
       <button class="btn-done" onclick="closeTeamPanel()">Закрыть</button>
     </div>
-    
     <div class="team-tabs">
-      <button class="team-tab active" onclick="switchTeamTab('researcher')">🔬 Исследователи</button>
-      <button class="team-tab fixer" onclick="switchTeamTab('fixer')">🔧 Исправители ошибок</button>
+      <button class="team-tab active" id="tab-researcher" onclick="switchTeamTab('researcher')">🔬 Исследователи</button>
+      <button class="team-tab fixer" id="tab-fixer" onclick="switchTeamTab('fixer')">🔧 Фиксеры</button>
+      <button class="team-tab myteam" id="tab-myteam" onclick="switchTeamTab('myteam')">👥 Мои</button>
     </div>
-
-    <div class="team-list" id="team-list">
-      <!-- JS добавит карточки -->
-    </div>
+    <div class="team-list" id="team-list"></div>
   </div>
 
+  <!-- ДИЗАЙН-СТУДИЯ -->
+  <div class="design-studio" id="design-studio">
+    <div class="ds-header">
+      <div class="ds-title">Студия дизайна</div>
+      <button class="btn-done" style="background:#444; color:#fff;" onclick="closeDesignStudio()">В офис</button>
+    </div>
+    <div class="ds-body">
+      <div class="ds-preview">
+        <!-- Сюда в будущем вставим 3D-модель телефона -->
+        <div style="color:#4facfe; font-weight:bold; font-size:20px;">3D ПРЕВЬЮ ТЕЛЕФОНА</div>
+      </div>
+      <div class="ds-ui">
+        <div class="ds-step-title" id="ds-step-title">Шаг 1. Устройство</div>
+        <div class="ds-step-desc" id="ds-step-desc">Что мы будем делать на этот раз?</div>
+        
+        <div id="ds-options-container">
+          <!-- Опции будут генерироваться JS -->
+        </div>
+      </div>
+    </div>
+    <div class="ds-footer">
+      <button class="main-btn" style="background:#333; color:#fff;">Назад</button>
+      <div style="font-weight:bold; color:#4facfe;" id="ds-step-counter">1 из 13</div>
+      <button class="main-btn" style="background:#4facfe; color:#000;">Продолжить</button>
+    </div>
+  </div>
+  <!-- МОДАЛКА ЗАПУСКА И МАРКЕТИНГА -->
+<div class="modal-overlay" id="launch-modal" style="z-index: 500;">
+  <div class="modal-box" id="launch-box" style="text-align: center;">
+    
+    <!-- Экран выбора маркетинга -->
+    <div id="launch-step-marketing">
+      <h2 style="color: #00ff88; margin-bottom: 10px;">Устройство готово!</h2>
+      <p style="color: #aaa; margin-bottom: 20px; font-size: 13px;">Как мы будем его продвигать?</p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="main-btn" style="background:#333; width:100%;" onclick="doMarketing(2, 10000)">Магазин (2★) - $10K</button>
+        <button class="main-btn" style="background:#4facfe; width:100%;" onclick="doMarketing(3, 50000)">Онлайн (3★) - $50K</button>
+        <button class="main-btn" style="background:#8E2DE2; width:100%;" onclick="doMarketing(4, 200000)">ТВ (4★) - $200K</button>
+        <button class="main-btn" style="background:#ff0055; width:100%;" onclick="doMarketing(5, 1000000)">Фуллстак (5★) - $1M</button>
+      </div>
+    </div>
+
+    <!-- Экран отсчета и конфетти -->
+    <div id="launch-step-countdown" style="display: none; padding: 40px 0;">
+      <h1 id="launch-countdown-text" style="font-size: 80px; color: #ffd700; text-shadow: 0 0 30px #ffd700;">3</h1>
+    </div>
+
+    <!-- Экран результатов -->
+    <div id="launch-step-results" style="display: none;">
+      <h2 style="color: #4facfe; margin-bottom: 10px;">Оценка критиков</h2>
+      <div id="critic-score" style="font-size: 50px; font-weight: 900; color: #00ff88; margin: 10px 0;">8.5</div>
+      <div id="critic-badge" style="display:none; background: #ffd700; color: #000; padding: 5px 10px; border-radius: 10px; font-weight: 900; margin-bottom: 10px;">ЗОЛОТОЙ РЕЙТИНГ</div>
+      <p style="color: #aaa; font-size: 12px; margin-bottom: 15px;" id="critic-comment">Неплохой телефон, но можно лучше.</p>
+      
+      <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+        <div style="font-size: 14px; color: #aaa;">Прибыль с продаж:</div>
+        <div id="launch-profit" style="font-size: 24px; font-weight: 900; color: #ffd700;">+$0</div>
+      </div>
+      <button class="main-btn" style="width: 100%;" onclick="closeLaunchModal()">Вернуться в офис</button>
+    </div>
+
+  </div>
+</div>
   <!-- НИЖНЯЯ ПАНЕЛЬ -->
   <div class="bottom-bar">
     <button class="main-btn" onclick="openBuildMenu()">🛠 Стройка</button>
+    <button class="main-btn design" onclick="openDesignStudio()">🎨 Дизайн</button>
     <button class="main-btn team" onclick="openTeamPanel()">👥 Команда</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script>
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
     document.body.classList.add('is-mobile');
 }
 
-// --- 1. СОСТОЯНИЕ ---
+// --- 1. СОСТОЯНИЕ (С ЗАЩИТОЙ ОТ ВЫЛЕТОВ) ---
 let state = {
     money: 200000,
     rp: 0,
-    objects: [], // {x, z, id}
-    employees: [], 
-    maxDesks: 5
+    objects: [], // {x, z, type, id}
+    employees: [], // {id, mesh, status, type, deskId, targetX, targetZ}
 };
 let buildMode = false;
 let selectedItem = null;
 let activeTeamTab = 'researcher';
 let currentCandidates = [];
 
-// --- 2. СЦЕНА ---
+try {
+    const saved = localStorage.getItem('tech_empire_v12');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        state.money = parsed.money !== undefined ? parsed.money : 200000;
+        state.rp = parsed.rp !== undefined ? parsed.rp : 0;
+        state.objects = parsed.objects || [];
+        state.employees = parsed.employees || [];
+    }
+} catch(e) { console.log("Сброс сохранения из-за ошибки", e); }
+
+// --- 2. ИНИЦИАЛИЗАЦИЯ 3D ---
 const container = document.getElementById('game-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x87CEEB); 
 
 const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-camera.position.set(8, 8, 8);
+camera.position.set(8, 10, 8);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
@@ -204,9 +304,8 @@ container.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
 controls.maxPolarAngle = Math.PI / 2 - 0.1;
-controls.minDistance = 4;
+controls.minDistance = 5;
 controls.maxDistance = 20;
 
 // --- 3. СВЕТ ---
@@ -218,87 +317,84 @@ sunLight.shadow.mapSize.width = 1024;
 sunLight.shadow.mapSize.height = 1024;
 scene.add(sunLight);
 
-// --- 4. КОМНАТА И ДВЕРЬ ---
-const floorGeo = new THREE.PlaneGeometry(10, 10);
-const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a3b4c, roughness: 0.8 });
-const floor = new THREE.Mesh(floorGeo, floorMat);
+// --- 4. КОМНАТА ---
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshStandardMaterial({ color: 0x2a3b4c, roughness: 0.8 }));
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 scene.add(floor);
+scene.add(new THREE.GridHelper(10, 10, 0x4facfe, 0x1f2d3d).translateY(0.01));
 
-const gridHelper = new THREE.GridHelper(10, 10, 0x4facfe, 0x1f2d3d);
-gridHelper.position.y = 0.01;
-scene.add(gridHelper);
-
-const wallMat = new THREE.MeshStandardMaterial({ color: 0x5d4037, roughness: 0.9 }); // Кофейный цвет
+const wallMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.9 }); // Кофейный
 
 // Задняя стена
 const wallBack = new THREE.Mesh(new THREE.BoxGeometry(10, 3, 0.2), wallMat);
-wallBack.position.set(0, 1.5, -5);
-wallBack.receiveShadow = true;
-scene.add(wallBack);
+wallBack.position.set(0, 1.5, -5); scene.add(wallBack);
 
-// Левая стена (разбита на две части, чтобы вставить дверь)
+// Левая стена (с проемом для двери)
 const wallLeft1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 4), wallMat);
-wallLeft1.position.set(-5, 1.5, -3);
-scene.add(wallLeft1);
-
+wallLeft1.position.set(-5, 1.5, -3); scene.add(wallLeft1);
 const wallLeft2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 4), wallMat);
-wallLeft2.position.set(-5, 1.5, 3);
-scene.add(wallLeft2);
+wallLeft2.position.set(-5, 1.5, 3); scene.add(wallLeft2);
 
-// Дверь (Неоновая)
-const doorMat = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x4facfe, emissiveIntensity: 0.5 });
-const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.2, 2), doorMat);
-door.position.set(-4.9, 1.1, 0); // В проеме
-scene.add(door);
+// Дверь
+const door = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.2, 2), new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x4facfe, emissiveIntensity: 0.5 }));
+door.position.set(-4.9, 1.1, 0); scene.add(door);
 
-// Ручка двери
-const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05), new THREE.MeshBasicMaterial({color:0xffffff}));
-knob.position.set(-4.8, 1.1, -0.8);
-scene.add(knob);
+// Окно (Прозрачное)
+const windowMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, transmission: 0.9 }));
+windowMesh.position.set(0, 1.8, -4.88); scene.add(windowMesh);
 
-// Окно
-const windowMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.2, transmission: 0.9 });
-const windowMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), windowMat);
-windowMesh.position.set(0, 1.8, -4.88);
-scene.add(windowMesh);
-
-// --- 5. 3D МОДЕЛИ (Стол, Персонаж, Эмодзи) ---
-function createWorkstation(x, z) {
+// --- 5. 3D-МОДЕЛИ СТОЛОВ ---
+function createDeskMesh(x, z, type) {
     const group = new THREE.Group();
+    
+    if (type === 'crt') {
+        // Старый деревянный стол
+        const top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.8), new THREE.MeshStandardMaterial({ color: 0x8b5a2b }));
+        top.position.y = 0.6; top.castShadow = true; group.add(top);
+        
+        const legGeo = new THREE.BoxGeometry(0.08, 0.6, 0.08);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x5a3a1b });
+        [[-0.5, 0.3, -0.3], [0.5, 0.3, -0.3], [-0.5, 0.3, 0.3], [0.5, 0.3, 0.3]].forEach(pos => {
+            const leg = new THREE.Mesh(legGeo, legMat); leg.position.set(...pos); leg.castShadow = true; group.add(leg);
+        });
+        
+        const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.4), new THREE.MeshStandardMaterial({ color: 0x888888 }));
+        monitor.position.set(0, 0.85, -0.2); monitor.castShadow = true; group.add(monitor);
+        const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.35), new THREE.MeshBasicMaterial({ color: 0x00ff88 }));
+        screen.position.set(0, 0.85, 0.01); group.add(screen);
+        
+    } else if (type === 'modern') {
+        // Современный стеклянный стол
+        const top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.8), new THREE.MeshPhysicalMaterial({ color: 0x1f2d3d, transparent: true, opacity: 0.8, metalness: 0.5, roughness: 0.1 }));
+        top.position.y = 0.6; top.castShadow = true; group.add(top);
+        
+        const legGeo = new THREE.BoxGeometry(0.06, 0.6, 0.06);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x4facfe, metalness: 0.8, emissive: 0x4facfe, emissiveIntensity: 0.2 });
+        [[-0.5, 0.3, -0.3], [0.5, 0.3, -0.3], [-0.5, 0.3, 0.3], [0.5, 0.3, 0.3]].forEach(pos => {
+            const leg = new THREE.Mesh(legGeo, legMat); leg.position.set(...pos); leg.castShadow = true; group.add(leg);
+        });
+        
+        // Тонкий монитор
+        const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.4, 0.05), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+        monitor.position.set(0, 0.85, -0.3); monitor.castShadow = true; group.add(monitor);
+        const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.65, 0.35), new THREE.MeshBasicMaterial({ color: 0x4facfe }));
+        screen.position.set(0, 0.85, -0.27); group.add(screen);
+    }
 
-    // Стол
-    const top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.8), new THREE.MeshStandardMaterial({ color: 0x8b5a2b }));
-    top.position.y = 0.6; top.castShadow = true; group.add(top);
-    const legGeo = new THREE.BoxGeometry(0.08, 0.6, 0.08);
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x5a3a1b });
-    [[-0.5, 0.3, -0.3], [0.5, 0.3, -0.3], [-0.5, 0.3, 0.3], [0.5, 0.3, 0.3]].forEach(pos => {
-        const leg = new THREE.Mesh(legGeo, legMat); leg.position.set(...pos); leg.castShadow = true; group.add(leg);
-    });
-
-    // Старый монитор
-    const monitorBox = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.4), new THREE.MeshStandardMaterial({ color: 0x888888 }));
-    monitorBox.position.set(0, 0.85, -0.2); monitorBox.castShadow = true; group.add(monitorBox);
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.35), new THREE.MeshBasicMaterial({ color: 0x00ff88 }));
-    screen.position.set(0, 0.85, 0.01); group.add(screen);
-
-    // Стул
-    const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.05, 0.4), new THREE.MeshStandardMaterial({ color: 0x8b5a2b }));
+    // Стул (общий для всех)
+    const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.05, 0.4), new THREE.MeshStandardMaterial({ color: 0x222222 }));
     chairSeat.position.set(0, 0.4, 0.6); chairSeat.castShadow = true; group.add(chairSeat);
-    const chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.05), new THREE.MeshStandardMaterial({ color: 0x8b5a2b }));
+    const chairBack = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.05), new THREE.MeshStandardMaterial({ color: 0x222222 }));
     chairBack.position.set(0, 0.6, 0.78); chairBack.castShadow = true; group.add(chairBack);
-    const chairLegGeo = new THREE.BoxGeometry(0.05, 0.4, 0.05);
-    [[-0.15, 0.2, 0.45], [0.15, 0.2, 0.45], [-0.15, 0.2, 0.75], [0.15, 0.2, 0.75]].forEach(pos => {
-        const leg = new THREE.Mesh(chairLegGeo, legMat); leg.position.set(...pos); leg.castShadow = true; group.add(leg);
-    });
-
+    
     group.position.set(x, 0, z);
     scene.add(group);
     return group;
 }
 
-function createCharacter() {
+// --- 6. 3D-МОДЕЛЬ ПЕРСОНАЖА (РОБЛОКСЕР) ---
+function createCharacter(x, z) {
     const charGroup = new THREE.Group();
     
     const legMat = new THREE.MeshStandardMaterial({ color: 0x00ff88 });
@@ -331,34 +427,18 @@ function createCharacter() {
     const facePlane = new THREE.Mesh(new THREE.PlaneGeometry(0.29, 0.29), new THREE.MeshBasicMaterial({ map: texture }));
     facePlane.position.set(0, 0.95, 0.151); charGroup.add(facePlane);
 
-    // Спрайт для эмоций (изначально скрыт)
+    // Эмодзи (скрыто изначально)
     const emojiSprite = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, opacity: 0 }));
     emojiSprite.scale.set(0.5, 0.5, 1);
     emojiSprite.position.set(0, 1.5, 0);
     charGroup.add(emojiSprite);
 
+    charGroup.position.set(x, 0, z);
     scene.add(charGroup);
     return charGroup;
 }
 
-// Функция для рисования эмодзи на текстуре
-function updateEmojiSprite(sprite, emoji) {
-    if(sprite.material.map && sprite.material.map.userData.emoji === emoji) return; // Если уже такой - не перерисовываем
-    const canvas = document.createElement('canvas');
-    canvas.width = 64; canvas.height = 64;
-    const ctx = canvas.getContext('2d');
-    ctx.font = '48px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, 32, 32);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.userData = { emoji: emoji };
-    sprite.material.map = texture;
-    sprite.material.opacity = 1;
-    sprite.material.needsUpdate = true;
-}
-
-// --- 6. ЛОГИКА 3D ---
+// --- 7. КЛИКИ И ЛОГИКА ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
@@ -372,40 +452,30 @@ container.addEventListener('pointerdown', (e) => {
     raycaster.setFromCamera(mouse, camera);
     
     if (selectedItem.type === 'demolish') {
-        // Режим сноса
         const intersects = raycaster.intersectObjects(scene.children, true);
-        // Ищем первый попавшийся объект, который принадлежит рабочему месту (у него есть свойство userData.isDesk)
-        // Т.к. это группа, ищем вверх по родителям
         for (let i = 0; i < intersects.length; i++) {
             let obj = intersects[i].object;
             while (obj && !obj.userData.isDesk && obj.parent) { obj = obj.parent; }
             if (obj && obj.userData.isDesk) {
-                // Нашли стол! Сносим.
                 demolishDesk(obj);
                 return;
             }
         }
     } else {
-        // Режим строительства
         const intersects = raycaster.intersectObject(floor);
         if (intersects.length > 0) {
             const point = intersects[0].point;
             const gridX = Math.round(point.x) - 0.5; 
             const gridZ = Math.round(point.z) - 0.5;
 
-            if (state.objects.some(o => o.x === gridX && o.z === gridZ)) {
-                alert("Здесь уже занято!"); return;
-            }
-            if (state.objects.length >= state.maxDesks) {
-                alert(`Лимит мебели (${state.maxDesks})!`); return;
-            }
-            
+            if (state.objects.some(o => o.x === gridX && o.z === gridZ)) { alert("Здесь уже занято!"); return; }
             if (state.money < selectedItem.price) { alert("Мало денег!"); return; }
+            
             state.money -= selectedItem.price;
-            const deskObj = { x: gridX, z: gridZ, id: Date.now() };
+            const deskObj = { x: gridX, z: gridZ, type: selectedItem.type, id: Date.now() };
             state.objects.push(deskObj);
             
-            const mesh = createWorkstation(gridX, gridZ);
+            const mesh = createDeskMesh(gridX, gridZ, selectedItem.type);
             mesh.userData.isDesk = true;
             mesh.userData.deskId = deskObj.id;
 
@@ -417,32 +487,25 @@ container.addEventListener('pointerdown', (e) => {
 });
 
 function demolishDesk(deskMesh) {
-    // Удаляем из сцены
     scene.remove(deskMesh);
-    
-    // Удаляем из стейта
     const deskId = deskMesh.userData.deskId;
     state.objects = state.objects.filter(o => o.id !== deskId);
     
-    // Увольняем сотрудника, если он там сидел
     const empToFire = state.employees.find(e => e.deskId === deskId);
     if (empToFire) {
-        // Переводим в статус "безработного"
         empToFire.status = 'unemployed';
         empToFire.deskId = null;
-        // Встаем
         empToFire.mesh.position.y = 0; 
-        // Даем случайную цель для прогулки
         empToFire.targetX = (Math.random() * 8) - 4;
         empToFire.targetZ = (Math.random() * 8) - 4;
+        empToFire.waitTimer = Date.now() + 2000;
     }
-
     updateUI();
     saveLocal();
     closeBuildMenu();
 }
 
-// --- 7. НАЙМ ---
+// --- 8. НАЙМ И КОМАНДА ---
 function openTeamPanel() {
     document.getElementById('team-panel').classList.add('active');
     generateCandidates();
@@ -455,20 +518,43 @@ function closeTeamPanel() {
 function switchTeamTab(tab) {
     activeTeamTab = tab;
     document.querySelectorAll('.team-tab').forEach(t => t.classList.remove('active'));
-    if (tab === 'researcher') document.querySelectorAll('.team-tab')[0].classList.add('active');
-    else document.querySelectorAll('.team-tab')[1].classList.add('active');
+    if (tab === 'researcher') document.getElementById('tab-researcher').classList.add('active');
+    else if (tab === 'fixer') document.getElementById('tab-fixer').classList.add('active');
+    else document.getElementById('tab-myteam').classList.add('active');
     generateCandidates();
 }
 
 function generateCandidates() {
     const list = document.getElementById('team-list');
     list.innerHTML = '';
-    currentCandidates = [];
 
+    if (activeTeamTab === 'myteam') {
+        if (state.employees.length === 0) {
+            list.innerHTML = '<p style="text-align:center; color:#888;">У вас пока нет сотрудников.</p>';
+        }
+        state.employees.forEach(emp => {
+            const card = document.createElement('div');
+            card.className = 'candidate-card';
+            card.innerHTML = `
+                <div class="cand-avatar" style="border-color: ${emp.type === 'researcher' ? '#4facfe' : '#ff0055'}">${emp.type === 'researcher' ? '🔬' : '🔧'}</div>
+                <div class="cand-info">
+                    <div class="cand-name">${emp.name}</div>
+                    <div class="cand-role">${emp.type === 'researcher' ? 'Исследователь' : 'Исправитель'}</div>
+                    <div class="cand-stars">${'★'.repeat(emp.stars)}${'☆'.repeat(5-emp.stars)}</div>
+                </div>
+                <button class="btn-action upgrade" disabled>Макс. ур.</button>
+            `;
+            list.appendChild(card);
+        });
+        return;
+    }
+
+    // Генерация новых кандидатов (1-3 звезды, как ты просил)
+    currentCandidates = [];
     for (let i = 0; i < 5; i++) {
         const name = ["Alex", "Max", "Sam", "John", "Igor", "Kot", "Doge", "Pepe"][Math.floor(Math.random()*8)] + Math.floor(Math.random()*100);
-        const stars = Math.floor(Math.random() * 3) + 3; 
-        const salary = (stars * 1000) + Math.floor(Math.random() * 5000);
+        const stars = Math.floor(Math.random() * 3) + 1; // 1 to 3 stars
+        const salary = (stars * 1000) + Math.floor(Math.random() * 2000);
 
         const cand = { id: Date.now()+i, name, stars, salary, type: activeTeamTab };
         currentCandidates.push(cand);
@@ -479,39 +565,31 @@ function generateCandidates() {
             <div class="cand-avatar" style="border-color: ${activeTeamTab === 'researcher' ? '#4facfe' : '#ff0055'}">${activeTeamTab === 'researcher' ? '🔬' : '🔧'}</div>
             <div class="cand-info">
                 <div class="cand-name">${name}</div>
-                <div class="cand-role">${activeTeamTab === 'researcher' ? 'Исследователь' : 'Исправитель ошибок'}</div>
+                <div class="cand-role">${activeTeamTab === 'researcher' ? 'Исследователь' : 'Исправитель'}</div>
                 <div class="cand-stars">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</div>
                 <div class="cand-salary">$${salary.toLocaleString()} / мес</div>
             </div>
-            <button class="btn-hire" onclick="hireEmployee(${cand.id})">Нанять</button>
+            <button class="btn-action" onclick="hireEmployee(${cand.id})">Нанять</button>
         `;
         list.appendChild(card);
     }
 }
 
 function hireEmployee(candId) {
-    // Проверяем наличие свободных столов
-    const freeDesk = state.objects.find(o => 
-        !state.employees.some(e => e.deskId === o.id)
-    );
-
-    if (!freeDesk) {
-        alert("Нет свободных рабочих мест! Постройте стол."); return;
-    }
+    const freeDesk = state.objects.find(o => !state.employees.some(e => e.deskId === o.id));
+    if (!freeDesk) { alert("Нет свободных рабочих мест! Постройте стол."); return; }
 
     const cand = currentCandidates.find(c => c.id === candId);
-    if (state.money < cand.salary) {
-        alert("Недостаточно денег для найма!"); return;
-    }
+    if (state.money < cand.salary) { alert("Недостаточно денег для найма!"); return; }
 
     state.money -= cand.salary;
     
-    // Спавним у двери
-    const charMesh = createCharacter();
-    charMesh.position.set(-4, 0, 0); // У двери
+    const charMesh = createCharacter(-4, 0); // Спавн у двери
 
     state.employees.push({
         id: cand.id,
+        name: cand.name,
+        stars: cand.stars,
         mesh: charMesh,
         status: 'walking',
         type: cand.type,
@@ -523,9 +601,10 @@ function hireEmployee(candId) {
 
     closeTeamPanel();
     updateUI();
+    saveLocal();
 }
 
-// --- 8. ИГРОВОЙ ЦИКЛ (ИИ) ---
+// --- 9. ИГРОВОЙ ЦИКЛ (ИИ и Анимация) ---
 function animate() {
     requestAnimationFrame(animate);
 
@@ -543,31 +622,27 @@ function animate() {
                 emp.mesh.position.y = Math.abs(Math.sin(Date.now() * 0.01)) * 0.1;
             } else {
                 emp.status = 'working';
-                emp.mesh.position.y = -0.2; 
-                emp.mesh.rotation.y = Math.PI; 
-                // Скрываем эмоции
+                emp.mesh.position.y = -0.2; // Садим
+                emp.mesh.rotation.y = Math.PI; // Лицом к монитору
                 emp.mesh.children[emp.mesh.children.length-1].material.opacity = 0;
             }
         } 
         else if (emp.status === 'unemployed') {
-            // Безработный - бродит
             const dx = emp.targetX - emp.mesh.position.x;
             const dz = emp.targetZ - emp.mesh.position.z;
             const distance = Math.sqrt(dx*dx + dz*dz);
 
             if (distance > 0.1) {
-                const speed = 0.02; // Медленно бредет
+                const speed = 0.02;
                 emp.mesh.position.x += (dx / distance) * speed;
                 emp.mesh.position.z += (dz / distance) * speed;
                 emp.mesh.rotation.y = Math.atan2(dx, dz);
                 emp.mesh.position.y = Math.abs(Math.sin(Date.now() * 0.005)) * 0.05;
             } else {
-                // Дошли до точки - постояли и выбрали новую
-                if (!emp.waitTimer) emp.waitTimer = Date.now() + 3000; // 3 секунды тупит
-                if (Date.now() > emp.waitTimer) {
+                if (!emp.waitTimer || Date.now() > emp.waitTimer) {
                     emp.targetX = (Math.random() * 8) - 4;
                     emp.targetZ = (Math.random() * 8) - 4;
-                    emp.waitTimer = null;
+                    emp.waitTimer = Date.now() + 3000;
                 }
             }
 
@@ -575,16 +650,21 @@ function animate() {
             if (Date.now() > emp.emojiTimer) {
                 const emojis = ['🤔', '🧐', '🥱'];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                updateEmojiSprite(emp.mesh.children[emp.mesh.children.length-1], randomEmoji);
                 
-                // Следующая мысль через 3-5 секунд
+                const canvas = document.createElement('canvas');
+                canvas.width = 64; canvas.height = 64;
+                const ctx = canvas.getContext('2d');
+                ctx.font = '48px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(randomEmoji, 32, 32);
+                
+                const sprite = emp.mesh.children[emp.mesh.children.length-1];
+                sprite.material.map = new THREE.CanvasTexture(canvas);
+                sprite.material.opacity = 1;
+                sprite.material.needsUpdate = true;
+                
                 emp.emojiTimer = Date.now() + 3000 + Math.random() * 2000;
-                
-                // Скрыть через 2 секунды
                 setTimeout(() => {
-                    if (emp.status === 'unemployed') {
-                        emp.mesh.children[emp.mesh.children.length-1].material.opacity = 0;
-                    }
+                    if (emp.status === 'unemployed') sprite.material.opacity = 0;
                 }, 2000);
             }
         }
@@ -594,27 +674,24 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// --- 9. ЭКОНОМИКА ---
+// --- 10. ЭКОНОМИКА (Раз в секунду) ---
 setInterval(() => {
-    let income = 0, rpGain = 0;
+    let rpGain = 0;
     state.employees.forEach(emp => {
-        if (emp.status === 'working') {
-            if (emp.type === 'researcher') rpGain += 5;
-            else income += 250;
+        if (emp.status === 'working' && emp.type === 'researcher') {
+            rpGain += emp.stars * 2; // Больше звезд = больше RP
         }
     });
-    if (income > 0 || rpGain > 0) {
-        state.money += income;
+    if (rpGain > 0) {
         state.rp += rpGain;
         updateUI();
     }
 }, 1000);
 
-// --- 10. UI ---
+// --- 11. UI И СОХРАНЕНИЯ ---
 function updateUI() {
     document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
     document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
-    document.getElementById('ui-desks').innerText = `${state.objects.length} / ${state.employees.length}`;
 }
 
 function openBuildMenu() {
@@ -637,12 +714,20 @@ function selectItem(type, price) {
     buildMode = true;
     document.querySelectorAll('.item').forEach(el => el.classList.remove('selected'));
     
-    if(type === 'desk') document.getElementById('item-desk').classList.add('selected');
+    if(type === 'crt') document.getElementById('item-crt').classList.add('selected');
+    else if(type === 'modern') document.getElementById('item-modern').classList.add('selected');
     else if(type === 'demolish') document.getElementById('item-demolish').classList.add('selected');
     
     document.getElementById('build-panel').classList.remove('active');
     document.getElementById('build-hint').innerText = type === 'demolish' ? "Тапни по столу, чтобы снести" : "Тапни по полу, чтобы поставить";
     document.getElementById('build-hint').classList.add('active');
+}
+
+function openDesignStudio() {
+    document.getElementById('design-studio').classList.add('active');
+}
+function closeDesignStudio() {
+    document.getElementById('design-studio').classList.remove('active');
 }
 
 function toggleFullscreen() {
@@ -651,26 +736,35 @@ function toggleFullscreen() {
 }
 
 function saveLocal() {
-    localStorage.setItem('tech_empire_v10', JSON.stringify({
-        money: state.money,
-        rp: state.rp,
-        objects: state.objects
-    }));
+    const saveData = {
+        money: state.money, rp: state.rp, objects: state.objects,
+        employees: state.employees.map(e => ({
+            id: e.id, name: e.name, stars: e.stars, type: e.type,
+            deskId: e.deskId, status: e.status, 
+            x: e.mesh.position.x, y: e.mesh.position.y, z: e.mesh.position.z
+        }))
+    };
+    localStorage.setItem('tech_empire_v12', JSON.stringify(saveData));
 }
 
 function loadLocal() {
-    const saved = localStorage.getItem('tech_empire_v10');
-    if (saved) {
-        const data = JSON.parse(saved);
-        state.money = data.money;
-        state.rp = data.rp;
-        state.objects = data.objects;
-        state.objects.forEach(obj => {
-            const mesh = createWorkstation(obj.x, obj.z);
-            mesh.userData.isDesk = true;
-            mesh.userData.deskId = obj.id;
-        });
-    }
+    // Восстанавливаем столы
+    state.objects.forEach(obj => {
+        const mesh = createDeskMesh(obj.x, obj.z, obj.type);
+        mesh.userData.isDesk = true;
+        mesh.userData.deskId = obj.id;
+    });
+
+    // Восстанавливаем сотрудников
+    state.employees.forEach(empData => {
+        const charMesh = createCharacter(empData.x, empData.z);
+        state.employees.find(e => e.id === empData.id).mesh = charMesh;
+        charMesh.position.y = empData.y;
+        if (empData.status === 'working') {
+            charMesh.rotation.y = Math.PI;
+        }
+    });
+
     updateUI();
 }
 
