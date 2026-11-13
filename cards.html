@@ -351,7 +351,8 @@
                 state.achievements = Array.isArray(data.achievements) ? data.achievements : [];
                 state.history = Array.isArray(data.history) ? data.history : [];
             }
-
+          
+            checkAchievements();
             isLoaded = true;
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('menu').style.display = 'flex';
