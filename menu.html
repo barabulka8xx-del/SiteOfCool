@@ -32,7 +32,6 @@
     .user-avatar { font-size: 18px; }
     .user-name-box { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: bold; color: #4facfe; transition: 0.3s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    /* Стили титула */
     .user-title { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); white-space: nowrap;}
     .neon-text { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
     .title-bold { font-weight: 900; }
@@ -40,7 +39,6 @@
     .title-uppercase { text-transform: uppercase; }
     .title-outline { -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0 #000; }
 
-    /* КОШЕЛЕК */
     .wallet-area { display: flex; align-items: center; gap: 8px; }
     .wallet { display: flex; align-items: center; gap: 5px; background: rgba(255, 215, 0, 0.1); padding: 5px 10px; border-radius: 20px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold; font-size: 15px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .wallet img { width: 20px; height: 20px; border-radius: 50%; }
@@ -48,14 +46,12 @@
     .btn-info { width: 32px; height: 32px; border-radius: 50%; background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe; color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; margin-left: 5px; }
     .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
 
-    /* ЗАГОЛОВОК И СТАТУС */
     .site-title { font-size: 28px; font-weight: 900; margin-bottom: 5px; margin-top: 10px; color: #fff; text-shadow: 0 0 20px #4facfe; text-align: center; letter-spacing: 1px; }
     .alpha-badge { background: rgba(79, 172, 254, 0.15); border: 1px solid #4facfe; color: #4facfe; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px; animation: pulseBlue 2s infinite; }
     @keyframes pulseBlue { 0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); } }
 
     .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
-    /* БАННЕРЫ */
     .banner { width: 100%; border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; position: relative; overflow: hidden; transition: 0.3s; cursor: pointer; }
     .banner:active { transform: scale(0.98); }
     .banner::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
@@ -80,9 +76,29 @@
     .game-icon { font-size: 22px; display: flex; gap: 2px; }
     .game-title { font-size: 13px; font-weight: bold; text-align: center; margin-bottom: 5px; }
     .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
-    .footer { margin-top: 20px; font-size: 12px; color: #666; text-align: center; }
+    
+    /* --- ФУТЕР И СТРЕЛОЧКИ --- */
+    .footer { margin-top: 20px; font-size: 12px; color: #ddd; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 0; cursor: pointer; }
+    .footer-text { text-decoration: underline; }
+    .arrow-anim {
+        font-size: 24px;
+        font-weight: 900;
+        display: inline-block;
+        animation: floatDiagonal 2s infinite alternate, rainbowGlow 3s infinite alternate;
+    }
+    .arrow-left { animation-delay: 0s; }
+    .arrow-right { animation-delay: 0.5s; }
+    @keyframes floatDiagonal {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(-5px, -8px); }
+    }
+    @keyframes rainbowGlow {
+        0% { color: #4facfe; text-shadow: 0 0 10px #4facfe; }
+        33% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+        66% { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
+        100% { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+    }
 
-    /* Плавающая кнопка магазина */
     .floating-shop-btn {
         position: fixed; bottom: 20px; right: 20px; z-index: 900;
         background: linear-gradient(135deg, #8E2DE2, #4A00E0); color: white;
@@ -111,7 +127,6 @@
     .tab-content { display: none; width: 100%; flex-direction: column; align-items: center; gap: 10px; }
     .tab-content.active { display: flex; }
 
-    /* Настройки профиля */
     .avatar-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px; }
     .avatar-option { position: relative; font-size: 22px; padding: 8px; background: #0f2027; border: 2px solid #333; border-radius: 50%; cursor: pointer; transition: 0.2s; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
     .avatar-option.selected { border-color: #4facfe; background: rgba(79, 172, 254, 0.2); transform: scale(1.1); }
@@ -124,14 +139,12 @@
     .settings-input:disabled { opacity: 0.5; cursor: not-allowed; }
     .settings-label { align-self: flex-start; font-size: 11px; color: #888; margin-left: 5px; }
 
-    /* Ачивки */
     .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; width: 100%; }
     .ach-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.5; filter: grayscale(1); transition: 0.3s; }
     .ach-item.unlocked { opacity: 1; filter: grayscale(0); border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .ach-icon { font-size: 24px; margin-bottom: 5px; }
     .ach-name { font-size: 10px; font-weight: bold; color: #ccc; line-height: 1.2; }
 
-    /* Инвентарь */
     .inventory-grid { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; justify-content: flex-start; }
     .inv-item { background: #0f2027; border: 1px solid #444; border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
     .inv-item:active { transform: scale(0.95); }
@@ -139,7 +152,6 @@
     .inv-item .equip-check { font-size: 12px; color: #00ff88; display: none; }
     .inv-item.equipped .equip-check { display: block; }
 
-    /* Магазин */
     .shop-item { background: #0f2027; border: 1px solid #333; border-radius: 10px; padding: 15px; width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .shop-info { display: flex; flex-direction: column; text-align: left; }
     .shop-title { font-weight: bold; font-size: 15px; color: #fff; }
@@ -148,7 +160,6 @@
     .btn-buy:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-buy img { width: 14px; height: 14px; }
     
-    /* Шансы */
     .chances-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-bottom: 10px; }
     .chances-list { display: none; width: 100%; background: #0f2027; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: left;}
     .chance-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed #333; }
@@ -156,7 +167,6 @@
     .chance-equip-btn { background: #4facfe; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; }
     .chance-item.unlocked .chance-equip-btn { display: block; }
 
-    /* --- БЛОК ЕЖЕДНЕВКИ В МАГАЗИНЕ --- */
     .daily-bonus-box {
         width: 100%;
         background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
@@ -189,7 +199,6 @@
     @keyframes pulseGold { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
     .daily-btn:active { transform: scale(0.95); }
 
-    /* --- КЕЙС CS:GO (С АНИМАЦИЯМИ) --- */
     .case-modal-content { background: #151b22; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; border: 2px solid #ffd700; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2); position: relative; }
     .case-container {
         position: relative; width: 100%; height: 100px; background: #0a0f14;
@@ -201,7 +210,6 @@
     .case-item.rarity-4 { border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.8), inset 0 0 10px rgba(255,0,85,0.5); animation: glowRed 1s infinite alternate; }
     @keyframes glowRed { from { box-shadow: 0 0 15px rgba(255,0,85,0.5); } to { box-shadow: 0 0 25px rgba(255,0,85,1); } }
     
-    /* Вспышка при выигрыше */
     .win-flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 100; }
     .win-flash.active { animation: flashAnim 0.8s ease-out; }
     @keyframes flashAnim { 0% { opacity: 1; } 100% { opacity: 0; } }
@@ -209,7 +217,6 @@
     .case-pointer { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #ffeb3b; z-index: 10; box-shadow: 0 0 10px #ffeb3b; }
     .case-pointer::before { content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: #ffeb3b; font-size: 12px; }
 
-    /* --- ПЛАШКА АЛЬФА-ТЕСТА --- */
     .alpha-modal { border-color: #ff0055; box-shadow: 0 0 50px rgba(255, 0, 85, 0.3); }
     .alpha-title { color: #ff0055; font-size: 26px; text-shadow: 0 0 20px #ff0055; margin-bottom: 10px; }
     .alpha-text { font-size: 14px; color: #ccc; line-height: 1.5; margin-bottom: 15px; }
@@ -217,8 +224,27 @@
     .alpha-title-name { color: #ff0055; font-weight: 900; font-size: 16px; text-transform: uppercase; }
 
     /* --- ГИМН В ИНФО --- */
-    .anthem-container { text-align: left; font-size: 12px; line-height: 1.6; color: #ddd; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border-left: 4px solid #ffd700; margin-bottom: 15px; max-height: 300px; overflow-y: auto; width: 100%; }
-    .anthem-container p { margin-bottom: 10px; }
+    .anthem-container { 
+        text-align: left; 
+        font-size: 13px; 
+        line-height: 1.6; 
+        color: #ddd; 
+        background: rgba(0,0,0,0.4); 
+        padding: 15px; 
+        border-radius: 10px; 
+        border-left: 4px solid #ffd700; 
+        margin-bottom: 15px; 
+        max-height: 350px; 
+        overflow-y: auto; 
+        width: 100%; 
+        scrollbar-width: thin;
+        scrollbar-color: #4facfe #0f2027;
+    }
+    .anthem-container::-webkit-scrollbar { width: 6px; }
+    .anthem-container::-webkit-scrollbar-track { background: #0f2027; border-radius: 3px; }
+    .anthem-container::-webkit-scrollbar-thumb { background: #4facfe; border-radius: 3px; }
+    .anthem-container p { margin-bottom: 12px; }
+    .anthem-container p:last-child { margin-bottom: 0; }
   </style>
 </head>
 <body>
@@ -295,7 +321,13 @@
         <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '28.10.2026')"><div class="icon-box"><div class="game-icon">😈🔴</div></div><div class="game-title">Кнопка</div><div class="game-desc">То, что нельзя нажимать.</div></div>
         <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '20.10.2026')"><div class="icon-box"><div class="game-icon">🗣️📜</div></div><div class="game-title">Отмазки</div><div class="game-desc">Железобетонные причины.</div></div>
       </div>
-      <div class="footer" onclick="openAbout()" style="cursor: pointer; text-decoration: underline;">Создано с любовью и котами 🐈</div>
+      
+      <!-- ФУТЕР СО СТРЕЛОЧКАМИ -->
+      <div class="footer" onclick="openAbout()">
+        <span class="arrow-anim arrow-left">↘</span>
+        <span class="footer-text">Создано с любовью и котами 🐈</span>
+        <span class="arrow-anim arrow-right">↙</span>
+      </div>
     </div>
   </div>
 
@@ -361,7 +393,6 @@
       
       <div class="modal-title" style="color: #b06ef7; margin-bottom: 15px;">🛒 Магазин Титулов</div>
       
-      <!-- БЛОК ЕЖЕДНЕВКИ -->
       <div class="daily-bonus-box" id="daily-bonus-box">
         <div class="daily-title">🎁 Ежедневный бонус</div>
         <div class="daily-timer" id="daily-timer">00:00:00</div>
@@ -373,7 +404,6 @@
           <div id="current-title-display" style="font-size: 16px; font-weight: bold; color: #fff;">Нет</div>
       </div>
 
-      <!-- РУЛЕТКА ИМЕНИ -->
       <div class="shop-item">
         <div class="shop-info"><span class="shop-title">🎲 Имя</span><span class="shop-desc">Случайный титул</span></div>
         <button class="btn-buy" onclick="rollTitle('name', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
@@ -381,7 +411,6 @@
       <button class="chances-btn" onclick="toggleChances('name')">Показать шансы ▼</button>
       <div class="chances-list" id="chances-name"></div>
 
-      <!-- РУЛЕТКА ЦВЕТА -->
       <div class="shop-item">
         <div class="shop-info"><span class="shop-title">🎨 Цвет</span><span class="shop-desc">Краска для титула</span></div>
         <button class="btn-buy" onclick="rollTitle('color', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
@@ -389,7 +418,6 @@
       <button class="chances-btn" onclick="toggleChances('color')">Показать шансы ▼</button>
       <div class="chances-list" id="chances-color"></div>
 
-      <!-- РУЛЕТКА СТИЛЯ -->
       <div class="shop-item">
         <div class="shop-info"><span class="shop-title">✨ Стиль</span><span class="shop-desc">Шрифт титула</span></div>
         <button class="btn-buy" onclick="rollTitle('style', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
@@ -401,7 +429,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА КЕЙСА (С ВСПЫШКОЙ) -->
+  <!-- МОДАЛКА КЕЙСА -->
   <div class="modal-overlay" id="case-modal" onclick="closeCaseModal(event)">
     <div class="case-modal-content" onclick="event.stopPropagation()">
       <div class="win-flash" id="win-flash"></div>
@@ -419,7 +447,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ТАБЛИЦЫ ЛИДЕРОВ -->
+  <!-- МОДАЛКА ЛИДЕРОВ -->
   <div class="modal-overlay" id="leaderboard-modal" onclick="closeLeaderboard(event)">
     <div class="modal-content" onclick="event.stopPropagation()" style="border-color: #ffd700;">
       <div class="modal-title" style="color: #ffd700; margin-bottom: 15px;">🏆 Топ Игроков</div>
@@ -448,7 +476,7 @@
     </div>
   </div>
 
-  <!-- УВЕДОМЛЕНИЕ О ПОЛУЧЕНИИ ТИТУЛА -->
+  <!-- УВЕДОМЛЕНИЕ О ТИТУЛЕ -->
   <div class="modal-overlay" id="ach-notification-modal" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">
     <div class="modal-content" style="border-color: #ffd700; box-shadow: 0 0 50px rgba(255,215,0,0.3);" onclick="event.stopPropagation()">
       <div style="font-size: 50px; margin-bottom: 10px;">🏅</div>
@@ -461,7 +489,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА "О ПРОЕКТЕ" (С ГИМНОМ) -->
+  <!-- МОДАЛКА "О ПРОЕКТЕ" -->
   <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
@@ -473,7 +501,12 @@
         <p>Мы долго молча отступали,<br>Досадно было, бага ждали,<br>Ворчали старики:<br>«Что ж мы? На зимние квартиры?<br>Не смеют, что ли, командиры<br>Свои скрипты зашить на швы<br>Нам заменили? Уж не мы ли<br>Вставили &lt;script&gt; не в те места?»</p>
         <p>И вот нашли большое поле:<br>Есть разгуляться где на воле!<br>Построили наш апп-массив.<br>База данных в темной ночи,<br>И трижды прерванный наш fetch,<br>И JWT-ключи.</p>
         <p>Забил заряд наш сервер чинно,<br>Вложил в index.js старинный<br>Свой новый пароль.<br>И вот на поле грозной сечи<br>Ночная пала тень.<br>Прилег вздремнуть я у лафета,<br>И слышно было до рассвета,<br>Как ликовал наш интерфейс.</p>
-        <p>... (Продолжение следует в анналах истории)</p>
+        <p>Слились в протяжный вой<br>Ошибки 500, 403, 404,<br>И не было конца им,<br>И отклик дан,<br>И шестьсот секунд длился бой!</p>
+        <p>Вам не видать таких багов!<br>Как мы боролись с переменной,<br>И БД, и JWT молчали,<br>Как будто в страшной пустоте.<br>Я сам порой терялся в коде,<br>И скобки падали в блокноте,<br>И крестик красный в DevTools<br>Сводил меня с ума, но я держался!</p>
+        <p>Ну ж был денек! Сквозь дым летучий<br>Французы двигались, как тучи,<br>А мы их давили в мобильном!<br>И всё носилось предо мной:<br>Гранит БД, порт 27490,<br>Работы тяжкой вдохновенье,<br>Терпенье, нервы, труд ночной.</p>
+        <p>И молвил он, сверкнув очами:<br>«Ребята! Не Москва ль за нами?<br>Умремте ж под портом,<br>Как наши братья умирали!»<br>И умереть мы обещали,<br>И клятву верности сдержали<br>Мы в Бородинский бой.</p>
+        <p>Тогда считать мы стали раны,<br>Товарищей считать...<br>Да, были люди в наше время,<br>Могучие кодеры — не вы.<br>Плохая им досталась доля,<br>Немногие вернулись с поля,<br>Не будь на то Господня воля,<br>Не отдали б порта 27490!</p>
+        <p>И вот на месте бурной сечи,<br>Где мы ломали руки, плечи,<br>Стоит теперь сервер живой.<br>Он, как и мы, не унывает,<br>И не забудет нас, кодеров,<br>Кто свой index.js писал,<br>Кто ради багов умирал!</p>
       </div>
 
       <div style="text-align: left; width: 100%; font-size: 12px; color: #666; text-align: center; margin-top: 5px;">
@@ -524,7 +557,7 @@ const ACHIEVEMENTS_LIST = [
 ];
 
 const ALL_ITEMS = {
-    name: [ { val: "Новичок", chance: 40 }, { val: "Мемер", chance: 30 }, { val: "Судья", chance: 15 }, { val: "Босс Биржи", chance: 10 }, { val: "Повелитель Мемов", chance: 4 }, { val: "БОГ САЙТА", chance: 1 } ],
+    name: [ { val: "Новичок", chance: 40 }, { val: "Мемер", chance: 30 }, { val: "Судья", chance: 15 }, { val: "Босс Биржи", chance: 10 }, { val: "Повелитель Мемов", chance: 4 }, { val: "БОГ САЙТА", chance: 1 }, { val: "🧪 Альфа-тестер", chance: 0 } ],
     color: [ { val: "#ffffff", name: "Белый", chance: 40 }, { val: "#aaaaaa", name: "Серый", chance: 30 }, { val: "#ff0055", name: "Красный", chance: 10 }, { val: "#8E2DE2", name: "Фиолетовый", chance: 10 }, { val: "neon_pink", name: "Неон Розовый", chance: 5 }, { val: "neon_cyan", name: "Неон Голубой", chance: 4 }, { val: "neon_gold", name: "Неон Золотой", chance: 1 } ],
     style: [ { val: "normal", name: "Обычный", chance: 40 }, { val: "bold", name: "Жирный", chance: 30 }, { val: "italic", name: "Курсив", chance: 15 }, { val: "uppercase", name: "КАПС", chance: 10 }, { val: "glow", name: "Свечение", chance: 4 }, { val: "outline", name: "Обводка", chance: 1 } ]
 };
@@ -679,26 +712,16 @@ async function loadProfile() {
                 document.getElementById('current-title-display').className = "";
             }
 
+            // Принудительно добавляем Альфа-тестера в список, если его там нет
+            if (!userTitles.includes("🧪 Альфа-тестер")) {
+                userTitles.push("🧪 Альфа-тестер");
+            }
+
             renderAvatars();
             renderAchievements();
             renderInventory();
             renderChances();
             updateDailyUI();
-            
-            // Выдача титула Альфа-тестера (строго 1 раз)
-            if (!data.unlockedTitles.includes("🧪 Альфа-тестер") && !localStorage.getItem('alpha_title_claimed')) {
-                fetch(`${API_URL}/user/equip_title`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ title: "🧪 Альфа-тестер", color: currentColor, style: currentStyle })
-                }).then(() => {
-                    localStorage.setItem('alpha_title_claimed', 'true');
-                    if (!userTitles.includes("🧪 Альфа-тестер")) userTitles.push("🧪 Альфа-тестер");
-                    currentTitle = "🧪 Альфа-тестер";
-                    renderInventory();
-                    document.getElementById('ach-notification-modal').classList.add('active');
-                });
-            }
         }
     } catch(e) { console.error('Ошибка загрузки профиля', e); }
 }
@@ -944,6 +967,12 @@ function renderAchievements() {
 function renderInventory() {
     const invTitles = document.getElementById('inv-titles');
     invTitles.innerHTML = '';
+    
+    // Принудительно добавляем Альфа-тестера
+    if (!userTitles.includes("🧪 Альфа-тестер")) {
+        userTitles.push("🧪 Альфа-тестер");
+    }
+
     const uniqueTitles = [...new Set(userTitles)];
     if (uniqueTitles.length === 0) invTitles.innerHTML = '<span style="color:#666; font-size:12px;">Пусто. Крути рулетку!</span>';
     
@@ -1215,7 +1244,7 @@ window.onload = () => {
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('alpha-modal').classList.remove('active');
     }
-};
+}; 
   </script>
 </body>
-</html>
+        </html>
