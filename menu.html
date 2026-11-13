@@ -215,7 +215,6 @@
 </head>
 <body>
 
-<script>
   <!-- ЭКРАН ВХОДА -->
   <div id="auth-screen">
     <div class="auth-box">
@@ -452,7 +451,9 @@
       <button class="btn-play" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">Круто!</button>
     </div>
   </div>
- // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
+
+  <script>
+  // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
 const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
 const WAIFLY_SERVER = 'http://node.waifly.com:27490/api';
 const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
@@ -581,7 +582,6 @@ function startApp() {
     loadProfile();
     loadCapital();
     
-    // Показываем альфу только 1 раз за сессию (в localStorage)
     if (!localStorage.getItem('alpha_seen')) {
         document.getElementById('alpha-modal').classList.add('active');
     } else {
@@ -656,18 +656,15 @@ async function loadProfile() {
             
             // Выдача титула Альфа-тестера
             if (!data.unlockedTitles.includes("🧪 Альфа-тестер")) {
-                // Добавляем в инвентарь на сервере
                 fetch(`${API_URL}/user/equip_title`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ title: "🧪 Альфа-тестер", color: currentColor, style: currentStyle })
                 }).then(() => {
-                    // Обновляем список и надеваем его один раз
                     data.unlockedTitles.push("🧪 Альфа-тестер");
                     userTitles.push("🧪 Альфа-тестер");
                     currentTitle = "🧪 Альфа-тестер";
                     renderInventory();
-                    // Показываем красивое уведомление
                     document.getElementById('ach-notification-modal').classList.add('active');
                 });
             }
@@ -804,7 +801,6 @@ async function rollTitle(type, e) {
         }, 100);
 
         setTimeout(async () => {
-            // ВСПЫШКА
             const flash = document.getElementById('win-flash');
             flash.classList.add('active');
             setTimeout(() => flash.classList.remove('active'), 800);
@@ -915,7 +911,6 @@ function renderAchievements() {
 
 // --- ИНВЕНТАРЬ ---
 function renderInventory() {
-    // Титулы
     const invTitles = document.getElementById('inv-titles');
     invTitles.innerHTML = '';
     if (userTitles.length === 0) invTitles.innerHTML = '<span style="color:#666; font-size:12px;">Пусто. Крути рулетку!</span>';
@@ -928,7 +923,6 @@ function renderInventory() {
         invTitles.appendChild(el);
     });
 
-    // Цвета
     const invColors = document.getElementById('inv-colors');
     invColors.innerHTML = '';
     userColors.forEach(color => {
@@ -945,7 +939,6 @@ function renderInventory() {
         invColors.appendChild(el);
     });
 
-    // Стили
     const invStyles = document.getElementById('inv-styles');
     invStyles.innerHTML = '';
     userStyles.forEach(style => {
@@ -1176,7 +1169,7 @@ window.onload = () => {
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('alpha-modal').classList.remove('active');
     }
-};  
+};
   </script>
 </body>
-</html>
+  </html>
