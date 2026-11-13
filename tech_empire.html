@@ -8,6 +8,15 @@
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #080b10; color: white; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
 
+    /* --- ПЛАШКА ДЛЯ ПОВОРОТА --- */
+    .rotate-warning { position: fixed; inset: 0; background: #080b10; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+    .rotate-warning .icon { font-size: 50px; margin-bottom: 20px; animation: rotateAnim 2s infinite; }
+    @keyframes rotateAnim { 0% { transform: rotate(0); } 50% { transform: rotate(90deg); } 100% { transform: rotate(0); } }
+    @media (orientation: portrait) {
+      /* Показываем плашку только если это не ПК */
+      body.is-mobile .rotate-warning { display: flex; }
+    }
+
     /* --- ШАПКА --- */
     .top-bar { height: 60px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .stat-box { display: flex; gap: 15px; align-items: center; }
@@ -42,12 +51,19 @@
     .main-btn { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #000; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); }
     .main-btn:active { transform: scale(0.95); }
 
-    /* Подсказка при стройке */
-    .hint { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #00ff88; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 50; display: none; border: 1px solid #00ff88; }
+    /* Подсказка */
+    .hint { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #00ff88; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 50; display: none; border: 1px solid #00ff88; text-align: center; width: 90%; max-width: 300px; }
     .hint.active { display: block; }
   </style>
 </head>
 <body>
+
+  <!-- ПЛАШКА ПОВОРОТА -->
+  <div class="rotate-warning">
+    <div class="icon">📱</div>
+    <div style="font-size: 20px; font-weight: 900; color: #4facfe; margin-bottom: 10px;">Поверни телефон</div>
+    <div style="font-size: 14px; color: #aaa;">Для лучшего 3D-обзора играй в горизонтальном режиме</div>
+  </div>
 
   <!-- ШАПКА -->
   <div class="top-bar">
@@ -60,6 +76,10 @@
         <span class="stat-label">Исследования</span>
         <span class="stat-val rp" id="ui-rp">0 RP</span>
       </div>
+    </div>
+    <div class="stat">
+        <span class="stat-label">Столы</span>
+        <span class="stat-val" id="ui-desks" style="color:#fff; text-shadow:none;">0 / 5</span>
     </div>
   </div>
 
@@ -98,20 +118,29 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
+    // Определяем мобилку для плашки
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        document.body.classList.add('is-mobile');
+    }
+
     // --- 1. СОСТОЯНИЕ ---
     let state = {
         money: 200000,
         rp: 0,
-        objects: [] // {x, z, type}
+        objects: [], // {x, z, type}
+        maxDesks: 5
     };
     let buildMode = false;
     let selectedItem = null;
 
-    // --- 2. НАСТРОЙКИ СЦЕНЫ ---
+    // --- 2. НАСТРОЙКИ СЦЕНЫ (ДЕНЬ) ---
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x080b10);
-    scene.fog = new THREE.Fog(0x080b10, 15, 40);
+    
+    // Дневное небо
+    scene.background = new THREE.Color(0x87CEEB); 
+    // Легкий туман для глубины
+    scene.fog = new THREE.Fog(0x87CEEB, 20, 50);
 
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.set(10, 10, 10);
@@ -127,27 +156,23 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.1; // Запрет на подземную камеру
+    controls.maxPolarAngle = Math.PI / 2 - 0.1;
     controls.minDistance = 5;
     controls.maxDistance = 25;
 
-    // --- 3. ОСВЕЩЕНИЕ ---
-    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    // --- 3. ОСВЕЩЕНИЕ (СОЛНЕЧНЫЙ ДЕНЬ) ---
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6)); // Больше базового света
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(5, 15, 5);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 1024;
-    dirLight.shadow.mapSize.height = 1024;
-    scene.add(dirLight);
-
-    // Синий неон
-    const pointLight = new THREE.PointLight(0x4facfe, 1, 20);
-    pointLight.position.set(-5, 5, -5);
-    scene.add(pointLight);
+    const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.0); // Теплый солнечный свет
+    sunLight.position.set(10, 20, 10);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
+    scene.add(sunLight);
 
     // --- 4. КОМНАТА (Пол и стены) ---
     const floorGeo = new THREE.PlaneGeometry(10, 10);
+    // Темный пол, чтобы сочеталось с интерфейсом
     const floorMat = new THREE.MeshStandardMaterial({ color: 0x0d151c, roughness: 0.8 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
@@ -170,27 +195,49 @@
     wallLeft.receiveShadow = true;
     scene.add(wallLeft);
 
-    // Окно
-    const windowMat = new THREE.MeshBasicMaterial({ color: 0x4facfe });
+    // Окно (Стекло)
+    const windowMat = new THREE.MeshPhysicalMaterial({ 
+        color: 0xffffff, 
+        transparent: true, 
+        opacity: 0.2, 
+        roughness: 0.1, 
+        metalness: 0, 
+        transmission: 0.9 
+    });
     const windowMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), windowMat);
     windowMesh.position.set(0, 1.8, -4.88);
     scene.add(windowMesh);
 
-    // --- 5. СОЗДАНИЕ 3D-МОДЕЛИ СТОЛА ИЗ КОДА ---
+    // Окно (Облака снаружи)
+    const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 });
+    for(let i = 0; i < 3; i++) {
+        const cloud = new THREE.Mesh(new THREE.BoxGeometry(1, 0.4, 0.2), cloudMat);
+        cloud.position.set(-1 + i*1.5, 1.5 + Math.random() * 1.5, -6);
+        scene.add(cloud);
+    }
+
+    // --- 5. СОЗДАНИЕ 3D-МОДЕЛИ СТОЛА ---
     function createDesk(x, z) {
         const deskGroup = new THREE.Group();
 
-        // Столешница (темное стекло/металл)
-        const topGeo = new THREE.BoxGeometry(1.2, 0.1, 0.8);
-        const topMat = new THREE.MeshStandardMaterial({ color: 0x1f2d3d, metalness: 0.5, roughness: 0.2 });
+        // Столешница (Стекло)
+        const topGeo = new THREE.BoxGeometry(1.2, 0.05, 0.8);
+        const topMat = new THREE.MeshPhysicalMaterial({ 
+            color: 0x1f2d3d, 
+            transparent: true, 
+            opacity: 0.8, 
+            roughness: 0.1, 
+            metalness: 0.5, 
+            clearcoat: 1.0 
+        });
         const top = new THREE.Mesh(topGeo, topMat);
-        top.position.y = 0.6; // Высота стола
+        top.position.y = 0.6;
         top.castShadow = true;
         top.receiveShadow = true;
         deskGroup.add(top);
 
-        // Ножки (металл)
-        const legGeo = new THREE.BoxGeometry(0.1, 0.6, 0.1);
+        // Ножки (Металл)
+        const legGeo = new THREE.BoxGeometry(0.08, 0.6, 0.08);
         const legMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.8, roughness: 0.2 });
         
         const legPositions = [
@@ -204,27 +251,42 @@
             deskGroup.add(leg);
         });
 
-        // Монитор (Экран)
-        const monitorGeo = new THREE.BoxGeometry(0.6, 0.4, 0.05);
+        // Подставка монитора (Шея) - Сдвинута назад!
+        const standGeo = new THREE.CylinderGeometry(0.04, 0.06, 0.25);
+        const standMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.9 });
+        const stand = new THREE.Mesh(standGeo, standMat);
+        stand.position.set(0, 0.75, -0.3); // z = -0.3, чтобы не мешать
+        stand.castShadow = true;
+        deskGroup.add(stand);
+
+        // Монитор (Корпус)
+        const monitorGeo = new THREE.BoxGeometry(0.7, 0.4, 0.04);
         const monitorMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
         const monitor = new THREE.Mesh(monitorGeo, monitorMat);
-        monitor.position.set(0, 0.9, -0.2);
+        monitor.position.set(0, 0.95, -0.3);
         monitor.castShadow = true;
         deskGroup.add(monitor);
 
-        // Светящийся экран (Неон)
-        const screenGeo = new THREE.PlaneGeometry(0.55, 0.35);
+        // Экран (Светится)
+        const screenGeo = new THREE.PlaneGeometry(0.65, 0.35);
         const screenMat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
         const screen = new THREE.Mesh(screenGeo, screenMat);
-        screen.position.set(0, 0.9, -0.17);
+        screen.position.set(0, 0.95, -0.27);
         deskGroup.add(screen);
 
-        // Подставка монитора
-        const standGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.2);
-        const standMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
-        const stand = new THREE.Mesh(standGeo, standMat);
-        stand.position.set(0, 0.7, -0.2);
-        deskGroup.add(stand);
+        // Клавиатура
+        const kbGeo = new THREE.BoxGeometry(0.5, 0.02, 0.15);
+        const kbMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const kb = new THREE.Mesh(kbGeo, kbMat);
+        kb.position.set(0, 0.63, 0.1);
+        deskGroup.add(kb);
+
+        // Мышка
+        const mouseGeo = new THREE.BoxGeometry(0.08, 0.03, 0.12);
+        const mouseMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+        const mouse = new THREE.Mesh(mouseGeo, mouseMat);
+        mouse.position.set(0.4, 0.64, 0.1);
+        deskGroup.add(mouse);
 
         // Позиционируем весь стол на сетке
         deskGroup.position.set(x, 0, z);
@@ -238,23 +300,17 @@
     const mouse = new THREE.Vector2();
 
     container.addEventListener('pointerdown', (e) => {
-        if (!buildMode || !selectedItem) return; // Работаем только в режиме стройки
+        if (!buildMode || !selectedItem) return;
 
-        // Пересчитываем координаты тапа/клика
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-
-        // Ищем пересечение с полом
         const intersects = raycaster.intersectObject(floor);
 
         if (intersects.length > 0) {
-            const point = intersects[0].point; // Координаты точки клика (X, Y, Z)
-            
-            // Округляем до сетки (каждая клетка 1x1, от -5 до 5)
-            // Например, клик в X=2.3 становится X=2.5 (центр клетки)
+            const point = intersects[0].point;
             const gridX = Math.round(point.x) - 0.5; 
             const gridZ = Math.round(point.z) - 0.5;
 
@@ -265,7 +321,13 @@
                 return;
             }
 
-            // Ставим стол
+            // Проверка лимита столов
+            const deskCount = state.objects.filter(o => o.type === 'desk').length;
+            if (deskCount >= state.maxDesks) {
+                alert(`Лимит столов для этого офиса (${state.maxDesks})! Сначала перейдите в новый офис.`);
+                return;
+            }
+
             placeDesk(gridX, gridZ);
         }
     });
@@ -278,15 +340,13 @@
         createDesk(x, z);
         updateUI();
         saveLocal();
-        
-        // Выключаем режим стройки после установки
         closeBuildMenu();
     }
 
     function openBuildMenu() {
         document.getElementById('build-panel').classList.add('active');
         document.getElementById('build-hint').classList.remove('active');
-        buildMode = false; // Активируется при выборе предмета
+        buildMode = false; 
     }
 
     function closeBuildMenu() {
@@ -302,11 +362,9 @@
         selectedItem = { type, price };
         buildMode = true;
         
-        // Визуальный фидбек
         document.querySelectorAll('.item').forEach(el => el.classList.remove('selected'));
         document.getElementById('item-desk').classList.add('selected');
         
-        // Закрываем панель и показываем подсказку
         document.getElementById('build-panel').classList.remove('active');
         document.getElementById('build-hint').classList.add('active');
     }
@@ -315,14 +373,17 @@
     function updateUI() {
         document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
         document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
+        
+        const deskCount = state.objects.filter(o => o.type === 'desk').length;
+        document.getElementById('ui-desks').innerText = `${deskCount} / ${state.maxDesks}`;
     }
 
     function saveLocal() {
-        localStorage.setItem('tech_empire_v4', JSON.stringify(state));
+        localStorage.setItem('tech_empire_v5', JSON.stringify(state));
     }
 
     function loadLocal() {
-        const saved = localStorage.getItem('tech_empire_v4');
+        const saved = localStorage.getItem('tech_empire_v5');
         if (saved) {
             state = JSON.parse(saved);
             state.objects.forEach(obj => {
