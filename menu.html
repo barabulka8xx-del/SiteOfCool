@@ -439,8 +439,19 @@
     </div>
   </div>
 
-  <script>
-  // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
+  <!-- УВЕДОМЛЕНИЕ О ПОЛУЧЕНИИ ТИТУЛА -->
+  <div class="modal-overlay" id="ach-notification-modal" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">
+    <div class="modal-content" style="border-color: #ffd700; box-shadow: 0 0 50px rgba(255,215,0,0.3);" onclick="event.stopPropagation()">
+      <div style="font-size: 50px; margin-bottom: 10px;">🏅</div>
+      <div class="modal-title" style="color: #ffd700;">Новый титул!</div>
+      <div style="font-size: 14px; color: #ccc; margin-bottom: 15px;">Ты получаешь титул:</div>
+      <div style="background: rgba(255,215,0,0.1); padding: 10px 20px; border-radius: 10px; border: 1px solid #ffd700; font-size: 20px; font-weight: bold; color: #ffd700; margin-bottom: 20px;">
+        🧪 Альфа-тестер
+      </div>
+      <button class="btn-play" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">Круто!</button>
+    </div>
+  </div>
+ // --- 1. НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К СЕРВЕРУ ---
 const WORKER_URL = 'https://solitary-math-e969.potapivan1999.workers.dev';
 const WAIFLY_SERVER = 'http://node.waifly.com:27490/api';
 const API_URL = `${WORKER_URL}/?url=${WAIFLY_SERVER}`;
@@ -644,7 +655,20 @@ async function loadProfile() {
             
             // Выдача титула Альфа-тестера
             if (!data.unlockedTitles.includes("🧪 Альфа-тестер")) {
-                equipSpecific('name', '🧪 Альфа-тестер');
+                // Добавляем в инвентарь на сервере
+                fetch(`${API_URL}/user/equip_title`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ title: "🧪 Альфа-тестер", color: currentColor, style: currentStyle })
+                }).then(() => {
+                    // Обновляем список и надеваем его один раз
+                    data.unlockedTitles.push("🧪 Альфа-тестер");
+                    userTitles.push("🧪 Альфа-тестер");
+                    currentTitle = "🧪 Альфа-тестер";
+                    renderInventory();
+                    // Показываем красивое уведомление
+                    document.getElementById('ach-notification-modal').classList.add('active');
+                });
             }
         }
     } catch(e) { console.error('Ошибка загрузки профиля', e); }
@@ -1152,6 +1176,8 @@ window.onload = () => {
         document.getElementById('alpha-modal').classList.remove('active');
     }
 };
+  <script>
+  
   </script>
 </body>
 </html>
