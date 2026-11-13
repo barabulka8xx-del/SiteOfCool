@@ -262,10 +262,10 @@ body {
       <div class="team-stat-box">Доход от услуг <span id="ui-services" style="color:var(--green);">$0 / мес</span></div>
     </div>
 
-    <div style="display:flex; gap:5px; margin-bottom:10px;">
-      <button class="btn" onclick="switchEmpireTab('services')" id="emp-tab-services">Услуги</button>
-      <button class="btn" onclick="switchEmpireTab('factories')" id="emp-tab-factories">Заводы</button>
-      <button class="btn" onclick="switchEmpireTab('projects')" id="emp-tab-projects">Мегапроекты</button>
+    <div style="display:flex; gap:5px; margin-bottom:10px; overflow-x:auto;">
+      <button class="btn" onclick="switchEmpireTab('services')" id="emp-tab-services" style="white-space:nowrap;">Услуги</button>
+      <button class="btn" onclick="switchEmpireTab('factories')" id="emp-tab-factories" style="white-space:nowrap;">Заводы</button>
+      <button class="btn" onclick="switchEmpireTab('projects')" id="emp-tab-projects" style="white-space:nowrap;">Мегапроекты</button>
     </div>
 
     <div id="empire-list"></div>
@@ -391,17 +391,6 @@ body {
     </div>
   </div>
 
-  <!-- МОДАЛКА РЕЛИЗА -->
-  <div class="modal-overlay" id="modal-release">
-    <div class="modal-content" style="text-align:center;">
-      <div class="modal-title" style="color:var(--green);">Устройство готово!</div>
-      <div style="font-size:50px; margin:10px 0;">📱</div>
-      <div style="font-size:14px; margin-bottom:5px;">Оценка: <span id="release-score" style="color:var(--gold); font-weight:900;">9.5</span></div>
-      <div style="font-size:14px; margin-bottom:15px;">Прибыль: <span id="release-profit" style="color:var(--green); font-weight:900;">$0</span></div>
-      <button class="btn btn-gold" style="width:100%; padding:15px;" onclick="finishRelease()">Начать производство</button>
-    </div>
-  </div>
-
   <!-- ДИЗАЙН-СТУДИЯ -->
   <div class="design-screen" id="design-screen">
     <div class="ds-header">
@@ -448,7 +437,7 @@ body {
 // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 
-const SAVE_KEY = 'tech_empire_v9';
+const SAVE_KEY = 'tech_empire_v11';
 
 const OFFICES = [
   { name: "Гараж", slots: 3, cost: 0 },
@@ -459,12 +448,11 @@ const OFFICES = [
 
 const NAMES = ["Hollow", "fady668709", "donechaa228", "Deadmanfatwhale", "IShowSpeed", "Bambam", "WINTAX270", "zakoli_4637", "Barsik_Dev", "Cat_Lover", "Neo_Dev", "AlphaTester", "SigmaCoder", "MegaMind"];
 
-// Глобальный стейт игры
 let state = {
   money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
   companyName: "Team of Red",
   workstations: [], selectedDeskId: null,
-  research: {}, // { techId: true }
+  research: {}, 
   employees: [],
   releasedPhones: [], 
   news: [],
@@ -474,11 +462,10 @@ let state = {
   stockPrice: 0,
   stockHistory: [],
   loan: { amount: 0, monthsLeft: 0, interest: 0 },
-  empire: { services: [], servicesIncome: 0, audience: 0 },
+  empire: { services: [], servicesIncome: 0, audience: 0, factories: [], projects: [] },
   markets: ['na']
 };
 
-// Ветки исследований
 const TECH_BRANCHES = [
   { id: 'screen', name: 'Экран', color: '#4facfe' },
   { id: 'camera', name: 'Камера', color: '#ff8c00' },
@@ -522,8 +509,8 @@ function formatTechName(branchId, year) {
     return names[Math.min(Math.floor(offset / 6), names.length - 1)];
   }
   if (branchId === 'camera') {
-    let mps = [1, 2, 3, 5, 8, 12, 24, 48, 108, 200];
-    return mps[Math.min(Math.floor(offset / 5), mps.length - 1)] + ' МП';
+    let mps = [1, 2, 3, 5, 8, 12, 24, 32, 48, 108, 200];
+    return mps[Math.min(Math.floor(offset / 4), mps.length - 1)] + ' МП';
   }
   if (branchId === 'cpu') {
     let cores = [1, 2, 4, 8, 16, 32, 64];
@@ -666,15 +653,22 @@ function startGameLoop() {
       renderResearchTree(); 
     }
 
+    // Ежедневный доход от телефонов
     let dailyIncome = 0;
     state.releasedPhones.forEach(p => {
-      if (state.year - p.releaseYear < 5) dailyIncome += p.profitPerDay;
+      if (state.year - p.releaseYear < 5) {
+        let dailySales = p.weeklySales / 7;
+        dailyIncome += dailySales * p.profitPerUnit;
+        p.totalSold += dailySales;
+      }
     });
     
     dailyIncome += (state.empire.servicesIncome || 0) / 30;
 
+    // Зарплаты с инфляцией
+    let inflationMultiplier = 1 + ((state.year - 2007) * 0.05);
     let dailyExpense = 0;
-    state.employees.forEach(e => dailyExpense += e.salary / 30);
+    state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
     
     state.money += (dailyIncome - dailyExpense) * daysPassed;
 
@@ -732,9 +726,43 @@ function updateUI() {
   document.getElementById('ui-research-progress').style.width = percent + '%';
 
   document.getElementById('ui-devices').innerText = state.releasedPhones.length;
-  document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + 10000, 0).toLocaleString();
+  document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + Math.floor(p.totalSold), 0).toLocaleString();
   let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
   document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
+
+  // Плашка активного телефона
+  let activePhone = state.releasedPhones[state.releasedPhones.length - 1];
+  let phoneBadge = document.getElementById('active-phone-badge');
+  if (!phoneBadge) {
+    phoneBadge = document.createElement('div');
+    phoneBadge.id = 'active-phone-badge';
+    phoneBadge.style.cssText = 'position:fixed; top:65px; right:10px; background:var(--panel); border:1px solid var(--green); border-radius:10px; padding:10px; z-index:50; width:150px; box-shadow:0 4px 15px rgba(0,0,0,0.5);';
+    document.body.appendChild(phoneBadge);
+  }
+  
+  if (activePhone) {
+    phoneBadge.style.display = 'block';
+    let totalIncome = activePhone.totalSold * activePhone.price;
+    let totalProfit = activePhone.totalSold * activePhone.profitPerUnit;
+    
+    phoneBadge.innerHTML = `
+      <div style="font-size:10px; color:#aaa;">Сейчас в продаже:</div>
+      <div style="font-weight:900; font-size:12px; color:#fff; margin-bottom:5px;">${activePhone.name}</div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
+        <span>Доход:</span>
+        <span style="color:var(--green);">$${Math.floor(totalIncome).toLocaleString()}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
+        <span>Прибыль:</span>
+        <span style="color:var(--gold);">$${Math.floor(totalProfit).toLocaleString()}</span>
+      </div>
+      <div style="margin-top:5px; background:#000; height:4px; border-radius:2px;">
+        <div style="background:var(--blue); height:100%; width:${Math.min(100, (state.year - activePhone.releaseYear) * 20)}%;"></div>
+      </div>
+    `;
+  } else {
+    phoneBadge.style.display = 'none';
+  }
 
   renderOffice();
   renderTeam();
@@ -904,7 +932,7 @@ function fireEmployee(id) {
   playSound('click');
   updateUI(); save();
   showToast(`${emp.name} уволен.`, 'red');
-  }
+    }
       // ==========================================
   // 7. МЕГА-МАГАЗИН (Все предметы)
   // ==========================================
@@ -1176,23 +1204,23 @@ function fireEmployee(id) {
   // ==========================================
 
   const designSteps = [
-    { title: "Шаг 1. Устройство", type: 'single', options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2, req: 'tech_6'}] },
-    { title: "Шаг 2. Шасси", type: 'single', options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3, req: 'tech_12'}] },
-    { title: "Шаг 3. Размер", type: 'single', options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
-    { title: "Шаг 4. Разрешение", type: 'single', options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4, req: 'tech_1'}] },
-    { title: "Шаг 5. Экран", type: 'single', options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3, req: 'tech_7'}] },
-    { title: "Шаг 6. Селфи", type: 'single', options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1}, {name: "12 МП", cost: 15000, q: 3, req: 'tech_19'}] },
-    { title: "Шаг 7. Камера", type: 'single', options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2, req: 'tech_13'}, {name: "108 МП", cost: 40000, q: 5, req: 'tech_43'}] },
-    { title: "Шаг 8. Порт", type: 'single', options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2, req: 'tech_2'}] },
-    { title: "Шаг 9. Процессор", type: 'single', options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2, req: 'tech_8'}, {name: "Мощный", cost: 50000, q: 5, req: 'tech_20'}] },
-    { title: "Шаг 10. Память", type: 'single', options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2, req: 'tech_3'}, {name: "8 ГБ", cost: 25000, q: 4, req: 'tech_15'}] },
+    { title: "Шаг 1. Устройство", type: 'single', options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 1500, q: 2, req: 'tech_6'}] },
+    { title: "Шаг 2. Шасси", type: 'single', options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 800, q: 1}, {name: "Титан", cost: 3500, q: 3, req: 'tech_12'}] },
+    { title: "Шаг 3. Размер", type: 'single', options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 500, q: 1}, {name: "6.7\"", cost: 1200, q: 2}] },
+    { title: "Шаг 4. Разрешение", type: 'single', options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 1500, q: 2}, {name: "1080p", cost: 4000, q: 4, req: 'tech_1'}] },
+    { title: "Шаг 5. Экран", type: 'single', options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 2500, q: 3, req: 'tech_7'}] },
+    { title: "Шаг 6. Селфи", type: 'single', options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 100, q: 1}, {name: "12 МП", cost: 1200, q: 3, req: 'tech_19'}] },
+    { title: "Шаг 7. Камера", type: 'single', options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 1000, q: 2, req: 'tech_13'}, {name: "32 МП", cost: 4000, q: 5, req: 'tech_43'}] },
+    { title: "Шаг 8. Порт", type: 'single', options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 300, q: 2, req: 'tech_2'}] },
+    { title: "Шаг 9. Процессор", type: 'single', options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 2000, q: 2, req: 'tech_8'}, {name: "Мощный", cost: 6000, q: 5, req: 'tech_20'}] },
+    { title: "Шаг 10. Память", type: 'single', options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 800, q: 2, req: 'tech_3'}, {name: "8 ГБ", cost: 2500, q: 4, req: 'tech_15'}] },
     { title: "Шаг 11. Функции", type: 'multiple', options: [
-      {name: "GPS", cost: 1500, q: 1, req: 'tech_9'}, 
-      {name: "NFC", cost: 2000, q: 1, req: 'tech_30'}, 
-      {name: "Влагозащита", cost: 5000, q: 2, req: 'tech_18'}, 
-      {name: "Стереозвук", cost: 3000, q: 1, req: 'tech_24'}
+      {name: "GPS", cost: 50, q: 1, req: 'tech_9'}, 
+      {name: "NFC", cost: 100, q: 1, req: 'tech_30'}, 
+      {name: "Влагозащита", cost: 300, q: 2, req: 'tech_18'}, 
+      {name: "Стереозвук", cost: 150, q: 1, req: 'tech_24'}
     ]},
-    { title: "Шаг 12. Цвет и Брендинг", type: 'single', options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] },
+    { title: "Шаг 12. Цвет и Брендинг", type: 'single', options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 100, q: 0}, {name: "Неоновый", cost: 500, q: 2}, {name: "Радужный", cost: 2000, q: 5}] },
     { title: "Шаг 13. Финальная проверка", type: 'final', options: [] }
   ];
 
@@ -1225,14 +1253,61 @@ function fireEmployee(id) {
     opts.innerHTML = '';
 
     if (step.type === 'final') {
+      let score = Math.min(9.9, (5 + currentDesign.quality / 2));
+      let recommendedPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
+      
+      let baseDemand = Math.floor(500 + (score * 800));
+      
+      window.updatePriceSlider = function(val) {
+        let price = parseInt(val);
+        let profit = price - currentDesign.cost;
+        let priceFactor = recommendedPrice / price;
+        let actualDemand = Math.floor(baseDemand * (priceFactor * priceFactor)); 
+        if (profit <= 0) actualDemand = 0;
+
+        document.getElementById('slider-price-text').innerText = '$' + price.toLocaleString();
+        document.getElementById('slider-profit-text').innerText = '+$' + profit.toLocaleString() + ' / шт';
+        document.getElementById('slider-profit-text').style.color = profit > 0 ? 'var(--green)' : 'var(--red)';
+        document.getElementById('slider-demand-text').innerText = actualDemand.toLocaleString() + ' шт / нед.';
+        
+        let btn = document.getElementById('btn-launch-phone');
+        btn.onclick = () => {
+          let customName = document.getElementById('input-phone-name').value;
+          finishRelease(price, profit, actualDemand, customName);
+        };
+      };
+
       opts.innerHTML = `
-        <div style="text-align:center; padding:20px;">
-          <div style="font-size:40px; margin-bottom:10px;">📱</div>
-          <div style="font-size:14px; margin-bottom:5px;">Оценка: <span style="color:var(--gold); font-weight:900;">${Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1)}</span></div>
-          <div style="font-size:14px; margin-bottom:15px;">Прибыль за шт: <span style="color:var(--green); font-weight:900;">$${Math.floor((Math.min(9.9, (5 + currentDesign.quality / 2)) * 100000) + (currentDesign.quality * 5000)).toLocaleString()}</span></div>
-          <button class="btn btn-gold" style="width:100%; padding:15px;" onclick="finishRelease()">Начать производство</button>
+        <div style="text-align:center; padding:10px;">
+          <div style="font-size:40px; margin-bottom:5px;">📱</div>
+          
+          <div style="margin-bottom:15px; text-align:left;">
+            <label style="font-size:11px; color:#aaa; margin-bottom:5px; display:block;">Название устройства</label>
+            <input type="text" id="input-phone-name" value="iFon ${state.releasedPhones.length + 1}" style="width:100%; padding:10px; background:var(--panel-light); border:1px solid var(--border); border-radius:8px; color:#fff; font-size:14px; font-weight:bold; outline:none;">
+          </div>
+
+          <div style="font-size:14px; margin-bottom:5px;">Оценка критиков: <span style="color:var(--gold); font-weight:900;">${score.toFixed(1)} / 10</span></div>
+          <div style="font-size:14px; margin-bottom:15px;">Себестоимость: <span style="color:var(--red); font-weight:900;">$${currentDesign.cost.toLocaleString()}</span></div>
+          
+          <div style="background: var(--panel-light); border-radius: 10px; border: 1px solid var(--border); padding: 15px;">
+            <div style="font-size:12px; color:#aaa; margin-bottom:5px;">Установите цену продажи</div>
+            <div style="font-size:28px; color:#fff; font-weight:900; margin-bottom:15px;" id="slider-price-text">$${recommendedPrice.toLocaleString()}</div>
+            
+            <input type="range" min="${currentDesign.cost + 10}" max="${recommendedPrice * 3}" value="${recommendedPrice}" 
+                   style="width: 100%; height: 10px; border-radius: 5px; background: #333; outline: none; -webkit-appearance: none; margin-bottom: 15px;"
+                   oninput="updatePriceSlider(this.value)">
+            
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+              <span style="color:var(--green);" id="slider-profit-text">+$${(recommendedPrice - currentDesign.cost).toLocaleString()} / шт</span>
+              <span style="color:var(--blue);" id="slider-demand-text">0 шт / нед.</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" id="btn-launch-phone">Начать производство</button>
         </div>
       `;
+      
+      setTimeout(() => updatePriceSlider(recommendedPrice), 50);
       return;
     }
 
@@ -1241,22 +1316,14 @@ function fireEmployee(id) {
       
       let isLocked = false;
       let lockText = '';
-      let techYear = 2007;
-
+      
       if (o.req) {
         let tech = RESEARCH_TREE.find(t => t.id === o.req);
-        if (tech) {
-          techYear = tech.yearReq;
-          if (!tech.unlocked) {
-            isLocked = true;
-            if (state.year < tech.yearReq) {
-              lockText = `🔒 Прибудет в ${techYear} г.`;
-            } else if (state.rp < tech.cost) {
-              lockText = `🔒 RP ${tech.cost}`;
-            } else {
-              lockText = `🔒 Нужны ранние иссл.`;
-            }
-          }
+        if (tech && !tech.unlocked) {
+          isLocked = true;
+          if (state.year < tech.yearReq) lockText = `🔒 Прибудет в ${tech.yearReq} г.`;
+          else if (state.rp < tech.cost) lockText = `🔒 RP ${tech.cost}`;
+          else lockText = `🔒 Нужны ранние иссл.`;
         }
       }
       
@@ -1308,17 +1375,29 @@ function fireEmployee(id) {
     renderDesignStep();
   }
 
-  function finishRelease() {
+  function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
     let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
-    let profit = Math.floor((score * 100000) + (currentDesign.quality * 5000));
     
-    state.money -= currentDesign.cost;
+    let finalName = customName.trim() === '' ? "Безымянный " + (state.releasedPhones.length + 1) : customName;
+    
+    let batchSize = weeklyDemand * 2;
+    let totalCost = currentDesign.cost * batchSize;
+    
+    if (state.money < totalCost) {
+      showToast(`Не хватает $${(totalCost - state.money).toLocaleString()} на сборку партии! Вы ушли в долг.`, 'red');
+    }
+    state.money -= totalCost;
     
     state.releasedPhones.push({
-      name: currentDesign.name + " " + (state.releasedPhones.length + 1),
+      id: Date.now(),
+      name: finalName,
       score: score,
-      profitPerDay: Math.floor(profit / 30), 
-      releaseYear: state.year
+      releaseYear: state.year,
+      price: finalPrice,
+      cost: currentDesign.cost,
+      profitPerUnit: profitPerUnit,
+      weeklySales: weeklyDemand,
+      totalSold: 0
     });
 
     state.reputation += score / 10;
@@ -1330,10 +1409,9 @@ function fireEmployee(id) {
       drawStockChart();
     }
 
-    document.getElementById('modal-release').classList.remove('active');
     closeDesignStudio();
     updateUI(); save();
-    showToast(`Телефон выпущен! Оценка: ${score}`, 'green');
+    showToast(`Устройство "${finalName}" запущено!`, 'green');
     startConfetti();
     playSound('release');
   }
@@ -1379,7 +1457,15 @@ function fireEmployee(id) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     let data = state.stockHistory;
-    if (data.length === 0) return;
+    
+    if (!state.isPublic || data.length === 0) {
+      ctx.fillStyle = '#333';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Выйдите на IPO, чтобы увидеть график', canvas.width / 2, canvas.height / 2);
+      document.getElementById('stock-price').innerText = '$0.00';
+      return;
+    }
 
     let max = Math.max(...data) * 1.1;
     let min = Math.min(...data) * 0.9;
@@ -1423,9 +1509,9 @@ function fireEmployee(id) {
 
     if (currentEmpireTab === 'services') {
       let items = [
-        { id: 'cloud', name: '☁️ Cloud Storage', price: 500000, income: 50000 },
-        { id: 'music', name: '🎵 Music Service', price: 1000000, income: 150000 },
-        { id: 'arcade', name: '🎮 Arcade Games', price: 2000000, income: 300000 }
+        { id: 'cloud', name: '☁️ Cloud Storage', price: 500000, income: 50000, desc: 'Хранилище для фото и файлов' },
+        { id: 'music', name: '🎵 Music Service', price: 1000000, income: 150000, desc: 'Стриминг музыки без рекламы' },
+        { id: 'arcade', name: '🎮 Arcade Games', price: 2000000, income: 300000, desc: 'Игровая библиотека для телефонов' }
       ];
       items.forEach(item => {
         let isOwned = state.empire?.services?.includes(item.id);
@@ -1433,16 +1519,46 @@ function fireEmployee(id) {
           <div class="card">
             <div class="card-info">
               <div class="card-title">${item.name}</div>
-              <div class="card-desc">Доход: +$${item.income.toLocaleString()} / мес</div>
+              <div class="card-desc">${item.desc} (Доход: +$${item.income.toLocaleString()} / мес)</div>
             </div>
-            <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyService('${item.id}', ${item.price}, ${item.income})">${isOwned ? 'Куплено' : 'Купить'}</button>
+            <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyService('${item.id}', ${item.price}, ${item.income})">${isOwned ? 'Куплено' : '$' + item.price.toLocaleString()}</button>
           </div>
         `;
       });
     } else if (currentEmpireTab === 'factories') {
-      list.innerHTML = `<div class="card"><div class="card-desc">Заводы требуют много денег и времени на реализацию (в разработке).</div></div>`;
+      let factories = [
+        { id: 'chip_factory', name: '🏭 Завод по производству чипов', price: 50000000, desc: 'Снижает стоимость чипов на 20%' },
+        { id: 'screen_factory', name: '🏭 Завод экранов', price: 80000000, desc: 'Снижает стоимость экранов на 20%' }
+      ];
+      factories.forEach(item => {
+        let isOwned = state.empire?.factories?.includes(item.id);
+        list.innerHTML += `
+          <div class="card">
+            <div class="card-info">
+              <div class="card-title">${item.name}</div>
+              <div class="card-desc">${item.desc}</div>
+            </div>
+            <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyFactory('${item.id}', ${item.price})">${isOwned ? 'Куплено' : '$' + item.price.toLocaleString()}</button>
+          </div>
+        `;
+      });
     } else if (currentEmpireTab === 'projects') {
-      list.innerHTML = `<div class="card"><div class="card-desc">Колонизация Луны и Марса (в разработке).</div></div>`;
+      let projects = [
+        { id: 'moon', name: '🌕 Лунная база', price: 5000000000, desc: 'Открывает Луну как рынок (+10% к продажам)' },
+        { id: 'mars', name: '🔴 Колония на Марсе', price: 50000000000, desc: 'Открывает Марс как рынок (+25% к продажам)' }
+      ];
+      projects.forEach(item => {
+        let isOwned = state.empire?.projects?.includes(item.id);
+        list.innerHTML += `
+          <div class="card">
+            <div class="card-info">
+              <div class="card-title">${item.name}</div>
+              <div class="card-desc">${item.desc}</div>
+            </div>
+            <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyProject('${item.id}', ${item.price})">${isOwned ? 'Завершено' : '$' + item.price.toLocaleString()}</button>
+          </div>
+        `;
+      });
     }
   }
 
@@ -1459,6 +1575,32 @@ function fireEmployee(id) {
     playSound('buy');
     updateUI(); save(); renderEmpire();
     showToast("Услуга запущена!", 'green');
+  }
+
+  function buyFactory(id, price) {
+    if (state.money < price) { showToast("Мало денег на завод!", 'red'); return; }
+    if (!state.empire) state.empire = { services: [], servicesIncome: 0, audience: 1000 };
+    if (!state.empire.factories) state.empire.factories = [];
+    
+    state.money -= price;
+    state.empire.factories.push(id);
+    
+    playSound('buy');
+    updateUI(); save(); renderEmpire();
+    showToast("Завод построен! Цены на детали снижены.", 'green');
+  }
+
+  function buyProject(id, price) {
+    if (state.money < price) { showToast("Мало денег на мегапроект!", 'red'); return; }
+    if (!state.empire) state.empire = { services: [], servicesIncome: 0, audience: 1000 };
+    if (!state.empire.projects) state.empire.projects = [];
+    
+    state.money -= price;
+    state.empire.projects.push(id);
+    
+    playSound('buy');
+    updateUI(); save(); renderEmpire();
+    showToast("Мегапроект завершен! Рынок расширен.", 'green');
   }
 
   // ==========================================
@@ -1481,7 +1623,7 @@ function fireEmployee(id) {
             <div class="card-title">${m.name}</div>
             <div class="card-desc">Множитель продаж: x${m.mult}</div>
           </div>
-          <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyMarket('${m.id}', ${m.price})">${isOwned ? 'Открыто' : 'Открыть'}</button>
+          <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyMarket('${m.id}', ${m.price})">${isOwned ? 'Открыто' : '$' + m.price.toLocaleString()}</button>
         </div>
       `;
     });
@@ -1636,4 +1778,4 @@ function fireEmployee(id) {
 </html>
   </script>
 </body>
-</html>
+  </html>
