@@ -3,434 +3,498 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tech Empire MVP v2 | Site Of Cool</title>
+  <title>Tech Empire 2D UI | Site Of Cool</title>
   <style>
     :root {
-      --bg: #05080a;
-      --panel: #111a22;
-      --border: #1f2d3d;
-      --green: #00ff88;
-      --blue: #4facfe;
-      --purple: #8E2DE2;
-      --red: #ff0055;
-      --gold: #ffd700;
+      --bg: #080b10; --panel: #111a22; --panel-lighter: #1a2632;
+      --border: #2a3b4c; --green: #00ff88; --blue: #4facfe; --purple: #8E2DE2; --red: #ff0055; --gold: #ffd700;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: white; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ШАПКА */
+    /* --- ШАПКА --- */
     .top-bar { height: 60px; background: var(--panel); border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 10; flex-shrink: 0; }
     .stat-box { display: flex; gap: 15px; }
     .stat { display: flex; flex-direction: column; }
-    .stat-label { font-size: 10px; color: #6c8196; text-transform: uppercase; font-weight: 800; }
-    .stat-val { font-size: 16px; font-weight: 900; }
-    .stat-val.money { color: var(--green); text-shadow: 0 0 10px rgba(0,255,136,0.3); }
-    .stat-val.rp { color: var(--purple); text-shadow: 0 0 10px rgba(142,45,226,0.3); }
+    .stat-label { font-size: 9px; color: #6c8196; text-transform: uppercase; font-weight: 800; }
+    .stat-val { font-size: 14px; font-weight: 900; }
+    .stat-val.money { color: var(--green); }
+    .stat-val.rp { color: var(--purple); }
+    .stat-val.date { color: var(--blue); }
 
-    /* ЭКРАНЫ */
-    .screen { flex: 1; overflow-y: auto; padding: 15px; display: none; flex-direction: column; gap: 12px; padding-bottom: 20px; }
-    .screen.active { display: flex; }
-
-    .section-title { font-size: 14px; font-weight: 800; color: #888; text-transform: uppercase; margin-top: 10px; margin-bottom: 5px; border-left: 3px solid var(--blue); padding-left: 8px; }
-
-    /* КАРТОЧКИ */
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: 0.2s; }
-    .card:active { transform: scale(0.98); border-color: var(--blue); }
-    .card-icon { font-size: 30px; width: 50px; height: 50px; background: #0a0f14; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 1px solid #333; flex-shrink: 0; }
-    .card-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
-    .card-title { font-weight: 900; font-size: 15px; }
-    .card-desc { font-size: 11px; color: #888; line-height: 1.3; }
-    .card-stats { font-size: 12px; font-weight: bold; color: var(--green); }
+    /* --- ИГРОВОЕ ПОЛЕ (2D ОФИС) --- */
+    #game-area { flex: 1; position: relative; background: radial-gradient(circle at top, #101922 0%, #05080a 100%); overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
     
-    .btn-buy { background: var(--blue); color: #000; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; white-space: nowrap; }
-    .btn-buy:disabled { background: #333; color: #666; }
-    .btn-buy.gold { background: var(--gold); }
+    .office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel-lighter); padding: 10px 15px; border-radius: 10px; border: 1px solid var(--border); }
+    .office-level { font-weight: 900; color: var(--gold); }
+    .office-slots { font-size: 12px; color: #aaa; }
 
-    /* НИЖНЯЯ НАВИГАЦИЯ */
-    .bottom-nav { height: 70px; background: var(--panel); border-top: 2px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 10; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6c8196; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-    .nav-item.active { color: var(--blue); }
-    .nav-icon { font-size: 22px; filter: grayscale(1); transition: 0.2s; }
-    .nav-item.active .nav-icon { filter: grayscale(0); transform: translateY(-2px); }
+    .placed-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; }
+    .item-placed { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .item-placed .icon { font-size: 24px; }
+    .item-placed .name { font-size: 10px; font-weight: bold; }
 
-    /* МОДАЛКИ */
+    /* --- НИЖНЯЯ ПАНЕЛЬ РАЗРАБОТКИ (DEV PANEL) --- */
+    .dev-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--panel); border-top: 2px solid var(--border); padding: 10px 15px; z-index: 20; display: none; flex-direction: column; gap: 5px; }
+    .dev-panel.active { display: flex; }
+    .dev-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; }
+    .progress-bg { width: 100%; height: 10px; background: #000; border-radius: 5px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: var(--blue); transition: width 0.3s; }
+    .bug-fill { background: var(--red); }
+    .dev-stats { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; }
+    .btn-dev { background: var(--green); color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: 900; width: 100%; margin-top: 5px; display: none; }
+
+    /* --- МЕНЮ СТРОЙКИ (BUILD MENU) --- */
+    .build-menu { background: var(--panel); border-top: 2px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; padding-bottom: env(safe-area-inset-bottom); }
+    .build-tabs { display: flex; overflow-x: auto; border-bottom: 1px solid var(--border); }
+    .build-tabs::-webkit-scrollbar { display: none; }
+    .b-tab { background: transparent; border: none; color: #6c8196; padding: 12px 15px; font-weight: 900; font-size: 12px; white-space: nowrap; cursor: pointer; border-bottom: 2px solid transparent; }
+    .b-tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    
+    .build-items { display: flex; overflow-x: auto; gap: 10px; padding: 15px; background: #0a0f14; }
+    .build-items::-webkit-scrollbar { display: none; }
+    .b-item { flex-shrink: 0; width: 100px; background: var(--panel-lighter); border: 1px solid var(--border); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; overflow: hidden; }
+    .b-item:active { transform: scale(0.95); border-color: var(--green); }
+    .b-item .icon { font-size: 30px; margin-bottom: 5px; }
+    .b-item .title { font-size: 10px; font-weight: bold; text-align: center; margin-bottom: 3px; }
+    .b-item .price { font-size: 11px; font-weight: 900; color: var(--gold); }
+    .b-item .buy-btn { background: var(--blue); color: #000; padding: 4px; width: 100%; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 5px; text-align: center; }
+
+    /* --- ВЕРХНИЕ КНОПКИ (ДИЗАЙН) --- */
+    .top-actions { display: flex; gap: 10px; padding: 10px 15px; background: var(--panel); border-bottom: 1px solid var(--border); }
+    .btn-action { flex: 1; background: linear-gradient(135deg, #8E2DE2, #4A00E0); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 900; font-size: 14px; cursor: pointer; box-shadow: 0 4px 15px rgba(142,45,226,0.4); text-align: center; }
+
+    /* --- МОДАЛКИ --- */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: var(--panel); border: 2px solid var(--blue); border-radius: 20px; padding: 20px; width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-    .modal-title { font-size: 20px; font-weight: 900; text-align: center; }
+    .modal-box { background: var(--panel); border: 2px solid var(--blue); border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 18px; font-weight: 900; text-align: center; }
     
-    /* ЭЛЕМЕНТЫ ДИЗАЙН-СТУДИИ */
-    .ds-step { font-size: 12px; color: var(--blue); font-weight: bold; text-align: center; }
+    /* Студия дизайна */
+    .ds-step-info { font-size: 12px; color: var(--blue); font-weight: bold; text-align: center; }
     .ds-option { background: #0a0f14; border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; cursor: pointer; font-size: 14px; font-weight: bold; }
     .ds-option:active { border-color: var(--green); background: rgba(0,255,136,0.05); }
     .ds-price { color: var(--gold); }
-
-    /* СБОРКА */
-    .progress-bg { width: 100%; height: 12px; background: #000; border-radius: 6px; overflow: hidden; margin-top: 5px; }
-    .progress-fill { height: 100%; width: 0%; background: var(--green); transition: width 0.3s; }
-    .bug-fill { background: var(--red); }
-
-    /* УВЕДОМЛЕНИЯ */
+    
+    /* Результаты */
+    .result-score { font-size: 60px; color: var(--gold); text-align: center; font-weight: 900; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+    
+    /* Тост */
     .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--panel); border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-weight: bold; color: var(--green); z-index: 200; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
 
-  <!-- ШАПКА -->
   <div class="top-bar">
     <div class="stat-box">
-      <div class="stat">
-        <span class="stat-label">Баланс</span>
-        <span class="stat-val money" id="ui-money">$200,000</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Исследования</span>
-        <span class="stat-val rp" id="ui-rp">0 RP</span>
-      </div>
+      <div class="stat"><span class="stat-label">Баланс</span><span class="stat-val money" id="ui-money">$200,000</span></div>
+      <div class="stat"><span class="stat-label">Исследования</span><span class="stat-val rp" id="ui-rp">0 RP</span></div>
     </div>
-    <button class="btn-buy" onclick="toggleFullscreen()">⛶</button>
+    <div class="stat"><span class="stat-label">Дата</span><span class="stat-val date" id="ui-date">1 Янв, 2007</span></div>
   </div>
 
-  <!-- ЭКРАН 1: ОФИС (ТУТ НЕТ СЕТКИ) -->
-  <div class="screen active" id="screen-office">
-    <div class="section-title">Твой офис</div>
-    <div id="office-list" style="display:flex; flex-direction:column; gap:10px;">
-      <!-- Тут будут столы -->
-    </div>
+  <div class="top-actions">
+    <button class="btn-action" onclick="openDesignStudio()">🎨 Студия Дизайна</button>
   </div>
 
-  <!-- ЭКРАН 2: МАГАЗИН -->
-  <div class="screen" id="screen-shop">
-    <div class="section-title">Рабочие места</div>
-    <div class="card">
-      <div class="card-icon">🪵</div>
-      <div class="card-info">
-        <div class="card-title">Деревянный стол</div>
-        <div class="card-desc">Старый скрипучий стол. Скорость работы: 1x</div>
-        <div class="card-stats">+1 RP/сек</div>
-      </div>
-      <button class="btn-buy" onclick="buyDesk('wood', 15000)" id="btn-buy-wood">$15K</button>
+  <!-- 2D ОФИС (Визуализация) -->
+  <div id="game-area">
+    <div class="office-header">
+      <div class="office-level" id="ui-office-name">Гараж</div>
+      <div class="office-slots" id="ui-slots">0 / 5 предметов</div>
+      <button class="btn-buy" style="padding:5px 10px; font-size:10px;" onclick="upgradeOffice()">Улучшить офис</button>
     </div>
-    
-    <div class="card">
-      <div class="card-icon">🖥️</div>
-      <div class="card-info">
-        <div class="card-title">Стеклянный стол</div>
-        <div class="card-desc">Стильный стол с неоновой подсветкой. Скорость: 2x</div>
-        <div class="card-stats">+5 RP/сек</div>
-      </div>
-      <button class="btn-buy" onclick="buyDesk('glass', 45000)" id="btn-buy-glass">$45K</button>
+    <div class="placed-items" id="placed-items">
+      <!-- Здесь будут отображаться купленные столы/стулья -->
     </div>
 
-    <div class="card" style="border-color: var(--gold); background: rgba(255,215,0,0.05);">
-      <div class="card-icon">🌈</div>
-      <div class="card-info">
-        <div class="card-title" style="color: var(--gold);">ЛГБТ-Стол</div>
-        <div class="card-desc">Максимально крутой, переливается всеми цветами. Сотрудники пищат от восторга.</div>
-        <div class="card-stats" style="color: var(--gold);">+1000 RP/сек</div>
-      </div>
-      <button class="btn-buy gold" onclick="buyDesk('lgbt', 1000000000)" id="btn-buy-lgbt">$1B</button>
-    </div>
-
-    <div class="section-title">Найм сотрудников</div>
-    <div class="card">
-      <div class="card-icon">🔬</div>
-      <div class="card-info">
-        <div class="card-title">Исследователь (1★)</div>
-        <div class="card-desc">Создает RP. Немного косячит. Зарплата: $5K</div>
-      </div>
-      <button class="btn-buy" onclick="hireEmp('researcher', 5000)">Нанять</button>
-    </div>
-    <div class="card">
-      <div class="card-icon">🔧</div>
-      <div class="card-info">
-        <div class="card-title">Исправитель ошибок (1★)</div>
-        <div class="card-desc">Чинит баги после исследователей. Зарплата: $5K</div>
-      </div>
-      <button class="btn-buy" onclick="hireEmp('fixer', 5000)">Нанять</button>
+    <!-- ПАНЕЛЬ РАЗРАБОТКИ (Внизу офиса) -->
+    <div class="dev-panel" id="dev-panel">
+      <div class="dev-header"><span id="dev-title">Разработка...</span><span id="dev-percent">0%</span></div>
+      <div class="progress-bg"><div class="progress-fill" id="dev-bar"></div></div>
+      <div class="dev-stats"><span>Качество: <span id="dev-quality" style="color:var(--green)">0</span></span><span>Ошибки: <span id="dev-bugs" style="color:var(--red)">0</span></span></div>
+      <button class="btn-dev" id="btn-finish-dev" onclick="launchDevice()">Запустить в продажу 🚀</button>
     </div>
   </div>
 
-  <!-- ЭКРАН 3: ДИЗАЙН -->
-  <div class="screen" id="screen-design">
-    <div class="section-title">Студия дизайна</div>
-    <div class="card" style="flex-direction:column; align-items:flex-start;">
-      <div class="card-title" style="margin-bottom: 10px;">Разработка устройства</div>
-      <div class="card-desc" style="margin-bottom: 15px;">Собери свой первый телефон. Чем лучше детали, тем выше рейтинг критиков и больше прибыль.</div>
-      <button class="btn-buy" style="width:100%; padding:15px;" onclick="startDesign()">🎨 Начать проектирование</button>
+  <!-- МЕНЮ СТРОЙКИ -->
+  <div class="build-menu">
+    <div class="build-tabs">
+      <button class="b-tab active" id="tab-desks" onclick="switchBuildTab('desks')">🪑 Столы</button>
+      <button class="b-tab" id="tab-chairs" onclick="switchBuildTab('chairs')">🪑 Стулья</button>
+      <button class="b-tab" id="tab-pcs" onclick="switchBuildTab('pcs')">💻 Компьютеры</button>
+      <button class="b-tab" id="tab-lab" onclick="switchBuildTab('lab')">🔬 Лаборатория</button>
+      <button class="b-tab" id="tab-rest" onclick="switchBuildTab('rest')">☕ Зона отдыха</button>
     </div>
-  </div>
-
-  <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-  <div class="bottom-nav">
-    <div class="nav-item active" id="nav-office" onclick="switchScreen('office')">
-      <div class="nav-icon">🏢</div> Офис
-    </div>
-    <div class="nav-item" id="nav-shop" onclick="switchScreen('shop')">
-      <div class="nav-icon">🛒</div> Магазин
-    </div>
-    <div class="nav-item" id="nav-design" onclick="switchScreen('design')">
-      <div class="nav-icon">🎨</div> Дизайн
+    <div class="build-items" id="build-items">
+      <!-- Предметы будут генерироваться через JS -->
     </div>
   </div>
 
   <!-- МОДАЛКА ДИЗАЙНА -->
   <div class="modal-overlay" id="design-modal">
     <div class="modal-box">
-      <div class="modal-title" id="ds-title">Шаг 1</div>
-      <div class="ds-step" id="ds-step-info">1 из 13</div>
-      <div id="ds-options" style="display:flex; flex-direction:column; gap:8px; max-height: 50vh; overflow-y: auto;">
-        <!-- Опции -->
-      </div>
+      <div class="modal-title" id="ds-title">Шаг 1. Устройство</div>
+      <div class="ds-step-info" id="ds-step-info">1 из 13</div>
+      <div id="ds-options" style="display:flex; flex-direction:column; gap:8px;"></div>
+      <button class="btn-buy" style="width:100%; background:#444; color:#fff; margin-top:10px;" onclick="document.getElementById('design-modal').classList.remove('active')">Отмена</button>
     </div>
   </div>
 
-  <!-- МОДАЛКА СБОРКИ -->
-  <div class="modal-overlay" id="assembly-modal">
-    <div class="modal-box">
-      <div class="modal-title" style="color:var(--blue);">Сборка устройства</div>
-      <div style="display:flex; justify-content:space-between; font-size:12px;">
-        <span>Прогресс</span> <span id="asm-prog-text">0%</span>
-      </div>
-      <div class="progress-bg"><div class="progress-fill" id="asm-prog-bar"></div></div>
-      
-      <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--red); margin-top:10px;">
-        <span>Ошибки (баги)</span> <span id="asm-bug-text">0</span>
-      </div>
-      <div class="progress-bg"><div class="progress-fill bug-fill" id="asm-bug-bar"></div></div>
-
-      <button class="btn-buy" style="width:100%; margin-top:15px; display:none;" id="asm-finish-btn" onclick="showLaunchResult()">Запустить в продажу 🚀</button>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА РЕЗУЛЬТАТА -->
+  <!-- МОДАЛКА РЕЗУЛЬТАТОВ -->
   <div class="modal-overlay" id="result-modal">
     <div class="modal-box" style="text-align:center; border-color: var(--gold);">
-      <h1 style="font-size:40px; color:var(--gold); margin-bottom:5px;" id="res-score">9.5</h1>
+      <div class="result-score" id="res-score">9.5</div>
       <div style="font-size:14px; color:#aaa; margin-bottom:15px;">Оценка критиков</div>
       <div style="font-size:20px; font-weight:900; color:var(--green); margin-bottom:20px;" id="res-profit">+$15,000,000</div>
       <button class="btn-buy" style="width:100%;" onclick="closeResult()">Забрать деньги</button>
     </div>
   </div>
 
-  <!-- ТОСТ -->
   <div class="toast" id="toast">Уведомление</div>
 
   <script>
-    // --- 1. СОСТОЯНИЕ ---
-    let state = {
-      money: 200000,
-      rp: 0,
-      desks: [], // {type: 'wood', count: 1, rpRate: 1}
-      employees: { researcher: 0, fixer: 0 }
-    };
+  // --- 1. СОСТОЯНИЕ И ДАННЫЕ ---
+let state = {
+    money: 200000,
+    rp: 0,
+    date: "1 Янв, 2007",
+    officeLvl: 0,
+    placedItems: [],
+    staff: { researchers: 0, fixers: 0 },
+    currentDesign: { quality: 0, cost: 0 },
+    dev: { active: false, progress: 0, bugs: 0 }
+};
 
-    // Загрузка
-    let saved = localStorage.getItem('empire_mvp_v2');
-    if(saved) {
-      try { state = JSON.parse(saved); } catch(e){}
-    }
+const OFFICES = [
+    { name: "Гараж", slots: 5, upgradeCost: 500000 },
+    { name: "Небольшой офис", slots: 10, upgradeCost: 2000000 },
+    { name: "Этаж офиса", slots: 15, upgradeCost: 10000000 },
+    { name: "Студия", slots: 25, upgradeCost: 50000000 },
+    { name: "Штаб-квартира", slots: 40, upgradeCost: -1 } // Максимум
+];
 
-    // --- 2. UI ЛОГИКА ---
-    function updateUI() {
-      document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
-      document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
-      
-      document.getElementById('btn-buy-wood').disabled = state.money < 15000;
-      document.getElementById('btn-buy-glass').disabled = state.money < 45000;
-      document.getElementById('btn-buy-lgbt').disabled = state.money < 1000000000;
-      
-      renderOffice();
-      save();
-    }
+const BUILD_ITEMS = {
+    desks: [
+        { id: 'desk_1', name: 'Старый стол', price: 12000, icon: '🪵', quality: 1 },
+        { id: 'desk_2', name: 'Рабочий стол', price: 50000, icon: '🪑', quality: 3 },
+        { id: 'desk_3', name: 'Стеклянный стол', price: 1500000, icon: '🖥️', quality: 6 }
+    ],
+    chairs: [
+        { id: 'chair_1', name: 'Табурет', price: 0, icon: '🪑', quality: 0 },
+        { id: 'chair_2', name: 'Кресло', price: 20000, icon: '💺', quality: 2 },
+        { id: 'chair_3', name: 'Игровое кресло', price: 80000, icon: '👑', quality: 4 }
+    ],
+    pcs: [
+        { id: 'pc_1', name: 'ЭЛТ монитор', price: 0, icon: '🖥️', quality: 0 },
+        { id: 'pc_2', name: 'Плоский монитор', price: 15000, icon: '📺', quality: 2 },
+        { id: 'pc_3', name: 'Два монитора', price: 45000, icon: '🖥️🖥️', quality: 4 }
+    ],
+    lab: [
+        { id: 'lab_1', name: 'Тестовая плата', price: 50000, icon: '🔬', quality: 2 },
+        { id: 'lab_2', name: 'Серверные стойки', price: 240000, icon: '🖧', quality: 5 }
+    ],
+    rest: [
+        { id: 'rest_1', name: 'Кулер', price: 1500, icon: '🚰', quality: 1 },
+        { id: 'rest_2', name: 'Кофемашина', price: 3000, icon: '☕', quality: 2 },
+        { id: 'rest_3', name: 'Диван', price: 6000, icon: '🛋️', quality: 3 }
+    ]
+};
 
-    function renderOffice() {
-      const list = document.getElementById('office-list');
-      list.innerHTML = '';
-      
-      if(state.desks.length === 0 && state.employees.researcher === 0) {
-        list.innerHTML = '<div style="text-align:center; color:#666; padding:20px; font-size:14px;">У тебя пусто. Купи стол и найми сотрудников в магазине.</div>';
+let currentTab = 'desks';
+let currentStep = 1;
+
+// 13 шагов дизайна
+const designSteps = [
+    { id: 'type', title: "Шаг 1. Устройство", options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2}] },
+    { id: 'body', title: "Шаг 2. Шасси", options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3}] },
+    { id: 'size', title: "Шаг 3. Размер", options: [{name: "3.5 дюйма", cost: 0, q: 0}, {name: "5.5 дюймов", cost: 5000, q: 1}, {name: "6.7 дюймов", cost: 15000, q: 2}] },
+    { id: 'res', title: "Шаг 4. Разрешение", options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4}] },
+    { id: 'tech', title: "Шаг 5. Экран", options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3}] },
+    { id: 'front_cam', title: "Шаг 6. Селфи", options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1}, {name: "12 МП", cost: 15000, q: 3}] },
+    { id: 'rear_cam', title: "Шаг 7. Камера", options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2}, {name: "108 МП", cost: 40000, q: 5}] },
+    { id: 'port', title: "Шаг 8. Порт", options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2}] },
+    { id: 'cpu', title: "Шаг 9. Процессор", options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2}, {name: "Мощный", cost: 50000, q: 5}] },
+    { id: 'ram', title: "Шаг 10. Память", options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2}, {name: "8 ГБ", cost: 25000, q: 4}] },
+    { id: 'battery', title: "Шаг 11. Батарея", options: [{name: "2000 мАч", cost: 0, q: 0}, {name: "4000 мАч", cost: 8000, q: 2}, {name: "6000 мАч", cost: 20000, q: 4}] },
+    { id: 'features', title: "Шаг 12. Фишки", options: [{name: "Нет", cost: 0, q: 0}, {name: "NFC + GPS", cost: 15000, q: 3}] },
+    { id: 'color', title: "Шаг 13. Цвет", options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] }
+];
+
+// --- 2. ИНИЦИАЛИЗАЦИЯ И UI ---
+window.onload = () => {
+    loadSave();
+    updateUI();
+    renderBuildMenu();
+    startGameLoop();
+};
+
+function updateUI() {
+    document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
+    document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
+    document.getElementById('ui-date').innerText = state.date;
+    
+    const office = OFFICES[state.officeLvl];
+    document.getElementById('ui-office-name').innerText = office.name;
+    document.getElementById('ui-slots').innerText = `${state.placedItems.length} / ${office.slots} предметов`;
+    
+    renderPlacedItems();
+}
+
+function renderPlacedItems() {
+    const container = document.getElementById('placed-items');
+    container.innerHTML = '';
+    
+    if (state.placedItems.length === 0) {
+        container.innerHTML = '<div style="color:#666; grid-column: 1/-1; text-align:center; padding: 20px;">Офис пуст. Купи что-нибудь снизу!</div>';
         return;
-      }
+    }
 
-      state.desks.forEach((desk, index) => {
-        let icon = desk.type === 'wood' ? '🪵' : desk.type === 'glass' ? '🖥️' : '🌈';
-        let name = desk.type === 'wood' ? 'Старый стол' : desk.type === 'glass' ? 'Стеклянный стол' : 'ЛГБТ-Стол за миллиард';
-        let color = desk.type === 'lgbt' ? 'var(--gold)' : 'white';
-        
-        let empOnDesk = "Никого нет";
-        if (index < state.employees.researcher) {
-           empOnDesk = "<span style='color:var(--blue)'>🔬 Исследователь работает</span>";
-        } else if (index - state.employees.researcher < state.employees.fixer) {
-           empOnDesk = "<span style='color:var(--red)'>🔧 Фиксер чинит баги</span>";
-        }
+    state.placedItems.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'item-placed';
+        el.innerHTML = `<div class="icon">${item.icon}</div><div class="name">${item.name}</div>`;
+        container.appendChild(el);
+    });
+}
 
-        list.innerHTML += `
-          <div class="card" style="${desk.type === 'lgbt' ? 'border-color: var(--gold); background: linear-gradient(45deg, rgba(255,0,0,0.1), rgba(0,255,0,0.1), rgba(0,0,255,0.1));' : ''}">
-            <div class="card-icon">${icon}</div>
-            <div class="card-info">
-              <div class="card-title" style="color:${color}">${name}</div>
-              <div class="card-desc">${empOnDesk}</div>
-            </div>
-            <div class="card-stats" style="color:${color}">+${desk.rpRate} RP/сек</div>
-          </div>
+function switchBuildTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.b-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    renderBuildMenu();
+}
+
+function renderBuildMenu() {
+    const container = document.getElementById('build-items');
+    container.innerHTML = '';
+    
+    BUILD_ITEMS[currentTab].forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'b-item';
+        el.onclick = () => buyItem(item);
+        el.innerHTML = `
+            <div class="icon">${item.icon}</div>
+            <div class="title">${item.name}</div>
+            <div class="price">${item.price === 0 ? 'Бесплатно' : '$' + item.price.toLocaleString()}</div>
+            <div class="buy-btn">Купить</div>
         `;
-      });
-    }
+        container.appendChild(el);
+    });
+}
 
-    function switchScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      document.getElementById(`screen-${screenId}`).classList.add('active');
-      document.getElementById(`nav-${screenId}`).classList.add('active');
-    }
+function buyItem(item) {
+    if (state.money < item.price) { showToast("Мало денег!"); return; }
+    if (state.placedItems.length >= OFFICES[state.officeLvl].slots) { showToast("Офис переполнен! Улучшите офис."); return; }
+    
+    state.money -= item.price;
+    state.placedItems.push(item);
+    updateUI();
+    save();
+    showToast(`Куплено: ${item.name}`);
+}
 
-    function showToast(text) {
-      const t = document.getElementById('toast');
-      t.innerText = text;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2000);
-    }
+function upgradeOffice() {
+    if (state.officeLvl >= OFFICES.length - 1) { showToast("У вас максимальный офис!"); return; }
+    const cost = OFFICES[state.officeLvl].upgradeCost;
+    if (state.money < cost) { showToast("Недостаточно денег для переезда!"); return; }
+    
+    state.money -= cost;
+    state.officeLvl++;
+    updateUI();
+    save();
+    showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`);
+}
 
-    // --- 3. ЭКОНОМИКА ---
-    function buyDesk(type, price) {
-      if (state.money < price) return;
-      
-      state.money -= price;
-      let existing = state.desks.find(d => d.type === type);
-      
-      if (existing) {
-        existing.count++;
-      } else {
-        state.desks.push({
-          type: type, count: 1, 
-          rpRate: type === 'wood' ? 1 : type === 'glass' ? 5 : 1000
-        });
-      }
-      
-      if (type === 'lgbt') showToast("🌈 ЛГБТ-стол установлен! Ты легенда!");
-      else showToast("Стол куплен!");
-      updateUI();
+// --- 3. НАЙМ (Меню команды через динамический HTML) ---
+function openTeamMenu() {
+    if(!document.getElementById('team-modal')) {
+        const html = `
+        <div class="modal-overlay" id="team-modal">
+            <div class="modal-box">
+                <div class="modal-title">Найм сотрудников</div>
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <button class="btn-buy" style="flex:1;" onclick="hire('researcher')">🔬 Исследователь<br>($5K)</button>
+                    <button class="btn-buy" style="flex:1; background:var(--red); color:#fff;" onclick="hire('fixer')">🔧 Фиксер<br>($5K)</button>
+                </div>
+                <div style="font-size:12px; color:#aaa; text-align:center; margin-bottom:10px;">
+                    Исследователи: <span style="color:var(--blue); font-weight:bold;">${state.staff.researchers}</span> | 
+                    Фиксеры: <span style="color:var(--red); font-weight:bold;">${state.staff.fixers}</span>
+                </div>
+                <button class="btn-buy" style="width:100%; background:#444; color:#fff;" onclick="document.getElementById('team-modal').classList.remove('active')">Закрыть</button>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', html);
     }
+    // Обновляем счетчики в модалке
+    document.querySelector('#team-modal div[style*="font-size:12px"]').innerHTML = `Исследователи: <span style="color:var(--blue); font-weight:bold;">${state.staff.researchers}</span> | Фиксеры: <span style="color:var(--red); font-weight:bold;">${state.staff.fixers}</span>`;
+    document.getElementById('team-modal').classList.add('active');
+}
 
-    function hireEmp(type, price) {
-      if (state.money < price) return;
-      state.money -= price;
-      state.employees[type]++;
-      showToast(type === 'researcher' ? "🔬 Исследователь нанят!" : "🔧 Фиксер нанят!");
-      updateUI();
-    }
+function hire(type) {
+    if (state.money < 5000) { showToast("Мало денег на зарплату!"); return; }
+    state.money -= 5000;
+    if(type === 'researcher') state.staff.researchers++;
+    else state.staff.fixers++;
+    updateUI(); save();
+    showToast(type === 'researcher' ? "Исследователь нанят!" : "Фиксер нанят!");
+    
+    // Обновляем текст в открытой модалке
+    document.querySelector('#team-modal div[style*="font-size:12px"]').innerHTML = `Исследователи: <span style="color:var(--blue); font-weight:bold;">${state.staff.researchers}</span> | Фиксеры: <span style="color:var(--red); font-weight:bold;">${state.staff.fixers}</span>`;
+}
 
-    setInterval(() => {
-      let earnedRP = 0;
-      let researchersUsed = 0;
-      state.desks.forEach(d => {
-        let availableResearchers = state.employees.researcher - researchersUsed;
-        if (availableResearchers > 0) {
-          earnedRP += d.rpRate;
-          researchersUsed++;
+// --- 4. ДИЗАЙН (13 ШАГОВ) ---
+function openDesignStudio() {
+    if (state.dev.active) { showToast("Сначала завершите текущую разработку!"); return; }
+    currentStep = 1;
+    state.currentDesign = { quality: 0, cost: 0 };
+    document.getElementById('design-modal').classList.add('active');
+    renderDesignStep();
+}
+
+function renderDesignStep() {
+    if (currentStep > designSteps.length) {
+        // Завершение дизайна
+        if (state.money < state.currentDesign.cost) {
+            showToast("Не хватает денег на детали!");
+            currentStep--;
+            return;
         }
-      });
-      
-      if (earnedRP > 0) state.rp += earnedRP;
-      if (state.rp > 0) state.money += state.rp * 0.1; 
-      
-      updateUI();
-    }, 1000);
-
-    // --- 4. ДИЗАЙН И СБОРКА ---
-    let currentStep = 1;
-    const steps = [
-      { title: "Тип устройства", options: ["Смартфон", "Планшет", "Кнопочный"] },
-      { title: "Цвет корпуса", options: ["Черный", "Белый", "Радужный"] },
-      { title: "Размер экрана", options: ["4.0 дюйма", "5.5 дюймов", "6.7 дюймов"] },
-      { title: "Камера", options: ["2 МП", "12 МП", "108 МП"] },
-      { title: "Процессор", options: ["Слабый", "Средний", "Мощный"] },
-      { title: "Батарея", options: ["2000 мАч", "4000 мАч", "10000 мАч"] }
-    ];
-
-    function startDesign() {
-      currentStep = 1;
-      document.getElementById('design-modal').classList.add('active');
-      renderDesignStep();
+        state.money -= state.currentDesign.cost;
+        document.getElementById('design-modal').classList.remove('active');
+        startDevPhase();
+        return;
     }
 
-    function renderDesignStep() {
-      if (currentStep > steps.length) {
-        document.getElementById('design-modal').classList.remove('active');
-        startAssembly();
-        return;
-      }
-
-      const step = steps[currentStep - 1];
-      document.getElementById('ds-title').innerText = step.title;
-      document.getElementById('ds-step-info').innerText = `Шаг ${currentStep} из ${steps.length}`;
-      
-      const opts = document.getElementById('ds-options');
-      opts.innerHTML = '';
-      step.options.forEach(o => {
+    const step = designSteps[currentStep - 1];
+    document.getElementById('ds-title').innerText = step.title;
+    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep} из ${designSteps.length}`;
+    
+    const opts = document.getElementById('ds-options');
+    opts.innerHTML = '';
+    step.options.forEach(o => {
         let el = document.createElement('div');
         el.className = 'ds-option';
-        el.innerHTML = `<span>${o}</span><span class="ds-price">Выбрать</span>`;
-        el.onclick = () => { currentStep++; renderDesignStep(); };
+        el.innerHTML = `<span>${o.name}</span><span class="ds-price">${o.cost === 0 ? 'Бесплатно' : '+$'+o.cost}</span>`;
+        el.onclick = () => {
+            state.currentDesign.cost += o.cost;
+            state.currentDesign.quality += o.q;
+            currentStep++;
+            renderDesignStep();
+            updateUI();
+        };
         opts.appendChild(el);
-      });
-    }
+    });
+}
 
-    let asmInterval = null;
-    function startAssembly() {
-      document.getElementById('assembly-modal').classList.add('active');
-      let prog = 0, bugs = 0;
-      document.getElementById('asm-finish-btn').style.display = 'none';
-      document.getElementById('asm-prog-bar').style.width = '0%';
-      document.getElementById('asm-bug-bar').style.width = '0%';
-      
-      clearInterval(asmInterval);
-      asmInterval = setInterval(() => {
-        if (state.employees.researcher > 0) prog += state.employees.researcher * 5;
-        if (prog > 100) prog = 100;
+// --- 5. ПРОЦЕСС СБОРКИ (DEV PANEL) ---
+function startDevPhase() {
+    state.dev = { active: true, progress: 0, bugs: 0 };
+    document.getElementById('dev-panel').classList.add('active');
+    document.getElementById('btn-finish-dev').style.display = 'none';
+    document.getElementById('dev-title').innerText = "Разработка...";
+    document.getElementById('dev-panel').style.borderColor = "var(--blue)";
+    updateDevUI();
+}
+
+function updateDevUI() {
+    document.getElementById('dev-percent').innerText = Math.floor(state.dev.progress) + '%';
+    document.getElementById('dev-bar').style.width = state.dev.progress + '%';
+    document.getElementById('dev-quality').innerText = state.currentDesign.quality;
+    document.getElementById('dev-bugs').innerText = Math.floor(state.dev.bugs);
+    document.getElementById('dev-bugs').style.color = state.dev.bugs > 0 ? 'var(--red)' : 'var(--green)';
+}
+
+function startGameLoop() {
+    setInterval(() => {
+        // Пассивный доход от RP
+        if (state.rp > 0) state.money += state.rp * 0.5;
         
-        if (state.employees.researcher > 0 && Math.random() < 0.3) bugs += 10;
-        if (state.employees.fixer > 0 && bugs > 0) bugs -= state.employees.fixer * 15;
-        if (bugs < 0) bugs = 0;
+        // Логика разработки
+        if (state.dev.active) {
+            // Прогресс от исследователей
+            if (state.staff.researchers > 0) {
+                state.dev.progress += state.staff.researchers * 2;
+            }
+            if (state.dev.progress > 100) state.dev.progress = 100;
 
-        document.getElementById('asm-prog-text').innerText = prog + '%';
-        document.getElementById('asm-prog-bar').style.width = prog + '%';
-        document.getElementById('asm-bug-text').innerText = bugs;
-        document.getElementById('asm-bug-bar').style.width = Math.min(100, bugs) + '%';
+            // Генерация багов (если прогресс идет)
+            if (state.dev.progress > 0 && state.dev.progress < 100) {
+                if (Math.random() < 0.3) {
+                    state.dev.bugs += Math.max(1, state.staff.researchers * 2);
+                }
+            }
 
-        if (prog >= 100 && bugs === 0) {
-          clearInterval(asmInterval);
-          document.getElementById('asm-finish-btn').style.display = 'block';
+            // Починка багов фиксерами
+            if (state.dev.bugs > 0 && state.staff.fixers > 0) {
+                state.dev.bugs -= state.staff.fixers * 3;
+            }
+            if (state.dev.bugs < 0) state.dev.bugs = 0;
+
+            updateDevUI();
+
+            // Проверка на завершение
+            if (state.dev.progress >= 100 && state.dev.bugs <= 0) {
+                document.getElementById('dev-title').innerText = "Готово к запуску!";
+                document.getElementById('btn-finish-dev').style.display = 'block';
+                document.getElementById('dev-panel').style.borderColor = "var(--green)";
+            }
         }
-      }, 500);
-    }
+        
+        updateUI();
+    }, 1000);
+}
 
-    function showLaunchResult() {
-      document.getElementById('assembly-modal').classList.remove('active');
-      let score = (Math.random() * 4 + 6).toFixed(1);
-      let profit = Math.floor(score * 1000000) + (state.money * 0.1);
-      
-      document.getElementById('res-score').innerText = score;
-      document.getElementById('res-profit').innerText = '+$' + profit.toLocaleString('ru-RU');
-      
-      state.money += profit;
-      updateUI();
-      document.getElementById('result-modal').classList.add('active');
-    }
-
-    function closeResult() {
-      document.getElementById('result-modal').classList.remove('active');
-      switchScreen('office');
-    }
-
-    // --- 5. ВСПОМОГАТЕЛЬНОЕ ---
-    function save() { localStorage.setItem('empire_mvp_v2', JSON.stringify(state)); }
-    function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); }
-
+function launchDevice() {
+    if (!state.dev.active) return;
+    state.dev.active = false;
+    document.getElementById('dev-panel').classList.remove('active');
+    
+    // Расчет оценки
+    let maxPossibleQ = 45; // Примерная максимальная оценка качества
+    let baseScore = 5 + (state.currentDesign.quality / maxPossibleQ) * 5;
+    let score = Math.min(9.9, baseScore + (Math.random() * 1.5 - 0.5)).toFixed(1);
+    
+    let profit = Math.floor(score * 5000000) + (state.currentDesign.quality * 100000);
+    state.money += profit;
+    
+    document.getElementById('res-score').innerText = score;
+    document.getElementById('res-profit').innerText = '+$' + profit.toLocaleString('ru-RU');
+    document.getElementById('result-modal').classList.add('active');
+    
     updateUI();
+    save();
+}
+
+function closeResult() {
+    document.getElementById('result-modal').classList.remove('active');
+    state.currentDesign = { quality: 0, cost: 0 };
+}
+
+// --- 6. ВСПОМОГАТЕЛЬНЫЕ ---
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function save() {
+    localStorage.setItem('tech_empire_final', JSON.stringify(state));
+}
+
+function loadSave() {
+    const saved = localStorage.getItem('tech_empire_final');
+    if (saved) {
+        try { state = JSON.parse(saved); } catch(e) {}
+    }
+    // Добавляем кнопку Команды, если её нет
+    if (!document.getElementById('btn-team-action')) {
+        const btnHTML = `<button class="btn-action" id="btn-team-action" onclick="openTeamMenu()" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">👥 Найм Команды</button>`;
+        document.querySelector('.top-actions').insertAdjacentHTML('beforeend', btnHTML);
+    }
+    }
   </script>
 </body>
 </html>
