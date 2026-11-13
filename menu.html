@@ -106,13 +106,15 @@
     .game-desc { font-size: 11px; color: #aaa; text-align: center; line-height: 1.3; }
     
     /* --- ФУТЕР И СТРЕЛОЧКИ --- */
-    .footer { margin-top: 20px; font-size: 12px; color: #ddd; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px 0; cursor: pointer; }
-    .footer-text { text-decoration: underline; }
+    .footer { margin-top: 20px; font-size: 12px; color: #ddd; text-align: center; display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 0; cursor: pointer; position: relative; }
+    .footer-text { text-decoration: underline; position: relative; top: -2px; }
     .arrow-anim {
         font-size: 24px;
         font-weight: 900;
         display: inline-block;
         animation: floatDiagonal 2s infinite alternate, rainbowGlow 3s infinite alternate;
+        position: relative;
+        top: -6px; /* Поднял стрелочки чуть выше текста */
     }
     .arrow-left { animation-delay: 0s; }
     .arrow-right { animation-delay: 0.5s; }
@@ -537,8 +539,9 @@
         <p>И вот на месте бурной сечи,<br>Где мы ломали руки, плечи,<br>Стоит теперь сервер живой.<br>Он, как и мы, не унывает,<br>И не забудет нас, кодеров,<br>Кто свой index.js писал,<br>Кто ради багов умирал!</p>
       </div>
 
-      <div style="text-align: left; width: 100%; font-size: 12px; color: #666; text-align: center; margin-top: 5px;">
+      <div style="text-align: center; width: 100%; font-size: 12px; color: #666; margin-top: 5px;">
         <p>© 2026 SiteOfCool. Все права защищены.</p>
+        <p style="margin-top: 8px;">📧 Почта поддержки: <a href="mailto:chesssupport.lord@gmail.com" style="color: #4facfe; text-decoration: none;">chesssupport.lord@gmail.com</a></p>
       </div>
       <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 15px;">Закрыть</button>
     </div>
@@ -584,7 +587,6 @@ const ACHIEVEMENTS_LIST = [
     { id: 'cards_streak_5', icon: '💀', name: 'Неудержимый', desc: '5 побед подряд в Битве Мемов', reward: 15 }
 ];
 
-// ОБНОВЛЕННЫЕ СПИСКИ ПРЕДМЕТОВ (больше вещей, меньше шансов)
 const ALL_ITEMS = {
     name: [ 
         { val: "Новичок", chance: 30 }, 
@@ -596,7 +598,7 @@ const ALL_ITEMS = {
         { val: "Повелитель Мемов", chance: 3 }, 
         { val: "Сеньор-Помидор", chance: 1.5 },
         { val: "БОГ САЙТА", chance: 0.5 },
-        { val: "🧪 Альфа-тестер", chance: 0 } // Выдается бесплатно
+        { val: "🧪 Альфа-тестер", chance: 0 }
     ],
     color: [ 
         { val: "#ffffff", name: "Белый", chance: 30 }, 
@@ -838,7 +840,7 @@ function updateDailyUI() {
 
 function startDailyTimer() {
     if (dailyTimerInterval) clearInterval(dailyTimerInterval);
-    const lastClaimTime = lastDailyClaim ? new Date(lastDailyClaim).getTime() : 0;
+    const lastClaimTime = lastDailyClaim ? new Date(lastDailyClaim).getTime() : new Date().getTime();
     const nextClaimTime = lastClaimTime + 24 * 60 * 60 * 1000;
     
     dailyTimerInterval = setInterval(() => {
