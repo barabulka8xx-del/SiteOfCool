@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>🚀Наши Проекты🚀</title>
+  <title>🚀 Site Of Cool 🚀</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0f2027; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; overflow-x: hidden; }
@@ -48,7 +48,11 @@
     .btn-info { width: 32px; height: 32px; border-radius: 50%; background: rgba(79, 172, 254, 0.2); border: 1px solid #4facfe; color: #4facfe; font-size: 18px; font-weight: bold; font-family: serif; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; margin-left: 5px; }
     .btn-info:active { transform: scale(0.9); background: #4facfe; color: #000; }
 
-    h1 { font-size: 24px; font-weight: bold; margin-bottom: 20px; margin-top: 10px; color: #fff; text-shadow: 0 0 15px rgba(79, 172, 254, 0.5); text-align: center; }
+    /* ЗАГОЛОВОК И СТАТУС */
+    .site-title { font-size: 28px; font-weight: 900; margin-bottom: 5px; margin-top: 10px; color: #fff; text-shadow: 0 0 20px #4facfe; text-align: center; letter-spacing: 1px; }
+    .alpha-badge { background: rgba(79, 172, 254, 0.15); border: 1px solid #4facfe; color: #4facfe; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px; animation: pulseBlue 2s infinite; }
+    @keyframes pulseBlue { 0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); } }
+
     .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; padding-bottom: 40px; }
 
     /* БАННЕРЫ */
@@ -211,6 +215,10 @@
     .alpha-text { font-size: 14px; color: #ccc; line-height: 1.5; margin-bottom: 15px; }
     .alpha-title-box { background: rgba(255,0,85,0.1); padding: 10px; border-radius: 10px; border: 1px solid #ff0055; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; gap: 5px;}
     .alpha-title-name { color: #ff0055; font-weight: 900; font-size: 16px; text-transform: uppercase; }
+
+    /* --- ГИМН В ИНФО --- */
+    .anthem-container { text-align: left; font-size: 12px; line-height: 1.6; color: #ddd; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border-left: 4px solid #ffd700; margin-bottom: 15px; max-height: 300px; overflow-y: auto; width: 100%; }
+    .anthem-container p { margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -253,7 +261,8 @@
       </div>
     </div>
 
-    <h1>🚀Наши Проекты🚀</h1>
+    <div class="site-title">Site Of Cool</div>
+    <div class="alpha-badge">🚧 Альфа-тест 🚧</div>
 
     <div class="container">
       <!-- ТОП БАННЕР -->
@@ -286,7 +295,7 @@
         <div class="game-card" onclick="openModal('button.html', 'Опасная кнопка', '😈🔴', 'Классическая кнопка-ловушка. Она убегает, меняет цвета и всячески издевается над тобой. Сможешь нажать 15 раз?', '28.10.2026')"><div class="icon-box"><div class="game-icon">😈🔴</div></div><div class="game-title">Кнопка</div><div class="game-desc">То, что нельзя нажимать.</div></div>
         <div class="game-card" onclick="openModal('excuse.html', 'Генератор Отмазок', '🗣️📜', 'Железобетонные причины, почему ты опоздал на работу, не сделал домашку или забил на встречу с друзьями.', '20.10.2026')"><div class="icon-box"><div class="game-icon">🗣️📜</div></div><div class="game-title">Отмазки</div><div class="game-desc">Железобетонные причины.</div></div>
       </div>
-      <div class="footer">Создано с любовью и котами 🐈</div>
+      <div class="footer" onclick="openAbout()" style="cursor: pointer; text-decoration: underline;">Создано с любовью и котами 🐈</div>
     </div>
   </div>
 
@@ -447,9 +456,30 @@
       <div style="font-size: 14px; color: #ccc; margin-bottom: 15px;">Ты получаешь титул:</div>
       <div style="background: rgba(255,215,0,0.1); padding: 10px 20px; border-radius: 10px; border: 1px solid #ffd700; font-size: 20px; font-weight: bold; color: #ffd700; margin-bottom: 20px;">
         🧪 Альфа-тестер
-        За игру Во время Альфа-Тестирования
       </div>
       <button class="btn-play" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">Круто!</button>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА "О ПРОЕКТЕ" (С ГИМНОМ) -->
+  <div class="modal-overlay" id="about-modal" onclick="closeAbout(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-title" style="margin-bottom: 15px;">🚀 SiteOfCool 🚀</div>
+      
+      <div class="anthem-container">
+        <p><b>🎵 Гимн Наших Проектов</b></p>
+        <p>— Скажи-ка, дядя, ведь недаром<br>Тот сервер, что светил пожаром,<br>Был отдан дяде моему?<br>Ведь были ж схватки боевые,<br>Да, говорят, еще какие!<br>Недаром помнит вся Россия<br>Про день Бэкенда сего!</p>
+        <p>— Да, были люди в наше время,<br>Не то, что нынешнее племя:<br>Могучие кодеры — не вы!<br>Плохая им досталась доля:<br>Немногие вернулись с поля...<br>Не будь на то Господня воля,<br><span style="color:#ff0055; font-weight:bold;">Не отдали б порта 27490!</span></p>
+        <p>Мы долго молча отступали,<br>Досадно было, бага ждали,<br>Ворчали старики:<br>«Что ж мы? На зимние квартиры?<br>Не смеют, что ли, командиры<br>Свои скрипты зашить на швы<br>Нам заменили? Уж не мы ли<br>Вставили &lt;script&gt; не в те места?»</p>
+        <p>И вот нашли большое поле:<br>Есть разгуляться где на воле!<br>Построили наш апп-массив.<br>База данных в темной ночи,<br>И трижды прерванный наш fetch,<br>И JWT-ключи.</p>
+        <p>Забил заряд наш сервер чинно,<br>Вложил в index.js старинный<br>Свой новый пароль.<br>И вот на поле грозной сечи<br>Ночная пала тень.<br>Прилег вздремнуть я у лафета,<br>И слышно было до рассвета,<br>Как ликовал наш интерфейс.</p>
+        <p>... (Продолжение следует в анналах истории)</p>
+      </div>
+
+      <div style="text-align: left; width: 100%; font-size: 12px; color: #666; text-align: center; margin-top: 5px;">
+        <p>© 2026 SiteOfCool. Все права защищены.</p>
+      </div>
+      <button class="btn-close-modal" onclick="closeAbout()" style="margin-top: 15px;">Закрыть</button>
     </div>
   </div>
 
@@ -912,10 +942,8 @@ function renderAchievements() {
 
 // --- ИНВЕНТАРЬ ---
 function renderInventory() {
-    // Титулы (с защитой от дублей)
     const invTitles = document.getElementById('inv-titles');
     invTitles.innerHTML = '';
-    
     const uniqueTitles = [...new Set(userTitles)];
     if (uniqueTitles.length === 0) invTitles.innerHTML = '<span style="color:#666; font-size:12px;">Пусто. Крути рулетку!</span>';
     
@@ -928,7 +956,6 @@ function renderInventory() {
         invTitles.appendChild(el);
     });
 
-    // Цвета
     const invColors = document.getElementById('inv-colors');
     invColors.innerHTML = '';
     const uniqueColors = [...new Set(userColors)];
@@ -946,7 +973,6 @@ function renderInventory() {
         invColors.appendChild(el);
     });
 
-    // Стили
     const invStyles = document.getElementById('inv-styles');
     invStyles.innerHTML = '';
     const uniqueStyles = [...new Set(userStyles)];
@@ -1170,6 +1196,17 @@ document.getElementById('modal-btn-play').onclick = () => {
   if (currentGameUrl) window.location.href = currentGameUrl;
 };
 
+function openAbout() {
+    document.getElementById('about-modal').classList.add('active');
+}
+
+function closeAbout(event) {
+    if (event) {
+        if (event.target.id !== 'about-modal' && !event.target.closest('.btn-close-modal')) return;
+    }
+    document.getElementById('about-modal').classList.remove('active');
+}
+
 window.onload = () => {
     if (token && currentUsername) {
         startApp();
@@ -1181,4 +1218,4 @@ window.onload = () => {
 };
   </script>
 </body>
-  </html>
+</html>
