@@ -39,6 +39,34 @@
     .title-uppercase { text-transform: uppercase; }
     .title-outline { -webkit-text-stroke: 1px #000; text-shadow: 2px 2px 0 #000; }
 
+    /* НОВЫЕ СТИЛИ ТИТУЛОВ */
+    .title-glitch { 
+        position: relative; 
+        color: #fff;
+        text-shadow: 2px 0 #ff0055, -2px 0 #00ffff;
+        animation: glitchAnim 2s infinite linear alternate-reverse;
+    }
+    @keyframes glitchAnim { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+    
+    .title-hacker { 
+        color: #00ff00; 
+        text-shadow: 0 0 8px #00ff00; 
+        font-family: monospace; 
+        letter-spacing: 2px;
+    }
+    
+    .title-gradient {
+        background: linear-gradient(90deg, #ff0055, #ffd700, #00ff88, #00ffff, #ff0055);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientMove 3s linear infinite;
+        font-weight: 900;
+    }
+    @keyframes gradientMove { to { background-position: 200% center; } }
+
+    /* КОШЕЛЕК */
     .wallet-area { display: flex; align-items: center; gap: 8px; }
     .wallet { display: flex; align-items: center; gap: 5px; background: rgba(255, 215, 0, 0.1); padding: 5px 10px; border-radius: 20px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold; font-size: 15px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
     .wallet img { width: 20px; height: 20px; border-radius: 50%; }
@@ -161,7 +189,7 @@
     .btn-buy img { width: 14px; height: 14px; }
     
     .chances-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-bottom: 10px; }
-    .chances-list { display: none; width: 100%; background: #0f2027; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: left;}
+    .chances-list { display: none; width: 100%; background: #0f2027; border: 1px solid #444; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: left; max-height: 200px; overflow-y: auto;}
     .chance-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed #333; }
     .chance-item.unlocked { color: #00ff00; }
     .chance-equip-btn { background: #4facfe; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; }
@@ -206,7 +234,7 @@
         margin-bottom: 20px;
     }
     .case-strip { display: flex; height: 100%; align-items: center; position: absolute; left: 0; top: 0; }
-    .case-item { width: 80px; height: 80px; margin: 0 5px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #fff; background: #1a2a33; border: 2px solid #333; flex-shrink: 0; position: relative; text-align: center; padding: 2px; transition: transform 0.3s; }
+    .case-item { width: 80px; height: 80px; margin: 0 5px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #fff; background: #1a2a33; border: 2px solid #333; flex-shrink: 0; position: relative; text-align: center; padding: 2px; transition: transform 0.3s; }
     .case-item.rarity-4 { border-color: #ff0055; box-shadow: 0 0 15px rgba(255,0,85,0.8), inset 0 0 10px rgba(255,0,85,0.5); animation: glowRed 1s infinite alternate; }
     @keyframes glowRed { from { box-shadow: 0 0 15px rgba(255,0,85,0.5); } to { box-shadow: 0 0 25px rgba(255,0,85,1); } }
     
@@ -540,7 +568,7 @@ let currentStyle = 'normal';
 let canClaimDaily = false;
 let lastDailyClaim = null;
 
-const ALL_AVATARS = ['😎', '🐸', '🐱', '👽', '🤖', '👑', '🗿', '🦄', '🐶', '🦊', '🐼', '💀'];
+const ALL_AVATARS = ['😎', '🐸', '🐱', '👽', '🤖', '👑', '🗿', '🦄', '🐶', '🦊', '🐼', '💀', '👾', '🐺', '🦁', '🐯'];
 
 const ACHIEVEMENTS_LIST = [
     { id: 'first_game', icon: '🕹️', name: 'Мультигеймер', desc: 'Зайти в 5 разных игр', reward: 20 },
@@ -556,10 +584,43 @@ const ACHIEVEMENTS_LIST = [
     { id: 'cards_streak_5', icon: '💀', name: 'Неудержимый', desc: '5 побед подряд в Битве Мемов', reward: 15 }
 ];
 
+// ОБНОВЛЕННЫЕ СПИСКИ ПРЕДМЕТОВ (больше вещей, меньше шансов)
 const ALL_ITEMS = {
-    name: [ { val: "Новичок", chance: 40 }, { val: "Мемер", chance: 30 }, { val: "Судья", chance: 15 }, { val: "Босс Биржи", chance: 10 }, { val: "Повелитель Мемов", chance: 4 }, { val: "БОГ САЙТА", chance: 1 }, { val: "🧪 Альфа-тестер", chance: 0 } ],
-    color: [ { val: "#ffffff", name: "Белый", chance: 40 }, { val: "#aaaaaa", name: "Серый", chance: 30 }, { val: "#ff0055", name: "Красный", chance: 10 }, { val: "#8E2DE2", name: "Фиолетовый", chance: 10 }, { val: "neon_pink", name: "Неон Розовый", chance: 5 }, { val: "neon_cyan", name: "Неон Голубой", chance: 4 }, { val: "neon_gold", name: "Неон Золотой", chance: 1 } ],
-    style: [ { val: "normal", name: "Обычный", chance: 40 }, { val: "bold", name: "Жирный", chance: 30 }, { val: "italic", name: "Курсив", chance: 15 }, { val: "uppercase", name: "КАПС", chance: 10 }, { val: "glow", name: "Свечение", chance: 4 }, { val: "outline", name: "Обводка", chance: 1 } ]
+    name: [ 
+        { val: "Новичок", chance: 30 }, 
+        { val: "Мемер", chance: 25 }, 
+        { val: "Судья", chance: 15 }, 
+        { val: "Кибер-Кот", chance: 10 },
+        { val: "Босс Биржи", chance: 8 }, 
+        { val: "Спамер", chance: 5 },
+        { val: "Повелитель Мемов", chance: 3 }, 
+        { val: "Сеньор-Помидор", chance: 1.5 },
+        { val: "БОГ САЙТА", chance: 0.5 },
+        { val: "🧪 Альфа-тестер", chance: 0 } // Выдается бесплатно
+    ],
+    color: [ 
+        { val: "#ffffff", name: "Белый", chance: 30 }, 
+        { val: "#aaaaaa", name: "Серый", chance: 25 }, 
+        { val: "#ff0055", name: "Красный", chance: 15 }, 
+        { val: "#00ff88", name: "Зеленый", chance: 10 },
+        { val: "#8E2DE2", name: "Фиолетовый", chance: 8 }, 
+        { val: "neon_blue", name: "Неон Синий", chance: 5 }, 
+        { val: "neon_pink", name: "Неон Розовый", chance: 3 }, 
+        { val: "neon_cyan", name: "Неон Голубой", chance: 2 }, 
+        { val: "neon_gold", name: "Неон Золотой", chance: 1 },
+        { val: "rainbow", name: "Радужный", chance: 0.5 }
+    ],
+    style: [ 
+        { val: "normal", name: "Обычный", chance: 30 }, 
+        { val: "bold", name: "Жирный", chance: 25 }, 
+        { val: "italic", name: "Курсив", chance: 15 }, 
+        { val: "uppercase", name: "КАПС", chance: 10 }, 
+        { val: "glow", name: "Свечение", chance: 8 }, 
+        { val: "outline", name: "Обводка", chance: 5 },
+        { val: "glitch", name: "Глитч", chance: 3 },
+        { val: "hacker", name: "Хакер", chance: 2 },
+        { val: "gradient", name: "Градиент", chance: 1 }
+    ]
 };
 
 let leaderboardInterval = null;
@@ -690,16 +751,26 @@ async function loadProfile() {
                 titleSpan.className = 'user-title';
                 titleSpan.innerText = data.title;
                 titleSpan.style.color = data.titleColor;
+                
                 if (data.titleStyle === 'bold') titleSpan.classList.add('title-bold');
                 if (data.titleStyle === 'italic') titleSpan.classList.add('title-italic');
                 if (data.titleStyle === 'uppercase') titleSpan.classList.add('title-uppercase');
                 if (data.titleStyle === 'outline') titleSpan.classList.add('title-outline');
+                if (data.titleStyle === 'glitch') titleSpan.classList.add('title-glitch');
+                if (data.titleStyle === 'hacker') titleSpan.classList.add('title-hacker');
+                if (data.titleStyle === 'gradient') titleSpan.classList.add('title-gradient');
+
                 if (data.titleColor.startsWith('neon_')) {
                     titleSpan.classList.add('neon-text');
                     if (data.titleColor === 'neon_pink') titleSpan.style.color = '#ff00ff';
                     if (data.titleColor === 'neon_cyan') titleSpan.style.color = '#00ffff';
                     if (data.titleColor === 'neon_gold') titleSpan.style.color = '#ffd700';
+                    if (data.titleColor === 'neon_blue') titleSpan.style.color = '#00bfff';
                 }
+                if (data.titleColor === 'rainbow') {
+                    titleSpan.classList.add('title-gradient');
+                }
+
                 nameEl.appendChild(titleSpan);
                 
                 const currTitle = document.getElementById('current-title-display');
@@ -743,7 +814,7 @@ async function loadCapital() {
     } catch(e) { document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>"; }
 }
 
-// --- 4. ЕЖЕДНЕВКА И ТАЙМЕР ---
+// --- 4. ЕЖЕДНЕВКА И ТАЙМЕР (ИСПРАВЛЕНО) ---
 function updateDailyUI() {
     const timerText = document.getElementById('daily-timer');
     const btn = document.getElementById('daily-btn');
@@ -754,9 +825,14 @@ function updateDailyUI() {
         btn.style.display = 'block';
         clearInterval(dailyTimerInterval);
     } else {
-        btn.style.display = 'none';
-        timerText.style.color = "#fff";
-        startDailyTimer();
+        btn.style.display = 'none'; // Жестко прячем кнопку, если нельзя забрать!
+        if (lastDailyClaim) {
+            timerText.style.color = "#fff";
+            startDailyTimer();
+        } else {
+            timerText.innerText = "Ожидание...";
+            timerText.style.color = "#aaa";
+        }
     }
 }
 
@@ -786,6 +862,7 @@ function startDailyTimer() {
 }
 
 async function claimDaily() {
+    document.getElementById('daily-btn').disabled = true;
     try {
         const res = await fetch(`${API_URL}/user/claim_daily`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
@@ -793,8 +870,19 @@ async function claimDaily() {
             document.getElementById('global-coins-display').innerText = data.newBalance;
             alert("🎉 Вы получили 10 мемкоинов!");
             loadProfile();
-        } else { alert(data.error); }
-    } catch(e) { alert("Ошибка сервера"); }
+        } else { 
+            if (data.error === "Бонус уже получен!") {
+                alert("Вы уже забирали бонус сегодня. Ждите таймер!");
+                loadProfile();
+            } else {
+                alert(data.error); 
+            }
+        }
+    } catch(e) { 
+        alert("Ошибка сервера"); 
+    } finally {
+        document.getElementById('daily-btn').disabled = false;
+    }
 }
 
 // --- 5. РУЛЕТКА И КЕЙС CS:GO ---
@@ -867,14 +955,19 @@ async function rollTitle(type, e) {
             else if (type === 'color') {
                 resultText.innerText = data.item.name;
                 if (data.item.value.startsWith('neon_')) {
-                    resultText.style.color = data.item.value === 'neon_pink' ? '#ff00ff' : data.item.value === 'neon_cyan' ? '#00ffff' : '#ffd700';
+                    resultText.style.color = data.item.value === 'neon_pink' ? '#ff00ff' : data.item.value === 'neon_cyan' ? '#00ffff' : data.item.value === 'neon_blue' ? '#00bfff' : '#ffd700';
                     resultText.style.textShadow = '0 0 10px currentColor';
+                } else if (data.item.value === 'rainbow') {
+                    resultText.className = 'title-gradient'; resultText.innerText = data.item.name;
                 } else {
                     resultText.style.color = data.item.value;
                     resultText.style.textShadow = 'none';
                 }
             }
-            else if (type === 'style') { resultText.innerText = data.item.name; resultText.className = 'title-' + data.item.value; }
+            else if (type === 'style') { 
+                resultText.innerText = data.item.name; 
+                resultText.className = 'title-' + data.item.value; 
+            }
             
             if (data.isDuplicate) alert("Тебе выпал дубликат!");
             
@@ -968,7 +1061,6 @@ function renderInventory() {
     const invTitles = document.getElementById('inv-titles');
     invTitles.innerHTML = '';
     
-    // Принудительно добавляем Альфа-тестера
     if (!userTitles.includes("🧪 Альфа-тестер")) {
         userTitles.push("🧪 Альфа-тестер");
     }
@@ -992,8 +1084,8 @@ function renderInventory() {
         const isEquipped = currentColor === color;
         const item = ALL_ITEMS.color.find(c => c.val === color);
         const displayName = item ? item.name : color;
-        const colorStyle = color.startsWith('neon_') ? 'neon-text' : '';
-        const realColor = color === 'neon_pink' ? '#ff00ff' : color === 'neon_cyan' ? '#00ffff' : color === 'neon_gold' ? '#ffd700' : color;
+        const colorStyle = color.startsWith('neon_') ? 'neon-text' : (color === 'rainbow' ? 'title-gradient' : '');
+        const realColor = color === 'neon_pink' ? '#ff00ff' : color === 'neon_cyan' ? '#00ffff' : color === 'neon_blue' ? '#00bfff' : color === 'neon_gold' ? '#ffd700' : color;
         
         const el = document.createElement('div');
         el.className = `inv-item ${isEquipped ? 'equipped' : ''}`;
@@ -1086,7 +1178,7 @@ function renderChances() {
         const isOwned = userColors.includes(item.val);
         const isEquipped = currentColor === item.val;
         htmlColor += `<div class="chance-item ${isOwned ? 'unlocked' : ''}">
-            <span style="${item.val.startsWith('neon_') ? 'color:#ff00ff;' : 'color:'+item.val}">${item.name}</span>
+            <span class="${item.val.startsWith('neon_') || item.val === 'rainbow' ? 'neon-text' : ''}" style="${item.val.startsWith('neon_') ? 'color:#ff00ff;' : 'color:'+item.val}">${item.name}</span>
             <div style="display:flex; align-items:center;">
                 <span style="font-size:10px; margin-right:5px;">${item.chance}%</span>
                 ${isOwned && !isEquipped ? `<button class="chance-equip-btn" onclick="equipSpecific('color', '${item.val}')">Надеть</button>` : ''}
@@ -1164,10 +1256,18 @@ async function loadLeaderboard() {
                 if (player.title_style === 'italic') styleClass = 'title-italic';
                 if (player.title_style === 'uppercase') styleClass = 'title-uppercase';
                 if (player.title_style === 'outline') styleClass = 'title-outline';
+                if (player.title_style === 'glitch') styleClass = 'title-glitch';
+                if (player.title_style === 'hacker') styleClass = 'title-hacker';
+                if (player.title_style === 'gradient') styleClass = 'title-gradient';
+                
                 let colorStyle = `color: ${player.title_color};`;
                 if (player.title_color.startsWith('neon_')) {
                     styleClass += ' neon-text';
-                    colorStyle = player.title_color === 'neon_pink' ? 'color: #ff00ff;' : player.title_color === 'neon_cyan' ? 'color: #00ffff;' : 'color: #ffd700;';
+                    colorStyle = player.title_color === 'neon_pink' ? 'color: #ff00ff;' : player.title_color === 'neon_cyan' ? 'color: #00ffff;' : player.title_color === 'neon_blue' ? 'color: #00bfff;' : 'color: #ffd700;';
+                }
+                if (player.title_color === 'rainbow') {
+                    styleClass += ' title-gradient';
+                    colorStyle = '';
                 }
                 titleHtml = `<span class="user-title ${styleClass}" style="${colorStyle}">${player.title}</span>`;
             }
@@ -1244,7 +1344,7 @@ window.onload = () => {
         document.getElementById('main-app').style.display = 'none';
         document.getElementById('alpha-modal').classList.remove('active');
     }
-}; 
+};
   </script>
 </body>
-        </html>
+</html>
