@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tech Empire MVP | Site Of Cool</title>
+  <title>Tech Empire MVP v2 | Site Of Cool</title>
   <style>
     :root {
       --bg: #05080a;
@@ -92,11 +92,11 @@
     <button class="btn-buy" onclick="toggleFullscreen()">⛶</button>
   </div>
 
-  <!-- ЭКРАН 1: ОФИС -->
+  <!-- ЭКРАН 1: ОФИС (ТУТ НЕТ СЕТКИ) -->
   <div class="screen active" id="screen-office">
     <div class="section-title">Твой офис</div>
     <div id="office-list" style="display:flex; flex-direction:column; gap:10px;">
-      <!-- Тут будут столы и сотрудники -->
+      <!-- Тут будут столы -->
     </div>
   </div>
 
@@ -209,7 +209,7 @@
     <div class="modal-box" style="text-align:center; border-color: var(--gold);">
       <h1 style="font-size:40px; color:var(--gold); margin-bottom:5px;" id="res-score">9.5</h1>
       <div style="font-size:14px; color:#aaa; margin-bottom:15px;">Оценка критиков</div>
-      <div style="font-size:20px; font-weight:900; color:var(--green); margin-bottom:20px;">+$15,000,000</div>
+      <div style="font-size:20px; font-weight:900; color:var(--green); margin-bottom:20px;" id="res-profit">+$15,000,000</div>
       <button class="btn-buy" style="width:100%;" onclick="closeResult()">Забрать деньги</button>
     </div>
   </div>
@@ -227,7 +227,7 @@
     };
 
     // Загрузка
-    let saved = localStorage.getItem('empire_mvp_v1');
+    let saved = localStorage.getItem('empire_mvp_v2');
     if(saved) {
       try { state = JSON.parse(saved); } catch(e){}
     }
@@ -237,7 +237,6 @@
       document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
       document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
       
-      // Кнопки в магазине
       document.getElementById('btn-buy-wood').disabled = state.money < 15000;
       document.getElementById('btn-buy-glass').disabled = state.money < 45000;
       document.getElementById('btn-buy-lgbt').disabled = state.money < 1000000000;
@@ -255,14 +254,12 @@
         return;
       }
 
-      // Вывод столов
       state.desks.forEach((desk, index) => {
         let icon = desk.type === 'wood' ? '🪵' : desk.type === 'glass' ? '🖥️' : '🌈';
         let name = desk.type === 'wood' ? 'Старый стол' : desk.type === 'glass' ? 'Стеклянный стол' : 'ЛГБТ-Стол за миллиард';
         let color = desk.type === 'lgbt' ? 'var(--gold)' : 'white';
         
         let empOnDesk = "Никого нет";
-        // Просто для визуала распределяем сотрудников
         if (index < state.employees.researcher) {
            empOnDesk = "<span style='color:var(--blue)'>🔬 Исследователь работает</span>";
         } else if (index - state.employees.researcher < state.employees.fixer) {
@@ -313,11 +310,8 @@
         });
       }
       
-      if (type === 'lgbt') {
-        showToast("🌈 ЛГБТ-стол установлен! Ты легенда!");
-      } else {
-        showToast("Стол куплен!");
-      }
+      if (type === 'lgbt') showToast("🌈 ЛГБТ-стол установлен! Ты легенда!");
+      else showToast("Стол куплен!");
       updateUI();
     }
 
@@ -329,11 +323,8 @@
       updateUI();
     }
 
-    // Тик игры (каждую секунду)
     setInterval(() => {
       let earnedRP = 0;
-      
-      // Считаем доход со столов (только если на них есть исследователи)
       let researchersUsed = 0;
       state.desks.forEach(d => {
         let availableResearchers = state.employees.researcher - researchersUsed;
@@ -343,14 +334,8 @@
         }
       });
       
-      if (earnedRP > 0) {
-        state.rp += earnedRP;
-      }
-      
-      // Пассивные деньги за исследования (для теста)
-      if (state.rp > 0) {
-        state.money += state.rp * 0.1; 
-      }
+      if (earnedRP > 0) state.rp += earnedRP;
+      if (state.rp > 0) state.money += state.rp * 0.1; 
       
       updateUI();
     }, 1000);
@@ -374,7 +359,6 @@
 
     function renderDesignStep() {
       if (currentStep > steps.length) {
-        // Финал дизайна -> Начинаем сборку
         document.getElementById('design-modal').classList.remove('active');
         startAssembly();
         return;
@@ -390,10 +374,7 @@
         let el = document.createElement('div');
         el.className = 'ds-option';
         el.innerHTML = `<span>${o}</span><span class="ds-price">Выбрать</span>`;
-        el.onclick = () => {
-          currentStep++;
-          renderDesignStep();
-        };
+        el.onclick = () => { currentStep++; renderDesignStep(); };
         opts.appendChild(el);
       });
     }
@@ -401,30 +382,18 @@
     let asmInterval = null;
     function startAssembly() {
       document.getElementById('assembly-modal').classList.add('active');
-      let prog = 0;
-      let bugs = 0;
-      
+      let prog = 0, bugs = 0;
       document.getElementById('asm-finish-btn').style.display = 'none';
       document.getElementById('asm-prog-bar').style.width = '0%';
       document.getElementById('asm-bug-bar').style.width = '0%';
       
       clearInterval(asmInterval);
       asmInterval = setInterval(() => {
-        // Прогресс
-        if (state.employees.researcher > 0) {
-          prog += state.employees.researcher * 5;
-        }
+        if (state.employees.researcher > 0) prog += state.employees.researcher * 5;
         if (prog > 100) prog = 100;
         
-        // Баги (появляются случайно)
-        if (state.employees.researcher > 0 && Math.random() < 0.3) {
-          bugs += 10;
-        }
-        
-        // Фиксеры чистят баги
-        if (state.employees.fixer > 0 && bugs > 0) {
-          bugs -= state.employees.fixer * 15;
-        }
+        if (state.employees.researcher > 0 && Math.random() < 0.3) bugs += 10;
+        if (state.employees.fixer > 0 && bugs > 0) bugs -= state.employees.fixer * 15;
         if (bugs < 0) bugs = 0;
 
         document.getElementById('asm-prog-text').innerText = prog + '%';
@@ -441,17 +410,14 @@
 
     function showLaunchResult() {
       document.getElementById('assembly-modal').classList.remove('active');
-      
-      // Случайная оценка и прибыль
-      let score = (Math.random() * 4 + 6).toFixed(1); // От 6.0 до 10.0
+      let score = (Math.random() * 4 + 6).toFixed(1);
       let profit = Math.floor(score * 1000000) + (state.money * 0.1);
       
       document.getElementById('res-score').innerText = score;
-      document.querySelector('#result-modal .btn-buy').innerText = `Забрать $${profit.toLocaleString()}`;
+      document.getElementById('res-profit').innerText = '+$' + profit.toLocaleString('ru-RU');
       
       state.money += profit;
       updateUI();
-      
       document.getElementById('result-modal').classList.add('active');
     }
 
@@ -461,15 +427,9 @@
     }
 
     // --- 5. ВСПОМОГАТЕЛЬНОЕ ---
-    function save() {
-      localStorage.setItem('empire_mvp_v1', JSON.stringify(state));
-    }
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e));
-      else document.exitFullscreen();
-    }
+    function save() { localStorage.setItem('empire_mvp_v2', JSON.stringify(state)); }
+    function toggleFullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); }
 
-    // Старт
     updateUI();
   </script>
 </body>
