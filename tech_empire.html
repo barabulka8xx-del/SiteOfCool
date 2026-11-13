@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tech Empire v5 | Site Of Cool</title>
+  <title>Tech Empire Strategy | Site Of Cool</title>
   <style>
     :root {
       --bg: #05080a; --panel: #111a22; --border: #2a3b4c; --panel-light: #1a2632;
@@ -13,68 +13,73 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: white; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
     /* ВЕРХНЯЯ ПАНЕЛЬ */
-    .top-bar { height: 50px; background: var(--panel); border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 10; flex-shrink: 0; font-size: 12px; }
+    .top-bar { height: 55px; background: var(--panel); border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 10; flex-shrink: 0; font-size: 12px; }
     .stat-group { display: flex; gap: 10px; font-weight: 900; }
     .stat.money { color: var(--green); }
     .stat.rp { color: var(--purple); }
     .stat.date { color: var(--blue); }
     
     .speed-controls { display: flex; gap: 2px; background: #000; padding: 2px; border-radius: 6px; }
-    .speed-btn { background: transparent; border: none; color: #666; padding: 4px 6px; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-    .speed-btn.active { background: var(--panel-light); color: var(--blue); }
+    .speed-btn { background: transparent; border: none; color: #666; padding: 6px 8px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+    .speed-btn.active { background: var(--panel-light); color: var(--blue); box-shadow: 0 0 5px rgba(79, 172, 254, 0.5); }
 
     /* ЭКРАНЫ */
     .screen { flex: 1; overflow-y: auto; display: none; flex-direction: column; padding: 10px; gap: 10px; padding-bottom: 15px; }
     .screen.active { display: flex; }
 
     /* ОФИС */
-    .office-header { display: flex; justify-content: space-between; background: var(--panel); padding: 10px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; }
+    .office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; }
     .placed-area { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-top: 10px; }
-    .workstation { background: var(--panel); border: 2px solid var(--border); border-radius: 10px; padding: 10px; width: 80px; height: 90px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; cursor: pointer; transition: 0.2s; }
+    
+    .workstation { background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 10px; width: 85px; height: 95px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; cursor: pointer; transition: 0.2s; }
     .workstation.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); transform: scale(1.05); }
-    .workstation .icon { font-size: 28px; }
-    .workstation .name { font-size: 8px; color: #aaa; text-align: center; margin-top: 5px; }
+    .workstation .icon { font-size: 30px; }
+    .workstation .name { font-size: 8px; color: #aaa; text-align: center; margin-top: 5px; font-weight: bold; }
     .workstation .attachment { position: absolute; font-size: 18px; z-index: 2; }
     .workstation .chair { bottom: 5px; right: 5px; }
     .workstation .pc { top: 5px; left: 5px; }
 
-    /* НИЖНЕЕ МЕНЮ (Как на скринах) */
-    .bottom-nav { height: 60px; background: var(--panel); border-top: 2px solid var(--border); display: flex; align-items: center; z-index: 10; flex-shrink: 0; overflow-x: auto; }
+    /* НИЖНЕЕ МЕНЮ */
+    .bottom-nav { height: 65px; background: var(--panel); border-top: 2px solid var(--border); display: flex; align-items: center; z-index: 10; flex-shrink: 0; overflow-x: auto; }
     .bottom-nav::-webkit-scrollbar { display: none; }
-    .nav-btn { flex: 1; min-width: 65px; background: transparent; border: none; color: #6c8196; font-size: 9px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; padding: 5px 0; transition: 0.2s; position: relative; }
+    .nav-btn { flex: 1; min-width: 65px; background: transparent; border: none; color: #6c8196; font-size: 9px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 5px 0; transition: 0.2s; position: relative; }
     .nav-btn.active { color: var(--blue); background: rgba(79, 172, 254, 0.1); border-top: 2px solid var(--blue); }
-    .nav-btn .icon { font-size: 20px; }
+    .nav-btn .icon { font-size: 22px; transition: 0.2s; }
+    .nav-btn.active .icon { transform: translateY(-2px); }
 
     /* КАРТОЧКИ МАГАЗИНА/ИССЛЕДОВАНИЙ */
-    .item-card { background: var(--panel); border: 1px solid var(--border); padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .item-card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .item-info { display: flex; flex-direction: column; gap: 3px; }
-    .item-title { font-weight: bold; font-size: 13px; }
-    .item-desc { font-size: 10px; color: #888; }
-    .item-price { font-size: 11px; color: var(--gold); font-weight: bold; }
-    .btn-buy { background: var(--blue); color: #000; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 900; font-size: 11px; cursor: pointer; }
+    .item-title { font-weight: 900; font-size: 14px; }
+    .item-desc { font-size: 11px; color: #888; }
+    .item-price { font-size: 12px; color: var(--gold); font-weight: bold; }
+    .btn-buy { background: var(--blue); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; }
     .btn-buy:disabled { background: #333; color: #666; }
     .btn-research { background: var(--purple); color: #fff; }
 
     /* ДИЗАЙН-СТУДИЯ */
     .design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
     .design-screen.active { display: flex; }
-    .ds-header { height: 50px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+    .ds-header { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
     .ds-body { flex: 1; display: flex; overflow: hidden; }
+    
     .ds-left { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101922 0%, #060a0f 100%); }
-    .phone-preview { width: 100px; height: 200px; border: 3px solid #333; border-radius: 15px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 30px; }
+    .phone-preview { width: 110px; height: 220px; border: 4px solid #333; border-radius: 18px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 0 50px rgba(79,172,254,0.1); transition: 0.3s; }
     
     .ds-right { width: 55%; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
-    .ds-step-header { padding: 10px; border-bottom: 1px solid var(--border); }
-    .ds-step-title { font-size: 14px; font-weight: 900; }
-    .ds-step-info { font-size: 10px; color: #aaa; }
-    .ds-options { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
-    .ds-opt { background: var(--panel-light); border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-size: 12px; display: flex; justify-content: space-between; cursor: pointer; }
-    .ds-opt.locked { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
-    .ds-opt.locked::after { content: '🔒'; margin-left: 5px; }
-    .ds-footer { padding: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .ds-step-header { padding: 15px; border-bottom: 1px solid var(--border); }
+    .ds-step-title { font-size: 16px; font-weight: 900; margin-bottom: 3px; }
+    .ds-step-info { font-size: 11px; color: var(--blue); font-weight: bold; }
+    .ds-options { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+    
+    .ds-opt { background: var(--panel-light); border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 13px; display: flex; justify-content: space-between; cursor: pointer; transition: 0.2s; font-weight: bold; }
+    .ds-opt:active { border-color: var(--green); transform: scale(0.98); }
+    .ds-opt.locked { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
+    
+    .ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
 
     /* УВЕДОМЛЕНИЯ */
-    .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 8px 15px; border-radius: 15px; font-size: 12px; color: var(--green); z-index: 200; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; }
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 200; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
@@ -95,40 +100,41 @@
     </div>
   </div>
 
-  <!-- ЭКРАН: КОМПАНИЯ (Изначально пустой, для галочки) -->
+  <!-- ЭКРАН: КОМПАНИЯ -->
   <div class="screen" id="screen-company">
     <div style="text-align:center; padding:20px; color:#666;">Обзор компании (в разработке)</div>
   </div>
 
-  <!-- ЭКРАН: ОФИС (Стройка) -->
+  <!-- ЭКРАН: ОФИС -->
   <div class="screen active" id="screen-office">
     <div class="office-header">
-      <span id="ui-office-name">Гараж</span>
-      <span id="ui-slots">0 / 3</span>
+      <span id="ui-office-name" style="color:var(--gold); font-weight:900;">Гараж</span>
+      <span id="ui-slots" style="color:#aaa;">0 / 3</span>
+      <button class="btn-buy" style="padding:6px 10px; font-size:10px; background:var(--purple); color:#fff;" onclick="upgradeOffice()">Улучшить</button>
     </div>
-    <div style="text-align:center; color:#666; font-size:10px;">Выбери стол, чтобы прикрепить к нему стул или ПК</div>
+    <div style="text-align:center; color:#888; font-size:11px; margin-top:5px;">Тапни по столу, чтобы прикрепить стул или ПК</div>
     <div class="placed-area" id="placed-area"></div>
   </div>
 
   <!-- ЭКРАН: МАГАЗИН -->
   <div class="screen" id="screen-shop">
     <div class="item-card">
-      <div class="item-info"><div class="item-title">🪵 Старый стол</div><div class="item-price">$12 000</div></div>
+      <div class="item-info"><div class="item-title">🪵 Старый стол</div><div class="item-desc">Базовое место для работы</div><div class="item-price">$12 000</div></div>
       <button class="btn-buy" onclick="buyItem('desk', 'wood', 12000)">Купить</button>
     </div>
     <div class="item-card">
-      <div class="item-info"><div class="item-title">💺 Офисный стул</div><div class="item-price">$5 000</div></div>
+      <div class="item-info"><div class="item-title">💺 Офисный стул</div><div class="item-desc">Для комфорта сотрудника</div><div class="item-price">$5 000</div></div>
       <button class="btn-buy" onclick="buyItem('chair', 'office', 5000)">Купить</button>
     </div>
     <div class="item-card">
-      <div class="item-info"><div class="item-title">🖥️ ЭЛТ Монитор</div><div class="item-price">$8 000</div></div>
+      <div class="item-info"><div class="item-title">🖥️ ЭЛТ Монитор</div><div class="item-desc">Старый, но рабочий</div><div class="item-price">$8 000</div></div>
       <button class="btn-buy" onclick="buyItem('pc', 'crt', 8000)">Купить</button>
     </div>
   </div>
 
-  <!-- ЭКРАН: ИССЛЕДОВАНИЯ (Лаборатория) -->
+  <!-- ЭКРАН: ИССЛЕДОВАНИЯ -->
   <div class="screen" id="screen-research">
-    <div style="font-size:12px; color:#aaa; margin-bottom:10px;">Открывай функции за RP, чтобы использовать их в Дизайне</div>
+    <div style="font-size:12px; color:#aaa; margin-bottom:10px;">Изучай функции за RP, чтобы использовать их в Дизайне</div>
     <div id="research-list"></div>
   </div>
 
@@ -140,17 +146,17 @@
   <!-- НИЖНЕЕ МЕНЮ -->
   <div class="bottom-nav">
     <button class="nav-btn" onclick="switchTab('company')"><div class="icon">🏢</div>Компания</button>
-    <button class="nav-btn active" onclick="switchTab('office')"><div class="icon">📱</div>Устройства</button>
+    <button class="nav-btn active" onclick="switchTab('office')"><div class="icon">📱</div>Офис</button>
     <button class="nav-btn" onclick="switchTab('shop')"><div class="icon">🛠️</div>Построить</button>
     <button class="nav-btn" onclick="openDesignStudio()"><div class="icon">🎨</div>Дизайн</button>
-    <button class="nav-btn" onclick="switchTab('research')"><div class="icon">🔬</div>Исследования</button>
+    <button class="nav-btn" onclick="switchTab('research')"><div class="icon">🔬</div>Наука</button>
     <button class="nav-btn" onclick="switchTab('news')"><div class="icon">📰</div>Новости</button>
   </div>
 
   <!-- ДИЗАЙН-СТУДИЯ -->
   <div class="design-screen" id="design-screen">
     <div class="ds-header">
-      <div style="font-weight:900; font-size:14px;">Студия Дизайна</div>
+      <div style="font-weight:900; font-size:16px; color:var(--blue);">Студия Дизайна</div>
       <button class="btn-buy" style="background:#444; color:#fff;" onclick="closeDesignStudio()">В офис</button>
     </div>
     <div class="ds-body">
@@ -159,12 +165,12 @@
       </div>
       <div class="ds-right">
         <div class="ds-step-header">
-          <div class="ds-step-title" id="ds-title">Шаг 1. Тип</div>
+          <div class="ds-step-title" id="ds-title">Шаг 1</div>
           <div class="ds-step-info" id="ds-step-info">1 из 13</div>
         </div>
         <div class="ds-options" id="ds-options"></div>
         <div class="ds-footer">
-          <button class="btn-buy" style="background:#333; color:#fff;" onclick="closeDesignStudio()">Отмена</button>
+          <button class="btn-buy" style="background:#333; color:#fff; width:100%;" onclick="closeDesignStudio()">Отмена</button>
         </div>
       </div>
     </div>
@@ -175,20 +181,9 @@
   <script>
   // --- 1. СОСТОЯНИЕ ---
 let state = {
-    money: 200000,
-    rp: 0,
-    year: 2007,
-    day: 1,
-    speed: 1,
-    officeLvl: 0,
-    workstations: [],
-    selectedDeskId: null,
-    research: {
-        'cam_2mp': false,
-        'cam_12mp': false,
-        'screen_oled': false,
-        'cpu_2ghz': false,
-    }
+    money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
+    workstations: [], selectedDeskId: null,
+    research: { 'cam_2mp': false, 'cam_12mp': false, 'screen_oled': false, 'cpu_2ghz': false }
 };
 
 // --- 2. КОНСТАНТЫ ---
@@ -218,11 +213,10 @@ window.onload = () => {
 // --- 4. ВРЕМЯ И ЭКОНОМИКА ---
 function startGameLoop() {
     setInterval(() => {
-        if (state.speed === 0) return; // Пауза
+        if (state.speed === 0) return;
         
-        // 1 день = 2 секунды реального времени. Умножаем на скорость.
-        let timePassed = state.speed * 0.5;
-        state.day += timePassed;
+        // Время идет (1 день за 0.5 сек на 1x)
+        state.day += state.speed * 0.5;
         
         if (state.day >= 30) {
             state.day -= 30;
@@ -230,23 +224,22 @@ function startGameLoop() {
             showToast(`Наступил ${state.year} год!`);
             updateUI();
         }
-    }, 1000); // Тик каждую секунду
+    }, 1000);
 }
 
 function setSpeed(spd) {
     state.speed = spd;
     document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.speed-btn')[spd-1].classList.add('active');
-    document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
 }
 
-// --- 5. UI И ВКЛАДКИ ---
+// --- 5. UI ---
 function switchTab(tabId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
     
     document.getElementById(`screen-${tabId}`).classList.add('active');
-    // Подсветка кнопки
+    
     const btns = document.querySelectorAll('.nav-btn');
     if(tabId === 'office') btns[1].classList.add('active');
     if(tabId === 'company') btns[0].classList.add('active');
@@ -267,7 +260,7 @@ function updateUI() {
     renderOffice();
 }
 
-// --- 6. ОФИС (Стройка и выделение) ---
+// --- 6. ОФИС ---
 function renderOffice() {
     const area = document.getElementById('placed-area');
     area.innerHTML = '';
@@ -286,16 +279,10 @@ function renderOffice() {
             <div class="name">${ws.desk.name}</div>
         `;
         
-        // ЛОГИКА ВЫДЕЛЕНИЯ
         el.onclick = () => {
-            if (state.selectedDeskId === ws.id) {
-                state.selectedDeskId = null; // Снять выделение
-            } else {
-                state.selectedDeskId = ws.id; // Выделить
-            }
-            renderOffice(); // Перерисовать
+            state.selectedDeskId = state.selectedDeskId === ws.id ? null : ws.id;
+            renderOffice();
         };
-        
         area.appendChild(el);
     });
 }
@@ -304,36 +291,32 @@ function renderOffice() {
 function buyItem(type, val, price) {
     if (state.money < price) { showToast("Мало денег!"); return; }
     
-    // Логика: Стул и ПК требуют выбора стола
     if (type === 'chair' || type === 'pc') {
         if (!state.selectedDeskId) { showToast("Сначала выбери стол!"); return; }
         let desk = state.workstations.find(w => w.id === state.selectedDeskId);
         if (!desk) return;
-        
-        if (type === 'chair' && desk.chair) { showToast("На этом столе уже есть стул!"); return; }
-        if (type === 'pc' && desk.pc) { showToast("На этом столе уже есть ПК!"); return; }
+        if (type === 'chair' && desk.chair) { showToast("Стул уже есть!"); return; }
+        if (type === 'pc' && desk.pc) { showToast("ПК уже есть!"); return; }
         
         state.money -= price;
         if (type === 'chair') desk.chair = { icon: '💺', name: 'Стул' };
         if (type === 'pc') desk.pc = { icon: '🖥️', name: 'ПК' };
         showToast("Установлено!");
-    } 
-    else if (type === 'desk') {
-        // Стол требует места
-        if (state.workstations.length >= OFFICES[state.officeLvl].slots) {
-            showToast("Нет места! Улучши офис."); return;
-        }
+    } else if (type === 'desk') {
+        if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места!"); return; }
         state.money -= price;
-        state.workstations.push({
-            id: Date.now(),
-            desk: { icon: '🪵', name: 'Старый стол' },
-            chair: null, pc: null
-        });
+        state.workstations.push({ id: Date.now(), desk: { icon: '🪵', name: 'Старый стол' }, chair: null, pc: null });
         showToast("Стол куплен!");
     }
-    
-    updateUI();
-    save();
+    updateUI(); save();
+}
+
+function upgradeOffice() {
+    if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
+    const cost = OFFICES[state.officeLvl].cost;
+    if (state.money < cost) { showToast("Мало денег для переезда!"); return; }
+    state.money -= cost; state.officeLvl++;
+    updateUI(); save(); showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`);
 }
 
 // --- 8. ИССЛЕДОВАНИЯ ---
@@ -363,18 +346,29 @@ function renderResearch() {
 function unlockRes(id) {
     const res = RESEARCH_TREE.find(r => r.id === id);
     if (!res || state.research[id]) return;
+    if (state.rp < res.cost || state.year < res.yearReq) return;
     
-    if (state.rp < res.cost) { showToast("Мало RP!"); return; }
-    
-    state.rp -= res.cost;
-    state.research[id] = true;
-    renderResearch();
-    updateUI();
-    save();
-    showToast(`Изучено: ${res.name}`);
+    state.rp -= res.cost; state.research[id] = true;
+    renderResearch(); updateUI(); save(); showToast(`Изучено: ${res.name}`);
 }
 
-// --- 9. ДИЗАЙН-СТУДИЯ ---
+// --- 9. ДИЗАЙН (13 ШАГОВ) ---
+const designSteps = [
+    { title: "Шаг 1. Устройство", options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2}] },
+    { title: "Шаг 2. Шасси", options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3}] },
+    { title: "Шаг 3. Размер", options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
+    { title: "Шаг 4. Разрешение", options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4}] },
+    { title: "Шаг 5. Экран", options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3, lock: !state.research['screen_oled']}] },
+    { title: "Шаг 6. Селфи", options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1, lock: !state.research['cam_2mp']}, {name: "12 МП", cost: 15000, q: 3, lock: !state.research['cam_12mp']}] },
+    { title: "Шаг 7. Камера", options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2, lock: !state.research['cam_12mp']}, {name: "108 МП", cost: 40000, q: 5}] },
+    { title: "Шаг 8. Порт", options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2}] },
+    { title: "Шаг 9. Процессор", options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2}, {name: "Мощный", cost: 50000, q: 5, lock: !state.research['cpu_2ghz']}] },
+    { title: "Шаг 10. Память", options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2}, {name: "8 ГБ", cost: 25000, q: 4}] },
+    { title: "Шаг 11. Батарея", options: [{name: "2000 мАч", cost: 0, q: 0}, {name: "4000 мАч", cost: 8000, q: 2}, {name: "6000 мАч", cost: 20000, q: 4}] },
+    { title: "Шаг 12. Фишки", options: [{name: "Нет", cost: 0, q: 0}, {name: "NFC + GPS", cost: 15000, q: 3}] },
+    { title: "Шаг 13. Цвет", options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] }
+];
+
 function openDesignStudio() {
     document.getElementById('design-screen').classList.add('active');
     currentStep = 0;
@@ -386,40 +380,22 @@ function closeDesignStudio() {
 }
 
 function renderDesignStep() {
-    const steps = [
-        { title: "Шаг 1. Тип", options: [{name: "Смартфон", cost: 0, q: 1, lock: false}] },
-        { title: "Шаг 2. Камера", options: [
-            {name: "0.3 МП", cost: 62, q: 1, lock: false},
-            {name: "2 МП", cost: 400, q: 2, lock: !state.research['cam_2mp']},
-            {name: "12 МП", cost: 2000, q: 5, lock: !state.research['cam_12mp']}
-        ]},
-        { title: "Шаг 3. Экран", options: [
-            {name: "LCD", cost: 0, q: 1, lock: false},
-            {name: "OLED", cost: 2000, q: 3, lock: !state.research['screen_oled']}
-        ]},
-        { title: "Шаг 4. Процессор", options: [
-            {name: "400 МГц", cost: 0, q: 1, lock: false},
-            {name: "2 ГГц", cost: 3000, q: 4, lock: !state.research['cpu_2ghz']}
-        ]}
-    ];
-
-    // Если прошли все шаги
-    if (currentStep >= steps.length) {
+    if (currentStep >= designSteps.length) {
         if (state.money < currentDesign.cost) { showToast("Мало денег на прототип!"); return; }
         state.money -= currentDesign.cost;
-        let score = (5 + currentDesign.quality).toFixed(1);
-        let profit = Math.floor(score * 500000);
+        let score = (5 + currentDesign.quality / 2).toFixed(1);
+        if(score > 9.9) score = 9.9;
+        
+        let profit = Math.floor(score * 1000000) + (currentDesign.quality * 50000);
         state.money += profit;
-        showToast(`Телефон выпущен! Оценка: ${score}. Прибыль: $${profit.toLocaleString()}`);
-        closeDesignStudio();
-        updateUI();
-        save();
+        showToast(`Устройство выпущено! Оценка: ${score}. Прибыль: $${profit.toLocaleString()}`);
+        closeDesignStudio(); updateUI(); save();
         return;
     }
 
-    const step = steps[currentStep];
+    const step = designSteps[currentStep];
     document.getElementById('ds-title').innerText = step.title;
-    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${steps.length}`;
+    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
     
     const opts = document.getElementById('ds-options');
     opts.innerHTML = '';
@@ -429,7 +405,7 @@ function renderDesignStep() {
         el.className = `ds-opt ${o.lock ? 'locked' : ''}`;
         
         let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
-        if (o.lock) priceStr = 'Не изучено';
+        if (o.lock) priceStr = '🔒 Не изучено';
         
         el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
         
@@ -448,15 +424,14 @@ function renderDesignStep() {
 // --- 10. СОХРАНЕНИЯ ---
 function showToast(msg) {
     const t = document.getElementById('toast');
-    t.innerText = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
+    t.innerText = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
 }
-function save() { localStorage.setItem('tech_empire_v5', JSON.stringify(state)); }
+function save() { localStorage.setItem('tech_empire_v6', JSON.stringify(state)); }
 function loadSave() {
-    const saved = localStorage.getItem('tech_empire_v5');
+    const saved = localStorage.getItem('tech_empire_v6');
     if (saved) { try { state = JSON.parse(saved); } catch(e){} }
-    }
+     }
   </script>
 </body>
 </html>
