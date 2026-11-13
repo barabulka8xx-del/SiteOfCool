@@ -3,17 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Tech Empire Strategy | Site Of Cool</title>
+  <title>Tech Empire v2 | Site Of Cool</title>
   <style>
     :root {
-      --bg: #05080a; --panel: #111a22; --border: #2a3b4c; --panel-light: #1a2632;
-      --green: #00ff88; --blue: #4facfe; --purple: #8E2DE2; --red: #ff0055; --gold: #ffd700;
+      --bg: #05080a; 
+      --panel: #111a22; 
+      --border: #2a3b4c; 
+      --panel-light: #1a2632;
+      --green: #00ff88; 
+      --blue: #4facfe; 
+      --purple: #8E2DE2; 
+      --red: #ff0055; 
+      --gold: #ffd700;
+      --orange: #ff8c00;
     }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: white; height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background: var(--bg); 
+      color: white; 
+      height: 100vh; 
+      height: 100dvh; 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
+    }
 
     /* ВЕРХНЯЯ ПАНЕЛЬ */
-    .top-bar { height: 55px; background: var(--panel); border-bottom: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 10; flex-shrink: 0; font-size: 12px; }
+    .top-bar { 
+      height: 55px; 
+      background: var(--panel); 
+      border-bottom: 2px solid var(--border); 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 0 10px; 
+      z-index: 10; 
+      flex-shrink: 0; 
+      font-size: 12px; 
+    }
+    
     .stat-group { display: flex; gap: 10px; font-weight: 900; }
     .stat.money { color: var(--green); }
     .stat.rp { color: var(--purple); }
@@ -27,12 +58,39 @@
     .screen { flex: 1; overflow-y: auto; display: none; flex-direction: column; padding: 10px; gap: 10px; padding-bottom: 15px; }
     .screen.active { display: flex; }
 
-    /* ОФИС */
+    /* ОБЩИЕ КАРТОЧКИ */
+    .card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .card-info { display: flex; flex-direction: column; gap: 3px; }
+    .card-title { font-weight: 900; font-size: 14px; }
+    .card-desc { font-size: 11px; color: #888; }
+    .btn { background: var(--blue); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; }
+    .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-research { background: var(--purple); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-gold { background: var(--gold); color: #000; }
+
+    /* ОФИС (2.5D) */
     .office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; }
-    .placed-area { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; padding-top: 10px; }
+    .placed-area { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px 10px; perspective: 800px; }
     
-    .workstation { background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 10px; width: 85px; height: 95px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; cursor: pointer; transition: 0.2s; }
-    .workstation.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); transform: scale(1.05); }
+    .workstation { 
+      background: var(--panel); 
+      border: 2px solid var(--border); 
+      border-radius: 12px; 
+      padding: 10px; 
+      width: 85px; 
+      height: 95px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-end; 
+      align-items: center; 
+      position: relative; 
+      cursor: pointer; 
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; 
+      transform-style: preserve-3d;
+    }
+    .workstation:hover { transform: translateY(-5px) rotateX(5deg); }
+    .workstation.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); transform: scale(1.05) rotateX(10deg); }
     .workstation .icon { font-size: 30px; }
     .workstation .name { font-size: 8px; color: #aaa; text-align: center; margin-top: 5px; font-weight: bold; }
     .workstation .attachment { position: absolute; font-size: 18px; z-index: 2; }
@@ -47,24 +105,44 @@
     .nav-btn .icon { font-size: 22px; transition: 0.2s; }
     .nav-btn.active .icon { transform: translateY(-2px); }
 
-    /* КАРТОЧКИ МАГАЗИНА/ИССЛЕДОВАНИЙ */
-    .item-card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-    .item-info { display: flex; flex-direction: column; gap: 3px; }
-    .item-title { font-weight: 900; font-size: 14px; }
-    .item-desc { font-size: 11px; color: #888; }
-    .item-price { font-size: 12px; color: var(--gold); font-weight: bold; }
-    .btn-buy { background: var(--blue); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .btn-buy:disabled { background: #333; color: #666; }
-    .btn-research { background: var(--purple); color: #fff; }
+    /* КОМАНДА (Как на фото) */
+    .team-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+    .team-stat-box { background: var(--panel); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 11px; color: #aaa; }
+    .team-stat-box span { display: block; font-size: 16px; font-weight: 900; color: #fff; margin-top: 4px; }
+    
+    .emp-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .emp-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 18px; color: #fff; }
+    .emp-avatar.researcher { background: var(--blue); }
+    .emp-avatar.fixer { background: var(--red); }
+    .emp-info { flex: 1; }
+    .emp-name { font-size: 13px; font-weight: bold; }
+    .emp-role { font-size: 10px; color: #888; margin-bottom: 4px; }
+    .emp-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+    .emp-actions { display: flex; flex-direction: column; gap: 5px; }
+    .emp-actions button { padding: 5px 10px; font-size: 10px; }
+
+    /* ДЕРЕВО ИССЛЕДОВАНИЙ */
+    .research-layout { display: flex; flex-direction: column; height: 100%; }
+    .research-sidebar { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); }
+    .research-tree-container { flex: 1; overflow: auto; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; padding: 20px; }
+    .tree-timeline { display: flex; color: #fff; font-weight: bold; font-size: 12px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    .tree-year { width: 150px; flex-shrink: 0; text-align: center; border-right: 1px dashed #333; }
+    .tree-row { display: flex; align-items: center; margin-bottom: 10px; }
+    .tree-node { width: 120px; height: 50px; background: #222; border: 1px solid #555; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; text-align: center; margin: 0 15px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+    .tree-node.unlocked { border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .tree-node.available { border-color: var(--gold); animation: pulse 2s infinite; }
+    .tree-node.locked { opacity: 0.5; background: #111; }
+    .tree-line { width: 30px; height: 2px; background: #333; flex-shrink: 0; }
+    .tree-line.active { background: var(--green); box-shadow: 0 0 5px var(--green); }
 
     /* ДИЗАЙН-СТУДИЯ */
     .design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
     .design-screen.active { display: flex; }
     .ds-header { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
     .ds-body { flex: 1; display: flex; overflow: hidden; }
-    
-    .ds-left { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101922 0%, #060a0f 100%); }
-    .phone-preview { width: 110px; height: 220px; border: 4px solid #333; border-radius: 18px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 0 50px rgba(79,172,254,0.1); transition: 0.3s; }
+    .ds-left { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101922 0%, #060a0f 100%); flex-direction: column; gap: 20px; }
+    .phone-preview { width: 120px; height: 240px; border: 4px solid #333; border-radius: 20px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 0 50px rgba(79,172,254,0.1); transition: 0.3s; position: relative; }
+    .phone-notch { position: absolute; top: 0; width: 40px; height: 15px; background: #333; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
     
     .ds-right { width: 55%; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
     .ds-step-header { padding: 15px; border-bottom: 1px solid var(--border); }
@@ -76,11 +154,23 @@
     .ds-opt:active { border-color: var(--green); transform: scale(0.98); }
     .ds-opt.locked { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
     
-    .ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+    .ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
 
-    /* УВЕДОМЛЕНИЯ */
-    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 200; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
+    /* УВЕДОМЛЕНИЯ И МОДАЛКИ */
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: var(--panel); border: 2px solid var(--border); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px; color: var(--gold); }
+
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+
+    /* Скроллбар */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -102,7 +192,10 @@
 
   <!-- ЭКРАН: КОМПАНИЯ -->
   <div class="screen" id="screen-company">
-    <div style="text-align:center; padding:20px; color:#666;">Обзор компании (в разработке)</div>
+    <div class="card" style="flex-direction: column; align-items: flex-start;">
+      <div class="card-title">История релизов</div>
+      <div class="card-desc" id="company-history-list">У вас пока нет выпущенных телефонов.</div>
+    </div>
   </div>
 
   <!-- ЭКРАН: ОФИС -->
@@ -110,58 +203,115 @@
     <div class="office-header">
       <span id="ui-office-name" style="color:var(--gold); font-weight:900;">Гараж</span>
       <span id="ui-slots" style="color:#aaa;">0 / 3</span>
-      <button class="btn-buy" style="padding:6px 10px; font-size:10px; background:var(--purple); color:#fff;" onclick="upgradeOffice()">Улучшить</button>
+      <button class="btn" style="padding:6px 10px; font-size:10px; background:var(--purple); color:#fff;" onclick="upgradeOffice()">Улучшить</button>
     </div>
     <div style="text-align:center; color:#888; font-size:11px; margin-top:5px;">Тапни по столу, чтобы прикрепить стул или ПК</div>
     <div class="placed-area" id="placed-area"></div>
   </div>
 
+  <!-- ЭКРАН: КОМАНДА -->
+  <div class="screen" id="screen-team">
+    <div class="team-stats">
+      <div class="team-stat-box">Мест: <span id="team-slots">0 / 3</span></div>
+      <div class="team-stat-box">Зарплата: <span id="team-salary">$0</span></div>
+      <div class="team-stat-box">Исследования: <span id="team-rp">0 / день</span></div>
+      <div class="team-stat-box">Исправлено багов: <span id="team-bugs">0 / день</span></div>
+    </div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-weight:900;">Ваша команда</div>
+      <button class="btn btn-gold" style="padding:5px 10px; font-size:10px;" onclick="openHireModal()">Нанять</button>
+    </div>
+    <div id="team-list"></div>
+  </div>
+
   <!-- ЭКРАН: МАГАЗИН -->
   <div class="screen" id="screen-shop">
-    <div class="item-card">
-      <div class="item-info"><div class="item-title">🪵 Старый стол</div><div class="item-desc">Базовое место для работы</div><div class="item-price">$12 000</div></div>
-      <button class="btn-buy" onclick="buyItem('desk', 'wood', 12000)">Купить</button>
+    <div style="display:flex; gap:5px; overflow-x:auto; padding-bottom:10px;" id="shop-tabs">
+      <button class="btn" onclick="switchShopTab('desks')" style="padding:6px 12px; font-size:10px;">Столы</button>
+      <button class="btn" onclick="switchShopTab('chairs')" style="padding:6px 12px; font-size:10px; background:#333;">Стулья</button>
+      <button class="btn" onclick="switchShopTab('pcs')" style="padding:6px 12px; font-size:10px; background:#333;">ПК</button>
+      <button class="btn" onclick="switchShopTab('lab')" style="padding:6px 12px; font-size:10px; background:#333;">Лаборатория</button>
     </div>
-    <div class="item-card">
-      <div class="item-info"><div class="item-title">💺 Офисный стул</div><div class="item-desc">Для комфорта сотрудника</div><div class="item-price">$5 000</div></div>
-      <button class="btn-buy" onclick="buyItem('chair', 'office', 5000)">Купить</button>
-    </div>
-    <div class="item-card">
-      <div class="item-info"><div class="item-title">🖥️ ЭЛТ Монитор</div><div class="item-desc">Старый, но рабочий</div><div class="item-price">$8 000</div></div>
-      <button class="btn-buy" onclick="buyItem('pc', 'crt', 8000)">Купить</button>
-    </div>
+    <div id="shop-list"></div>
   </div>
 
   <!-- ЭКРАН: ИССЛЕДОВАНИЯ -->
   <div class="screen" id="screen-research">
-    <div style="font-size:12px; color:#aaa; margin-bottom:10px;">Изучай функции за RP, чтобы использовать их в Дизайне</div>
-    <div id="research-list"></div>
+    <div class="research-layout">
+      <div class="research-sidebar">
+        <div style="color:var(--purple); font-size:20px; font-weight:900;" id="ui-rp-sidebar">145129</div>
+        <div style="font-size:11px; color:#aaa; margin-bottom:10px;">Очков исследования</div>
+        <div style="font-size:11px; color:#fff; margin-bottom:5px;">Изучено технологий</div>
+        <div style="background:#000; height:8px; border-radius:4px; overflow:hidden;">
+          <div style="background:var(--blue); height:100%; width:10%;" id="ui-research-progress"></div>
+        </div>
+      </div>
+      
+      <div class="research-tree-container">
+        <div class="tree-timeline" id="tree-timeline">
+          <!-- Генерируется в JS -->
+        </div>
+        <div id="tree-body">
+          <!-- Генерируется в JS -->
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ЭКРАН: НОВОСТИ -->
   <div class="screen" id="screen-news">
-    <div style="text-align:center; padding:20px; color:#666;">Новостей пока нет</div>
+    <div id="news-list"></div>
   </div>
 
   <!-- НИЖНЕЕ МЕНЮ -->
   <div class="bottom-nav">
     <button class="nav-btn" onclick="switchTab('company')"><div class="icon">🏢</div>Компания</button>
     <button class="nav-btn active" onclick="switchTab('office')"><div class="icon">📱</div>Офис</button>
+    <button class="nav-btn" onclick="switchTab('team')"><div class="icon">👥</div>Команда</button>
     <button class="nav-btn" onclick="switchTab('shop')"><div class="icon">🛠️</div>Построить</button>
     <button class="nav-btn" onclick="openDesignStudio()"><div class="icon">🎨</div>Дизайн</button>
     <button class="nav-btn" onclick="switchTab('research')"><div class="icon">🔬</div>Наука</button>
     <button class="nav-btn" onclick="switchTab('news')"><div class="icon">📰</div>Новости</button>
   </div>
 
+  <!-- МОДАЛКА НАЙМА -->
+  <div class="modal-overlay" id="modal-hire">
+    <div class="modal-content">
+      <div class="modal-title">Найм сотрудников</div>
+      <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <button class="btn" style="flex:1; background:var(--blue);" onclick="generateCandidates('researcher')">Исследователь</button>
+        <button class="btn" style="flex:1; background:var(--red);" onclick="generateCandidates('fixer')">Исправитель</button>
+      </div>
+      <div id="hire-candidates-list"></div>
+      <button class="btn" style="width:100%; margin-top:15px; background:#333; color:#fff;" onclick="closeModal('modal-hire')">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- МОДАЛКА РЕЛИЗА -->
+  <div class="modal-overlay" id="modal-release">
+    <div class="modal-content" style="text-align:center;">
+      <div class="modal-title" style="color:var(--green);">Устройство готово!</div>
+      <div style="font-size:50px; margin:10px 0;">📱</div>
+      <div style="font-size:14px; margin-bottom:5px;">Оценка: <span id="release-score" style="color:var(--gold); font-weight:900;">9.5</span></div>
+      <div style="font-size:14px; margin-bottom:15px;">Прибыль: <span id="release-profit" style="color:var(--green); font-weight:900;">$0</span></div>
+      <button class="btn btn-gold" style="width:100%; padding:15px;" onclick="finishRelease()">Начать производство</button>
+    </div>
+  </div>
+
   <!-- ДИЗАЙН-СТУДИЯ -->
   <div class="design-screen" id="design-screen">
     <div class="ds-header">
       <div style="font-weight:900; font-size:16px; color:var(--blue);">Студия Дизайна</div>
-      <button class="btn-buy" style="background:#444; color:#fff;" onclick="closeDesignStudio()">В офис</button>
+      <button class="btn" style="background:#444; color:#fff;" onclick="closeDesignStudio()">В офис</button>
     </div>
     <div class="ds-body">
       <div class="ds-left">
-        <div class="phone-preview" id="ds-phone-preview">📱</div>
+        <div class="phone-preview" id="ds-phone-preview">
+          <div class="phone-notch"></div>
+          📱
+        </div>
+        <div id="ds-phone-name" style="font-weight:900; color:#fff; text-align:center;">iFon 1</div>
       </div>
       <div class="ds-right">
         <div class="ds-step-header">
@@ -170,268 +320,809 @@
         </div>
         <div class="ds-options" id="ds-options"></div>
         <div class="ds-footer">
-          <button class="btn-buy" style="background:#333; color:#fff; width:100%;" onclick="closeDesignStudio()">Отмена</button>
+          <button class="btn" style="background:#333; color:#fff; flex:1;" onclick="prevDesignStep()">Назад</button>
+          <button class="btn" style="background:var(--blue); color:#000; flex:2;" onclick="skipDesignStep()">Пропустить шаг</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- КОНФЕТТИ -->
+  <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:999;"></canvas>
   <div class="toast" id="toast">Уведомление</div>
 
   <script>
-  // --- 1. СОСТОЯНИЕ ---
-let state = {
-    money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
-    workstations: [], selectedDeskId: null,
-    research: { 'cam_2mp': false, 'cam_12mp': false, 'screen_oled': false, 'cpu_2ghz': false }
-};
+// ==========================================
+// 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ==========================================
 
-// --- 2. КОНСТАНТЫ ---
+const SAVE_KEY = 'tech_empire_v7';
+
 const OFFICES = [
-    { name: "Гараж", slots: 3, cost: 500000 },
-    { name: "Офис", slots: 6, cost: 2000000 },
+  { name: "Гараж", slots: 3, cost: 0 },
+  { name: "Офис", slots: 6, cost: 500000 },
+  { name: "Бизнес-Центр", slots: 12, cost: 2000000 },
+  { name: "Мега-Кампус", slots: 40, cost: 15000000 }
 ];
 
-const RESEARCH_TREE = [
-    { id: 'cam_2mp', name: 'Камера 2 МП', cost: 50, yearReq: 2007 },
-    { id: 'screen_oled', name: 'Экран OLED', cost: 150, yearReq: 2010 },
-    { id: 'cam_12mp', name: 'Камера 12 МП', cost: 300, yearReq: 2015 },
-    { id: 'cpu_2ghz', name: 'Процессор 2 ГГц', cost: 500, yearReq: 2020 },
-];
+// Базовые шаблоны имен для сотрудников
+const NAMES = ["Hollow", "fady668709", "donechaa228", "Deadmanfatwhale", "IShowSpeed", "Bambam", "WINTAX270", "zakoli_4637", "Barsik_Dev", "Cat_Lover", "Neo_Dev", "AlphaTester", "SigmaCoder", "MegaMind"];
+const SURNAMES = ["Иванов", "Петров", "Сидоров", "Смит", "Джонсон", "Маск", "Дуров"];
 
-let currentStep = 0;
-let currentDesign = { cost: 0, quality: 0 };
-
-// --- 3. ИНИЦИАЛИЗАЦИЯ ---
-window.onload = () => {
-    loadSave();
-    updateUI();
-    renderResearch();
-    startGameLoop();
+let state = {
+  money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
+  workstations: [], selectedDeskId: null,
+  research: {}, // { techId: true }
+  employees: [],
+  releasedPhones: [], // [{ name, score, profitPerDay, releaseYear }]
+  news: [],
+  lastTick: Date.now()
 };
 
-// --- 4. ВРЕМЯ И ЭКОНОМИКА ---
+// ==========================================
+// 2. ГЕНЕРАЦИЯ ДЕРЕВА ИССЛЕДОВАНИЙ (2007-2052)
+// ==========================================
+
+const TECH_BRANCHES = [
+  { id: 'screen', name: 'Экран', color: '#4facfe', startYear: 2007, techs: ['LCD', 'OLED', 'AMOLED', 'MicroLED', 'Голограмма'] },
+  { id: 'camera', name: 'Камера', color: '#ff8c00', startYear: 2007, techs: ['1 МП', '2 МП', '5 МП', '8 МП', '12 МП', '48 МП', '108 МП', '200 МП'] },
+  { id: 'cpu', name: 'Чипсы', color: '#ff0055', startYear: 2007, techs: ['1 Ядро', '2 Ядра', '4 Ядра', '8 Ядер', 'Нейрочип', 'Квантовый'] },
+  { id: 'memory', name: 'Память', color: '#8E2DE2', startYear: 2007, techs: ['256 МБ', '512 МБ', '1 ГБ', '2 ГБ', '4 ГБ', '8 ГБ', '16 ГБ', '32 ГБ'] },
+  { id: 'battery', name: 'Батарея', color: '#00ff88', startYear: 2007, techs: ['1000 мАч', '2000 мАч', '4000 мАч', '6000 мАч', 'Графен'] },
+  { id: 'network', name: 'Сеть', color: '#ffd700', startYear: 2007, techs: ['2G', '3G', '4G', '5G', '6G', 'Спутник'] }
+];
+
+let RESEARCH_TREE = [];
+
+function generateResearchTree() {
+  let year = 2007;
+  let techIndex = 0;
+  
+  // Генерируем до 2052 года
+  for (let y = 2007; y <= 2052; y++) {
+    TECH_BRANCHES.forEach(branch => {
+      // Каждый год в каждой ветке может появиться 1-2 технологии
+      if (Math.random() > 0.6) {
+        let techName = branch.techs[Math.floor(Math.random() * branch.techs.length)] + " " + (y - 2000) + "г.";
+        let cost = 50 + (y - 2007) * 20;
+        
+        RESEARCH_TREE.push({
+          id: 'tech_' + techIndex++,
+          branch: branch.id,
+          name: techName,
+          cost: cost,
+          yearReq: y,
+          unlocked: false
+        });
+      }
+    });
+  }
+}
+
+// ==========================================
+// 3. ИНИЦИАЛИЗАЦИЯ И СОХРАНЕНИЯ
+// ==========================================
+
+window.onload = () => {
+  generateResearchTree();
+  loadSave();
+  updateUI();
+  renderShop('desks');
+  renderResearchTree();
+  startGameLoop();
+  
+  // Восстанавливаем скорость
+  document.querySelectorAll('.speed-btn').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === state.speed);
+  });
+};
+
+function save() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+}
+
+function loadSave() {
+  const saved = localStorage.getItem(SAVE_KEY);
+  if (saved) {
+    try {
+      let parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      // Восстанавливаем разблокированные исследования
+      if (parsed.research) {
+        RESEARCH_TREE.forEach(t => {
+          if (parsed.research[t.id]) t.unlocked = true;
+        });
+      }
+    } catch(e) { console.error("Save error", e); }
+  }
+}
+
+// ==========================================
+// 4. ЗВУКИ (WebAudio)
+// ==========================================
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  if (type === 'click') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+  } else if (type === 'buy') {
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+  } else if (type === 'release') {
+    // Фанфары
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = 'triangle';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+      o.start(audioCtx.currentTime + i * 0.1);
+      o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+    });
+  }
+}
+
+// ==========================================
+// 5. ГЕЙМПЛЕЙ И ЭКОНОМИКА
+// ==========================================
+
 function startGameLoop() {
-    setInterval(() => {
-        if (state.speed === 0) return;
-        
-        // Время идет (1 день за 0.5 сек на 1x)
-        state.day += state.speed * 0.5;
-        
-        if (state.day >= 30) {
-            state.day -= 30;
-            state.year++;
-            showToast(`Наступил ${state.year} год!`);
-            updateUI();
-        }
-    }, 1000);
+  setInterval(() => {
+    if (state.speed === 0) return;
+    
+    // Игровое время: 1 тик = 1 игровой день (на 1x)
+    let daysPassed = state.speed * 0.5; 
+    state.day += daysPassed;
+    
+    // Смена года
+    if (state.day >= 30) {
+      state.day -= 30;
+      state.year++;
+      showToast(`Наступил ${state.year} год!`, 'gold');
+      updateUI();
+      renderResearchTree(); // Перерисовываем дерево, чтобы открыть новые годы
+    }
+
+    // Экономика (пассивный доход)
+    let incomePerDay = 0;
+    state.releasedPhones.forEach(p => {
+      if (state.year - p.releaseYear < 5) { // Телефон живет 5 лет
+        incomePerDay += p.profitPerDay;
+      }
+    });
+    state.money += incomePerDay * daysPassed;
+
+    // Зарплаты (вычитаются раз в 30 дней)
+    if (Math.floor(state.day) === 1) {
+      let totalSalary = state.employees.reduce((acc, e) => acc + e.salary, 0);
+      state.money -= totalSalary;
+    }
+
+    // RP от исследователей
+    let rpPerDay = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
+    // Бонус от лаборатории (серверных стоек)
+    let labBonus = state.workstations.filter(w => w.lab).length * 5;
+    state.rp += (rpPerDay + labBonus) * daysPassed;
+
+    // Автосохранение каждые 10 сек
+    if (Date.now() - state.lastTick > 10000) {
+      state.lastTick = Date.now();
+      save();
+    }
+    
+    updateUI();
+  }, 1000); // 1 сек реального времени
 }
 
 function setSpeed(spd) {
-    state.speed = spd;
-    document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.speed-btn')[spd-1].classList.add('active');
+  state.speed = spd;
+  document.querySelectorAll('.speed-btn').forEach((b, i) => {
+    b.classList.toggle('active', i + 1 === spd);
+  });
+  playSound('click');
 }
 
-// --- 5. UI ---
-function switchTab(tabId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-    
-    document.getElementById(`screen-${tabId}`).classList.add('active');
-    
-    const btns = document.querySelectorAll('.nav-btn');
-    if(tabId === 'office') btns[1].classList.add('active');
-    if(tabId === 'company') btns[0].classList.add('active');
-    if(tabId === 'shop') btns[2].classList.add('active');
-    if(tabId === 'research') btns[4].classList.add('active');
-    if(tabId === 'news') btns[5].classList.add('active');
-}
+// ==========================================
+// 6. ОБНОВЛЕНИЕ UI
+// ==========================================
 
 function updateUI() {
-    document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
-    document.getElementById('ui-rp').innerText = Math.floor(state.rp) + ' RP';
-    document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
-    
-    const office = OFFICES[state.officeLvl];
-    document.getElementById('ui-office-name').innerText = office.name;
-    document.getElementById('ui-slots').innerText = `${state.workstations.length} / ${office.slots}`;
-    
-    renderOffice();
+  document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
+  document.getElementById('ui-rp').innerText = Math.floor(state.rp) + ' RP';
+  document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
+  document.getElementById('ui-rp-sidebar').innerText = Math.floor(state.rp).toLocaleString();
+  
+  const office = OFFICES[state.officeLvl];
+  document.getElementById('ui-office-name').innerText = office.name;
+  document.getElementById('ui-slots').innerText = `${state.workstations.filter(w => w.desk).length} / ${office.slots}`;
+  
+  // Обновление статов команды
+  document.getElementById('team-slots').innerText = `${state.employees.length} / ${office.slots}`;
+  let totalSal = state.employees.reduce((acc, e) => acc + e.salary, 0);
+  document.getElementById('team-salary').innerText = '$' + totalSal.toLocaleString();
+  
+  let totalRp = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
+  document.getElementById('team-rp').innerText = totalRp + ' / день';
+  
+  let totalBugs = state.employees.filter(e => e.role === 'fixer').reduce((acc, e) => acc + (e.stars * 1.5), 0);
+  document.getElementById('team-bugs').innerText = totalBugs + ' / день';
+
+  renderOffice();
+  renderTeam();
+  
+  // Прогресс исследований
+  let totalTechs = RESEARCH_TREE.length;
+  let unlockedTechs = RESEARCH_TREE.filter(t => t.unlocked).length;
+  let percent = totalTechs > 0 ? (unlockedTechs / totalTechs) * 100 : 0;
+  document.getElementById('ui-research-progress').style.width = percent + '%';
 }
 
-// --- 6. ОФИС ---
+function switchTab(tabId) {
+  playSound('click');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById(`screen-${tabId}`).classList.add('active');
+  
+  const btns = document.querySelectorAll('.nav-btn');
+  const map = { company: 0, office: 1, team: 2, shop: 3, research: 5, news: 6 };
+  if (map[tabId] !== undefined) btns[map[tabId]].classList.add('active');
+  
+  if (tabId === 'news') renderNews();
+  if (tabId === 'company') renderCompany();
+}
+
+// ==========================================
+// 7. ОФИС
+// ==========================================
+
 function renderOffice() {
-    const area = document.getElementById('placed-area');
-    area.innerHTML = '';
+  const area = document.getElementById('placed-area');
+  area.innerHTML = '';
+  
+  state.workstations.forEach(ws => {
+    if (!ws.desk) return;
+    const el = document.createElement('div');
+    el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
     
-    state.workstations.forEach(ws => {
-        const el = document.createElement('div');
-        el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
-        
-        let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
-        let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
-        
-        el.innerHTML = `
-            ${pcHtml}
-            <div class="icon">${ws.desk.icon}</div>
-            ${chairHtml}
-            <div class="name">${ws.desk.name}</div>
-        `;
-        
-        el.onclick = () => {
-            state.selectedDeskId = state.selectedDeskId === ws.id ? null : ws.id;
-            renderOffice();
-        };
-        area.appendChild(el);
-    });
-}
-
-// --- 7. МАГАЗИН ---
-function buyItem(type, val, price) {
-    if (state.money < price) { showToast("Мало денег!"); return; }
+    let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
+    let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
+    let labHtml = ws.lab ? `<div class="attachment pc" style="left:auto; right:5px; color:var(--purple);">🧪</div>` : '';
     
-    if (type === 'chair' || type === 'pc') {
-        if (!state.selectedDeskId) { showToast("Сначала выбери стол!"); return; }
-        let desk = state.workstations.find(w => w.id === state.selectedDeskId);
-        if (!desk) return;
-        if (type === 'chair' && desk.chair) { showToast("Стул уже есть!"); return; }
-        if (type === 'pc' && desk.pc) { showToast("ПК уже есть!"); return; }
-        
-        state.money -= price;
-        if (type === 'chair') desk.chair = { icon: '💺', name: 'Стул' };
-        if (type === 'pc') desk.pc = { icon: '🖥️', name: 'ПК' };
-        showToast("Установлено!");
-    } else if (type === 'desk') {
-        if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места!"); return; }
-        state.money -= price;
-        state.workstations.push({ id: Date.now(), desk: { icon: '🪵', name: 'Старый стол' }, chair: null, pc: null });
-        showToast("Стол куплен!");
-    }
-    updateUI(); save();
+    el.innerHTML = `
+      ${pcHtml}
+      ${labHtml}
+      <div class="icon">${ws.desk.icon}</div>
+      ${chairHtml}
+      <div class="name">${ws.desk.name}</div>
+    `;
+    
+    el.onclick = () => {
+      playSound('click');
+      state.selectedDeskId = state.selectedDeskId === ws.id ? null : ws.id;
+      renderOffice();
+    };
+    area.appendChild(el);
+  });
 }
 
 function upgradeOffice() {
-    if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
-    const cost = OFFICES[state.officeLvl].cost;
-    if (state.money < cost) { showToast("Мало денег для переезда!"); return; }
-    state.money -= cost; state.officeLvl++;
-    updateUI(); save(); showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`);
+  if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
+  const cost = OFFICES[state.officeLvl + 1].cost;
+  if (state.money < cost) { showToast("Мало денег для переезда!", 'red'); return; }
+  state.money -= cost; 
+  state.officeLvl++;
+  playSound('buy');
+  updateUI(); save(); 
+  showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`, 'green');
 }
 
-// --- 8. ИССЛЕДОВАНИЯ ---
-function renderResearch() {
-    const list = document.getElementById('research-list');
-    list.innerHTML = '';
-    RESEARCH_TREE.forEach(res => {
-        const isDone = state.research[res.id];
-        const canBuy = !isDone && state.rp >= res.cost && state.year >= res.yearReq;
-        
-        const el = document.createElement('div');
-        el.className = 'item-card';
-        el.innerHTML = `
-            <div class="item-info">
-                <div class="item-title">${res.name}</div>
-                <div class="item-desc">Год: ${res.yearReq}+</div>
-                <div class="item-price">${isDone ? '✅ Открыто' : res.cost + ' RP'}</div>
-            </div>
-            <button class="btn-buy btn-research" ${!canBuy ? 'disabled' : ''} onclick="unlockRes('${res.id}')">
-                ${isDone ? 'Готово' : 'Изучить'}
-            </button>
-        `;
-        list.appendChild(el);
-    });
+// ==========================================
+// 8. МАГАЗИН
+// ==========================================
+
+const SHOP_ITEMS = {
+  desks: [
+    { id: 'desk_wood', name: '🪵 Старый стол', price: 12000, icon: '🪵' },
+    { id: 'desk_glass', name: '💎 Стеклянный стол', price: 250000, icon: '💎' },
+    { id: 'desk_battle', name: '⚔️ Боевая станция', price: 25000000, icon: '⚔️' }
+  ],
+  chairs: [
+    { id: 'chair_stool', name: '🪑 Табурет', price: 5000, icon: '🪑' },
+    { id: 'chair_gaming', name: '🎮 Гоночное кресло', price: 50000, icon: '🎮' },
+    { id: 'chair_throne', name: '👑 Трон', price: 1000000, icon: '👑' }
+  ],
+  pcs: [
+    { id: 'pc_crt', name: '🖥️ ЭЛТ Монитор', price: 8000, icon: '🖥️' },
+    { id: 'pc_flat', name: '🖥️ Плоский', price: 30000, icon: '🖥️' },
+    { id: 'pc_dual', name: '🖥️ Два монитора', price: 100000, icon: '🖥️' }
+  ],
+  lab: [
+    { id: 'lab_board', name: '🧪 Тестовая плата', price: 500000, icon: '🧪' },
+    { id: 'lab_server', name: '🗄️ Серверная стойка', price: 2000000, icon: '🗄️' }
+  ]
+};
+
+function switchShopTab(tab) {
+  playSound('click');
+  document.querySelectorAll('#shop-tabs .btn').forEach(b => b.style.background = '#333');
+  event.target.style.background = 'var(--blue)';
+  renderShop(tab);
 }
 
-function unlockRes(id) {
-    const res = RESEARCH_TREE.find(r => r.id === id);
-    if (!res || state.research[id]) return;
-    if (state.rp < res.cost || state.year < res.yearReq) return;
+function renderShop(tab) {
+  const list = document.getElementById('shop-list');
+  list.innerHTML = '';
+  SHOP_ITEMS[tab].forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="card-info">
+        <div class="card-title">${item.name}</div>
+        <div class="card-desc" style="color:var(--gold);">$${item.price.toLocaleString()}</div>
+      </div>
+      <button class="btn" onclick="buyItem('${tab}', '${item.id}')">Купить</button>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function buyItem(category, itemId) {
+  const item = SHOP_ITEMS[category].find(i => i.id === itemId);
+  if (!item) return;
+  if (state.money < item.price) { showToast("Мало денег!", 'red'); return; }
+  
+  if (category === 'desks') {
+    if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места!", 'red'); return; }
+    state.money -= item.price;
+    state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null });
+  } else {
+    if (!state.selectedDeskId) { showToast("Сначала выбери стол в офисе!", 'red'); return; }
+    let desk = state.workstations.find(w => w.id === state.selectedDeskId);
+    if (!desk) return;
     
-    state.rp -= res.cost; state.research[id] = true;
-    renderResearch(); updateUI(); save(); showToast(`Изучено: ${res.name}`);
+    if (category === 'chairs') { if (desk.chair) return showToast("Стул уже есть"); desk.chair = item; }
+    if (category === 'pcs') { if (desk.pc) return showToast("ПК уже есть"); desk.pc = item; }
+    if (category === 'lab') { if (desk.lab) return showToast("Лаборатория уже есть"); desk.lab = item; }
+    
+    state.money -= item.price;
+  }
+  
+  playSound('buy');
+  updateUI(); save();
+  showToast("Куплено!");
 }
 
-// --- 9. ДИЗАЙН (13 ШАГОВ) ---
+// ==========================================
+// 9. КОМАНДА (СОТРУДНИКИ)
+// ==========================================
+
+function renderTeam() {
+  const list = document.getElementById('team-list');
+  list.innerHTML = '';
+  
+  if (state.employees.length === 0) {
+    list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">В команде пока никого нет. Наймите кого-нибудь!</div>';
+    return;
+  }
+
+  state.employees.forEach(emp => {
+    const el = document.createElement('div');
+    el.className = 'emp-card';
+    let starsStr = '★'.repeat(emp.stars) + '☆'.repeat(5 - emp.stars);
+    
+    el.innerHTML = `
+      <div class="emp-avatar ${emp.role}">${emp.name[0]}</div>
+      <div class="emp-info">
+        <div class="emp-name">${emp.name} <span style="font-size:10px; color:#666;">возраст ${emp.age}</span></div>
+        <div class="emp-role">${emp.role === 'researcher' ? 'Исследователь' : 'Исправитель ошибок'}</div>
+        <div class="emp-stars">${starsStr}</div>
+        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${emp.salary.toLocaleString()} / мес</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn btn-gold" onclick="upgradeEmployee(${emp.id})">Мастер</button>
+        <button class="btn btn-red" onclick="fireEmployee(${emp.id})">Огонь</button>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function openHireModal() {
+  playSound('click');
+  document.getElementById('hire-candidates-list').innerHTML = '';
+  document.getElementById('modal-hire').classList.add('active');
+}
+
+function generateCandidates(role) {
+  if (state.employees.length >= OFFICES[state.officeLvl].slots) {
+    showToast("Офис переполнен! Купите новый.", 'red');
+    return;
+  }
+  
+  playSound('click');
+  const list = document.getElementById('hire-candidates-list');
+  list.innerHTML = '';
+  
+  for (let i = 0; i < 3; i++) {
+    let name = NAMES[Math.floor(Math.random() * NAMES.length)];
+    let stars = Math.floor(Math.random() * 3) + 3; // 3-5 звезд
+    let salary = stars * 20000 + Math.floor(Math.random() * 10000);
+    let age = Math.floor(Math.random() * 20) + 20;
+    
+    const el = document.createElement('div');
+    el.className = 'emp-card';
+    el.innerHTML = `
+      <div class="emp-avatar ${role}">${name[0]}</div>
+      <div class="emp-info">
+        <div class="emp-name">${name}</div>
+        <div class="emp-role">${role === 'researcher' ? 'Исследователь' : 'Исправитель'} • возраст ${age}</div>
+        <div class="emp-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>
+        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${salary.toLocaleString()} / мес</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn" onclick="hireEmployee('${name}', '${role}', ${stars}, ${salary}, ${age})">Нанять</button>
+      </div>
+    `;
+    list.appendChild(el);
+  }
+}
+
+function hireEmployee(name, role, stars, salary, age) {
+  if (state.money < salary) { showToast("Не хватает на первый оклад!", 'red'); return; }
+  state.employees.push({ id: Date.now() + Math.random(), name, role, stars, salary, age });
+  playSound('buy');
+  updateUI(); save();
+  closeModal('modal-hire');
+  showToast(`${name} принят на работу!`, 'green');
+}
+
+function upgradeEmployee(id) {
+  let emp = state.employees.find(e => e.id === id);
+  if (!emp) return;
+  if (emp.stars >= 5) { showToast("Максимальный уровень!"); return; }
+  
+  let cost = emp.stars * 50000;
+  if (state.money < cost) { showToast("Мало денег на обучение!", 'red'); return; }
+  
+  state.money -= cost;
+  emp.stars++;
+  emp.salary += 10000;
+  playSound('buy');
+  updateUI(); save();
+  showToast(`${emp.name} прокачан до ${emp.stars}★!`, 'green');
+}
+
+function fireEmployee(id) {
+  let idx = state.employees.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  
+  // Выходное пособие
+  let emp = state.employees[idx];
+  state.money -= emp.salary; 
+  
+  state.employees.splice(idx, 1);
+  playSound('click');
+  updateUI(); save();
+  showToast(`${emp.name} уволен.`, 'red');
+}
+
+// ==========================================
+// 10. ИССЛЕДОВАНИЯ (ДЕРЕВО)
+// ==========================================
+
+function renderResearchTree() {
+  const timeline = document.getElementById('tree-timeline');
+  const body = document.getElementById('tree-body');
+  
+  timeline.innerHTML = '';
+  body.innerHTML = '';
+  
+  // Рисуем таймлайн
+  for (let y = 2007; y <= 2052; y += 5) {
+    let el = document.createElement('div');
+    el.className = 'tree-year';
+    el.innerText = y;
+    timeline.appendChild(el);
+  }
+
+  // Группируем технологии по годам
+  let grouped = {};
+  RESEARCH_TREE.forEach(tech => {
+    if (!grouped[tech.yearReq]) grouped[tech.yearReq] = [];
+    grouped[tech.yearReq].push(tech);
+  });
+
+  // Рисуем ряды по годам
+  for (let y = 2007; y <= 2052; y++) {
+    if (!grouped[y]) continue;
+    
+    let row = document.createElement('div');
+    row.className = 'tree-row';
+    
+    // Заглушка для годов
+    let yearLabel = document.createElement('div');
+    yearLabel.style.width = '120px';
+    yearLabel.style.fontSize = '10px';
+    yearLabel.style.color = '#666';
+    yearLabel.style.flexShrink = '0';
+    yearLabel.innerText = y;
+    row.appendChild(yearLabel);
+
+    grouped[y].forEach(tech => {
+      let branch = TECH_BRANCHES.find(b => b.id === tech.branch);
+      let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
+      
+      let node = document.createElement('div');
+      node.className = `tree-node ${tech.unlocked ? 'unlocked' : (isAvailable ? 'available' : 'locked')}`;
+      node.style.borderColor = tech.unlocked ? 'var(--green)' : (isAvailable ? 'var(--gold)' : branch.color);
+      
+      node.innerHTML = `
+        <div style="font-size:8px; color:${branch.color};">${branch.name}</div>
+        <div>${tech.name}</div>
+        <div style="font-size:9px; color:#aaa;">${tech.unlocked ? '✅' : tech.cost + ' RP'}</div>
+      `;
+      
+      node.onclick = () => unlockTech(tech.id);
+      row.appendChild(node);
+      
+      // Рисуем линию связи (упрощенно)
+      let line = document.createElement('div');
+      line.className = `tree-line ${tech.unlocked ? 'active' : ''}`;
+      row.appendChild(line);
+    });
+    
+    body.appendChild(row);
+  }
+}
+
+function unlockTech(id) {
+  let tech = RESEARCH_TREE.find(t => t.id === id);
+  if (!tech || tech.unlocked) return;
+  if (state.year < tech.yearReq) { showToast("Этот год еще не наступил!", 'red'); return; }
+  if (state.rp < tech.cost) { showToast("Не хватает RP!", 'red'); return; }
+  
+  state.rp -= tech.cost;
+  tech.unlocked = true;
+  state.research[tech.id] = true;
+  
+  playSound('buy');
+  updateUI(); save();
+  renderResearchTree();
+  showToast(`Изучено: ${tech.name}`, 'green');
+}
+
+// ==========================================
+// 11. ДИЗАЙН-СТУДИЯ
+// ==========================================
+
 const designSteps = [
-    { title: "Шаг 1. Устройство", options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2}] },
-    { title: "Шаг 2. Шасси", options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3}] },
-    { title: "Шаг 3. Размер", options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
-    { title: "Шаг 4. Разрешение", options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4}] },
-    { title: "Шаг 5. Экран", options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3, lock: !state.research['screen_oled']}] },
-    { title: "Шаг 6. Селфи", options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1, lock: !state.research['cam_2mp']}, {name: "12 МП", cost: 15000, q: 3, lock: !state.research['cam_12mp']}] },
-    { title: "Шаг 7. Камера", options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2, lock: !state.research['cam_12mp']}, {name: "108 МП", cost: 40000, q: 5}] },
-    { title: "Шаг 8. Порт", options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2}] },
-    { title: "Шаг 9. Процессор", options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2}, {name: "Мощный", cost: 50000, q: 5, lock: !state.research['cpu_2ghz']}] },
-    { title: "Шаг 10. Память", options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2}, {name: "8 ГБ", cost: 25000, q: 4}] },
-    { title: "Шаг 11. Батарея", options: [{name: "2000 мАч", cost: 0, q: 0}, {name: "4000 мАч", cost: 8000, q: 2}, {name: "6000 мАч", cost: 20000, q: 4}] },
-    { title: "Шаг 12. Фишки", options: [{name: "Нет", cost: 0, q: 0}, {name: "NFC + GPS", cost: 15000, q: 3}] },
-    { title: "Шаг 13. Цвет", options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] }
+  { title: "Шаг 1. Устройство", options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2}] },
+  { title: "Шаг 2. Шасси", options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3}] },
+  { title: "Шаг 3. Размер", options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
+  { title: "Шаг 4. Разрешение", options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4}] },
+  { title: "Шаг 5. Экран", options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3}] },
+  { title: "Шаг 6. Селфи", options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1}, {name: "12 МП", cost: 15000, q: 3}] },
+  { title: "Шаг 7. Камера", options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2}, {name: "108 МП", cost: 40000, q: 5}] },
+  { title: "Шаг 8. Порт", options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2}] },
+  { title: "Шаг 9. Процессор", options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2}, {name: "Мощный", cost: 50000, q: 5}] },
+  { title: "Шаг 10. Память", options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2}, {name: "8 ГБ", cost: 25000, q: 4}] },
+  { title: "Шаг 11. Батарея", options: [{name: "2000 мАч", cost: 0, q: 0}, {name: "4000 мАч", cost: 8000, q: 2}, {name: "6000 мАч", cost: 20000, q: 4}] },
+  { title: "Шаг 12. Фишки", options: [{name: "Нет", cost: 0, q: 0}, {name: "NFC + GPS", cost: 15000, q: 3}] },
+  { title: "Шаг 13. Цвет", options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] }
 ];
 
+let currentStep = 0;
+let currentDesign = { cost: 0, quality: 0, name: "iFon" };
+
 function openDesignStudio() {
-    document.getElementById('design-screen').classList.add('active');
-    currentStep = 0;
-    currentDesign = { cost: 0, quality: 0 };
-    renderDesignStep();
+  playSound('click');
+  document.getElementById('design-screen').classList.add('active');
+  currentStep = 0;
+  currentDesign = { cost: 0, quality: 0, name: "iFon" };
+  renderDesignStep();
 }
+
 function closeDesignStudio() {
-    document.getElementById('design-screen').classList.remove('active');
+  playSound('click');
+  document.getElementById('design-screen').classList.remove('active');
 }
 
 function renderDesignStep() {
-    if (currentStep >= designSteps.length) {
-        if (state.money < currentDesign.cost) { showToast("Мало денег на прототип!"); return; }
-        state.money -= currentDesign.cost;
-        let score = (5 + currentDesign.quality / 2).toFixed(1);
-        if(score > 9.9) score = 9.9;
-        
-        let profit = Math.floor(score * 1000000) + (currentDesign.quality * 50000);
-        state.money += profit;
-        showToast(`Устройство выпущено! Оценка: ${score}. Прибыль: $${profit.toLocaleString()}`);
-        closeDesignStudio(); updateUI(); save();
-        return;
-    }
+  if (currentStep >= designSteps.length) {
+    // Финал - показываем модалку релиза
+    let score = Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1);
+    let profit = Math.floor(score * 100000) + (currentDesign.quality * 5000);
+    
+    document.getElementById('release-score').innerText = score;
+    document.getElementById('release-profit').innerText = '$' + profit.toLocaleString();
+    document.getElementById('modal-release').classList.add('active');
+    playSound('release');
+    startConfetti();
+    return;
+  }
 
-    const step = designSteps[currentStep];
-    document.getElementById('ds-title').innerText = step.title;
-    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
+  const step = designSteps[currentStep];
+  document.getElementById('ds-title').innerText = step.title;
+  document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
+  
+  // Рандомное обновление превью телефона
+  let preview = document.getElementById('ds-phone-preview');
+  let colors = ['#333', '#fff', '#4facfe', '#ff0055', '#8E2DE2'];
+  preview.style.borderColor = colors[currentStep % colors.length];
+  
+  // Имя телефона
+  document.getElementById('ds-phone-name').innerText = currentDesign.name + " " + (state.releasedPhones.length + 1);
+
+  const opts = document.getElementById('ds-options');
+  opts.innerHTML = '';
+  
+  step.options.forEach(o => {
+    let el = document.createElement('div');
+    el.className = `ds-opt`;
     
-    const opts = document.getElementById('ds-options');
-    opts.innerHTML = '';
+    let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
     
-    step.options.forEach(o => {
-        let el = document.createElement('div');
-        el.className = `ds-opt ${o.lock ? 'locked' : ''}`;
-        
-        let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
-        if (o.lock) priceStr = '🔒 Не изучено';
-        
-        el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
-        
-        if (!o.lock) {
-            el.onclick = () => {
-                currentDesign.cost += o.cost;
-                currentDesign.quality += o.q;
-                currentStep++;
-                renderDesignStep();
-            };
-        }
-        opts.appendChild(el);
+    el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
+    
+    el.onclick = () => {
+      playSound('click');
+      currentDesign.cost += o.cost;
+      currentDesign.quality += o.q;
+      currentStep++;
+      renderDesignStep();
+    };
+    opts.appendChild(el);
+  });
+}
+
+function prevDesignStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderDesignStep();
+  } else {
+    closeDesignStudio();
+  }
+}
+
+function skipDesignStep() {
+  playSound('click');
+  currentStep++;
+  renderDesignStep();
+}
+
+function finishRelease() {
+  let score = parseFloat(document.getElementById('release-score').innerText);
+  let profit = parseInt(document.getElementById('release-profit').innerText.replace(/[^0-9]/g, ''));
+  
+  // Списываем затраты на прототип
+  if (state.money < currentDesign.cost) {
+    showToast("Не хватает денег на производство!", 'red');
+    return;
+  }
+  state.money -= currentDesign.cost;
+  
+  // Добавляем телефон в историю
+  state.releasedPhones.push({
+    name: currentDesign.name + " " + (state.releasedPhones.length + 1),
+    score: score,
+    profitPerDay: Math.floor(profit / 30), // Прибыль распределяется на месяц
+    releaseYear: state.year
+  });
+
+  closeModal('modal-release');
+  closeDesignStudio();
+  updateUI(); save();
+  showToast(`Телефон выпущен! Оценка: ${score}`, 'green');
+}
+
+// ==========================================
+// 12. КОМПАНИЯ И НОВОСТИ
+// ==========================================
+
+function renderCompany() {
+  let list = document.getElementById('company-history-list');
+  if (state.releasedPhones.length === 0) {
+    list.innerHTML = 'У вас пока нет выпущенных телефонов.';
+    return;
+  }
+  
+  list.innerHTML = state.releasedPhones.map(p => 
+    `<div style="border-bottom:1px solid #333; padding:5px 0;">
+      <b>${p.name}</b> (${p.releaseYear}) — Оценка: ${p.score}★ — Доход: $${p.profitPerDay}/день
+    </div>`
+  ).join('');
+}
+
+function renderNews() {
+  let list = document.getElementById('news-list');
+  list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">Пресса пока молчит...</div>';
+}
+
+// ==========================================
+// 13. УТИЛИТЫ (Тосты, Модалки, Конфетти)
+// ==========================================
+
+function showToast(msg, type = 'green') {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+  t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Конфетти
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function startConfetti() {
+  particles = [];
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      vx: (Math.random() - 0.5) * 20,
+      vy: (Math.random() - 0.5) * 20,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      size: Math.random() * 6 + 2,
+      life: 100
     });
+  }
+  requestAnimationFrame(updateConfetti);
 }
 
-// --- 10. СОХРАНЕНИЯ ---
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+function updateConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let alive = false;
+  
+  particles.forEach(p => {
+    if (p.life > 0) {
+      alive = true;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.3; // Гравитация
+      p.life--;
+      
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+  });
+  
+  if (alive) requestAnimationFrame(updateConfetti);
+  else ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
-function save() { localStorage.setItem('tech_empire_v6', JSON.stringify(state)); }
-function loadSave() {
-    const saved = localStorage.getItem('tech_empire_v6');
-    if (saved) { try { state = JSON.parse(saved); } catch(e){} }
-     }
+
   </script>
 </body>
 </html>
