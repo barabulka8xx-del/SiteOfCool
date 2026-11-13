@@ -81,7 +81,7 @@ body {
 .btn-gold { background: var(--gold); color: #000; }
 
 /* ОФИС (2.5D) */
-.office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; }
+.office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; gap: 5px; }
 .placed-area { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px 10px; perspective: 800px; }
 
 .workstation { 
@@ -169,6 +169,11 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+/* Стили для горизонтального магазина */
+#shop-list::-webkit-scrollbar { height: 4px; }
+#shop-list::-webkit-scrollbar-track { background: transparent; }
+#shop-list::-webkit-scrollbar-thumb { background: var(--border); }
   </style>
 </head>
 <body>
@@ -279,9 +284,10 @@ body {
     <div class="office-header">
       <span id="ui-office-name" style="color:var(--gold); font-weight:900;">Гараж</span>
       <span id="ui-slots" style="color:#aaa;">0 / 3</span>
+      <span id="ui-comfort" style="color:var(--gold); font-size:10px;">⭐ Комфорт: 0.0</span>
       <button class="btn" style="padding:6px 10px; font-size:10px; background:var(--purple); color:#fff;" onclick="upgradeOffice()">Улучшить</button>
     </div>
-    <div style="text-align:center; color:#888; font-size:11px; margin-top:5px;">Тапни по столу, чтобы прикрепить стул или ПК</div>
+    <div style="text-align:center; color:#888; font-size:11px; margin-top:5px;">Тапни по столу, чтобы прикрепить предметы</div>
     <div class="placed-area" id="placed-area"></div>
   </div>
 
@@ -304,10 +310,14 @@ body {
   <!-- ЭКРАН: МАГАЗИН -->
   <div class="screen" id="screen-shop">
     <div style="display:flex; gap:5px; overflow-x:auto; padding-bottom:10px;" id="shop-tabs">
-      <button class="btn" onclick="switchShopTab('desks')" style="padding:6px 12px; font-size:10px;">Столы</button>
-      <button class="btn" onclick="switchShopTab('chairs')" style="padding:6px 12px; font-size:10px; background:#333;">Стулья</button>
-      <button class="btn" onclick="switchShopTab('pcs')" style="padding:6px 12px; font-size:10px; background:#333;">ПК</button>
-      <button class="btn" onclick="switchShopTab('lab')" style="padding:6px 12px; font-size:10px; background:#333;">Лаборатория</button>
+      <button class="btn" onclick="switchShopTab('desks')" style="padding:6px 12px; font-size:10px; white-space:nowrap;">Столы</button>
+      <button class="btn" onclick="switchShopTab('chairs')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Стулья</button>
+      <button class="btn" onclick="switchShopTab('pcs')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">ПК</button>
+      <button class="btn" onclick="switchShopTab('lab')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Лаборатория</button>
+      <button class="btn" onclick="switchShopTab('rest')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Зона отдыха</button>
+      <button class="btn" onclick="switchShopTab('plants')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Растения</button>
+      <button class="btn" onclick="switchShopTab('lighting')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Освещение</button>
+      <button class="btn" onclick="switchShopTab('decor')" style="padding:6px 12px; font-size:10px; background:#333; white-space:nowrap;">Украшения</button>
     </div>
     <div id="shop-list"></div>
   </div>
@@ -438,7 +448,7 @@ body {
 // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 
-const SAVE_KEY = 'tech_empire_v8_1';
+const SAVE_KEY = 'tech_empire_v9';
 
 const OFFICES = [
   { name: "Гараж", slots: 3, cost: 0 },
@@ -574,7 +584,6 @@ function startGame() {
   renderResearchTree();
   startGameLoop();
   
-  // Включаем туториал при первом запуске
   if (!saved) {
     startTutorial();
   }
@@ -591,7 +600,6 @@ function save() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state));
 }
 
-// Сохранение при закрытии
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') save();
 });
@@ -658,27 +666,22 @@ function startGameLoop() {
       renderResearchTree(); 
     }
 
-    // Ежедневный доход от проданных телефонов
     let dailyIncome = 0;
     state.releasedPhones.forEach(p => {
       if (state.year - p.releaseYear < 5) dailyIncome += p.profitPerDay;
     });
     
-    // Доход от услуг империи
     dailyIncome += (state.empire.servicesIncome || 0) / 30;
 
-    // Расходы на зарплаты
     let dailyExpense = 0;
     state.employees.forEach(e => dailyExpense += e.salary / 30);
     
     state.money += (dailyIncome - dailyExpense) * daysPassed;
 
-    // RP от исследователей
     let rpPerDay = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
     let labBonus = state.workstations.filter(w => w.lab).length * 5;
     state.rp += (rpPerDay + labBonus) * daysPassed;
 
-    // Проверка на банкротство
     if (state.money < -5000000) {
       triggerBankruptcy();
     }
@@ -716,7 +719,6 @@ function updateUI() {
   document.getElementById('ui-office-name').innerText = office.name;
   document.getElementById('ui-slots').innerText = `${state.workstations.filter(w => w.desk).length} / ${office.slots}`;
   
-  // Команда
   document.getElementById('team-slots').innerText = `${state.employees.length} / ${office.slots}`;
   let totalSal = state.employees.reduce((acc, e) => acc + e.salary, 0);
   document.getElementById('team-salary').innerText = '$' + totalSal.toLocaleString();
@@ -725,12 +727,10 @@ function updateUI() {
   let totalBugs = state.employees.filter(e => e.role === 'fixer').reduce((acc, e) => acc + (e.stars * 1.5), 0);
   document.getElementById('team-bugs').innerText = totalBugs + ' / день';
 
-  // Исследования
   let unlocked = RESEARCH_TREE.filter(t => t.unlocked).length;
   let percent = RESEARCH_TREE.length > 0 ? (unlocked / RESEARCH_TREE.length) * 100 : 0;
   document.getElementById('ui-research-progress').style.width = percent + '%';
 
-  // Обзор компании
   document.getElementById('ui-devices').innerText = state.releasedPhones.length;
   document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + 10000, 0).toLocaleString();
   let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
@@ -764,15 +764,36 @@ function switchTab(tabId) {
 function renderOffice() {
   const area = document.getElementById('placed-area');
   area.innerHTML = '';
+  
+  let totalComfort = 0;
+  state.workstations.forEach(ws => {
+    if (ws.chair) totalComfort += ws.chair.bonus;
+    if (ws.rest) totalComfort += ws.rest.bonus;
+    if (ws.plant) totalComfort += ws.plant.bonus;
+    if (ws.light) totalComfort += ws.light.bonus;
+    if (ws.decor) totalComfort += ws.decor.bonus;
+  });
+  
+  let comfortSpan = document.getElementById('ui-comfort');
+  if (comfortSpan) comfortSpan.innerText = `⭐ Комфорт: ${totalComfort.toFixed(1)}`;
+
   state.workstations.forEach(ws => {
     if (!ws.desk) return;
     const el = document.createElement('div');
     el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
+    
     let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
     let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
-    let labHtml = ws.lab ? `<div class="attachment pc" style="left:auto; right:5px; color:var(--purple);">🧪</div>` : '';
+    let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
+    let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
+    let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
     
-    el.innerHTML = `${pcHtml}${labHtml}<div class="icon">${ws.desk.icon}</div>${chairHtml}<div class="name">${ws.desk.name}</div>`;
+    el.innerHTML = `
+      ${pcHtml}${labHtml}${restHtml}${plantHtml}
+      <div class="icon">${ws.desk.icon}</div>
+      ${chairHtml}
+      <div class="name">${ws.desk.name}</div>
+    `;
     
     el.onclick = () => {
       playSound('click');
@@ -883,186 +904,274 @@ function fireEmployee(id) {
   playSound('click');
   updateUI(); save();
   showToast(`${emp.name} уволен.`, 'red');
-}
-
-// ==========================================
-// 7. МАГАЗИН
-// ==========================================
-
-const SHOP_ITEMS = {
-  desks: [
-    { id: 'desk_wood', name: '🪵 Старый стол', price: 12000, icon: '🪵' },
-    { id: 'desk_glass', name: '💎 Стеклянный стол', price: 250000, icon: '💎' },
-    { id: 'desk_battle', name: '⚔️ Боевая станция', price: 25000000, icon: '⚔️' }
-  ],
-  chairs: [
-    { id: 'chair_stool', name: '🪑 Табурет', price: 5000, icon: '🪑' },
-    { id: 'chair_gaming', name: '🎮 Гоночное кресло', price: 50000, icon: '🎮' },
-    { id: 'chair_throne', name: '👑 Трон', price: 1000000, icon: '👑' }
-  ],
-  pcs: [
-    { id: 'pc_crt', name: '🖥️ ЭЛТ Монитор', price: 8000, icon: '🖥️' },
-    { id: 'pc_flat', name: '🖥️ Плоский', price: 30000, icon: '🖥️' },
-    { id: 'pc_dual', name: '🖥️ Два монитора', price: 100000, icon: '🖥️' }
-  ],
-  lab: [
-    { id: 'lab_board', name: '🧪 Тестовая плата', price: 500000, icon: '🧪' },
-    { id: 'lab_server', name: '🗄️ Серверная стойка', price: 2000000, icon: '🗄️' }
-  ]
-};
-
-function switchShopTab(tab) {
-  playSound('click');
-  document.querySelectorAll('#shop-tabs .btn').forEach(b => b.style.background = '#333');
-  if (event && event.target) event.target.style.background = 'var(--blue)';
-  renderShop(tab);
-}
-
-function renderShop(tab) {
-  const list = document.getElementById('shop-list');
-  list.innerHTML = '';
-  if (!SHOP_ITEMS[tab]) return;
-  
-  SHOP_ITEMS[tab].forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'card';
-    el.innerHTML = `
-      <div class="card-info">
-        <div class="card-title">${item.name}</div>
-        <div class="card-desc" style="color:var(--gold);">$${item.price.toLocaleString()}</div>
-      </div>
-      <button class="btn" onclick="buyItem('${tab}', '${item.id}')">Купить</button>
-    `;
-    list.appendChild(el);
-  });
-}
-
-function buyItem(category, itemId) {
-  const item = SHOP_ITEMS[category].find(i => i.id === itemId);
-  if (!item) return;
-  
-  // Мы разрешаем уходить в минус, поэтому просто списываем
-  if (category === 'desks') {
-    if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места!", 'red'); return; }
-    state.money -= item.price;
-    state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null });
-  } else {
-    if (!state.selectedDeskId) { showToast("Сначала выбери стол в офисе!", 'red'); return; }
-    let desk = state.workstations.find(w => w.id === state.selectedDeskId);
-    if (!desk) return;
-    if (category === 'chairs') { if (desk.chair) return showToast("Стул уже есть"); desk.chair = item; }
-    if (category === 'pcs') { if (desk.pc) return showToast("ПК уже есть"); desk.pc = item; }
-    if (category === 'lab') { if (desk.lab) return showToast("Лаборатория уже есть"); desk.lab = item; }
-    state.money -= item.price;
   }
-  playSound('buy');
-  updateUI(); save();
-  showToast("Куплено!");
-}
-
-function upgradeOffice() {
-  if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
-  const cost = OFFICES[state.officeLvl + 1].cost;
-  state.money -= cost; 
-  state.officeLvl++;
-  playSound('buy');
-  updateUI(); save(); 
-  showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`, 'green');
-}
-
-// ==========================================
-// 8. ИССЛЕДОВАНИЯ
-// ==========================================
-
-function renderResearchTree() {
-  const timeline = document.getElementById('tree-timeline');
-  const body = document.getElementById('tree-body');
-  timeline.innerHTML = ''; body.innerHTML = '';
-  
-  let grid = document.createElement('div');
-  grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = `120px repeat(46, 100px)`;
-  grid.style.gap = '10px'; grid.style.alignItems = 'center';
-
-  grid.appendChild(document.createElement('div')); 
-  for (let y = 2007; y <= 2052; y++) {
-    let yearHeader = document.createElement('div');
-    yearHeader.innerText = y;
-    yearHeader.style.textAlign = 'center'; yearHeader.style.fontWeight = 'bold';
-    yearHeader.style.color = y === state.year ? 'var(--gold)' : '#666';
-    yearHeader.style.fontSize = '12px';
-    yearHeader.style.borderBottom = y === state.year ? '2px solid var(--gold)' : '1px solid #222';
-    yearHeader.style.paddingBottom = '5px';
-    grid.appendChild(yearHeader);
-  }
-
-  TECH_BRANCHES.forEach(branch => {
-    let branchName = document.createElement('div');
-    branchName.innerText = branch.name; branchName.style.color = branch.color;
-    branchName.style.fontWeight = 'bold'; branchName.style.fontSize = '14px';
-    branchName.style.borderLeft = `3px solid ${branch.color}`; branchName.style.paddingLeft = '10px';
-    grid.appendChild(branchName);
-
-    for (let y = 2007; y <= 2052; y++) {
-      let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === y);
-      let cell = document.createElement('div');
-      cell.style.display = 'flex'; cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
-      cell.style.height = '40px'; cell.style.position = 'relative';
-
-      if (tech) {
-        let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
-        let node = document.createElement('div');
-        node.className = 'tree-node';
-        node.style.width = '80px'; node.style.height = '40px'; node.style.margin = '0';
-        node.style.borderRadius = '6px'; node.style.fontSize = '9px';
-        node.style.cursor = tech.unlocked || isAvailable ? 'pointer' : 'not-allowed';
-        
-        if (tech.unlocked) {
-          node.style.background = `rgba(0, 255, 136, 0.1)`; node.style.border = `1px solid var(--green)`; node.style.color = 'var(--green)';
-        } else if (isAvailable) {
-          node.style.background = `rgba(255, 215, 0, 0.1)`; node.style.border = `1px solid var(--gold)`; node.style.color = 'var(--gold)';
-          node.style.animation = 'pulse 2s infinite';
-        } else {
-          node.style.background = `#111`; node.style.border = `1px solid ${branch.color}`; node.style.color = '#888'; node.style.opacity = '0.6';
-        }
-
-        node.innerHTML = `<div style="font-weight:bold; margin-bottom:2px;">${tech.name}</div><div>${tech.unlocked ? '✅' : tech.cost + ' RP'}</div>`;
-        if (tech.unlocked || isAvailable) node.onclick = () => unlockTech(tech.id);
-        cell.appendChild(node);
-
-        if (y < 2052) {
-          let line = document.createElement('div');
-          line.style.position = 'absolute'; line.style.right = '-10px'; line.style.width = '10px'; line.style.height = '2px';
-          line.style.background = tech.unlocked ? 'var(--green)' : '#333';
-          cell.appendChild(line);
-        }
-      } else {
-        let dot = document.createElement('div');
-        dot.style.width = '2px'; dot.style.height = '2px'; dot.style.background = '#333';
-        cell.appendChild(dot);
-      }
-      grid.appendChild(cell);
-    }
-  });
-  body.appendChild(grid);
-}
-
-function unlockTech(id) {
-  let tech = RESEARCH_TREE.find(t => t.id === id);
-  if (!tech || tech.unlocked) return;
-  if (state.year < tech.yearReq) { showToast("Этот год еще не наступил!", 'red'); return; }
-  if (state.rp < tech.cost) { showToast("Не хватает RP!", 'red'); return; }
-  
-  state.rp -= tech.cost;
-  tech.unlocked = true;
-  state.research[tech.id] = true;
-  
-  playSound('buy');
-  updateUI(); save();
-  renderResearchTree();
-  showToast(`Изучено: ${tech.name}`, 'green');
-    }
       // ==========================================
+  // 7. МЕГА-МАГАЗИН (Все предметы)
+  // ==========================================
+
+  const SHOP_ITEMS = {
+    desks: [
+      { id: 'desk_1', name: '🪵 Складной стол', price: 0, icon: '🪵', bonus: 0, type: 'Скорость работы' },
+      { id: 'desk_2', name: '🪵 Деревянный стол', price: 12000, icon: '🪵', bonus: 3, type: 'Скорость работы' },
+      { id: 'desk_3', name: '🪵 Рабочий стол', price: 50000, icon: '🪵', bonus: 6, type: 'Скорость работы' },
+      { id: 'desk_4', name: '💎 Стеклянный стол', price: 160000, icon: '💎', bonus: 9, type: 'Скорость работы' },
+      { id: 'desk_5', name: '⚔️ Боевая станция', price: 1500000, icon: '⚔️', bonus: 10.5, type: 'Скорость работы' },
+      { id: 'desk_6', name: '👑 Золотой стол', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
+      { id: 'desk_7', name: '🚀 Стол Авроры', price: 2500000000, icon: '🚀', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+    ],
+    chairs: [
+      { id: 'chair_1', name: '🪑 Табурет', price: 0, icon: '🪑', bonus: 0, type: 'Скорость работы' },
+      { id: 'chair_2', name: '💺 Кресло для офиса', price: 12000, icon: '💺', bonus: 3, type: 'Скорость работы' },
+      { id: 'chair_3', name: '💺 Эргономичный стул', price: 50000, icon: '💺', bonus: 6, type: 'Скорость работы' },
+      { id: 'chair_4', name: '💺 Деревянный стул', price: 150000, icon: '💺', bonus: 9, type: 'Скорость работы' },
+      { id: 'chair_5', name: '🏎️ Гоночный стул', price: 1500000, icon: '🏎️', bonus: 10.5, type: 'Скорость работы' },
+      { id: 'chair_6', name: '👑 Трон для массажа', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
+      { id: 'chair_7', name: '👑 Парящее кресло', price: 2000000000, icon: '👑', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+    ],
+    pcs: [
+      { id: 'pc_1', name: '📺 Бежевый ЭЛТ-монитор', price: 0, icon: '📺', bonus: 0, type: 'Исследования' },
+      { id: 'pc_2', name: '🖥️ Плоский монитор', price: 15000, icon: '🖥️', bonus: 15, type: 'Исследования' },
+      { id: 'pc_3', name: '🖥️ Широкий экран', price: 50000, icon: '🖥️', bonus: 30, type: 'Исследования' },
+      { id: 'pc_4', name: '🖥️ Два монитора', price: 150000, icon: '🖥️', bonus: 45, type: 'Исследования' },
+      { id: 'pc_5', name: '🖥️ Тройная установка', price: 1500000, icon: '🖥️', bonus: 60, type: 'Исследования' },
+      { id: 'pc_6', name: '🌌 Голографический экран', price: 25000000, icon: '🌌', bonus: 75, type: 'Исследования', exclusive: true },
+      { id: 'pc_7', name: '⚛️ Квантовая рабочая станция', price: 1500000000, icon: '⚛️', bonus: 90, type: 'Исследования', exclusive: true },
+      { id: 'pc_8', name: '🧠 Нейронный интерфейс', price: 4000000000, icon: '🧠', bonus: 135, type: 'Исследования', exclusive: true }
+    ],
+    lab: [
+      { id: 'lab_1', name: '🧪 Тестовая платформа', price: 50000, icon: '🧪', bonus: 20, type: 'Исправление ошибок' },
+      { id: 'lab_2', name: '🗄️ Серверные стойки', price: 240000, icon: '🗄️', bonus: 20, type: 'Исправление ошибок' },
+      { id: 'lab_3', name: '🔬 Лаборатория', price: 800000, icon: '🔬', bonus: 20, type: 'Исправление ошибок' },
+      { id: 'lab_4', name: '🦾 Рука робота', price: 30000000, icon: '🦾', bonus: 20, type: 'Исправление ошибок' },
+      { id: 'lab_5', name: '💻 Суперкомпьютер', price: 400000000, icon: '💻', bonus: 60, type: 'Исправление ошибок' },
+      { id: 'lab_6', name: '⚛️ Квантовый компьютер', price: 3000000000, icon: '⚛️', bonus: 60, type: 'Исправление ошибок', exclusive: true },
+      { id: 'lab_7', name: '☢️ Реактор слияния', price: 12000000000, icon: '☢️', bonus: 100, type: 'Исправление ошибок', exclusive: true }
+    ],
+    rest: [
+      { id: 'rest_1', name: '🚰 Кулер для воды', price: 1500, icon: '🚰', bonus: 1, type: 'Комфорт' },
+      { id: 'rest_2', name: '☕ Уголок для кофе', price: 3000, icon: '☕', bonus: 2, type: 'Комфорт' },
+      { id: 'rest_3', name: '📋 Доска', price: 4000, icon: '📋', bonus: 1, type: 'Комфорт' },
+      { id: 'rest_4', name: '🛋️ Диван', price: 6000, icon: '🛋️', bonus: 3, type: 'Комфорт' },
+      { id: 'rest_5', name: '📚 Книжный шкаф', price: 10000, icon: '📚', bonus: 2, type: 'Комфорт' },
+      { id: 'rest_6', name: '🎰 Игровой автомат', price: 80000, icon: '🎰', bonus: 4, type: 'Комфорт' },
+      { id: 'rest_7', name: '🥤 Автомат продажи', price: 150000, icon: '🥤', bonus: 3, type: 'Комфорт' },
+      { id: 'rest_8', name: '🎱 Настольный бильярд', price: 2000000, icon: '🎱', bonus: 6, type: 'Комфорт' },
+      { id: 'rest_9', name: '🍹 Бар для приготовления', price: 5000000, icon: '🍹', bonus: 6, type: 'Комфорт' },
+      { id: 'rest_10', name: '🐠 Аквариум', price: 12000000, icon: '🐠', bonus: 8, type: 'Комфорт' },
+      { id: 'rest_11', name: '🛋️ Неоновый салон', price: 60000000, icon: '🛋️', bonus: 10, type: 'Комфорт' }
+    ],
+    plants: [
+      { id: 'plant_1', name: '🪴 Растение в горшке', price: 500, icon: '🪴', bonus: 1, type: 'Комфорт' },
+      { id: 'plant_2', name: '🪴 Высокое растение', price: 2000, icon: '🪴', bonus: 2, type: 'Комфорт' },
+      { id: 'plant_3', name: '🌴 Пальмовое дерево', price: 15000, icon: '🌴', bonus: 3, type: 'Комфорт' },
+      { id: 'plant_4', name: '🌳 Бонсай', price: 250000, icon: '🌳', bonus: 4, type: 'Комфорт' },
+      { id: 'plant_5', name: '🌲 Внутреннее дерево', price: 3000000, icon: '🌲', bonus: 6, type: 'Комфорт' }
+    ],
+    lighting: [
+      { id: 'light_1', name: '💡 Напольная лампа', price: 1000, icon: '💡', bonus: 1, type: 'Комфорт' },
+      { id: 'light_2', name: '💡 Световая лампа', price: 20000, icon: '💡', bonus: 2, type: 'Комфорт' },
+      { id: 'light_3', name: '💡 Неоновая табличка', price: 400000, icon: '💡', bonus: 4, type: 'Комфорт' },
+      { id: 'light_4', name: '💡 Световой столб LED', price: 8000000, icon: '💡', bonus: 5, type: 'Комфорт' }
+    ],
+    decor: [
+      { id: 'decor_1', name: '🟫 Ковер', price: 2000, icon: '🟫', bonus: 1, type: 'Комфорт' },
+      { id: 'decor_2', name: '🟫 Роскошный ковер', price: 50000, icon: '🟫', bonus: 3, type: 'Комфорт' },
+      { id: 'decor_3', name: '🗄️ Шкаф для хранения', price: 3000, icon: '🗄️', bonus: 1, type: 'Комфорт' },
+      { id: 'decor_4', name: '🌍 Глобус', price: 50000, icon: '🌍', bonus: 2, type: 'Комфорт' },
+      { id: 'decor_5', name: '📺 Дисплей телефона', price: 1000000, icon: '📺', bonus: 4, type: 'Комфорт' },
+      { id: 'decor_6', name: '🗿 Современная статуя', price: 80000000, icon: '🗿', bonus: 8, type: 'Комфорт' }
+    ]
+  };
+
+  function switchShopTab(tab) {
+    playSound('click');
+    document.querySelectorAll('#shop-tabs .btn').forEach(b => b.style.background = '#333');
+    if (event && event.target) event.target.style.background = 'var(--blue)';
+    renderShop(tab);
+  }
+
+  function renderShop(tab) {
+    const list = document.getElementById('shop-list');
+    list.innerHTML = '';
+    if (!SHOP_ITEMS[tab]) return;
+
+    list.style.display = 'flex';
+    list.style.gap = '10px';
+    list.style.overflowX = 'auto';
+    list.style.paddingBottom = '15px';
+    list.style.paddingTop = '5px';
+    list.style.scrollBehavior = 'smooth';
+    list.style.WebkitOverflowScrolling = 'touch'; 
+    
+    SHOP_ITEMS[tab].forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.style.flexDirection = 'column';
+      el.style.minWidth = '140px';
+      el.style.maxWidth = '140px';
+      el.style.padding = '10px';
+      el.style.margin = '0';
+      el.style.textAlign = 'center';
+      el.style.justifyContent = 'space-between';
+      if (item.exclusive) el.style.borderColor = 'var(--gold)';
+      
+      let bonusHtml = item.bonus > 0 ? `<div style="font-size:10px; color:var(--green); margin-bottom:5px;">${item.type} +${item.bonus}%</div>` : '';
+      let exclusiveHtml = item.exclusive ? `<div style="font-size:9px; color:var(--gold); position:absolute; top:-5px; background:var(--bg); padding:0 5px; border-radius:5px; border:1px solid var(--gold);">ЭКСКЛЮЗИВ</div>` : '';
+      
+      el.innerHTML = `
+        ${exclusiveHtml}
+        <div style="font-size:35px; margin-bottom:5px;">${item.icon}</div>
+        <div style="font-size:12px; font-weight:900; margin-bottom:5px; line-height:1.2;">${item.name}</div>
+        ${bonusHtml}
+        <div style="font-size:12px; color:var(--gold); font-weight:bold; margin-bottom:10px;">${item.price === 0 ? 'Бесплатно' : '$' + item.price.toLocaleString()}</div>
+        <button class="btn" style="width:100%; padding:8px 0; font-size:11px;" onclick="buyItem('${tab}', '${item.id}')">Купить</button>
+      `;
+      el.style.position = 'relative';
+      list.appendChild(el);
+    });
+  }
+
+  function buyItem(category, itemId) {
+    const item = SHOP_ITEMS[category].find(i => i.id === itemId);
+    if (!item) return;
+    
+    if (category === 'desks') {
+      if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места! Купите офис побольше.", 'red'); return; }
+      state.money -= item.price;
+      state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null, rest: null, plant: null, light: null, decor: null });
+    } else {
+      if (!state.selectedDeskId) { showToast("Сначала выбери стол в офисе!", 'red'); return; }
+      let desk = state.workstations.find(w => w.id === state.selectedDeskId);
+      if (!desk) return;
+      
+      if (category === 'chairs' && desk.chair) { showToast("Стул уже есть"); return; }
+      if (category === 'pcs' && desk.pc) { showToast("ПК уже есть"); return; }
+      if (category === 'lab' && desk.lab) { showToast("Лаборатория уже есть"); return; }
+      if (category === 'rest' && desk.rest) { showToast("Зона отдыха уже есть"); return; }
+      if (category === 'plants' && desk.plant) { showToast("Растение уже есть"); return; }
+      if (category === 'lighting' && desk.light) { showToast("Освещение уже есть"); return; }
+      if (category === 'decor' && desk.decor) { showToast("Украшение уже есть"); return; }
+      
+      if (category === 'chairs') desk.chair = item;
+      if (category === 'pcs') desk.pc = item;
+      if (category === 'lab') desk.lab = item;
+      if (category === 'rest') desk.rest = item;
+      if (category === 'plants') desk.plant = item;
+      if (category === 'lighting') desk.light = item;
+      if (category === 'decor') desk.decor = item;
+      
+      state.money -= item.price;
+    }
+    
+    playSound('buy');
+    updateUI(); save();
+    showToast("Куплено!");
+  }
+
+  function upgradeOffice() {
+    if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
+    const cost = OFFICES[state.officeLvl + 1].cost;
+    state.money -= cost; 
+    state.officeLvl++;
+    playSound('buy');
+    updateUI(); save(); 
+    showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`, 'green');
+  }
+
+  // ==========================================
+  // 8. ИССЛЕДОВАНИЯ
+  // ==========================================
+
+  function renderResearchTree() {
+    const timeline = document.getElementById('tree-timeline');
+    const body = document.getElementById('tree-body');
+    timeline.innerHTML = ''; body.innerHTML = '';
+    
+    let grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `120px repeat(46, 100px)`;
+    grid.style.gap = '10px'; grid.style.alignItems = 'center';
+
+    grid.appendChild(document.createElement('div')); 
+    for (let y = 2007; y <= 2052; y++) {
+      let yearHeader = document.createElement('div');
+      yearHeader.innerText = y;
+      yearHeader.style.textAlign = 'center'; yearHeader.style.fontWeight = 'bold';
+      yearHeader.style.color = y === state.year ? 'var(--gold)' : '#666';
+      yearHeader.style.fontSize = '12px';
+      yearHeader.style.borderBottom = y === state.year ? '2px solid var(--gold)' : '1px solid #222';
+      yearHeader.style.paddingBottom = '5px';
+      grid.appendChild(yearHeader);
+    }
+
+    TECH_BRANCHES.forEach(branch => {
+      let branchName = document.createElement('div');
+      branchName.innerText = branch.name; branchName.style.color = branch.color;
+      branchName.style.fontWeight = 'bold'; branchName.style.fontSize = '14px';
+      branchName.style.borderLeft = `3px solid ${branch.color}`; branchName.style.paddingLeft = '10px';
+      grid.appendChild(branchName);
+
+      for (let y = 2007; y <= 2052; y++) {
+        let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === y);
+        let cell = document.createElement('div');
+        cell.style.display = 'flex'; cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
+        cell.style.height = '40px'; cell.style.position = 'relative';
+
+        if (tech) {
+          let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
+          let node = document.createElement('div');
+          node.className = 'tree-node';
+          node.style.width = '80px'; node.style.height = '40px'; node.style.margin = '0';
+          node.style.borderRadius = '6px'; node.style.fontSize = '9px';
+          node.style.cursor = tech.unlocked || isAvailable ? 'pointer' : 'not-allowed';
+          
+          if (tech.unlocked) {
+            node.style.background = `rgba(0, 255, 136, 0.1)`; node.style.border = `1px solid var(--green)`; node.style.color = 'var(--green)';
+          } else if (isAvailable) {
+            node.style.background = `rgba(255, 215, 0, 0.1)`; node.style.border = `1px solid var(--gold)`; node.style.color = 'var(--gold)';
+            node.style.animation = 'pulse 2s infinite';
+          } else {
+            node.style.background = `#111`; node.style.border = `1px solid ${branch.color}`; node.style.color = '#888'; node.style.opacity = '0.6';
+          }
+
+          node.innerHTML = `<div style="font-weight:bold; margin-bottom:2px;">${tech.name}</div><div>${tech.unlocked ? '✅' : (state.year >= tech.yearReq ? tech.cost + ' RP' : '???')}</div>`;
+          if (tech.unlocked || isAvailable) node.onclick = () => unlockTech(tech.id);
+          cell.appendChild(node);
+
+          if (y < 2052) {
+            let line = document.createElement('div');
+            line.style.position = 'absolute'; line.style.right = '-10px'; line.style.width = '10px'; line.style.height = '2px';
+            line.style.background = tech.unlocked ? 'var(--green)' : '#333';
+            cell.appendChild(line);
+          }
+        } else {
+          let dot = document.createElement('div');
+          dot.style.width = '2px'; dot.style.height = '2px'; dot.style.background = '#333';
+          cell.appendChild(dot);
+        }
+        grid.appendChild(cell);
+      }
+    });
+    body.appendChild(grid);
+  }
+
+  function unlockTech(id) {
+    let tech = RESEARCH_TREE.find(t => t.id === id);
+    if (!tech || tech.unlocked) return;
+    if (state.year < tech.yearReq) { showToast("Этот год еще не наступил!", 'red'); return; }
+    if (state.rp < tech.cost) { showToast("Не хватает RP!", 'red'); return; }
+    
+    state.rp -= tech.cost;
+    tech.unlocked = true;
+    state.research[tech.id] = true;
+    
+    playSound('buy');
+    updateUI(); save();
+    renderResearchTree();
+    showToast(`Изучено: ${tech.name}`, 'green');
+  }
+
+  // ==========================================
   // 9. ДИЗАЙН-СТУДИЯ (13 ШАГОВ С ЗАМОЧКАМИ)
   // ==========================================
 
@@ -1078,8 +1187,8 @@ function unlockTech(id) {
     { title: "Шаг 9. Процессор", type: 'single', options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2, req: 'tech_8'}, {name: "Мощный", cost: 50000, q: 5, req: 'tech_20'}] },
     { title: "Шаг 10. Память", type: 'single', options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2, req: 'tech_3'}, {name: "8 ГБ", cost: 25000, q: 4, req: 'tech_15'}] },
     { title: "Шаг 11. Функции", type: 'multiple', options: [
-      {name: "NFC", cost: 2000, q: 1, req: 'tech_30'}, 
       {name: "GPS", cost: 1500, q: 1, req: 'tech_9'}, 
+      {name: "NFC", cost: 2000, q: 1, req: 'tech_30'}, 
       {name: "Влагозащита", cost: 5000, q: 2, req: 'tech_18'}, 
       {name: "Стереозвук", cost: 3000, q: 1, req: 'tech_24'}
     ]},
@@ -1130,16 +1239,30 @@ function unlockTech(id) {
     step.options.forEach(o => {
       let el = document.createElement('div');
       
-      // Проверка замочка (привязка к Науке)
       let isLocked = false;
+      let lockText = '';
+      let techYear = 2007;
+
       if (o.req) {
         let tech = RESEARCH_TREE.find(t => t.id === o.req);
-        if (tech && !tech.unlocked) isLocked = true;
+        if (tech) {
+          techYear = tech.yearReq;
+          if (!tech.unlocked) {
+            isLocked = true;
+            if (state.year < tech.yearReq) {
+              lockText = `🔒 Прибудет в ${techYear} г.`;
+            } else if (state.rp < tech.cost) {
+              lockText = `🔒 RP ${tech.cost}`;
+            } else {
+              lockText = `🔒 Нужны ранние иссл.`;
+            }
+          }
+        }
       }
       
       el.className = `ds-opt ${isLocked ? 'locked' : ''}`;
       let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
-      if (isLocked) priceStr = '🔒 Не изучено';
+      if (isLocked) priceStr = lockText;
       
       if (step.type === 'multiple') {
         let isChecked = currentDesign.features.includes(o.name);
@@ -1189,7 +1312,6 @@ function unlockTech(id) {
     let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
     let profit = Math.floor((score * 100000) + (currentDesign.quality * 5000));
     
-    // Списание денег (разрешаем уход в минус)
     state.money -= currentDesign.cost;
     
     state.releasedPhones.push({
@@ -1201,7 +1323,6 @@ function unlockTech(id) {
 
     state.reputation += score / 10;
     
-    // Обновляем акции, если компания публичная
     if (state.isPublic) {
       state.stockPrice = Math.max(0.1, state.stockPrice + (score - 5) * 2);
       state.stockHistory.push(state.stockPrice);
@@ -1474,7 +1595,6 @@ function unlockTech(id) {
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Запуск ивентов (раз в 60 секунд реального времени, если скорость > 0)
   setInterval(() => {
     if (state.speed > 0 && Math.random() > 0.7) {
       triggerRandomEvent();
@@ -1507,11 +1627,13 @@ function unlockTech(id) {
     document.getElementById('tut-text').innerText = tutTexts[tutStep];
   }
 
-  // Финальный автосохранение при закрытии
   window.addEventListener('beforeunload', () => {
     save();
   });
 
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
