@@ -159,7 +159,7 @@
         margin-bottom: 10px; 
         font-size: 12px; 
         text-align: left; 
-        max-height: 350px; 
+        max-height: 250px; 
         overflow-y: auto; 
         scrollbar-width: thin;
         scrollbar-color: #4facfe #0f2027;
@@ -775,7 +775,7 @@ async function loadCapital() {
     } catch(e) { document.getElementById('banner-capital').innerHTML = "<span style='color:#ff0055; font-weight:bold;'>⚠️ Ошибка сервера</span>"; }
 }
 
-// --- 4. ЕЖЕДНЕВКА И ТАЙМЕР (ИСПРАВЛЕНО) ---
+// --- 4. ЕЖЕДНЕВКА И ТАЙМЕР ---
 function updateDailyUI() {
     const timerText = document.getElementById('daily-timer');
     const btn = document.getElementById('daily-btn');
@@ -1037,6 +1037,7 @@ function renderInventory() {
         invTitles.appendChild(el);
     });
 
+    // --- ЦВЕТА ---
     const invColors = document.getElementById('inv-colors');
     invColors.innerHTML = '';
     const uniqueColors = [...new Set(userColors)];
@@ -1044,8 +1045,14 @@ function renderInventory() {
         const isEquipped = currentColor === color;
         const item = ALL_ITEMS.color.find(c => c.val === color);
         const displayName = item ? item.name : color;
-        const colorStyle = color.startsWith('neon_') ? 'neon-text' : (color === 'rainbow' ? 'title-gradient' : '');
-        const realColor = color === 'neon_pink' ? '#ff00ff' : color === 'neon_cyan' ? '#00ffff' : color === 'neon_blue' ? '#00bfff' : color === 'neon_gold' ? '#ffd700' : color;
+        
+        let colorStyle = '';
+        let realColor = color;
+        if (color === 'neon_pink') { realColor = '#ff00ff'; colorStyle = 'neon-text'; }
+        else if (color === 'neon_cyan') { realColor = '#00ffff'; colorStyle = 'neon-text'; }
+        else if (color === 'neon_blue') { realColor = '#00bfff'; colorStyle = 'neon-text'; }
+        else if (color === 'neon_gold') { realColor = '#ffd700'; colorStyle = 'neon-text'; }
+        else if (color === 'rainbow') { realColor = ''; colorStyle = 'title-gradient'; }
         
         const el = document.createElement('div');
         el.className = `inv-item ${isEquipped ? 'equipped' : ''}`;
@@ -1054,6 +1061,7 @@ function renderInventory() {
         invColors.appendChild(el);
     });
 
+    // --- СТИЛИ ---
     const invStyles = document.getElementById('inv-styles');
     invStyles.innerHTML = '';
     const uniqueStyles = [...new Set(userStyles)];
@@ -1061,7 +1069,15 @@ function renderInventory() {
         const isEquipped = currentStyle === style;
         const item = ALL_ITEMS.style.find(s => s.val === style);
         const displayName = item ? item.name : style;
-        const styleClass = style !== 'normal' ? `title-${style}` : '';
+        
+        let styleClass = '';
+        if (style === 'bold') styleClass = 'title-bold';
+        if (style === 'italic') styleClass = 'title-italic';
+        if (style === 'uppercase') styleClass = 'title-uppercase';
+        if (style === 'outline') styleClass = 'title-outline';
+        if (style === 'glitch') styleClass = 'title-glitch';
+        if (style === 'hacker') styleClass = 'title-hacker';
+        if (style === 'gradient') styleClass = 'title-gradient';
         
         const el = document.createElement('div');
         el.className = `inv-item ${isEquipped ? 'equipped' : ''}`;
