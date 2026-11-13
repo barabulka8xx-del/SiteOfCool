@@ -9,7 +9,7 @@
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #080b10; color: white; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
 
     /* --- ШАПКА --- */
-    .top-bar { height: 65px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    .top-bar { height: 60px; background: #111a22; border-bottom: 2px solid #1f2d3d; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .stat-box { display: flex; gap: 15px; align-items: center; }
     .stat { display: flex; flex-direction: column; }
     .stat-label { font-size: 10px; color: #6c8196; text-transform: uppercase; font-weight: 700; }
@@ -17,13 +17,34 @@
     .stat-val.rp { color: #8E2DE2; text-shadow: 0 0 10px rgba(142,45,226,0.3); }
 
     /* --- 3D КАНВАС --- */
-    #game-container { flex: 1; position: relative; outline: none; background: #000; }
+    #game-container { flex: 1; position: relative; outline: none; background: #000; overflow: hidden; }
     canvas { display: block; width: 100%; height: 100%; }
 
-    /* --- НИЖНЯЯ ПАНЕЛЬ (UI) --- */
-    .bottom-bar { height: 65px; background: #111a22; border-top: 2px solid #1f2d3d; display: flex; justify-content: center; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    /* --- ПАНЕЛЬ СТРОЙКИ --- */
+    .build-panel { position: absolute; bottom: -100%; left: 0; width: 100%; background: #111a22; border-top: 2px solid #1f2d3d; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); z-index: 200; display: flex; flex-direction: column; border-radius: 20px 20px 0 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.9); padding-bottom: env(safe-area-inset-bottom); }
+    .build-panel.active { bottom: 0; }
+
+    .build-header { padding: 15px; border-bottom: 1px solid #1f2d3d; display: flex; justify-content: space-between; align-items: center; }
+    .build-title { font-weight: 900; font-size: 16px; color: #fff; }
+    .btn-done { background: #00ff88; color: #000; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(0,255,136,0.3); }
+    
+    .build-items { display: flex; gap: 12px; padding: 15px; overflow-x: auto; }
+    .build-items::-webkit-scrollbar { display: none; }
+    .item { flex-shrink: 0; width: 100px; background: #0a0f14; border: 1px solid #2a3b4c; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; }
+    .item:active { transform: scale(0.95); border-color: #00ff88; }
+    .item.selected { border-color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.3); background: #11221a; }
+    .item-img { width: 100%; height: 40px; background: #1f2d3d; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
+    .item-title { font-size: 11px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .item-price { font-size: 12px; font-weight: 900; color: #ffd700; }
+
+    /* --- НИЖНЯЯ ПАНЕЛЬ --- */
+    .bottom-bar { height: 60px; background: #111a22; border-top: 2px solid #1f2d3d; display: flex; justify-content: center; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
     .main-btn { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #000; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 900; font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 5px 20px rgba(79,172,254,0.4); }
     .main-btn:active { transform: scale(0.95); }
+
+    /* Подсказка при стройке */
+    .hint { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #00ff88; padding: 10px 20px; border-radius: 20px; font-weight: bold; z-index: 50; display: none; border: 1px solid #00ff88; }
+    .hint.active { display: block; }
   </style>
 </head>
 <body>
@@ -43,53 +64,76 @@
   </div>
 
   <!-- СЮДА РЕНДЕРИТСЯ 3D -->
-  <div id="game-container"></div>
+  <div id="game-container">
+    <div class="hint" id="build-hint">Тапни по полу, чтобы поставить стол</div>
+  </div>
+
+  <!-- ПАНЕЛЬ СТРОЙКИ -->
+  <div class="build-panel" id="build-panel">
+    <div class="build-header">
+      <div class="build-title">🛠 Строительство</div>
+      <button class="btn-done" onclick="closeBuildMenu()">Done</button>
+    </div>
+    <div class="build-items">
+      <!-- Рабочий стол -->
+      <div class="item" id="item-desk" onclick="selectItem('desk', 15000)">
+        <div class="item-img">
+          <div style="width:30px; height:20px; background:#1f2d3d; border:1px solid #4facfe; border-radius:2px;"></div>
+        </div>
+        <div class="item-title">Рабочий стол</div>
+        <div class="item-price">$15.0K</div>
+      </div>
+    </div>
+  </div>
 
   <!-- НИЖНЯЯ ПАНЕЛЬ -->
   <div class="bottom-bar">
-    <button class="main-btn" onclick="alert('Режим стройки в следующей части!')">
+    <button class="main-btn" onclick="openBuildMenu()">
       🛠 Стройка
     </button>
   </div>
 
-  <!-- ПОДКЛЮЧАЕМ THREE.JS И ORBIT CONTROLS -->
+  <!-- ПОДКЛЮЧАЕМ THREE.JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
-    // --- НАСТРОЙКИ СЦЕНЫ ---
+    // --- 1. СОСТОЯНИЕ ---
+    let state = {
+        money: 200000,
+        rp: 0,
+        objects: [] // {x, z, type}
+    };
+    let buildMode = false;
+    let selectedItem = null;
+
+    // --- 2. НАСТРОЙКИ СЦЕНЫ ---
     const container = document.getElementById('game-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x080b10);
-    // Туман для глубины
     scene.fog = new THREE.Fog(0x080b10, 15, 40);
 
-    // --- КАМЕРА ---
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.set(12, 12, 12);
+    camera.position.set(10, 10, 10);
 
-    // --- РЕНДЕРЕР ---
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Оптимизация для мобилок
-    renderer.shadowMap.enabled = true; // Включаем тени
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    // --- УПРАВЛЕНИЕ КАМЕРОЙ (Мышь/Тач) ---
+    // Камера (OrbitControls)
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; // Плавность
+    controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.1; // Запрещаем камере уходить под пол
+    controls.maxPolarAngle = Math.PI / 2 - 0.1; // Запрет на подземную камеру
     controls.minDistance = 5;
     controls.maxDistance = 25;
-    controls.target.set(0, 0, 0);
 
-    // --- ОСВЕЩЕНИЕ ---
-    // Базовый свет
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambientLight);
+    // --- 3. ОСВЕЩЕНИЕ ---
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-    // Направленный свет (как лампа сверху)
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     dirLight.position.set(5, 15, 5);
     dirLight.castShadow = true;
@@ -97,85 +141,215 @@
     dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
-    // Неоновая подсветка (синяя)
+    // Синий неон
     const pointLight = new THREE.PointLight(0x4facfe, 1, 20);
     pointLight.position.set(-5, 5, -5);
     scene.add(pointLight);
 
-    // --- ПОЛ (СЕТКА 10х10) ---
-    // Размер комнаты: 10x10, клетка: 1x1
+    // --- 4. КОМНАТА (Пол и стены) ---
     const floorGeo = new THREE.PlaneGeometry(10, 10);
-    const floorMat = new THREE.MeshStandardMaterial({ 
-        color: 0x0d151c, 
-        roughness: 0.8,
-        metalness: 0.2
-    });
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x0d151c, roughness: 0.8 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2; // Кладем пол горизонтально
+    floor.rotation.x = -Math.PI / 2;
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Визуальная сетка поверх пола
     const gridHelper = new THREE.GridHelper(10, 10, 0x4facfe, 0x1f2d3d);
-    gridHelper.position.y = 0.01; // Чуть выше пола, чтобы не было мерцания
+    gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
-    // --- СТЕНЫ ---
     const wallMat = new THREE.MeshStandardMaterial({ color: 0x111a22, roughness: 1 });
     
-    // Задняя стена (ось Z)
     const wallBack = new THREE.Mesh(new THREE.BoxGeometry(10, 3, 0.2), wallMat);
     wallBack.position.set(0, 1.5, -5);
     wallBack.receiveShadow = true;
-    wallBack.castShadow = true;
     scene.add(wallBack);
 
-    // Левая стена (ось X)
     const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 10), wallMat);
     wallLeft.position.set(-5, 1.5, 0);
     wallLeft.receiveShadow = true;
-    wallLeft.castShadow = true;
     scene.add(wallLeft);
 
-    // Окно на задней стене (Светящийся прямоугольник)
-    const windowMat = new THREE.MeshBasicMaterial({ color: 0x4facfe }); // MeshBasicMaterial не зависит от света
+    // Окно
+    const windowMat = new THREE.MeshBasicMaterial({ color: 0x4facfe });
     const windowMesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 0.1), windowMat);
-    windowMesh.position.set(0, 1.8, -4.88); // Чуть впереди стены
+    windowMesh.position.set(0, 1.8, -4.88);
     scene.add(windowMesh);
 
-    // --- РАМКА ОКНА ---
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.7, 0.2), frameMat);
-    frame.position.set(0, 1.8, -4.9);
-    scene.add(frame);
+    // --- 5. СОЗДАНИЕ 3D-МОДЕЛИ СТОЛА ИЗ КОДА ---
+    function createDesk(x, z) {
+        const deskGroup = new THREE.Group();
 
+        // Столешница (темное стекло/металл)
+        const topGeo = new THREE.BoxGeometry(1.2, 0.1, 0.8);
+        const topMat = new THREE.MeshStandardMaterial({ color: 0x1f2d3d, metalness: 0.5, roughness: 0.2 });
+        const top = new THREE.Mesh(topGeo, topMat);
+        top.position.y = 0.6; // Высота стола
+        top.castShadow = true;
+        top.receiveShadow = true;
+        deskGroup.add(top);
 
-    // --- АДАПТИВНОСТЬ ---
+        // Ножки (металл)
+        const legGeo = new THREE.BoxGeometry(0.1, 0.6, 0.1);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.8, roughness: 0.2 });
+        
+        const legPositions = [
+            [-0.5, 0.3, -0.3], [0.5, 0.3, -0.3],
+            [-0.5, 0.3, 0.3],  [0.5, 0.3, 0.3]
+        ];
+        legPositions.forEach(pos => {
+            const leg = new THREE.Mesh(legGeo, legMat);
+            leg.position.set(...pos);
+            leg.castShadow = true;
+            deskGroup.add(leg);
+        });
+
+        // Монитор (Экран)
+        const monitorGeo = new THREE.BoxGeometry(0.6, 0.4, 0.05);
+        const monitorMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const monitor = new THREE.Mesh(monitorGeo, monitorMat);
+        monitor.position.set(0, 0.9, -0.2);
+        monitor.castShadow = true;
+        deskGroup.add(monitor);
+
+        // Светящийся экран (Неон)
+        const screenGeo = new THREE.PlaneGeometry(0.55, 0.35);
+        const screenMat = new THREE.MeshBasicMaterial({ color: 0x00ff88 });
+        const screen = new THREE.Mesh(screenGeo, screenMat);
+        screen.position.set(0, 0.9, -0.17);
+        deskGroup.add(screen);
+
+        // Подставка монитора
+        const standGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.2);
+        const standMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+        const stand = new THREE.Mesh(standGeo, standMat);
+        stand.position.set(0, 0.7, -0.2);
+        deskGroup.add(stand);
+
+        // Позиционируем весь стол на сетке
+        deskGroup.position.set(x, 0, z);
+        
+        scene.add(deskGroup);
+        return deskGroup;
+    }
+
+    // --- 6. RAYCASTER (Клик по 3D-полу) ---
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    container.addEventListener('pointerdown', (e) => {
+        if (!buildMode || !selectedItem) return; // Работаем только в режиме стройки
+
+        // Пересчитываем координаты тапа/клика
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        // Ищем пересечение с полом
+        const intersects = raycaster.intersectObject(floor);
+
+        if (intersects.length > 0) {
+            const point = intersects[0].point; // Координаты точки клика (X, Y, Z)
+            
+            // Округляем до сетки (каждая клетка 1x1, от -5 до 5)
+            // Например, клик в X=2.3 становится X=2.5 (центр клетки)
+            const gridX = Math.round(point.x) - 0.5; 
+            const gridZ = Math.round(point.z) - 0.5;
+
+            // Проверка: не занято ли место?
+            const isOccupied = state.objects.some(o => o.x === gridX && o.z === gridZ);
+            if (isOccupied) {
+                alert("Здесь уже стоит стол!");
+                return;
+            }
+
+            // Ставим стол
+            placeDesk(gridX, gridZ);
+        }
+    });
+
+    // --- 7. ЛОГИКА СТРОИТЕЛЬСТВА ---
+    function placeDesk(x, z) {
+        state.money -= selectedItem.price;
+        state.objects.push({ x, z, type: selectedItem.type });
+        
+        createDesk(x, z);
+        updateUI();
+        saveLocal();
+        
+        // Выключаем режим стройки после установки
+        closeBuildMenu();
+    }
+
+    function openBuildMenu() {
+        document.getElementById('build-panel').classList.add('active');
+        document.getElementById('build-hint').classList.remove('active');
+        buildMode = false; // Активируется при выборе предмета
+    }
+
+    function closeBuildMenu() {
+        document.getElementById('build-panel').classList.remove('active');
+        document.getElementById('build-hint').classList.remove('active');
+        buildMode = false;
+        selectedItem = null;
+        document.querySelectorAll('.item').forEach(el => el.classList.remove('selected'));
+    }
+
+    function selectItem(type, price) {
+        if (state.money < price) { alert("Недостаточно денег!"); return; }
+        selectedItem = { type, price };
+        buildMode = true;
+        
+        // Визуальный фидбек
+        document.querySelectorAll('.item').forEach(el => el.classList.remove('selected'));
+        document.getElementById('item-desk').classList.add('selected');
+        
+        // Закрываем панель и показываем подсказку
+        document.getElementById('build-panel').classList.remove('active');
+        document.getElementById('build-hint').classList.add('active');
+    }
+
+    // --- 8. UI И СОХРАНЕНИЯ ---
+    function updateUI() {
+        document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
+        document.getElementById('ui-rp').innerText = Math.floor(state.rp).toLocaleString('ru-RU') + ' RP';
+    }
+
+    function saveLocal() {
+        localStorage.setItem('tech_empire_v4', JSON.stringify(state));
+    }
+
+    function loadLocal() {
+        const saved = localStorage.getItem('tech_empire_v4');
+        if (saved) {
+            state = JSON.parse(saved);
+            state.objects.forEach(obj => {
+                createDesk(obj.x, obj.z);
+            });
+        }
+        updateUI();
+    }
+
+    // --- 9. ЦИКЛ РЕНДЕРА ---
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
     window.addEventListener('resize', () => {
         camera.aspect = container.clientWidth / container.clientHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(container.clientWidth, container.clientHeight);
     });
 
-    // --- АНИМАЦИОННЫЙ ЦИКЛ ---
-    function animate() {
-        requestAnimationFrame(animate);
-        controls.update(); // Обновляем позицию камеры
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
-    // --- ТЕСТ: СОЗДАДИМ КУБИК (Заглушка для будущего стола) ---
-    // Просто чтобы ты увидел, что 3D работает и тени падают
-    const testBoxGeo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-    const testBoxMat = new THREE.MeshStandardMaterial({ color: 0xff0055 });
-    const testBox = new THREE.Mesh(testBoxGeo, testBoxMat);
-    testBox.position.set(0, 0.4, 0);
-    testBox.castShadow = true;
-    testBox.receiveShadow = true;
-    scene.add(testBox);
-
+    // Запуск
+    window.onload = () => {
+        loadLocal();
+        animate();
+    };
   </script>
 </body>
 </html>
