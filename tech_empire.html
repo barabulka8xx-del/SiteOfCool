@@ -6,29 +6,16 @@
   <title>Tech Empire Simulator | Site Of Cool</title>
   <style>
   :root {
-  --bg: #05080a; 
-  --panel: #111a22; 
-  --border: #2a3b4c; 
-  --panel-light: #1a2632;
-  --green: #00ff88; 
-  --blue: #4facfe; 
-  --purple: #8E2DE2; 
-  --red: #ff0055; 
-  --gold: #ffd700;
-  --orange: #ff8c00;
+  --bg: #05080a; --panel: #111a22; --border: #2a3b4c; --panel-light: #1a2632;
+  --green: #00ff88; --blue: #4facfe; --purple: #8E2DE2; --red: #ff0055; --gold: #ffd700; --orange: #ff8c00;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
 body { 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-  background: var(--bg); 
-  color: white; 
-  height: 100vh; 
-  height: 100dvh; 
-  display: flex; 
-  flex-direction: column; 
-  overflow: hidden; 
+  background: var(--bg); color: white; height: 100vh; height: 100dvh; 
+  display: flex; flex-direction: column; overflow: hidden; 
 }
 
 /* СТАРТОВЫЙ ЭКРАН */
@@ -145,8 +132,6 @@ body {
 .tree-node.unlocked { border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
 .tree-node.available { border-color: var(--gold); animation: pulse 2s infinite; }
 .tree-node.locked { opacity: 0.5; background: #111; }
-.tree-line { width: 30px; height: 2px; background: #333; flex-shrink: 0; }
-.tree-line.active { background: var(--green); box-shadow: 0 0 5px var(--green); }
 
 /* ДИЗАЙН-СТУДИЯ */
 .design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
@@ -377,7 +362,7 @@ body {
     </div>
   </div>
 
-  <!-- МОДАЛКА СОБЫТИЙ (СУД, ИВЕНТЫ) -->
+  <!-- МОДАЛКА СОБЫТИЙ -->
   <div class="modal-overlay" id="modal-event">
     <div class="modal-content">
       <div class="modal-title" id="event-title" style="color:var(--red);">Событие!</div>
@@ -453,7 +438,7 @@ body {
 // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 
-const SAVE_KEY = 'tech_empire_v8';
+const SAVE_KEY = 'tech_empire_v8_1';
 
 const OFFICES = [
   { name: "Гараж", slots: 3, cost: 0 },
@@ -478,7 +463,9 @@ let state = {
   isPublic: false,
   stockPrice: 0,
   stockHistory: [],
-  loan: { amount: 0, monthsLeft: 0, interest: 0 }
+  loan: { amount: 0, monthsLeft: 0, interest: 0 },
+  empire: { services: [], servicesIncome: 0, audience: 0 },
+  markets: ['na']
 };
 
 // Ветки исследований
@@ -501,12 +488,9 @@ function generateResearchTree() {
   RESEARCH_TREE = [];
   let techIndex = 0;
   
-  // Генерируем технологии для каждой ветки
   for (let y = 2007; y <= 2052; y++) {
     TECH_BRANCHES.forEach(branch => {
-      // В каждом году есть 1 технология в каждой ветке (чтобы дерево было плотным)
       let techName = formatTechName(branch.id, y);
-      // Цена растет с каждым годом
       let cost = 50 + (y - 2007) * 30; 
       
       RESEARCH_TREE.push({
@@ -589,6 +573,11 @@ function startGame() {
   renderShop('desks');
   renderResearchTree();
   startGameLoop();
+  
+  // Включаем туториал при первом запуске
+  if (!saved) {
+    startTutorial();
+  }
 }
 
 function newCompany() {
@@ -669,14 +658,14 @@ function startGameLoop() {
       renderResearchTree(); 
     }
 
-    // Ежедневный доход
+    // Ежедневный доход от проданных телефонов
     let dailyIncome = 0;
     state.releasedPhones.forEach(p => {
       if (state.year - p.releaseYear < 5) dailyIncome += p.profitPerDay;
     });
     
     // Доход от услуг империи
-    dailyIncome += (state.empire?.servicesIncome || 0) / 30;
+    dailyIncome += (state.empire.servicesIncome || 0) / 30;
 
     // Расходы на зарплаты
     let dailyExpense = 0;
@@ -699,7 +688,6 @@ function startGameLoop() {
 }
 
 function processMonthlyFinances() {
-  // Выплата кредита
   if (state.loan && state.loan.monthsLeft > 0) {
     let payment = state.loan.amount / state.loan.monthsLeft;
     state.money -= payment;
@@ -722,6 +710,7 @@ function updateUI() {
   document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
   document.getElementById('ui-rp-sidebar').innerText = Math.floor(state.rp).toLocaleString();
   document.getElementById('ui-reputation').innerText = state.reputation.toFixed(2);
+  document.getElementById('bank-limit').innerText = '$' + (1000000 + (state.reputation * 500000)).toLocaleString();
   
   const office = OFFICES[state.officeLvl];
   document.getElementById('ui-office-name').innerText = office.name;
@@ -741,6 +730,12 @@ function updateUI() {
   let percent = RESEARCH_TREE.length > 0 ? (unlocked / RESEARCH_TREE.length) * 100 : 0;
   document.getElementById('ui-research-progress').style.width = percent + '%';
 
+  // Обзор компании
+  document.getElementById('ui-devices').innerText = state.releasedPhones.length;
+  document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + 10000, 0).toLocaleString();
+  let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
+  document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
+
   renderOffice();
   renderTeam();
 }
@@ -759,6 +754,7 @@ function switchTab(tabId) {
   if (tabId === 'news') renderNews();
   if (tabId === 'empire') renderEmpire();
   if (tabId === 'markets') renderMarkets();
+  if (tabId === 'overview') drawStockChart();
 }
 
 // ==========================================
@@ -918,13 +914,15 @@ const SHOP_ITEMS = {
 function switchShopTab(tab) {
   playSound('click');
   document.querySelectorAll('#shop-tabs .btn').forEach(b => b.style.background = '#333');
-  event.target.style.background = 'var(--blue)';
+  if (event && event.target) event.target.style.background = 'var(--blue)';
   renderShop(tab);
 }
 
 function renderShop(tab) {
   const list = document.getElementById('shop-list');
   list.innerHTML = '';
+  if (!SHOP_ITEMS[tab]) return;
+  
   SHOP_ITEMS[tab].forEach(item => {
     const el = document.createElement('div');
     el.className = 'card';
@@ -942,8 +940,8 @@ function renderShop(tab) {
 function buyItem(category, itemId) {
   const item = SHOP_ITEMS[category].find(i => i.id === itemId);
   if (!item) return;
-  if (state.money < item.price) { showToast("Мало денег! Уходите в минус.", 'red'); }
   
+  // Мы разрешаем уходить в минус, поэтому просто списываем
   if (category === 'desks') {
     if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места!", 'red'); return; }
     state.money -= item.price;
@@ -965,7 +963,6 @@ function buyItem(category, itemId) {
 function upgradeOffice() {
   if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
   const cost = OFFICES[state.officeLvl + 1].cost;
-  if (state.money < cost) { showToast("Мало денег для переезда!", 'red'); return; }
   state.money -= cost; 
   state.officeLvl++;
   playSound('buy');
@@ -1065,437 +1062,459 @@ function unlockTech(id) {
   renderResearchTree();
   showToast(`Изучено: ${tech.name}`, 'green');
     }
-    // ==========================================
-// 9. ДИЗАЙН-СТУДИЯ (13 ШАГОВ)
-// ==========================================
+      // ==========================================
+  // 9. ДИЗАЙН-СТУДИЯ (13 ШАГОВ С ЗАМОЧКАМИ)
+  // ==========================================
 
-const designSteps = [
-  { title: "Шаг 1. Устройство", type: 'single', options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2}] },
-  { title: "Шаг 2. Шасси", type: 'single', options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3}] },
-  { title: "Шаг 3. Размер", type: 'single', options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
-  { title: "Шаг 4. Разрешение", type: 'single', options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4}] },
-  { title: "Шаг 5. Экран", type: 'single', options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3}] },
-  { title: "Шаг 6. Селфи", type: 'single', options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1}, {name: "12 МП", cost: 15000, q: 3}] },
-  { title: "Шаг 7. Камера", type: 'single', options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2}, {name: "108 МП", cost: 40000, q: 5}] },
-  { title: "Шаг 8. Порт", type: 'single', options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2}] },
-  { title: "Шаг 9. Процессор", type: 'single', options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2}, {name: "Мощный", cost: 50000, q: 5}] },
-  { title: "Шаг 10. Память", type: 'single', options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2}, {name: "8 ГБ", cost: 25000, q: 4}] },
-  { title: "Шаг 11. Функции", type: 'multiple', options: [
-    {name: "NFC", cost: 2000, q: 1}, {name: "GPS", cost: 1500, q: 1}, 
-    {name: "Влагозащита", cost: 5000, q: 2}, {name: "Стереозвук", cost: 3000, q: 1}
-  ]},
-  { title: "Шаг 12. Цвет и Брендинг", type: 'single', options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] },
-  { title: "Шаг 13. Финальная проверка", type: 'final', options: [] }
-];
+  const designSteps = [
+    { title: "Шаг 1. Устройство", type: 'single', options: [{name: "Телефон", cost: 0, q: 1}, {name: "Планшет", cost: 10000, q: 2, req: 'tech_6'}] },
+    { title: "Шаг 2. Шасси", type: 'single', options: [{name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 5000, q: 1}, {name: "Титан", cost: 20000, q: 3, req: 'tech_12'}] },
+    { title: "Шаг 3. Размер", type: 'single', options: [{name: "3.5\"", cost: 0, q: 0}, {name: "5.5\"", cost: 5000, q: 1}, {name: "6.7\"", cost: 15000, q: 2}] },
+    { title: "Шаг 4. Разрешение", type: 'single', options: [{name: "240p", cost: 0, q: 0}, {name: "720p", cost: 10000, q: 2}, {name: "1080p", cost: 30000, q: 4, req: 'tech_1'}] },
+    { title: "Шаг 5. Экран", type: 'single', options: [{name: "LCD", cost: 0, q: 0}, {name: "OLED", cost: 20000, q: 3, req: 'tech_7'}] },
+    { title: "Шаг 6. Селфи", type: 'single', options: [{name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2000, q: 1}, {name: "12 МП", cost: 15000, q: 3, req: 'tech_19'}] },
+    { title: "Шаг 7. Камера", type: 'single', options: [{name: "2 МП", cost: 0, q: 0}, {name: "12 МП", cost: 10000, q: 2, req: 'tech_13'}, {name: "108 МП", cost: 40000, q: 5, req: 'tech_43'}] },
+    { title: "Шаг 8. Порт", type: 'single', options: [{name: "Micro-USB", cost: 0, q: 0}, {name: "USB-C", cost: 5000, q: 2, req: 'tech_2'}] },
+    { title: "Шаг 9. Процессор", type: 'single', options: [{name: "Слабый", cost: 0, q: 0}, {name: "Средний", cost: 15000, q: 2, req: 'tech_8'}, {name: "Мощный", cost: 50000, q: 5, req: 'tech_20'}] },
+    { title: "Шаг 10. Память", type: 'single', options: [{name: "1 ГБ", cost: 0, q: 0}, {name: "4 ГБ", cost: 10000, q: 2, req: 'tech_3'}, {name: "8 ГБ", cost: 25000, q: 4, req: 'tech_15'}] },
+    { title: "Шаг 11. Функции", type: 'multiple', options: [
+      {name: "NFC", cost: 2000, q: 1, req: 'tech_30'}, 
+      {name: "GPS", cost: 1500, q: 1, req: 'tech_9'}, 
+      {name: "Влагозащита", cost: 5000, q: 2, req: 'tech_18'}, 
+      {name: "Стереозвук", cost: 3000, q: 1, req: 'tech_24'}
+    ]},
+    { title: "Шаг 12. Цвет и Брендинг", type: 'single', options: [{name: "Черный", cost: 0, q: 0}, {name: "Белый", cost: 0, q: 0}, {name: "Неоновый", cost: 10000, q: 2}, {name: "Радужный", cost: 50000, q: 5}] },
+    { title: "Шаг 13. Финальная проверка", type: 'final', options: [] }
+  ];
 
-let currentStep = 0;
-let currentDesign = { cost: 0, quality: 0, features: [], name: "iFon" };
+  let currentStep = 0;
+  let currentDesign = { cost: 0, quality: 0, features: [], name: "iFon" };
 
-function openDesignStudio() {
-  playSound('click');
-  document.getElementById('design-screen').classList.add('active');
-  currentStep = 0;
-  currentDesign = { cost: 0, quality: 0, features: [], name: "iFon" };
-  renderDesignStep();
-}
-
-function closeDesignStudio() {
-  playSound('click');
-  document.getElementById('design-screen').classList.remove('active');
-}
-
-function renderDesignStep() {
-  if (currentStep >= designSteps.length) return;
-  const step = designSteps[currentStep];
-  
-  document.getElementById('ds-title').innerText = step.title;
-  document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
-  document.getElementById('ds-est-price').innerText = `Себестоимость: $${currentDesign.cost.toLocaleString()}`;
-  document.getElementById('ds-phone-name').innerText = currentDesign.name + " " + (state.releasedPhones.length + 1);
-
-  const opts = document.getElementById('ds-options');
-  opts.innerHTML = '';
-
-  if (step.type === 'final') {
-    opts.innerHTML = `
-      <div style="text-align:center; padding:20px;">
-        <div style="font-size:40px; margin-bottom:10px;">📱</div>
-        <div style="font-size:14px; margin-bottom:5px;">Оценка: <span style="color:var(--gold); font-weight:900;">${Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1)}</span></div>
-        <div style="font-size:14px; margin-bottom:15px;">Прибыль за шт: <span style="color:var(--green); font-weight:900;">$${Math.floor((Math.min(9.9, (5 + currentDesign.quality / 2)) * 100000) + (currentDesign.quality * 5000)).toLocaleString()}</span></div>
-        <button class="btn btn-gold" style="width:100%; padding:15px;" onclick="finishRelease()">Начать производство</button>
-      </div>
-    `;
-    return;
+  function openDesignStudio() {
+    playSound('click');
+    document.getElementById('design-screen').classList.add('active');
+    currentStep = 0;
+    currentDesign = { cost: 0, quality: 0, features: [], name: "iFon" };
+    renderDesignStep();
   }
 
-  step.options.forEach(o => {
-    let el = document.createElement('div');
-    el.className = `ds-opt`;
-    let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
+  function closeDesignStudio() {
+    playSound('click');
+    document.getElementById('design-screen').classList.remove('active');
+  }
+
+  function renderDesignStep() {
+    if (currentStep >= designSteps.length) return;
+    const step = designSteps[currentStep];
     
-    if (step.type === 'multiple') {
-      let isChecked = currentDesign.features.includes(o.name);
-      el.innerHTML = `<span>${isChecked ? '✅' : '⬜'} ${o.name}</span><span>${priceStr}</span>`;
-      el.onclick = () => {
-        playSound('click');
-        if (isChecked) {
-          currentDesign.features = currentDesign.features.filter(f => f !== o.name);
-          currentDesign.cost -= o.cost;
-          currentDesign.quality -= o.q;
-        } else {
-          currentDesign.features.push(o.name);
-          currentDesign.cost += o.cost;
-          currentDesign.quality += o.q;
-        }
-        renderDesignStep();
-      };
-    } else {
-      el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
-      el.onclick = () => {
-        playSound('click');
-        currentDesign.cost += o.cost;
-        currentDesign.quality += o.q;
-        currentStep++;
-        renderDesignStep();
-      };
+    document.getElementById('ds-title').innerText = step.title;
+    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
+    document.getElementById('ds-est-price').innerText = `Себестоимость: $${currentDesign.cost.toLocaleString()}`;
+    document.getElementById('ds-phone-name').innerText = currentDesign.name + " " + (state.releasedPhones.length + 1);
+
+    const opts = document.getElementById('ds-options');
+    opts.innerHTML = '';
+
+    if (step.type === 'final') {
+      opts.innerHTML = `
+        <div style="text-align:center; padding:20px;">
+          <div style="font-size:40px; margin-bottom:10px;">📱</div>
+          <div style="font-size:14px; margin-bottom:5px;">Оценка: <span style="color:var(--gold); font-weight:900;">${Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1)}</span></div>
+          <div style="font-size:14px; margin-bottom:15px;">Прибыль за шт: <span style="color:var(--green); font-weight:900;">$${Math.floor((Math.min(9.9, (5 + currentDesign.quality / 2)) * 100000) + (currentDesign.quality * 5000)).toLocaleString()}</span></div>
+          <button class="btn btn-gold" style="width:100%; padding:15px;" onclick="finishRelease()">Начать производство</button>
+        </div>
+      `;
+      return;
     }
-    opts.appendChild(el);
-  });
-}
 
-function prevDesignStep() {
-  if (currentStep > 0) { currentStep--; renderDesignStep(); } else { closeDesignStudio(); }
-}
-
-function skipDesignStep() {
-  playSound('click');
-  currentStep++;
-  renderDesignStep();
-}
-
-function finishRelease() {
-  let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
-  let profit = Math.floor((score * 100000) + (currentDesign.quality * 5000));
-  
-  if (state.money < currentDesign.cost) {
-    showToast("Вы ушли в минус на производстве!", 'red');
+    step.options.forEach(o => {
+      let el = document.createElement('div');
+      
+      // Проверка замочка (привязка к Науке)
+      let isLocked = false;
+      if (o.req) {
+        let tech = RESEARCH_TREE.find(t => t.id === o.req);
+        if (tech && !tech.unlocked) isLocked = true;
+      }
+      
+      el.className = `ds-opt ${isLocked ? 'locked' : ''}`;
+      let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
+      if (isLocked) priceStr = '🔒 Не изучено';
+      
+      if (step.type === 'multiple') {
+        let isChecked = currentDesign.features.includes(o.name);
+        el.innerHTML = `<span>${isLocked ? '🔒' : (isChecked ? '✅' : '⬜')} ${o.name}</span><span>${priceStr}</span>`;
+        if (!isLocked) {
+          el.onclick = () => {
+            playSound('click');
+            if (isChecked) {
+              currentDesign.features = currentDesign.features.filter(f => f !== o.name);
+              currentDesign.cost -= o.cost;
+              currentDesign.quality -= o.q;
+            } else {
+              currentDesign.features.push(o.name);
+              currentDesign.cost += o.cost;
+              currentDesign.quality += o.q;
+            }
+            renderDesignStep();
+          };
+        }
+      } else {
+        el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
+        if (!isLocked) {
+          el.onclick = () => {
+            playSound('click');
+            currentDesign.cost += o.cost;
+            currentDesign.quality += o.q;
+            currentStep++;
+            renderDesignStep();
+          };
+        }
+      }
+      opts.appendChild(el);
+    });
   }
-  state.money -= currentDesign.cost;
-  
-  state.releasedPhones.push({
-    name: currentDesign.name + " " + (state.releasedPhones.length + 1),
-    score: score,
-    profitPerDay: Math.floor(profit / 30), 
-    releaseYear: state.year
-  });
 
-  state.reputation += score / 10;
-  
-  // Обновляем акции, если компания публичная
-  if (state.isPublic) {
-    state.stockPrice = Math.max(0.1, state.stockPrice + (score - 5) * 2);
-    state.stockHistory.push(state.stockPrice);
-    if (state.stockHistory.length > 30) state.stockHistory.shift();
-    drawStockChart();
+  function prevDesignStep() {
+    if (currentStep > 0) { currentStep--; renderDesignStep(); } else { closeDesignStudio(); }
   }
 
-  document.getElementById('modal-release').classList.remove('active');
-  closeDesignStudio();
-  updateUI(); save();
-  showToast(`Телефон выпущен! Оценка: ${score}`, 'green');
-  startConfetti();
-  playSound('release');
-}
+  function skipDesignStep() {
+    playSound('click');
+    currentStep++;
+    renderDesignStep();
+  }
 
-// ==========================================
-// 10. БАНК И АКЦИИ
-// ==========================================
-
-function takeLoan(months) {
-  let limit = 1000000 + (state.reputation * 500000);
-  let rate = months === 6 ? 0.06 : (months === 12 ? 0.08 : 0.12);
-  
-  if (state.loan.amount > 0) { showToast("У вас уже есть кредит!", 'red'); return; }
-  if (state.money < 0) { showToast("Банк не дает кредит должникам!", 'red'); return; }
-
-  let amount = limit;
-  state.money += amount;
-  state.loan = { amount: amount * (1 + rate), monthsLeft: months, interest: rate };
-  
-  playSound('buy');
-  updateUI(); save();
-  showToast(`Вы взяли кредит $${amount.toLocaleString()}`, 'green');
-}
-
-function goPublic() {
-  if (state.isPublic) return;
-  if (state.reputation < 5) { showToast("Репутация слишком низкая для IPO (нужно 5)", 'red'); return; }
-  
-  state.isPublic = true;
-  state.stockPrice = 10;
-  state.stockHistory = [10, 10, 10, 10, 10];
-  document.getElementById('btn-ipo').innerText = 'IPO Завершено';
-  document.getElementById('btn-ipo').disabled = true;
-  drawStockChart();
-  save();
-  showToast("Вы вышли на IPO!", 'green');
-}
-
-function drawStockChart() {
-  const canvas = document.getElementById('stock-chart');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  let data = state.stockHistory;
-  if (data.length === 0) return;
-
-  let max = Math.max(...data) * 1.1;
-  let min = Math.min(...data) * 0.9;
-  if (max === min) max = min + 1;
-  
-  let barWidth = canvas.width / data.length;
-  
-  data.forEach((val, i) => {
-    let height = ((val - min) / (max - min)) * canvas.height;
-    let x = i * barWidth;
-    let y = canvas.height - height;
+  function finishRelease() {
+    let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
+    let profit = Math.floor((score * 100000) + (currentDesign.quality * 5000));
     
-    ctx.fillStyle = i > 0 && val < data[i-1] ? '#ff0055' : '#00ff88';
-    ctx.fillRect(x + 2, y, barWidth - 4, height);
-  });
+    // Списание денег (разрешаем уход в минус)
+    state.money -= currentDesign.cost;
+    
+    state.releasedPhones.push({
+      name: currentDesign.name + " " + (state.releasedPhones.length + 1),
+      score: score,
+      profitPerDay: Math.floor(profit / 30), 
+      releaseYear: state.year
+    });
 
-  document.getElementById('stock-price').innerText = '$' + state.stockPrice.toFixed(2);
-}
+    state.reputation += score / 10;
+    
+    // Обновляем акции, если компания публичная
+    if (state.isPublic) {
+      state.stockPrice = Math.max(0.1, state.stockPrice + (score - 5) * 2);
+      state.stockHistory.push(state.stockPrice);
+      if (state.stockHistory.length > 30) state.stockHistory.shift();
+      drawStockChart();
+    }
 
-// ==========================================
-// 11. ИМПЕРИЯ (Заводы, Услуги, Проекты)
-// ==========================================
+    document.getElementById('modal-release').classList.remove('active');
+    closeDesignStudio();
+    updateUI(); save();
+    showToast(`Телефон выпущен! Оценка: ${score}`, 'green');
+    startConfetti();
+    playSound('release');
+  }
 
-let currentEmpireTab = 'services';
+  // ==========================================
+  // 10. БАНК И АКЦИИ
+  // ==========================================
 
-function switchEmpireTab(tab) {
-  playSound('click');
-  currentEmpireTab = tab;
-  document.querySelectorAll('#screen-empire .btn').forEach(b => b.style.background = '#333');
-  event.target.style.background = 'var(--blue)';
-  renderEmpire();
-}
+  function takeLoan(months) {
+    let limit = 1000000 + (state.reputation * 500000);
+    let rate = months === 6 ? 0.06 : (months === 12 ? 0.08 : 0.12);
+    
+    if (state.loan.amount > 0) { showToast("У вас уже есть кредит!", 'red'); return; }
+    if (state.money < 0) { showToast("Банк не дает кредит должникам!", 'red'); return; }
 
-function renderEmpire() {
-  const list = document.getElementById('empire-list');
-  list.innerHTML = '';
-  
-  let income = state.empire?.servicesIncome || 0;
-  document.getElementById('ui-services').innerText = '$' + income.toLocaleString() + ' / мес';
-  document.getElementById('ui-audience').innerText = (state.empire?.audience || 0).toLocaleString();
+    let amount = limit;
+    state.money += amount;
+    state.loan = { amount: amount * (1 + rate), monthsLeft: months, interest: rate };
+    
+    playSound('buy');
+    updateUI(); save();
+    showToast(`Вы взяли кредит $${amount.toLocaleString()}`, 'green');
+  }
 
-  if (currentEmpireTab === 'services') {
-    let items = [
-      { id: 'cloud', name: '☁️ Cloud Storage', price: 500000, income: 50000 },
-      { id: 'music', name: '🎵 Music Service', price: 1000000, income: 150000 },
-      { id: 'arcade', name: '🎮 Arcade Games', price: 2000000, income: 300000 }
+  function goPublic() {
+    if (state.isPublic) return;
+    if (state.reputation < 5) { showToast("Репутация слишком низкая для IPO (нужно 5)", 'red'); return; }
+    
+    state.isPublic = true;
+    state.stockPrice = 10;
+    state.stockHistory = [10, 10, 10, 10, 10];
+    document.getElementById('btn-ipo').innerText = 'IPO Завершено';
+    document.getElementById('btn-ipo').disabled = true;
+    drawStockChart();
+    save();
+    showToast("Вы вышли на IPO!", 'green');
+  }
+
+  function drawStockChart() {
+    const canvas = document.getElementById('stock-chart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let data = state.stockHistory;
+    if (data.length === 0) return;
+
+    let max = Math.max(...data) * 1.1;
+    let min = Math.min(...data) * 0.9;
+    if (max === min) max = min + 1;
+    
+    let barWidth = canvas.width / data.length;
+    
+    data.forEach((val, i) => {
+      let height = ((val - min) / (max - min)) * canvas.height;
+      let x = i * barWidth;
+      let y = canvas.height - height;
+      
+      ctx.fillStyle = i > 0 && val < data[i-1] ? '#ff0055' : '#00ff88';
+      ctx.fillRect(x + 2, y, barWidth - 4, height);
+    });
+
+    document.getElementById('stock-price').innerText = '$' + state.stockPrice.toFixed(2);
+  }
+
+  // ==========================================
+  // 11. ИМПЕРИЯ (Заводы, Услуги, Проекты)
+  // ==========================================
+
+  let currentEmpireTab = 'services';
+
+  function switchEmpireTab(tab) {
+    playSound('click');
+    currentEmpireTab = tab;
+    document.querySelectorAll('#screen-empire .btn').forEach(b => b.style.background = '#333');
+    if (event && event.target) event.target.style.background = 'var(--blue)';
+    renderEmpire();
+  }
+
+  function renderEmpire() {
+    const list = document.getElementById('empire-list');
+    list.innerHTML = '';
+    
+    let income = state.empire?.servicesIncome || 0;
+    document.getElementById('ui-services').innerText = '$' + income.toLocaleString() + ' / мес';
+    document.getElementById('ui-audience').innerText = (state.empire?.audience || 0).toLocaleString();
+
+    if (currentEmpireTab === 'services') {
+      let items = [
+        { id: 'cloud', name: '☁️ Cloud Storage', price: 500000, income: 50000 },
+        { id: 'music', name: '🎵 Music Service', price: 1000000, income: 150000 },
+        { id: 'arcade', name: '🎮 Arcade Games', price: 2000000, income: 300000 }
+      ];
+      items.forEach(item => {
+        let isOwned = state.empire?.services?.includes(item.id);
+        list.innerHTML += `
+          <div class="card">
+            <div class="card-info">
+              <div class="card-title">${item.name}</div>
+              <div class="card-desc">Доход: +$${item.income.toLocaleString()} / мес</div>
+            </div>
+            <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyService('${item.id}', ${item.price}, ${item.income})">${isOwned ? 'Куплено' : 'Купить'}</button>
+          </div>
+        `;
+      });
+    } else if (currentEmpireTab === 'factories') {
+      list.innerHTML = `<div class="card"><div class="card-desc">Заводы требуют много денег и времени на реализацию (в разработке).</div></div>`;
+    } else if (currentEmpireTab === 'projects') {
+      list.innerHTML = `<div class="card"><div class="card-desc">Колонизация Луны и Марса (в разработке).</div></div>`;
+    }
+  }
+
+  function buyService(id, price, income) {
+    if (state.money < price) { showToast("Мало денег!", 'red'); return; }
+    if (!state.empire) state.empire = { services: [], servicesIncome: 0, audience: 1000 };
+    if (state.empire.services.includes(id)) return;
+    
+    state.money -= price;
+    state.empire.services.push(id);
+    state.empire.servicesIncome += income;
+    state.empire.audience += 500000;
+    
+    playSound('buy');
+    updateUI(); save(); renderEmpire();
+    showToast("Услуга запущена!", 'green');
+  }
+
+  // ==========================================
+  // 12. РЫНКИ
+  // ==========================================
+
+  function renderMarkets() {
+    const list = document.getElementById('markets-list');
+    list.innerHTML = '';
+    let markets = [
+      { id: 'na', name: 'Северная Америка', price: 0, mult: 1 },
+      { id: 'eu', name: 'Европа', price: 5000000, mult: 1.5 },
+      { id: 'asia', name: 'Азия', price: 15000000, mult: 2.5 }
     ];
-    items.forEach(item => {
-      let isOwned = state.empire?.services?.includes(item.id);
+    markets.forEach(m => {
+      let isOwned = state.markets?.includes(m.id) || m.price === 0;
       list.innerHTML += `
         <div class="card">
           <div class="card-info">
-            <div class="card-title">${item.name}</div>
-            <div class="card-desc">Доход: +$${item.income.toLocaleString()} / мес</div>
+            <div class="card-title">${m.name}</div>
+            <div class="card-desc">Множитель продаж: x${m.mult}</div>
           </div>
-          <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyService('${item.id}', ${item.price}, ${item.income})">${isOwned ? 'Куплено' : 'Купить'}</button>
+          <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyMarket('${m.id}', ${m.price})">${isOwned ? 'Открыто' : 'Открыть'}</button>
         </div>
       `;
     });
-  } else if (currentEmpireTab === 'factories') {
-    list.innerHTML = `<div class="card"><div class="card-desc">Заводы требуют много денег и времени на реализацию (в разработке).</div></div>`;
-  } else if (currentEmpireTab === 'projects') {
-    list.innerHTML = `<div class="card"><div class="card-desc">Колонизация Луны и Марса (в разработке).</div></div>`;
   }
-}
 
-function buyService(id, price, income) {
-  if (state.money < price) { showToast("Мало денег!", 'red'); return; }
-  if (!state.empire) state.empire = { services: [], servicesIncome: 0, audience: 1000 };
-  if (state.empire.services.includes(id)) return;
-  
-  state.money -= price;
-  state.empire.services.push(id);
-  state.empire.servicesIncome += income;
-  state.empire.audience += 500000;
-  
-  playSound('buy');
-  updateUI(); save(); renderEmpire();
-  showToast("Услуга запущена!", 'green');
-}
-
-// ==========================================
-// 12. РЫНКИ
-// ==========================================
-
-function renderMarkets() {
-  const list = document.getElementById('markets-list');
-  list.innerHTML = '';
-  let markets = [
-    { id: 'na', name: 'Северная Америка', price: 0, mult: 1 },
-    { id: 'eu', name: 'Европа', price: 5000000, mult: 1.5 },
-    { id: 'asia', name: 'Азия', price: 15000000, mult: 2.5 }
-  ];
-  markets.forEach(m => {
-    let isOwned = state.markets?.includes(m.id) || m.price === 0;
-    list.innerHTML += `
-      <div class="card">
-        <div class="card-info">
-          <div class="card-title">${m.name}</div>
-          <div class="card-desc">Множитель продаж: x${m.mult}</div>
-        </div>
-        <button class="btn ${isOwned ? 'btn-gold' : ''}" onclick="buyMarket('${m.id}', ${m.price})">${isOwned ? 'Открыто' : 'Открыть'}</button>
-      </div>
-    `;
-  });
-}
-
-function buyMarket(id, price) {
-  if (state.money < price) { showToast("Мало денег!", 'red'); return; }
-  if (!state.markets) state.markets = ['na'];
-  if (state.markets.includes(id)) return;
-  state.money -= price;
-  state.markets.push(id);
-  playSound('buy');
-  updateUI(); save(); renderMarkets();
-  showToast("Рынок открыт!", 'green');
-}
-
-// ==========================================
-// 13. ИВЕНТЫ И БАНКРОТСТВО
-// ==========================================
-
-function triggerRandomEvent() {
-  let events = [
-    { title: "Суд!", text: "На вас подали в суд за плагиат. Штраф $100,000.", type: 'bad', effect: () => { state.money -= 100000; } },
-    { title: "Хайп!", text: "Ваш телефон стал мемом. Продажи выросли!", type: 'good', effect: () => { state.money += 500000; } },
-    { title: "Поломка!", text: "Сервер упал. Пришлось чинить.", type: 'bad', effect: () => { state.money -= 50000; } }
-  ];
-  let ev = events[Math.floor(Math.random() * events.length)];
-  
-  document.getElementById('event-title').innerText = ev.title;
-  document.getElementById('event-title').style.color = ev.type === 'bad' ? 'var(--red)' : 'var(--green)';
-  document.getElementById('event-text').innerText = ev.text;
-  document.getElementById('modal-event').classList.add('active');
-  
-  ev.effect();
-  updateUI();
-}
-
-function resolveEvent() {
-  document.getElementById('modal-event').classList.remove('active');
-}
-
-function triggerBankruptcy() {
-  document.getElementById('modal-bankruptcy').classList.add('active');
-  state.speed = 0;
-}
-
-function restartGame() {
-  localStorage.removeItem(SAVE_KEY);
-  location.reload();
-}
-
-// ==========================================
-// 14. УТИЛИТЫ (Тосты, Конфетти, Новости)
-// ==========================================
-
-function renderNews() {
-  let list = document.getElementById('news-list');
-  list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">Пресса пока молчит...</div>';
-}
-
-function showToast(msg, type = 'green') {
-  const t = document.getElementById('toast');
-  t.innerText = msg;
-  t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
-  t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-// Конфетти
-const canvas = document.getElementById('confetti-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-function startConfetti() {
-  particles = [];
-  for (let i = 0; i < 150; i++) {
-    particles.push({
-      x: canvas.width / 2, y: canvas.height / 2,
-      vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-      size: Math.random() * 6 + 2, life: 100
-    });
+  function buyMarket(id, price) {
+    if (state.money < price) { showToast("Мало денег!", 'red'); return; }
+    if (!state.markets) state.markets = ['na'];
+    if (state.markets.includes(id)) return;
+    state.money -= price;
+    state.markets.push(id);
+    playSound('buy');
+    updateUI(); save(); renderMarkets();
+    showToast("Рынок открыт!", 'green');
   }
-  requestAnimationFrame(updateConfetti);
-}
 
-function updateConfetti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let alive = false;
-  particles.forEach(p => {
-    if (p.life > 0) {
-      alive = true;
-      p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life--;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+  // ==========================================
+  // 13. ИВЕНТЫ И БАНКРОТСТВО
+  // ==========================================
+
+  function triggerRandomEvent() {
+    let events = [
+      { title: "Суд!", text: "На вас подали в суд за плагиат. Штраф $100,000.", type: 'bad', effect: () => { state.money -= 100000; } },
+      { title: "Хайп!", text: "Ваш телефон стал мемом. Продажи выросли!", type: 'good', effect: () => { state.money += 500000; } },
+      { title: "Поломка!", text: "Сервер упал. Пришлось чинить.", type: 'bad', effect: () => { state.money -= 50000; } }
+    ];
+    let ev = events[Math.floor(Math.random() * events.length)];
+    
+    document.getElementById('event-title').innerText = ev.title;
+    document.getElementById('event-title').style.color = ev.type === 'bad' ? 'var(--red)' : 'var(--green)';
+    document.getElementById('event-text').innerText = ev.text;
+    document.getElementById('modal-event').classList.add('active');
+    
+    ev.effect();
+    updateUI();
+  }
+
+  function resolveEvent() {
+    document.getElementById('modal-event').classList.remove('active');
+  }
+
+  function triggerBankruptcy() {
+    document.getElementById('modal-bankruptcy').classList.add('active');
+    state.speed = 0;
+  }
+
+  function restartGame() {
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  }
+
+  // ==========================================
+  // 14. УТИЛИТЫ (Тосты, Конфетти, Новости)
+  // ==========================================
+
+  function renderNews() {
+    let list = document.getElementById('news-list');
+    list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">Пресса пока молчит...</div>';
+  }
+
+  function showToast(msg, type = 'green') {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+    t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+
+  // Конфетти
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startConfetti() {
+    particles = [];
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: canvas.width / 2, y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 0.5) * 20,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        size: Math.random() * 6 + 2, life: 100
+      });
     }
+    requestAnimationFrame(updateConfetti);
+  }
+
+  function updateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      if (p.life > 0) {
+        alive = true;
+        p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life--;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
+      }
+    });
+    if (alive) requestAnimationFrame(updateConfetti);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Запуск ивентов (раз в 60 секунд реального времени, если скорость > 0)
+  setInterval(() => {
+    if (state.speed > 0 && Math.random() > 0.7) {
+      triggerRandomEvent();
+    }
+  }, 60000);
+
+  // ==========================================
+  // 15. ТУТОРИАЛ
+  // ==========================================
+
+  let tutStep = 0;
+  const tutTexts = [
+    "Привет! Я твой помощник. Давай создадим первый телефон!",
+    "Нажми на вкладку 'Дизайн' внизу.",
+    "Выбери характеристики. Чем лучше — тем дороже продашь!",
+    "Готово! Ты выпустил первый телефон. Доход капает каждый день."
+  ];
+
+  function startTutorial() {
+    document.getElementById('tutorial-overlay').style.display = 'flex';
+    document.getElementById('tut-text').innerText = tutTexts[0];
+  }
+
+  function nextTutorialStep() {
+    tutStep++;
+    if (tutStep >= tutTexts.length) {
+      document.getElementById('tutorial-overlay').style.display = 'none';
+      return;
+    }
+    document.getElementById('tut-text').innerText = tutTexts[tutStep];
+  }
+
+  // Финальный автосохранение при закрытии
+  window.addEventListener('beforeunload', () => {
+    save();
   });
-  if (alive) requestAnimationFrame(updateConfetti);
-  else ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
 
-// Запуск ивентов (раз в 30 игровых дней)
-setInterval(() => {
-  if (state.speed > 0 && Math.random() > 0.7) {
-    triggerRandomEvent();
-  }
-}, 60000);
-
-// ==========================================
-// 15. ТУТОРИАЛ
-// ==========================================
-
-let tutStep = 0;
-const tutTexts = [
-  "Привет! Я твой помощник. Давай создадим первый телефон!",
-  "Нажми на вкладку 'Дизайн' внизу.",
-  "Выбери характеристики. Чем лучше — тем дороже продашь!",
-  "Готово! Ты выпустил первый телефон. Доход капает каждый день."
-];
-
-function startTutorial() {
-  document.getElementById('tutorial-overlay').style.display = 'flex';
-  document.getElementById('tut-text').innerText = tutTexts[0];
-}
-
-function nextTutorialStep() {
-  tutStep++;
-  if (tutStep >= tutTexts.length) {
-    document.getElementById('tutorial-overlay').style.display = 'none';
-    return;
-  }
-  document.getElementById('tut-text').innerText = tutTexts[tutStep];
-  }
   </script>
 </body>
 </html>
+  </script>
+</body>
+                                                     </html>
