@@ -447,6 +447,7 @@
       <div style="font-size: 14px; color: #ccc; margin-bottom: 15px;">Ты получаешь титул:</div>
       <div style="background: rgba(255,215,0,0.1); padding: 10px 20px; border-radius: 10px; border: 1px solid #ffd700; font-size: 20px; font-weight: bold; color: #ffd700; margin-bottom: 20px;">
         🧪 Альфа-тестер
+        За игру Во время Альфа-Тестирования
       </div>
       <button class="btn-play" onclick="document.getElementById('ach-notification-modal').classList.remove('active')">Круто!</button>
     </div>
@@ -654,15 +655,15 @@ async function loadProfile() {
             renderChances();
             updateDailyUI();
             
-            // Выдача титула Альфа-тестера
-            if (!data.unlockedTitles.includes("🧪 Альфа-тестер")) {
+            // Выдача титула Альфа-тестера (строго 1 раз)
+            if (!data.unlockedTitles.includes("🧪 Альфа-тестер") && !localStorage.getItem('alpha_title_claimed')) {
                 fetch(`${API_URL}/user/equip_title`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ title: "🧪 Альфа-тестер", color: currentColor, style: currentStyle })
                 }).then(() => {
-                    data.unlockedTitles.push("🧪 Альфа-тестер");
-                    userTitles.push("🧪 Альфа-тестер");
+                    localStorage.setItem('alpha_title_claimed', 'true');
+                    if (!userTitles.includes("🧪 Альфа-тестер")) userTitles.push("🧪 Альфа-тестер");
                     currentTitle = "🧪 Альфа-тестер";
                     renderInventory();
                     document.getElementById('ach-notification-modal').classList.add('active');
@@ -911,10 +912,14 @@ function renderAchievements() {
 
 // --- ИНВЕНТАРЬ ---
 function renderInventory() {
+    // Титулы (с защитой от дублей)
     const invTitles = document.getElementById('inv-titles');
     invTitles.innerHTML = '';
-    if (userTitles.length === 0) invTitles.innerHTML = '<span style="color:#666; font-size:12px;">Пусто. Крути рулетку!</span>';
-    userTitles.forEach(title => {
+    
+    const uniqueTitles = [...new Set(userTitles)];
+    if (uniqueTitles.length === 0) invTitles.innerHTML = '<span style="color:#666; font-size:12px;">Пусто. Крути рулетку!</span>';
+    
+    uniqueTitles.forEach(title => {
         const isEquipped = currentTitle === title;
         const el = document.createElement('div');
         el.className = `inv-item ${isEquipped ? 'equipped' : ''}`;
@@ -923,9 +928,11 @@ function renderInventory() {
         invTitles.appendChild(el);
     });
 
+    // Цвета
     const invColors = document.getElementById('inv-colors');
     invColors.innerHTML = '';
-    userColors.forEach(color => {
+    const uniqueColors = [...new Set(userColors)];
+    uniqueColors.forEach(color => {
         const isEquipped = currentColor === color;
         const item = ALL_ITEMS.color.find(c => c.val === color);
         const displayName = item ? item.name : color;
@@ -939,9 +946,11 @@ function renderInventory() {
         invColors.appendChild(el);
     });
 
+    // Стили
     const invStyles = document.getElementById('inv-styles');
     invStyles.innerHTML = '';
-    userStyles.forEach(style => {
+    const uniqueStyles = [...new Set(userStyles)];
+    uniqueStyles.forEach(style => {
         const isEquipped = currentStyle === style;
         const item = ALL_ITEMS.style.find(s => s.val === style);
         const displayName = item ? item.name : style;
