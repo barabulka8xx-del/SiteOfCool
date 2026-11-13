@@ -148,27 +148,19 @@
     
     .chances-btn { background: transparent; border: 1px solid #555; color: #aaa; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; width: 100%; margin-bottom: 10px; }
     
-    /* ОБНОВЛЕННЫЙ СПИСОК ШАНСОВ */
     .chances-list { 
         display: none; 
         width: 100%; 
-        background: #0f2027; 
+        background: rgba(0, 0, 0, 0.4); 
         border: 1px solid #444; 
         border-radius: 8px; 
         padding: 10px; 
         margin-bottom: 10px; 
         font-size: 12px; 
         text-align: left; 
-        max-height: 250px; 
-        overflow-y: auto; 
-        scrollbar-width: thin;
-        scrollbar-color: #4facfe #0f2027;
     }
-    .chances-list::-webkit-scrollbar { width: 6px; }
-    .chances-list::-webkit-scrollbar-track { background: #0f2027; border-radius: 3px; }
-    .chances-list::-webkit-scrollbar-thumb { background: #4facfe; border-radius: 3px; }
-
-    .chance-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed #333; }
+    .chance-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 4px; border-bottom: 1px dashed #333; }
+    .chance-item:last-child { border-bottom: none; }
     .chance-item.unlocked { color: #00ff00; }
     .chance-equip-btn { background: #4facfe; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; margin-left: 10px; display: none; }
     .chance-item.unlocked .chance-equip-btn { display: block; }
@@ -398,21 +390,21 @@
         <div class="shop-info"><span class="shop-title">🎲 Имя</span><span class="shop-desc">Случайный титул</span></div>
         <button class="btn-buy" onclick="rollTitle('name', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
       </div>
-      <button class="chances-btn" onclick="toggleChances('name')">Показать шансы ▼</button>
+      <button class="chances-btn" onclick="toggleChances('name', event)">Показать шансы ▼</button>
       <div class="chances-list" id="chances-name"></div>
 
       <div class="shop-item">
         <div class="shop-info"><span class="shop-title">🎨 Цвет</span><span class="shop-desc">Краска для титула</span></div>
         <button class="btn-buy" onclick="rollTitle('color', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
       </div>
-      <button class="chances-btn" onclick="toggleChances('color')">Показать шансы ▼</button>
+      <button class="chances-btn" onclick="toggleChances('color', event)">Показать шансы ▼</button>
       <div class="chances-list" id="chances-color"></div>
 
       <div class="shop-item">
         <div class="shop-info"><span class="shop-title">✨ Стиль</span><span class="shop-desc">Шрифт титула</span></div>
         <button class="btn-buy" onclick="rollTitle('style', event)">35 <img src="memcoin.png" onerror="this.style.display='none'"></button>
       </div>
-      <button class="chances-btn" onclick="toggleChances('style')">Показать шансы ▼</button>
+      <button class="chances-btn" onclick="toggleChances('style', event)">Показать шансы ▼</button>
       <div class="chances-list" id="chances-style"></div>
 
       <button class="btn-close-modal" onclick="closeShop(event)" style="margin-top: 15px;">Закрыть</button>
@@ -1180,9 +1172,17 @@ function renderChances() {
     document.getElementById('chances-style').innerHTML = htmlStyle;
 }
 
-function toggleChances(type) {
+function toggleChances(type, event) {
     const box = document.getElementById('chances-' + type);
-    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    const btn = event ? event.target : null;
+    
+    if (box.style.display === 'block') {
+        box.style.display = 'none';
+        if (btn) btn.innerHTML = 'Показать шансы ▼';
+    } else {
+        box.style.display = 'block';
+        if (btn) btn.innerHTML = 'Скрыть шансы ▲';
+    }
 }
 
 // --- 7. ОСТАЛЬНЫЕ МОДАЛКИ ---
@@ -1200,10 +1200,11 @@ function closeShop(event) {
 
 function openLeaderboard() {
     document.getElementById('leaderboard-modal').classList.add('active');
-    loadLeaderboard();
-    if (leaderboardInterval) clearInterval(leaderboardInterval);
-    leaderboardInterval = setInterval(loadLeaderboard, 900000); 
-    startLeaderboardTimer();
+    
+    if (!leaderboardInterval) {
+        loadLeaderboard();
+        startLeaderboardTimer();
+    }
 }
 
 function closeLeaderboard(event) {
@@ -1211,8 +1212,6 @@ function closeLeaderboard(event) {
         if (event.target.id !== 'leaderboard-modal' && !event.target.closest('.btn-close-modal')) return;
     }
     document.getElementById('leaderboard-modal').classList.remove('active');
-    clearInterval(leaderboardInterval);
-    clearInterval(timerInterval);
 }
 
 async function loadLeaderboard() {
@@ -1282,6 +1281,7 @@ function startLeaderboardTimer() {
             startLeaderboardTimer();
         }
     }, 1000);
+    leaderboardInterval = true;
 }
 
 function openModal(url, title, icon, desc) {
