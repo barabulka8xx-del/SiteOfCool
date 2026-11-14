@@ -245,7 +245,6 @@ body {
     </div>
     
     <div style="display:flex; gap:10px; align-items:center;">
-      <!-- КНОПКА ПЕРЕКЛЮЧЕНИЯ ТИПА УСТРОЙСТВА -->
       <button class="btn" id="btn-device-type" style="background:var(--purple); color:#fff; font-size:10px; padding:5px 10px;" onclick="toggleDeviceType()">📱 Телефоны</button>
       
       <div class="speed-controls">
@@ -431,6 +430,16 @@ body {
     </div>
   </div>
 
+  <!-- МОДАЛКА СОЗДАНИЯ ОС -->
+  <div class="modal-overlay" id="modal-create-os">
+    <div class="modal-content">
+      <div class="modal-title">Создание операционной системы</div>
+      <div class="card-desc" style="text-align:center; margin-bottom:15px;">Вы изучили технологию создания собственной ОС. Придумайте ей название!</div>
+      <input type="text" id="os-name-input" value="MyOS" style="width:100%; padding:12px; background:var(--panel-light); border:1px solid var(--border); border-radius:8px; color:#fff; font-size:16px; font-weight:bold; outline:none; margin-bottom:15px;">
+      <button class="btn btn-gold" style="width:100%; padding:12px;" onclick="createCustomOS()">Создать ОС</button>
+    </div>
+  </div>
+
   <!-- ДИЗАЙН-СТУДИЯ -->
   <div class="design-screen" id="design-screen">
     <div class="ds-header">
@@ -471,13 +480,13 @@ body {
 
   <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:999;"></canvas>
   <div class="toast" id="toast">Уведомление</div>
-
+  
   <script>
   // ==========================================
 // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 
-const SAVE_KEY = 'tech_empire_v13';
+const SAVE_KEY = 'tech_empire_v13_3';
 
 const OFFICES = [
   { name: "Гараж", slots: 3, cost: 0 },
@@ -493,6 +502,7 @@ let state = {
   companyName: "Team of Red",
   workstations: [], selectedDeskId: null,
   research: {}, // { techId: true }
+  customOSNames: {}, // { techId: "Название" }
   employees: [],
   releasedPhones: [], 
   news: [],
@@ -514,7 +524,7 @@ const TECH_BRANCHES = [
   { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2' },
   { id: 'battery', name: 'Аккумулятор', color: '#00ff88' },
   { id: 'network', name: 'Сеть', color: '#ffd700' },
-  { id: 'os', name: 'ОС', color: '#ff00ff' },
+  { id: 'os', name: 'Операционная система', color: '#ff00ff' },
   { id: 'ports', name: 'Порты', color: '#00ffff' },
   { id: 'body', name: 'Материал тела', color: '#a52a2a' },
   { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500' },
@@ -537,83 +547,92 @@ function generateResearchTree() {
   
   for (let y = 2007; y <= 2052; y++) {
     TECH_BRANCHES.forEach(branch => {
-      let techName = formatTechName(branch.id, y);
-      let cost = 50 + (y - 2007) * 30; 
+      let techData = getTechData(branch.id, y);
       
       RESEARCH_TREE.push({
         id: 'tech_' + techIndex++,
         branch: branch.id,
-        name: techName,
-        cost: cost,
+        name: techData.name,
+        cost: techData.cost,
         yearReq: y,
-        unlocked: false
+        unlocked: false,
+        isCustomOS: techData.isCustomOS || false
       });
     });
   }
 }
 
-function formatTechName(branchId, year) {
+// Функция для выдачи названий и цен по годам для каждой ветки
+function getTechData(branchId, year) {
   let offset = year - 2007;
+  let cost = 50 + offset * 30; // Базовая цена растет с годами
+
   if (branchId === 'screen') {
     let names = ['LCD', 'TFT', 'OLED', 'AMOLED', 'MicroLED', 'Голограмма', 'Гибкий экран'];
-    return names[Math.min(Math.floor(offset / 6), names.length - 1)];
+    return { name: names[Math.min(Math.floor(offset / 6), names.length - 1)], cost: cost };
   }
   if (branchId === 'camera') {
     let mps = [1, 2, 3, 5, 8, 12, 24, 32, 48, 108, 200];
-    return mps[Math.min(Math.floor(offset / 4), mps.length - 1)] + ' МП';
+    return { name: mps[Math.min(Math.floor(offset / 4), mps.length - 1)] + ' МП', cost: cost };
   }
   if (branchId === 'cpu') {
     let cores = [1, 2, 4, 8, 16, 32, 64];
-    return cores[Math.min(Math.floor(offset / 7), cores.length - 1)] + ' Ядра';
+    return { name: cores[Math.min(Math.floor(offset / 7), cores.length - 1)] + ' Ядра', cost: cost };
   }
   if (branchId === 'memory') {
     let mem = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
-    return mem[Math.min(Math.floor(offset / 5), mem.length - 1)] + ' МБ';
+    return { name: mem[Math.min(Math.floor(offset / 5), mem.length - 1)] + ' МБ', cost: cost };
   }
   if (branchId === 'battery') {
-    return (1000 + offset * 200) + ' мАч';
+    return { name: (1000 + offset * 200) + ' мАч', cost: cost };
   }
   if (branchId === 'network') {
     let nets = ['2G', '3G', '4G', '5G', '6G', '7G', 'Спутник'];
-    return nets[Math.min(Math.floor(offset / 7), nets.length - 1)];
+    return { name: nets[Math.min(Math.floor(offset / 7), nets.length - 1)], cost: cost };
   }
   if (branchId === 'os') {
-    let os = ['Базовая', 'RED CO', 'RED CO + AI', 'Super OS', 'Квантовая ОС'];
-    return os[Math.min(Math.floor(offset / 9), os.length - 1)];
+    // Сначала Базовая ОС, потом RoboOS, потом Собственная ОС и т.д.
+    let os = ['Базовая ОС', 'RoboOS', 'RoboOS + Магазин', 'Собственная ОС', 'Собственная ОС + AI', 'Собственная ОС + AI Agent', 'Супермозг'];
+    let index = Math.min(Math.floor(offset / 6), os.length - 1);
+    return { 
+      name: os[index], 
+      cost: cost,
+      isCustomOS: os[index].includes('Собственная ОС') // Флаг для ввода названия
+    };
   }
   if (branchId === 'ports') {
     let ports = ['Мини-USB', 'Микро-USB', 'USB-C', 'USB-C 3.2', 'Беспроводная'];
-    return ports[Math.min(Math.floor(offset / 8), ports.length - 1)];
+    return { name: ports[Math.min(Math.floor(offset / 8), ports.length - 1)], cost: cost };
   }
   if (branchId === 'body') {
     let mats = ['Пластик', 'Поликарбонат', 'Стекло', 'Алюминий', 'Титан', 'Керамика', 'Графен'];
-    return mats[Math.min(Math.floor(offset / 6), mats.length - 1)];
+    return { name: mats[Math.min(Math.floor(offset / 6), mats.length - 1)], cost: cost };
   }
   if (branchId === 'design') {
     let des = ['Классика', 'Мягкий матовый', 'Отполированный', 'Рамка Аврора', 'Квантовая доска'];
-    return des[Math.min(Math.floor(offset / 8), des.length - 1)];
+    return { name: des[Math.min(Math.floor(offset / 8), des.length - 1)], cost: cost };
   }
   if (branchId === 'features') {
     let feats = ['GPS', 'NFC', 'Влагозащита', 'Стерео', 'Сканер лица', 'Лидар', 'Голограмма'];
-    return feats[Math.min(Math.floor(offset / 6), feats.length - 1)];
+    return { name: feats[Math.min(Math.floor(offset / 6), feats.length - 1)], cost: cost };
   }
   if (branchId === 'games') {
     let g = ['Контроллер', 'Охлаждение', 'RGB-освещение', 'VR-режим', 'Тактильная отдача'];
-    return g[Math.min(Math.floor(offset / 8), g.length - 1)];
+    return { name: g[Math.min(Math.floor(offset / 8), g.length - 1)], cost: cost };
   }
   if (branchId === 'pc') {
     let pc = ['Один монитор', 'Два монитора', 'Водяное охлаждение', 'Модульный ПК', 'ИИ-ассистент'];
-    return pc[Math.min(Math.floor(offset / 8), pc.length - 1)];
+    return { name: pc[Math.min(Math.floor(offset / 8), pc.length - 1)], cost: cost };
   }
   if (branchId === 'notebook') {
     let n = ['Клавиатура', 'Тачпад', 'Тонкий корпус', 'Съемная батарея', 'Док-станция'];
-    return n[Math.min(Math.floor(offset / 8), n.length - 1)];
+    return { name: n[Math.min(Math.floor(offset / 8), n.length - 1)], cost: cost };
   }
   if (branchId === 'devices') {
     let d = ['Музыкальный плеер', 'Игровая консоль', 'Планшет', 'Умные часы', 'Дрон'];
-    return d[Math.min(Math.floor(offset / 8), d.length - 1)];
+    return { name: d[Math.min(Math.floor(offset / 8), d.length - 1)], cost: cost };
   }
-  return 'Tech ' + year;
+  return { name: 'Tech ' + year, cost: cost };
 }
 
 // ==========================================
@@ -1057,7 +1076,7 @@ const designSteps = [
     options: [
       {name: "Пластик", cost: 0, q: 0, desc: 'Стандартный корпус'}, 
       {name: "Стекло", cost: 3, q: 1, desc: 'Гладкое стекло'}, 
-      {name: "Титан", cost: 12, q: 3, desc: 'Премиальный титан', req: 'tech_12'}
+      {name: "Титан", cost: 12, q: 3, desc: 'Премиальный титан', req: 'body'}
     ]
   },
   { 
@@ -1069,10 +1088,10 @@ const designSteps = [
     title: "Шаг 4. Тип экрана", 
     type: 'list', 
     options: [
-      {name: "Дисплей IPS LCD", cost: 1, q: 0}, 
-      {name: "OLED", cost: 3, q: 2}, 
-      {name: "AMOLED", cost: 9, q: 3, req: 'tech_7'},
-      {name: "LTPO-OLED", cost: 4, q: 4}
+      {name: "Дисплей IPS LCD", cost: 1, q: 0, req: 'screen'}, 
+      {name: "OLED", cost: 3, q: 2, req: 'screen'}, 
+      {name: "AMOLED", cost: 9, q: 3, req: 'screen'},
+      {name: "LTPO-OLED", cost: 4, q: 4, req: 'screen'}
     ]
   },
   { 
@@ -1080,24 +1099,24 @@ const designSteps = [
     type: 'list', 
     options: [
       {name: "Нет", cost: 0, q: 0}, 
-      {name: "2 МП", cost: 2, q: 1}, 
-      {name: "5 МП", cost: 3, q: 2},
-      {name: "8 МП", cost: 5, q: 3},
-      {name: "12 МП", cost: 7, q: 4, req: 'tech_19'}
+      {name: "2 МП", cost: 2, q: 1, req: 'camera'}, 
+      {name: "5 МП", cost: 3, q: 2, req: 'camera'},
+      {name: "8 МП", cost: 5, q: 3, req: 'camera'},
+      {name: "12 МП", cost: 7, q: 4, req: 'camera'}
     ]
   },
   { 
     title: "Шаг 6. Задние камеры", 
     type: 'grid_camera', 
     options: [
-      {name: "Основная 12 МП", cost: 5, q: 2},
-      {name: "Основная 24 МП", cost: 10, q: 3},
-      {name: "Основная 48 МП", cost: 14, q: 4},
-      {name: "Основная 108 МП", cost: 20, q: 5, req: 'tech_43'},
-      {name: "Ультраширокий", cost: 4, q: 1},
-      {name: "Телеобъектив", cost: 5, q: 1},
-      {name: "Сканер LiDAR", cost: 8, q: 2, req: 'tech_60'},
-      {name: "Ночное видение ИИ", cost: 12, q: 3, req: 'tech_80'}
+      {name: "Основная 12 МП", cost: 5, q: 2, req: 'camera'},
+      {name: "Основная 24 МП", cost: 10, q: 3, req: 'camera'},
+      {name: "Основная 48 МП", cost: 14, q: 4, req: 'camera'},
+      {name: "Основная 108 МП", cost: 20, q: 5, req: 'camera'},
+      {name: "Ультраширокий", cost: 4, q: 1, req: 'camera'},
+      {name: "Телеобъектив", cost: 5, q: 1, req: 'camera'},
+      {name: "Сканер LiDAR", cost: 8, q: 2, req: 'camera'},
+      {name: "Ночное видение ИИ", cost: 12, q: 3, req: 'camera'}
     ]
   },
   { 
@@ -1114,35 +1133,35 @@ const designSteps = [
     title: "Шаг 9. Разъем для зарядки", 
     type: 'list', 
     options: [
-      {name: "Мини-USB", cost: 1, q: 0},
-      {name: "Микро-USB", cost: 0, q: 1},
-      {name: "USB-C", cost: 1, q: 2},
-      {name: "USB-C 3.2", cost: 2, q: 3},
-      {name: "Нет порта", cost: 1, q: 4}
+      {name: "Мини-USB", cost: 1, q: 0, req: 'ports'},
+      {name: "Микро-USB", cost: 0, q: 1, req: 'ports'},
+      {name: "USB-C", cost: 1, q: 2, req: 'ports'},
+      {name: "USB-C 3.2", cost: 2, q: 3, req: 'ports'},
+      {name: "Нет порта", cost: 1, q: 4, req: 'ports'}
     ]
   },
   { 
     title: "Шаг 10. Характеристики", 
     type: 'list', 
     options: [
-      {name: "1 ядро 400 МГц", cost: 2, q: 1},
-      {name: "1 ядро 1 ГГц", cost: 3, q: 2},
-      {name: "2 ядра", cost: 6, q: 3},
-      {name: "4 ядра", cost: 9, q: 4},
-      {name: "8 ядер", cost: 13, q: 5},
-      {name: "Квантовый сопроцессор", cost: 63, q: 8, req: 'tech_150'}
+      {name: "1 ядро 400 МГц", cost: 2, q: 1, req: 'cpu'},
+      {name: "1 ядро 1 ГГц", cost: 3, q: 2, req: 'cpu'},
+      {name: "2 ядра", cost: 6, q: 3, req: 'cpu'},
+      {name: "4 ядра", cost: 9, q: 4, req: 'cpu'},
+      {name: "8 ядер", cost: 13, q: 5, req: 'cpu'},
+      {name: "Квантовый сопроцессор", cost: 63, q: 8, req: 'cpu'}
     ]
   },
   { 
     title: "Шаг 11. Функции", 
     type: 'multiple', 
     options: [
-      {name: "GPS", cost: 1, q: 1, req: 'tech_9'}, 
-      {name: "NFC", cost: 2, q: 1, req: 'tech_30'}, 
-      {name: "Влагозащита", cost: 3, q: 2, req: 'tech_18'}, 
-      {name: "Стереозвук", cost: 2, q: 1, req: 'tech_24'},
-      {name: "Сканер лица", cost: 4, q: 2, req: 'tech_36'},
-      {name: "Спутник", cost: 6, q: 3, req: 'tech_140'}
+      {name: "GPS", cost: 1, q: 1, req: 'features'}, 
+      {name: "NFC", cost: 2, q: 1, req: 'features'}, 
+      {name: "Влагозащита", cost: 3, q: 2, req: 'features'}, 
+      {name: "Стереозвук", cost: 2, q: 1, req: 'features'},
+      {name: "Сканер лица", cost: 4, q: 2, req: 'features'},
+      {name: "Спутник", cost: 6, q: 3, req: 'features'}
     ]
   },
   { 
@@ -1169,14 +1188,14 @@ let currentDesign = {
   features: [], 
   name: "iFon",
   deviceType: "Телефон",
-  selectedCamera: null
+  selectedOS: "Базовая ОС"
 };
 
 function openDesignStudio() {
   playSound('click');
   document.getElementById('design-screen').classList.add('active');
   currentStep = 0;
-  currentDesign = { cost: 0, quality: 0, features: [], name: "iFon", deviceType: "Телефон", selectedCamera: null };
+  currentDesign = { cost: 0, quality: 0, features: [], name: "iFon", deviceType: "Телефон", selectedOS: "Базовая ОС" };
   renderDesignStep();
 }
 
@@ -1196,8 +1215,6 @@ function renderDesignStep() {
 
   const opts = document.getElementById('ds-options');
   opts.innerHTML = '';
-
-  // --- ОТРИСОВКА ПО ТИПАМ ---
 
   // 1. ПЛИТКИ (Устройства)
   if (step.type === 'grid') {
@@ -1219,7 +1236,6 @@ function renderDesignStep() {
       el.onclick = () => {
         playSound('click');
         currentDesign.deviceType = o.name;
-        // Сбрасываем предыдущие затраты для этого шага
         currentDesign.cost = 0;
         currentDesign.quality = 1;
         currentDesign.cost += o.cost;
@@ -1249,13 +1265,13 @@ function renderDesignStep() {
     window.updateSlider = function(v, min, max) {
       let display = document.getElementById('slider-val-display');
       display.innerText = currentStep === 2 ? v + '"' : v + '%';
-      // Здесь можно добавить логику изменения цены от размера, если нужно
     };
     
-    // Добавляем кнопку Далее для слайдера
     let nextBtn = document.createElement('button');
-    nextBtn.className = 'btn btn-blue';
+    nextBtn.className = 'btn';
     nextBtn.style.marginTop = '20px';
+    nextBtn.style.width = '100%';
+    nextBtn.style.padding = '12px';
     nextBtn.innerText = 'Продолжить';
     nextBtn.onclick = () => {
       playSound('click');
@@ -1274,8 +1290,9 @@ function renderDesignStep() {
     step.options.forEach(o => {
       let isLocked = false;
       if (o.req) {
-        let tech = RESEARCH_TREE.find(t => t.id === o.req);
-        if (tech && !tech.unlocked) isLocked = true;
+        // Проверка года для камер (берем базовую технологию)
+        let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.yearReq === 2007);
+        if (state.year < 2007) isLocked = true; // Заглушка
       }
 
       let el = document.createElement('div');
@@ -1305,28 +1322,26 @@ function renderDesignStep() {
       grid.appendChild(el);
     });
     
-    // Кнопка далее
     let nextBtn = document.createElement('button');
-    nextBtn.className = 'btn btn-blue';
+    nextBtn.className = 'btn';
     nextBtn.style.marginTop = '20px';
+    nextBtn.style.width = '100%';
+    nextBtn.style.padding = '12px';
     nextBtn.innerText = 'Продолжить';
-    nextBtn.onclick = () => {
-      playSound('click');
-      currentStep++;
-      renderDesignStep();
-    };
+    nextBtn.onclick = () => { playSound('click'); currentStep++; renderDesignStep(); };
     opts.appendChild(nextBtn);
     return;
   }
 
-  // 4. СПИСОК (Стандартный)
+  // 4. СПИСОК
   if (step.type === 'list' || step.type === 'multiple') {
     step.options.forEach(o => {
       let isLocked = false;
       let lockText = '';
       
       if (o.req) {
-        let tech = RESEARCH_TREE.find(t => t.id === o.req);
+        // Умная проверка: ищем технологию в дереве, которая соответствует названию
+        let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
         if (tech && !tech.unlocked) {
           isLocked = true;
           if (state.year < tech.yearReq) lockText = `🔒 Прибудет в ${tech.yearReq} г.`;
@@ -1375,7 +1390,7 @@ function renderDesignStep() {
     return;
   }
 
-  // 5. ФИНАЛ (Расчет цены)
+  // 5. ФИНАЛ
   if (step.type === 'final') {
     let score = Math.min(9.9, (5 + currentDesign.quality / 2));
     let recommendedPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
@@ -1427,7 +1442,7 @@ function renderDesignStep() {
           </div>
         </div>
         
-        <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" id="btn-launch-phone">Начать разработку</button>
+        <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" id="btn-launch-phone">Начать производство</button>
       </div>
     `;
     
@@ -1451,8 +1466,8 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   
   let finalName = customName.trim() === '' ? "Безымянный " + (state.releasedPhones.length + 1) : customName;
   
-  // Стоимость первой партии (неделя продаж)
-  let batchSize = weeklyDemand;
+  // Стоимость первой партии (2 недели продаж)
+  let batchSize = weeklyDemand * 2;
   let totalCost = currentDesign.cost * batchSize;
   
   if (state.money < totalCost) {
@@ -1759,8 +1774,8 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   function showToast(msg, type = 'green') {
     const t = document.getElementById('toast');
     t.innerText = msg;
-    t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
-    t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+    t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : (type === 'blue' ? 'var(--blue)' : 'var(--green)'));
+    t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : (type === 'blue' ? 'var(--blue)' : 'var(--green)'));
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
@@ -1817,7 +1832,23 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }, 60000);
 
   // ==========================================
-  // 13. ТУТОРИАЛ
+  // 13. МОДАЛКА СОЗДАНИЯ ОС
+  // ==========================================
+
+  function createCustomOS() {
+    let osName = document.getElementById('os-name-input').value.trim();
+    if (osName === '') osName = "MyOS";
+    
+    // Сохраняем в стейт (в реальной игре здесь была бы логика привязки к изученной технологии)
+    state.customOSNames['custom_os'] = osName;
+    
+    closeModal('modal-create-os');
+    showToast(`ОС "${osName}" успешно создана!`, 'green');
+    save();
+  }
+
+  // ==========================================
+  // 14. ТУТОРИАЛ
   // ==========================================
 
   let tutStep = 0;
