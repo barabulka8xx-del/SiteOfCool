@@ -384,7 +384,7 @@
   // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
   // ==========================================
   
-  const SAVE_KEY = 'tech_empire_v22_1';
+  const SAVE_KEY = 'tech_empire_v24_1';
   
   const OFFICES = [
     { name: "Гараж", slots: 3, cost: 0 },
@@ -780,7 +780,7 @@
     setInterval(() => {
       if (state.speed === 0) return;
       
-      let daysPassed = state.speed * 0.1; 
+      let daysPassed = state.speed * 0.05; 
       state.day += daysPassed;
       
       if (state.day >= 30) {
@@ -794,7 +794,7 @@
         }
       }
 
-      // Доход от устройств
+      // 1. ДОХОД ОТ ПРОДАННЫХ ТЕЛЕФОНОВ
       let dailyIncome = 0;
       state.releasedPhones.forEach(p => {
         if (state.year - p.releaseYear < 5) {
@@ -806,38 +806,45 @@
       
       dailyIncome += (state.empire.servicesIncome || 0) / 30;
 
-      // Расходы (зарплаты)
+      // 2. РАСХОДЫ (ЗАРПЛАТЫ)
       let inflationMultiplier = 1 + ((state.year - 2007) * 0.05);
       let dailyExpense = 0;
       state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
       
-      // РАСХОДЫ НА РАЗРАБОТКУ
+      // 3. РАСХОДЫ И ЗАВЕРШЕНИЕ РАЗРАБОТКИ
       if (state.activeDevelopment) {
         dailyExpense += state.activeDevelopment.dailyCost;
         state.activeDevelopment.daysLeft -= daysPassed;
         
         if (state.activeDevelopment.daysLeft <= 0) {
+          // РАЗРАБОТКА ЗАВЕРШЕНА - ТЕЛЕФОН ВЫХОДИТ В ПРОДАЖУ
           let score = parseFloat(Math.min(9.9, (5 + state.activeDevelopment.quality / 2)).toFixed(1));
           let profit = Math.floor(state.activeDevelopment.recommendedPrice * 0.4);
           let demand = Math.floor(500 + (score * 800));
           
           state.releasedPhones.push({
             name: state.activeDevelopment.name,
-            score: score, releaseYear: state.year, price: state.activeDevelopment.recommendedPrice,
-            cost: state.activeDevelopment.cost, profitPerUnit: profit, weeklySales: demand, totalSold: 0
+            score: score, 
+            releaseYear: state.year, 
+            price: state.activeDevelopment.recommendedPrice,
+            cost: state.activeDevelopment.cost, 
+            profitPerUnit: profit, 
+            weeklySales: demand, 
+            totalSold: 0
           });
           
           state.reputation += score / 10;
           state.activeDevelopment = null;
           playSound('release');
-          showToast(`Устройство запущено в продажу!`, 'green');
+          showToast(`Телефон вышел в продажу!`, 'green');
           startConfetti();
         }
       }
       
+      // 4. ОБНОВЛЕНИЕ БАЛАНСА
       state.money += (dailyIncome - dailyExpense) * daysPassed;
 
-      // RP
+      // 5. ИССЛЕДОВАНИЯ (RP)
       let rpPerDay = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
       let labBonus = state.workstations.filter(w => w.lab).length * 5;
       state.rp += (rpPerDay + labBonus) * daysPassed;
@@ -1378,7 +1385,6 @@
         ctx.strokeStyle = tech.unlocked ? '#00ff88' : (isAvailable ? '#ffd700' : branch.color);
         ctx.lineWidth = 2;
         
-        // Отрисовка прямоугольника (без roundRect для старых браузеров)
         ctx.beginPath();
         ctx.rect(x, y, 80, 40);
         ctx.fill();
@@ -1415,31 +1421,44 @@
       {name: "Планшет", cost: 15, q: 2, icon: '📟', desc: 'Большой.'}
     ]},
     { title: "Шаг 2. Шасси", type: 'list', options: [
-      {name: "Пластик", cost: 0, q: 0}, {name: "Стекло", cost: 3, q: 1}, {name: "Титан", cost: 12, q: 3, req: 'body'}
+      {name: "Пластик", cost: 0, q: 0, reqId: 't_8'}, 
+      {name: "Стекло", cost: 3, q: 1, reqId: 't_9'}, 
+      {name: "Титан", cost: 12, q: 3, reqId: 't_10'}
     ]},
     { title: "Шаг 3. Размер", type: 'slider', min: 3.5, max: 7.5, step: 0.1, defaultVal: 5.5 },
     { title: "Шаг 4. Экран", type: 'list', options: [
-      {name: "LCD", cost: 1, q: 0, req: 'screen'}, {name: "OLED", cost: 3, q: 2, req: 'screen'}, {name: "AMOLED", cost: 9, q: 3, req: 'screen'}
+      {name: "LCD", cost: 1, q: 0, reqId: 't_0'}, 
+      {name: "OLED", cost: 3, q: 2, reqId: 't_18'},
+      {name: "AMOLED", cost: 9, q: 3, reqId: 't_26'}
     ]},
     { title: "Шаг 5. Селфи", type: 'list', options: [
-      {name: "Нет", cost: 0, q: 0}, {name: "2 МП", cost: 2, q: 1, req: 'camera'}, {name: "5 МП", cost: 3, q: 2, req: 'camera'}
+      {name: "Нет", cost: 0, q: 0}, 
+      {name: "2 МП", cost: 2, q: 1, reqId: 't_1'}, 
+      {name: "5 МП", cost: 3, q: 2, reqId: 't_4'}
     ]},
     { title: "Шаг 6. Камеры", type: 'grid_camera', options: [
-      {name: "12 МП", cost: 5, q: 2, req: 'camera'}, {name: "24 МП", cost: 10, q: 3, req: 'camera'}
+      {name: "12 МП", cost: 5, q: 2, reqId: 't_11'}, 
+      {name: "24 МП", cost: 10, q: 3, reqId: 't_30'}
     ]},
     { title: "Шаг 7. Углы", type: 'slider', min: 0, max: 100, defaultVal: 50 },
     { title: "Шаг 8. Кнопки", type: 'slider', min: 0, max: 100, defaultVal: 50 },
     { title: "Шаг 9. Порт", type: 'list', options: [
-      {name: "Мини-USB", cost: 1, q: 0, req: 'ports'}, {name: "USB-C", cost: 1, q: 2, req: 'ports'}
+      {name: "Мини-USB", cost: 1, q: 0, reqId: 't_6'}, 
+      {name: "USB-C", cost: 1, q: 2, reqId: 't_20'}
     ]},
     { title: "Шаг 10. Процессор", type: 'list', options: [
-      {name: "1 ядро", cost: 2, q: 1, req: 'cpu'}, {name: "2 ядра", cost: 6, q: 3, req: 'cpu'}, {name: "4 ядра", cost: 9, q: 4, req: 'cpu'}
+      {name: "1 ядро", cost: 2, q: 1, reqId: 't_2'}, 
+      {name: "2 ядра", cost: 6, q: 3, reqId: 't_13'}, 
+      {name: "4 ядра", cost: 9, q: 4, reqId: 't_23'}
     ]},
     { title: "Шаг 11. Функции", type: 'multiple', options: [
-      {name: "GPS", cost: 1, q: 1, req: 'features'}, {name: "NFC", cost: 2, q: 1, req: 'features'}, {name: "Влагозащита", cost: 3, q: 2, req: 'features'}
+      {name: "GPS", cost: 1, q: 1, reqId: 't_10'}, 
+      {name: "NFC", cost: 2, q: 1, reqId: 't_15'}, 
+      {name: "Влагозащита", cost: 3, q: 2, reqId: 't_20'}
     ]},
     { title: "Шаг 12. Цвет", type: 'list', options: [
-      {name: "Черный", cost: 0, q: 0}, {name: "Неоновый", cost: 2, q: 2}
+      {name: "Черный", cost: 0, q: 0}, 
+      {name: "Неоновый", cost: 2, q: 2}
     ]},
     { title: "Шаг 13. Финал", type: 'final', options: [] }
   ];
@@ -1506,9 +1525,9 @@
       let grid = opts.firstChild;
       step.options.forEach(o => {
         let isLocked = false;
-        if (o.req) {
-          let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
-          if (tech && !tech.unlocked) isLocked = true;
+        if (o.reqId) {
+          let tech = RESEARCH_TREE.find(t => t.id === o.reqId);
+          if (!tech || !tech.unlocked) isLocked = true;
         }
         let isSelected = currentDesign.features.includes(o.name);
         let el = document.createElement('div');
@@ -1532,11 +1551,12 @@
     if (step.type === 'list' || step.type === 'multiple') {
       step.options.forEach(o => {
         let isLocked = false; let lockText = '';
-        if (o.req) {
-          let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
-          if (tech && !tech.unlocked) {
+        if (o.reqId) {
+          let tech = RESEARCH_TREE.find(t => t.id === o.reqId);
+          if (!tech || !tech.unlocked) {
             isLocked = true;
-            if (state.year < tech.yearReq) lockText = `🔒 ${tech.yearReq} г.`;
+            if (!tech) lockText = `🔒 Ошибка`;
+            else if (state.year < tech.yearReq) lockText = `🔒 ${tech.yearReq} г.`;
             else if (state.rp < tech.cost) lockText = `🔒 RP ${tech.cost}`;
             else lockText = `🔒 Иссл.`;
           }
@@ -1670,4 +1690,4 @@
 
   </script>
 </body>
-</html>
+  </html>
