@@ -5,209 +5,209 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Tech Empire Simulator | Site Of Cool</title>
   <style>
-  :root {
-  --bg: #05080a; --panel: #111a22; --border: #2a3b4c; --panel-light: #1a2632;
-  --green: #00ff88; --blue: #4facfe; --purple: #8E2DE2; --red: #ff0055; --gold: #ffd700; --orange: #ff8c00;
-}
+    :root {
+      --bg: #05080a; --panel: #111a22; --border: #2a3b4c; --panel-light: #1a2632;
+      --green: #00ff88; --blue: #4facfe; --purple: #8E2DE2; --red: #ff0055; --gold: #ffd700; --orange: #ff8c00;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background: var(--bg); color: white; height: 100vh; height: 100dvh; 
+      display: flex; flex-direction: column; overflow: hidden; 
+    }
 
-* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    /* СТАРТОВЫЙ ЭКРАН */
+    .start-screen {
+      position: fixed; inset: 0; z-index: 999; display: none; flex-direction: column;
+      justify-content: center; align-items: center; padding: 20px;
+      background: linear-gradient(135deg, #05080a 0%, #101922 100%);
+    }
+    .start-screen.active { display: flex; }
+    .start-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .start-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 400px; }
+    .start-content h1 { font-size: 36px; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px; }
+    .start-content p { color: #888; font-size: 14px; margin-bottom: 30px; }
+    
+    .company-setup { text-align: left; margin-bottom: 20px; }
+    .company-setup label { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; }
+    .company-setup input {
+      width: 100%; padding: 15px; background: var(--panel-light); border: 1px solid var(--border);
+      border-radius: 10px; color: white; font-size: 16px; font-weight: bold; outline: none;
+    }
+    .company-setup input:focus { border-color: var(--blue); }
 
-body { 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-  background: var(--bg); color: white; height: 100vh; height: 100dvh; 
-  display: flex; flex-direction: column; overflow: hidden; 
-}
+    .start-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .btn-start { background: #fff; color: #000; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; }
+    .btn-new { background: #333; color: #fff; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; }
+    
+    .start-stats { background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; color: #888; text-align: left; }
+    .start-stats div:first-child { color: #fff; font-weight: bold; margin-bottom: 5px; }
 
-/* СТАРТОВЫЙ ЭКРАН */
-.start-screen {
-  position: fixed; inset: 0; z-index: 999; display: none; flex-direction: column;
-  justify-content: center; align-items: center; padding: 20px;
-  background: linear-gradient(135deg, #05080a 0%, #101922 100%);
-}
-.start-screen.active { display: flex; }
-.start-bg {
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 60%);
-  pointer-events: none;
-}
-.start-content { position: relative; z-index: 2; text-align: center; width: 100%; max-width: 400px; }
-.start-content h1 { font-size: 36px; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px; }
-.start-content p { color: #888; font-size: 14px; margin-bottom: 30px; }
+    /* ВЕРХНЯЯ ПАНЕЛЬ */
+    .top-bar { 
+      height: 55px; background: var(--panel); border-bottom: 2px solid var(--border); 
+      display: flex; align-items: center; justify-content: space-between; padding: 0 10px; 
+      z-index: 10; flex-shrink: 0; font-size: 12px; 
+    }
+    .stat-group { display: flex; gap: 10px; font-weight: 900; }
+    .stat.money { color: var(--green); }
+    .stat.rp { color: var(--purple); }
+    .stat.date { color: var(--blue); }
+    
+    .speed-controls { display: flex; gap: 2px; background: #000; padding: 2px; border-radius: 6px; }
+    .speed-btn { background: transparent; border: none; color: #666; padding: 6px 8px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+    .speed-btn.active { background: var(--panel-light); color: var(--blue); box-shadow: 0 0 5px rgba(79, 172, 254, 0.5); }
 
-.company-setup { text-align: left; margin-bottom: 20px; }
-.company-setup label { font-size: 12px; color: #aaa; display: block; margin-bottom: 5px; }
-.company-setup input {
-  width: 100%; padding: 15px; background: var(--panel-light); border: 1px solid var(--border);
-  border-radius: 10px; color: white; font-size: 16px; font-weight: bold; outline: none;
-}
-.company-setup input:focus { border-color: var(--blue); }
+    /* ЭКРАНЫ */
+    .screen { flex: 1; overflow-y: auto; display: none; flex-direction: column; padding: 10px; gap: 10px; padding-bottom: 15px; }
+    .screen.active { display: flex; }
 
-.start-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.btn-start { background: #fff; color: #000; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; }
-.btn-new { background: #333; color: #fff; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 900; cursor: pointer; }
+    /* ОБЩИЕ КАРТОЧКИ */
+    .card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .card-info { display: flex; flex-direction: column; gap: 3px; }
+    .card-title { font-weight: 900; font-size: 14px; }
+    .card-desc { font-size: 11px; color: #888; }
+    .btn { background: var(--blue); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; }
+    .btn:active { transform: scale(0.95); }
+    .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-research { background: var(--purple); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-gold { background: var(--gold); color: #000; }
 
-.start-stats { background: var(--panel); padding: 15px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; color: #888; text-align: left; }
-.start-stats div:first-child { color: #fff; font-weight: bold; margin-bottom: 5px; }
+    /* ОФИС (2.5D) */
+    .office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; gap: 5px; }
+    .placed-area { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px 10px; perspective: 800px; }
+    
+    .workstation { 
+      background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 10px; 
+      width: 85px; height: 95px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
+      position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; transform-style: preserve-3d;
+    }
+    .workstation:hover { transform: translateY(-5px) rotateX(5deg); }
+    .workstation.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); transform: scale(1.05) rotateX(10deg); }
+    .workstation .icon { font-size: 30px; }
+    .workstation .name { font-size: 8px; color: #aaa; text-align: center; margin-top: 5px; font-weight: bold; }
+    .workstation .attachment { position: absolute; font-size: 18px; z-index: 2; }
+    .workstation .chair { bottom: 5px; right: 5px; }
+    .workstation .pc { top: 5px; left: 5px; }
 
-/* ВЕРХНЯЯ ПАНЕЛЬ */
-.top-bar { 
-  height: 55px; background: var(--panel); border-bottom: 2px solid var(--border); 
-  display: flex; align-items: center; justify-content: space-between; padding: 0 10px; 
-  z-index: 10; flex-shrink: 0; font-size: 12px; 
-}
-.stat-group { display: flex; gap: 10px; font-weight: 900; }
-.stat.money { color: var(--green); }
-.stat.rp { color: var(--purple); }
-.stat.date { color: var(--blue); }
+    /* НИЖНЕЕ МЕНЮ */
+    .bottom-nav { height: 65px; background: var(--panel); border-top: 2px solid var(--border); display: flex; align-items: center; z-index: 10; flex-shrink: 0; overflow-x: auto; }
+    .bottom-nav::-webkit-scrollbar { display: none; }
+    .nav-btn { flex: 1; min-width: 65px; background: transparent; border: none; color: #6c8196; font-size: 9px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 5px 0; transition: 0.2s; position: relative; }
+    .nav-btn.active { color: var(--blue); background: rgba(79, 172, 254, 0.1); border-top: 2px solid var(--blue); }
+    .nav-btn .icon { font-size: 22px; transition: 0.2s; }
+    .nav-btn.active .icon { transform: translateY(-2px); }
 
-.speed-controls { display: flex; gap: 2px; background: #000; padding: 2px; border-radius: 6px; }
-.speed-btn { background: transparent; border: none; color: #666; padding: 6px 8px; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s; }
-.speed-btn.active { background: var(--panel-light); color: var(--blue); box-shadow: 0 0 5px rgba(79, 172, 254, 0.5); }
+    /* КОМАНДА */
+    .team-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+    .team-stat-box { background: var(--panel); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 11px; color: #aaa; }
+    .team-stat-box span { display: block; font-size: 16px; font-weight: 900; color: #fff; margin-top: 4px; }
+    
+    .emp-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .emp-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 18px; color: #fff; }
+    .emp-avatar.researcher { background: var(--blue); }
+    .emp-avatar.fixer { background: var(--red); }
+    .emp-info { flex: 1; }
+    .emp-name { font-size: 13px; font-weight: bold; }
+    .emp-role { font-size: 10px; color: #888; margin-bottom: 4px; }
+    .emp-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+    .emp-actions { display: flex; flex-direction: column; gap: 5px; }
+    .emp-actions button { padding: 5px 10px; font-size: 10px; }
 
-/* ЭКРАНЫ */
-.screen { flex: 1; overflow-y: auto; display: none; flex-direction: column; padding: 10px; gap: 10px; padding-bottom: 15px; }
-.screen.active { display: flex; }
+    /* ДЕРЕВО ИССЛЕДОВАНИЙ */
+    .research-layout { display: flex; flex-direction: column; height: 100%; }
+    .research-sidebar { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); }
+    .research-tree-container { flex: 1; overflow: auto; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; padding: 20px; }
+    .tree-timeline { display: flex; color: #fff; font-weight: bold; font-size: 12px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    .tree-year { width: 150px; flex-shrink: 0; text-align: center; border-right: 1px dashed #333; }
+    .tree-row { display: flex; align-items: center; margin-bottom: 10px; }
+    .tree-node { width: 120px; height: 50px; background: #222; border: 1px solid #555; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; text-align: center; margin: 0 15px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+    .tree-node.unlocked { border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
+    .tree-node.available { border-color: var(--gold); animation: pulse 2s infinite; }
+    .tree-node.locked { opacity: 0.5; background: #111; }
 
-/* ОБЩИЕ КАРТОЧКИ */
-.card { background: var(--panel); border: 1px solid var(--border); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-.card-info { display: flex; flex-direction: column; gap: 3px; }
-.card-title { font-weight: 900; font-size: 14px; }
-.card-desc { font-size: 11px; color: #888; }
-.btn { background: var(--blue); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; }
-.btn:active { transform: scale(0.95); }
-.btn:disabled { background: #333; color: #666; cursor: not-allowed; }
-.btn-research { background: var(--purple); color: #fff; }
-.btn-red { background: var(--red); color: #fff; }
-.btn-gold { background: var(--gold); color: #000; }
+    /* ДИЗАЙН-СТУДИЯ */
+    .design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
+    .design-screen.active { display: flex; }
+    .ds-header { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
+    .ds-body { flex: 1; display: flex; overflow: hidden; }
+    .ds-left { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101922 0%, #060a0f 100%); flex-direction: column; gap: 20px; }
+    .phone-preview { width: 120px; height: 240px; border: 4px solid #333; border-radius: 20px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 0 50px rgba(79,172,254,0.1); transition: 0.3s; position: relative; }
+    .phone-notch { position: absolute; top: 0; width: 40px; height: 15px; background: #333; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+    
+    .ds-right { width: 55%; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+    .ds-step-header { padding: 15px; border-bottom: 1px solid var(--border); }
+    .ds-step-title { font-size: 16px; font-weight: 900; margin-bottom: 3px; }
+    .ds-step-info { font-size: 11px; color: var(--blue); font-weight: bold; }
+    .ds-options { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+    
+    /* НОВЫЕ СТИЛИ ДЛЯ ДИЗАЙН-СТУДИИ */
+    .ds-opt { 
+      background: var(--panel-light); border: 1px solid var(--border); padding: 12px; 
+      border-radius: 10px; font-size: 13px; display: flex; justify-content: space-between; 
+      cursor: pointer; transition: 0.2s; font-weight: bold; 
+    }
+    .ds-opt:active { border-color: var(--green); transform: scale(0.98); }
+    .ds-opt.locked { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
+    .ds-opt.selected { border-color: var(--green); background: rgba(0, 255, 136, 0.1); }
+    
+    /* Сетка для плиток (выбор устройства) */
+    .ds-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .ds-tile {
+      background: var(--panel-light); border: 2px solid var(--border); padding: 15px; 
+      border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .ds-tile.selected { border-color: var(--blue); box-shadow: 0 0 15px rgba(79,172,254,0.3); }
+    .ds-tile .tile-icon { font-size: 40px; margin-bottom: 10px; }
+    .ds-tile .tile-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
+    .ds-tile .tile-desc { font-size: 10px; color: #888; }
 
-/* ОФИС (2.5D) */
-.office-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 12px; border-radius: 10px; border: 1px solid var(--border); font-size: 12px; flex-wrap: wrap; gap: 5px; }
-.placed-area { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; padding: 20px 10px; perspective: 800px; }
+    /* Ползунок (Slider) */
+    .ds-slider-container {
+      padding: 15px; background: var(--panel-light); border-radius: 10px; border: 1px solid var(--border);
+    }
+    .ds-slider-value { font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 15px; color: #fff; }
+    .ds-slider {
+      width: 100%; height: 8px; background: #333; border-radius: 4px; outline: none; -webkit-appearance: none;
+    }
+    .ds-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
+      border-radius: 50%; background: var(--blue); cursor: pointer; box-shadow: 0 0 10px rgba(79,172,254,0.5);
+    }
+    .ds-slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-top: 10px; }
 
-.workstation { 
-  background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 10px; 
-  width: 85px; height: 95px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
-  position: relative; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; transform-style: preserve-3d;
-}
-.workstation:hover { transform: translateY(-5px) rotateX(5deg); }
-.workstation.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); transform: scale(1.05) rotateX(10deg); }
-.workstation .icon { font-size: 30px; }
-.workstation .name { font-size: 8px; color: #aaa; text-align: center; margin-top: 5px; font-weight: bold; }
-.workstation .attachment { position: absolute; font-size: 18px; z-index: 2; }
-.workstation .chair { bottom: 5px; right: 5px; }
-.workstation .pc { top: 5px; left: 5px; }
+    /* Кнопки навигации */
+    .ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
 
-/* НИЖНЕЕ МЕНЮ */
-.bottom-nav { height: 65px; background: var(--panel); border-top: 2px solid var(--border); display: flex; align-items: center; z-index: 10; flex-shrink: 0; overflow-x: auto; }
-.bottom-nav::-webkit-scrollbar { display: none; }
-.nav-btn { flex: 1; min-width: 65px; background: transparent; border: none; color: #6c8196; font-size: 9px; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 5px 0; transition: 0.2s; position: relative; }
-.nav-btn.active { color: var(--blue); background: rgba(79, 172, 254, 0.1); border-top: 2px solid var(--blue); }
-.nav-btn .icon { font-size: 22px; transition: 0.2s; }
-.nav-btn.active .icon { transform: translateY(-2px); }
+    /* УВЕДОМЛЕНИЯ И МОДАЛКИ */
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-/* КОМАНДА */
-.team-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-.team-stat-box { background: var(--panel); padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 11px; color: #aaa; }
-.team-stat-box span { display: block; font-size: 16px; font-weight: 900; color: #fff; margin-top: 4px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: var(--panel); border: 2px solid var(--border); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px; color: var(--gold); }
 
-.emp-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
-.emp-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 18px; color: #fff; }
-.emp-avatar.researcher { background: var(--blue); }
-.emp-avatar.fixer { background: var(--red); }
-.emp-info { flex: 1; }
-.emp-name { font-size: 13px; font-weight: bold; }
-.emp-role { font-size: 10px; color: #888; margin-bottom: 4px; }
-.emp-stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
-.emp-actions { display: flex; flex-direction: column; gap: 5px; }
-.emp-actions button { padding: 5px 10px; font-size: 10px; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
 
-/* ДЕРЕВО ИССЛЕДОВАНИЙ */
-.research-layout { display: flex; flex-direction: column; height: 100%; }
-.research-sidebar { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); }
-.research-tree-container { flex: 1; overflow: auto; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; padding: 20px; }
-.tree-timeline { display: flex; color: #fff; font-weight: bold; font-size: 12px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-.tree-year { width: 150px; flex-shrink: 0; text-align: center; border-right: 1px dashed #333; }
-.tree-row { display: flex; align-items: center; margin-bottom: 10px; }
-.tree-node { width: 120px; height: 50px; background: #222; border: 1px solid #555; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; text-align: center; margin: 0 15px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
-.tree-node.unlocked { border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
-.tree-node.available { border-color: var(--gold); animation: pulse 2s infinite; }
-.tree-node.locked { opacity: 0.5; background: #111; }
+    /* Скроллбар */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-/* ДИЗАЙН-СТУДИЯ */
-.design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
-.design-screen.active { display: flex; }
-.ds-header { height: 60px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; }
-.ds-body { flex: 1; display: flex; overflow: hidden; }
-.ds-left { flex: 1; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #101922 0%, #060a0f 100%); flex-direction: column; gap: 20px; }
-.phone-preview { width: 120px; height: 240px; border: 4px solid #333; border-radius: 20px; background: #111; display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 0 50px rgba(79,172,254,0.1); transition: 0.3s; position: relative; }
-.phone-notch { position: absolute; top: 0; width: 40px; height: 15px; background: #333; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
-
-.ds-right { width: 55%; background: var(--panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
-.ds-step-header { padding: 15px; border-bottom: 1px solid var(--border); }
-.ds-step-title { font-size: 16px; font-weight: 900; margin-bottom: 3px; }
-.ds-step-info { font-size: 11px; color: var(--blue); font-weight: bold; }
-.ds-options { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-
-/* НОВЫЕ СТИЛИ ДЛЯ ДИЗАЙН-СТУДИИ */
-.ds-opt { 
-  background: var(--panel-light); border: 1px solid var(--border); padding: 12px; 
-  border-radius: 10px; font-size: 13px; display: flex; justify-content: space-between; 
-  cursor: pointer; transition: 0.2s; font-weight: bold; 
-}
-.ds-opt:active { border-color: var(--green); transform: scale(0.98); }
-.ds-opt.locked { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; pointer-events: none; }
-.ds-opt.selected { border-color: var(--green); background: rgba(0, 255, 136, 0.1); }
-
-/* Сетка для плиток (выбор устройства) */
-.ds-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-}
-.ds-tile {
-  background: var(--panel-light); border: 2px solid var(--border); padding: 15px; 
-  border-radius: 12px; text-align: center; cursor: pointer; transition: 0.2s;
-}
-.ds-tile.selected { border-color: var(--blue); box-shadow: 0 0 15px rgba(79,172,254,0.3); }
-.ds-tile .tile-icon { font-size: 40px; margin-bottom: 10px; }
-.ds-tile .tile-name { font-size: 14px; font-weight: bold; margin-bottom: 5px; }
-.ds-tile .tile-desc { font-size: 10px; color: #888; }
-
-/* Ползунок (Slider) */
-.ds-slider-container {
-  padding: 15px; background: var(--panel-light); border-radius: 10px; border: 1px solid var(--border);
-}
-.ds-slider-value { font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 15px; color: #fff; }
-.ds-slider {
-  width: 100%; height: 8px; background: #333; border-radius: 4px; outline: none; -webkit-appearance: none;
-}
-.ds-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none; width: 24px; height: 24px;
-  border-radius: 50%; background: var(--blue); cursor: pointer; box-shadow: 0 0 10px rgba(79,172,254,0.5);
-}
-.ds-slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-top: 10px; }
-
-/* Кнопки навигации */
-.ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
-
-/* УВЕДОМЛЕНИЯ И МОДАЛКИ */
-.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
-.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-.modal-overlay.active { display: flex; }
-.modal-content { background: var(--panel); border: 2px solid var(--border); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px; color: var(--gold); }
-
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
-
-/* Скроллбар */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-/* Стили для горизонтального магазина */
-#shop-list::-webkit-scrollbar { height: 4px; }
-#shop-list::-webkit-scrollbar-track { background: transparent; }
-#shop-list::-webkit-scrollbar-thumb { background: var(--border); }
+    /* Стили для горизонтального магазина */
+    #shop-list::-webkit-scrollbar { height: 4px; }
+    #shop-list::-webkit-scrollbar-track { background: transparent; }
+    #shop-list::-webkit-scrollbar-thumb { background: var(--border); }
   </style>
 </head>
 <body>
@@ -480,13 +480,13 @@ body {
 
   <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:999;"></canvas>
   <div class="toast" id="toast">Уведомление</div>
-  
+
   <script>
   // ==========================================
 // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ==========================================
 
-const SAVE_KEY = 'tech_empire_v13_3';
+const SAVE_KEY = 'tech_empire_v15_1';
 
 const OFFICES = [
   { name: "Гараж", slots: 3, cost: 0 },
@@ -516,599 +516,972 @@ let state = {
   markets: ['na']
 };
 
-// 15 ВЕТОК ИССЛЕДОВАНИЙ (включая ПК)
-const TECH_BRANCHES = [
-  { id: 'screen', name: 'Экран', color: '#4facfe' },
-  { id: 'camera', name: 'Камера', color: '#ff8c00' },
-  { id: 'cpu', name: 'Чипсы', color: '#ff0055' },
-  { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2' },
-  { id: 'battery', name: 'Аккумулятор', color: '#00ff88' },
-  { id: 'network', name: 'Сеть', color: '#ffd700' },
-  { id: 'os', name: 'Операционная система', color: '#ff00ff' },
-  { id: 'ports', name: 'Порты', color: '#00ffff' },
-  { id: 'body', name: 'Материал тела', color: '#a52a2a' },
-  { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500' },
-  { id: 'features', name: 'Функции', color: '#7fffd4' },
-  { id: 'games', name: 'Игровые функции', color: '#ff69b4' },
-  { id: 'pc', name: 'Функции ПК', color: '#808080' },
-  { id: 'notebook', name: 'Особенности ноутбука', color: '#4682b4' },
-  { id: 'devices', name: 'Новые устройства', color: '#32cd32' }
-];
+// ==========================================
+// 2. МЕГА-МАССИВ ТЕХНОЛОГИЙ (БЕЗ ЦИКЛОВ)
+// ==========================================
 
 let RESEARCH_TREE = [];
 
-// ==========================================
-// 2. ГЕНЕРАЦИЯ ДЕРЕВА (2007-2052)
-// ==========================================
-
 function generateResearchTree() {
   RESEARCH_TREE = [];
-  let techIndex = 0;
   
-  for (let y = 2007; y <= 2052; y++) {
-    TECH_BRANCHES.forEach(branch => {
-      let techData = getTechData(branch.id, y);
-      
-      RESEARCH_TREE.push({
-        id: 'tech_' + techIndex++,
-        branch: branch.id,
-        name: techData.name,
-        cost: techData.cost,
-        yearReq: y,
-        unlocked: false,
-        isCustomOS: techData.isCustomOS || false
-      });
-    });
-  }
-}
+  // --- 2007 ---
+  RESEARCH_TREE.push({ id: 't_1', branch: 'screen', name: 'LCD', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_2', branch: 'camera', name: '1 МП', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_3', branch: 'cpu', name: '1 Ядро', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_4', branch: 'memory', name: '256 МБ', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_5', branch: 'battery', name: '1000 мАч', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_6', branch: 'network', name: '2G', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_7', branch: 'os', name: 'Базовая ОС', yearReq: 2007, cost: 0, unlocked: true });
+  RESEARCH_TREE.push({ id: 't_8', branch: 'ports', name: 'Мини-USB', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_9', branch: 'body', name: 'Пластик', yearReq: 2007, cost: 0, unlocked: true });
+  RESEARCH_TREE.push({ id: 't_10', branch: 'design', name: 'Классика', yearReq: 2007, cost: 0, unlocked: true });
+  RESEARCH_TREE.push({ id: 't_11', branch: 'features', name: 'GPS', yearReq: 2007, cost: 50, unlocked: false });
 
-// Функция для выдачи названий и цен по годам для каждой ветки
-function getTechData(branchId, year) {
-  let offset = year - 2007;
-  let cost = 50 + offset * 30; // Базовая цена растет с годами
+  // --- 2008 ---
+  RESEARCH_TREE.push({ id: 't_12', branch: 'screen', name: 'TFT', yearReq: 2008, cost: 80, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_13', branch: 'camera', name: '2 МП', yearReq: 2008, cost: 80, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_14', branch: 'os', name: 'RoboOS', yearReq: 2008, cost: 80, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_15', branch: 'ports', name: 'Микро-USB', yearReq: 2008, cost: 80, unlocked: false });
 
-  if (branchId === 'screen') {
-    let names = ['LCD', 'TFT', 'OLED', 'AMOLED', 'MicroLED', 'Голограмма', 'Гибкий экран'];
-    return { name: names[Math.min(Math.floor(offset / 6), names.length - 1)], cost: cost };
-  }
-  if (branchId === 'camera') {
-    let mps = [1, 2, 3, 5, 8, 12, 24, 32, 48, 108, 200];
-    return { name: mps[Math.min(Math.floor(offset / 4), mps.length - 1)] + ' МП', cost: cost };
-  }
-  if (branchId === 'cpu') {
-    let cores = [1, 2, 4, 8, 16, 32, 64];
-    return { name: cores[Math.min(Math.floor(offset / 7), cores.length - 1)] + ' Ядра', cost: cost };
-  }
-  if (branchId === 'memory') {
-    let mem = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536];
-    return { name: mem[Math.min(Math.floor(offset / 5), mem.length - 1)] + ' МБ', cost: cost };
-  }
-  if (branchId === 'battery') {
-    return { name: (1000 + offset * 200) + ' мАч', cost: cost };
-  }
-  if (branchId === 'network') {
-    let nets = ['2G', '3G', '4G', '5G', '6G', '7G', 'Спутник'];
-    return { name: nets[Math.min(Math.floor(offset / 7), nets.length - 1)], cost: cost };
-  }
-  if (branchId === 'os') {
-    // Сначала Базовая ОС, потом RoboOS, потом Собственная ОС и т.д.
-    let os = ['Базовая ОС', 'RoboOS', 'RoboOS + Магазин', 'Собственная ОС', 'Собственная ОС + AI', 'Собственная ОС + AI Agent', 'Супермозг'];
-    let index = Math.min(Math.floor(offset / 6), os.length - 1);
-    return { 
-      name: os[index], 
-      cost: cost,
-      isCustomOS: os[index].includes('Собственная ОС') // Флаг для ввода названия
-    };
-  }
-  if (branchId === 'ports') {
-    let ports = ['Мини-USB', 'Микро-USB', 'USB-C', 'USB-C 3.2', 'Беспроводная'];
-    return { name: ports[Math.min(Math.floor(offset / 8), ports.length - 1)], cost: cost };
-  }
-  if (branchId === 'body') {
-    let mats = ['Пластик', 'Поликарбонат', 'Стекло', 'Алюминий', 'Титан', 'Керамика', 'Графен'];
-    return { name: mats[Math.min(Math.floor(offset / 6), mats.length - 1)], cost: cost };
-  }
-  if (branchId === 'design') {
-    let des = ['Классика', 'Мягкий матовый', 'Отполированный', 'Рамка Аврора', 'Квантовая доска'];
-    return { name: des[Math.min(Math.floor(offset / 8), des.length - 1)], cost: cost };
-  }
-  if (branchId === 'features') {
-    let feats = ['GPS', 'NFC', 'Влагозащита', 'Стерео', 'Сканер лица', 'Лидар', 'Голограмма'];
-    return { name: feats[Math.min(Math.floor(offset / 6), feats.length - 1)], cost: cost };
-  }
-  if (branchId === 'games') {
-    let g = ['Контроллер', 'Охлаждение', 'RGB-освещение', 'VR-режим', 'Тактильная отдача'];
-    return { name: g[Math.min(Math.floor(offset / 8), g.length - 1)], cost: cost };
-  }
-  if (branchId === 'pc') {
-    let pc = ['Один монитор', 'Два монитора', 'Водяное охлаждение', 'Модульный ПК', 'ИИ-ассистент'];
-    return { name: pc[Math.min(Math.floor(offset / 8), pc.length - 1)], cost: cost };
-  }
-  if (branchId === 'notebook') {
-    let n = ['Клавиатура', 'Тачпад', 'Тонкий корпус', 'Съемная батарея', 'Док-станция'];
-    return { name: n[Math.min(Math.floor(offset / 8), n.length - 1)], cost: cost };
-  }
-  if (branchId === 'devices') {
-    let d = ['Музыкальный плеер', 'Игровая консоль', 'Планшет', 'Умные часы', 'Дрон'];
-    return { name: d[Math.min(Math.floor(offset / 8), d.length - 1)], cost: cost };
-  }
-  return { name: 'Tech ' + year, cost: cost };
+  // --- 2009 ---
+  RESEARCH_TREE.push({ id: 't_16', branch: 'cpu', name: '2 Ядра', yearReq: 2009, cost: 110, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_17', branch: 'network', name: '3G', yearReq: 2009, cost: 110, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_18', branch: 'features', name: 'NFC', yearReq: 2009, cost: 110, unlocked: false });
+
+  // --- 2010 ---
+  RESEARCH_TREE.push({ id: 't_19', branch: 'screen', name: 'OLED', yearReq: 2010, cost: 140, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_20', branch: 'body', name: 'Стекло', yearReq: 2010, cost: 140, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_21', branch: 'memory', name: '512 МБ', yearReq: 2010, cost: 140, unlocked: false });
+
+  // --- 2011 ---
+  RESEARCH_TREE.push({ id: 't_22', branch: 'os', name: 'Собственная ОС', yearReq: 2011, cost: 170, unlocked: false, isCustomOS: true });
+
+  // --- 2012 ---
+  RESEARCH_TREE.push({ id: 't_23', branch: 'features', name: 'Влагозащита', yearReq: 2012, cost: 200, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_24', branch: 'ports', name: 'USB-C', yearReq: 2012, cost: 200, unlocked: false });
+
+  // --- 2013 ---
+  RESEARCH_TREE.push({ id: 't_25', branch: 'cpu', name: '4 Ядра', yearReq: 2013, cost: 230, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_26', branch: 'battery', name: '2000 мАч', yearReq: 2013, cost: 230, unlocked: false });
+
+  // --- 2014 ---
+  RESEARCH_TREE.push({ id: 't_27', branch: 'screen', name: 'AMOLED', yearReq: 2014, cost: 260, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_28', branch: 'camera', name: '8 МП', yearReq: 2014, cost: 260, unlocked: false });
+
+  // --- 2015 ---
+  RESEARCH_TREE.push({ id: 't_29', branch: 'network', name: '4G', yearReq: 2015, cost: 290, unlocked: false });
+
+  // --- 2016 ---
+  RESEARCH_TREE.push({ id: 't_30', branch: 'features', name: 'Стерео', yearReq: 2016, cost: 320, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_31', branch: 'design', name: 'Мягкий матовый', yearReq: 2016, cost: 320, unlocked: false });
+
+  // --- 2017 ---
+  RESEARCH_TREE.push({ id: 't_32', branch: 'memory', name: '1 ГБ', yearReq: 2017, cost: 350, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_33', branch: 'os', name: 'Собственная ОС + AI', yearReq: 2017, cost: 350, unlocked: false, isCustomOS: true });
+
+  // --- 2018 ---
+  RESEARCH_TREE.push({ id: 't_34', branch: 'camera', name: '12 МП', yearReq: 2018, cost: 380, unlocked: false });
+
+  // --- 2019 ---
+  RESEARCH_TREE.push({ id: 't_35', branch: 'cpu', name: '8 Ядер', yearReq: 2019, cost: 410, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_36', branch: 'body', name: 'Алюминий', yearReq: 2019, cost: 410, unlocked: false });
+
+  // --- 2020 ---
+  RESEARCH_TREE.push({ id: 't_37', branch: 'network', name: '5G', yearReq: 2020, cost: 440, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_38', branch: 'battery', name: '4000 мАч', yearReq: 2020, cost: 440, unlocked: false });
+
+  // --- 2021 ---
+  RESEARCH_TREE.push({ id: 't_39', branch: 'screen', name: 'MicroLED', yearReq: 2021, cost: 470, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_40', branch: 'features', name: 'Сканер лица', yearReq: 2021, cost: 470, unlocked: false });
+
+  // --- 2022 ---
+  RESEARCH_TREE.push({ id: 't_41', branch: 'design', name: 'Отполированный', yearReq: 2022, cost: 500, unlocked: false });
+
+  // --- 2023 ---
+  RESEARCH_TREE.push({ id: 't_42', branch: 'os', name: 'Собственная ОС + AI Agent', yearReq: 2023, cost: 530, unlocked: false, isCustomOS: true });
+
+  // --- 2024 ---
+  RESEARCH_TREE.push({ id: 't_43', branch: 'camera', name: '32 МП', yearReq: 2024, cost: 560, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_44', branch: 'memory', name: '4 ГБ', yearReq: 2024, cost: 560, unlocked: false });
+
+  // --- 2025 ---
+  RESEARCH_TREE.push({ id: 't_45', branch: 'cpu', name: '16 Ядер', yearReq: 2025, cost: 590, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_46', branch: 'body', name: 'Титан', yearReq: 2025, cost: 590, unlocked: false });
+
+  // --- 2026 ---
+  RESEARCH_TREE.push({ id: 't_47', branch: 'network', name: '6G', yearReq: 2026, cost: 620, unlocked: false });
+
+  // --- 2027 ---
+  RESEARCH_TREE.push({ id: 't_48', branch: 'features', name: 'Лидар', yearReq: 2027, cost: 650, unlocked: false });
+
+  // --- 2028 ---
+  RESEARCH_TREE.push({ id: 't_49', branch: 'battery', name: '6000 мАч', yearReq: 2028, cost: 680, unlocked: false });
+
+  // --- 2029 ---
+  RESEARCH_TREE.push({ id: 't_50', branch: 'screen', name: 'Голограмма', yearReq: 2029, cost: 710, unlocked: false });
+
+  // --- 2030 ---
+  RESEARCH_TREE.push({ id: 't_51', branch: 'camera', name: '108 МП', yearReq: 2030, cost: 740, unlocked: false });
+
+  // --- 2031 ---
+  RESEARCH_TREE.push({ id: 't_52', branch: 'cpu', name: '32 Ядра', yearReq: 2031, cost: 770, unlocked: false });
+
+  // --- 2032 ---
+  RESEARCH_TREE.push({ id: 't_53', branch: 'body', name: 'Керамика', yearReq: 2032, cost: 800, unlocked: false });
+
+  // --- 2033 ---
+  RESEARCH_TREE.push({ id: 't_54', branch: 'os', name: 'Супермозг', yearReq: 2033, cost: 830, unlocked: false, isCustomOS: true });
+
+  // --- 2034 ---
+  RESEARCH_TREE.push({ id: 't_55', branch: 'memory', name: '8 ГБ', yearReq: 2034, cost: 860, unlocked: false });
+
+  // --- 2035 ---
+  RESEARCH_TREE.push({ id: 't_56', branch: 'network', name: '7G', yearReq: 2035, cost: 890, unlocked: false });
+
+  // --- 2036 ---
+  RESEARCH_TREE.push({ id: 't_57', branch: 'design', name: 'Рамка Аврора', yearReq: 2036, cost: 920, unlocked: false });
+
+  // --- 2037 ---
+  RESEARCH_TREE.push({ id: 't_58', branch: 'battery', name: '8000 мАч', yearReq: 2037, cost: 950, unlocked: false });
+
+  // --- 2038 ---
+  RESEARCH_TREE.push({ id: 't_59', branch: 'features', name: 'Голограмма', yearReq: 2038, cost: 980, unlocked: false });
+
+  // --- 2039 ---
+  RESEARCH_TREE.push({ id: 't_60', branch: 'cpu', name: '64 Ядра', yearReq: 2039, cost: 1010, unlocked: false });
+
+  // --- 2040 ---
+  RESEARCH_TREE.push({ id: 't_61', branch: 'camera', name: '200 МП', yearReq: 2040, cost: 1040, unlocked: false });
+
+  // --- 2041 ---
+  RESEARCH_TREE.push({ id: 't_62', branch: 'body', name: 'Графен', yearReq: 2041, cost: 1070, unlocked: false });
+
+  // --- 2042 ---
+  RESEARCH_TREE.push({ id: 't_63', branch: 'screen', name: 'Гибкий экран', yearReq: 2042, cost: 1100, unlocked: false });
+
+  // --- 2043 ---
+  RESEARCH_TREE.push({ id: 't_64', branch: 'network', name: 'Спутник', yearReq: 2043, cost: 1130, unlocked: false });
+
+  // --- 2044 ---
+  RESEARCH_TREE.push({ id: 't_65', branch: 'memory', name: '16 ГБ', yearReq: 2044, cost: 1160, unlocked: false });
+
+  // --- 2045 ---
+  RESEARCH_TREE.push({ id: 't_66', branch: 'design', name: 'Квантовая доска', yearReq: 2045, cost: 1190, unlocked: false });
+
+  // --- 2046 ---
+  RESEARCH_TREE.push({ id: 't_67', branch: 'battery', name: '10000 мАч', yearReq: 2046, cost: 1220, unlocked: false });
+
+  // --- 2047 ---
+  RESEARCH_TREE.push({ id: 't_68', branch: 'cpu', name: 'Квантовый сопроцессор', yearReq: 2047, cost: 1250, unlocked: false });
+
+  // --- 2048 ---
+  RESEARCH_TREE.push({ id: 't_69', branch: 'camera', name: '500 МП', yearReq: 2048, cost: 1280, unlocked: false });
+
+  // --- 2049 ---
+  RESEARCH_TREE.push({ id: 't_70', branch: 'features', name: 'Квантовая связь', yearReq: 2049, cost: 1310, unlocked: false });
+
+  // --- 2050 ---
+  RESEARCH_TREE.push({ id: 't_71', branch: 'screen', name: 'Квантовый экран', yearReq: 2050, cost: 1340, unlocked: false });
+
+  // --- 2051 ---
+  RESEARCH_TREE.push({ id: 't_72', branch: 'memory', name: '32 ГБ', yearReq: 2051, cost: 1370, unlocked: false });
+
+  // --- 2052 ---
+  RESEARCH_TREE.push({ id: 't_73', branch: 'os', name: 'Сингулярность', yearReq: 2052, cost: 1400, unlocked: false, isCustomOS: true });
+
+  // --- ВЕТКИ ПК и Ноутбуков (добавлены отдельно, чтобы не мешать телефонам) ---
+  RESEARCH_TREE.push({ id: 't_pc1', branch: 'pc', name: 'Один монитор', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_pc2', branch: 'pc', name: 'Два монитора', yearReq: 2010, cost: 100, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_pc3', branch: 'pc', name: 'Водяное охлаждение', yearReq: 2015, cost: 200, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_pc4', branch: 'pc', name: 'Модульный ПК', yearReq: 2020, cost: 400, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_pc5', branch: 'pc', name: 'ИИ-ассистент', yearReq: 2025, cost: 800, unlocked: false });
+
+  RESEARCH_TREE.push({ id: 't_nb1', branch: 'notebook', name: 'Клавиатура', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_nb2', branch: 'notebook', name: 'Тачпад', yearReq: 2010, cost: 100, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_nb3', branch: 'notebook', name: 'Тонкий корпус', yearReq: 2015, cost: 200, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_nb4', branch: 'notebook', name: 'Съемная батарея', yearReq: 2020, cost: 400, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_nb5', branch: 'notebook', name: 'Док-станция', yearReq: 2025, cost: 800, unlocked: false });
+
+  // --- ВЕТКА УСТРОЙСТВ ---
+  RESEARCH_TREE.push({ id: 't_dev1', branch: 'devices', name: 'Музыкальный плеер', yearReq: 2007, cost: 50, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_dev2', branch: 'devices', name: 'Игровая консоль', yearReq: 2010, cost: 100, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_dev3', branch: 'devices', name: 'Планшет', yearReq: 2015, cost: 200, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_dev4', branch: 'devices', name: 'Умные часы', yearReq: 2020, cost: 400, unlocked: false });
+  RESEARCH_TREE.push({ id: 't_dev5', branch: 'devices', name: 'Дрон', yearReq: 2025, cost: 800, unlocked: false });
 }
 
 // ==========================================
-// 3. ИНИЦИАЛИЗАЦИЯ И СОХРАНЕНИЯ
+// 3. МЕГА-МАССИВ МАГАЗИНА (БЕЗ ЦИКЛОВ)
 // ==========================================
 
-window.onload = () => {
-  generateResearchTree();
-  checkSave();
+const SHOP_ITEMS = {
+  desks: [
+    { id: 'desk_1', name: '🪵 Складной стол', price: 0, icon: '🪵', bonus: 0, type: 'Скорость работы' },
+    { id: 'desk_2', name: '🪵 Деревянный стол', price: 12000, icon: '🪵', bonus: 3, type: 'Скорость работы' },
+    { id: 'desk_3', name: '🪵 Рабочий стол', price: 50000, icon: '🪵', bonus: 6, type: 'Скорость работы' },
+    { id: 'desk_4', name: '💎 Стеклянный стол', price: 160000, icon: '💎', bonus: 9, type: 'Скорость работы' },
+    { id: 'desk_5', name: '⚔️ Боевая станция', price: 1500000, icon: '⚔️', bonus: 10.5, type: 'Скорость работы' },
+    { id: 'desk_6', name: '👑 Золотой стол', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
+    { id: 'desk_7', name: '🚀 Стол Авроры', price: 2500000000, icon: '🚀', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+  ],
+  chairs: [
+    { id: 'chair_1', name: '🪑 Табурет', price: 0, icon: '🪑', bonus: 0, type: 'Скорость работы' },
+    { id: 'chair_2', name: '💺 Кресло для офиса', price: 12000, icon: '💺', bonus: 3, type: 'Скорость работы' },
+    { id: 'chair_3', name: '💺 Эргономичный стул', price: 50000, icon: '💺', bonus: 6, type: 'Скорость работы' },
+    { id: 'chair_4', name: '💺 Деревянный стул', price: 150000, icon: '💺', bonus: 9, type: 'Скорость работы' },
+    { id: 'chair_5', name: '🏎️ Гоночный стул', price: 1500000, icon: '🏎️', bonus: 10.5, type: 'Скорость работы' },
+    { id: 'chair_6', name: '👑 Трон для массажа', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
+    { id: 'chair_7', name: '👑 Парящее кресло', price: 2000000000, icon: '👑', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+  ],
+  pcs: [
+    { id: 'pc_1', name: '📺 Бежевый ЭЛТ-монитор', price: 0, icon: '📺', bonus: 0, type: 'Исследования' },
+    { id: 'pc_2', name: '🖥️ Плоский монитор', price: 15000, icon: '🖥️', bonus: 15, type: 'Исследования' },
+    { id: 'pc_3', name: '🖥️ Широкий экран', price: 50000, icon: '🖥️', bonus: 30, type: 'Исследования' },
+    { id: 'pc_4', name: '🖥️ Два монитора', price: 150000, icon: '🖥️', bonus: 45, type: 'Исследования' },
+    { id: 'pc_5', name: '🖥️ Тройная установка', price: 1500000, icon: '🖥️', bonus: 60, type: 'Исследования' },
+    { id: 'pc_6', name: '🌌 Голографический экран', price: 25000000, icon: '🌌', bonus: 75, type: 'Исследования', exclusive: true },
+    { id: 'pc_7', name: '⚛️ Квантовая рабочая станция', price: 1500000000, icon: '⚛️', bonus: 90, type: 'Исследования', exclusive: true },
+    { id: 'pc_8', name: '🧠 Нейронный интерфейс', price: 4000000000, icon: '🧠', bonus: 135, type: 'Исследования', exclusive: true }
+  ],
+  lab: [
+    { id: 'lab_1', name: '🧪 Тестовая платформа', price: 50000, icon: '🧪', bonus: 20, type: 'Исправление ошибок' },
+    { id: 'lab_2', name: '🗄️ Серверные стойки', price: 240000, icon: '🗄️', bonus: 20, type: 'Исправление ошибок' },
+    { id: 'lab_3', name: '🔬 Лаборатория', price: 800000, icon: '🔬', bonus: 20, type: 'Исправление ошибок' },
+    { id: 'lab_4', name: '🦾 Рука робота', price: 30000000, icon: '🦾', bonus: 20, type: 'Исправление ошибок' },
+    { id: 'lab_5', name: '💻 Суперкомпьютер', price: 400000000, icon: '💻', bonus: 60, type: 'Исправление ошибок' },
+    { id: 'lab_6', name: '⚛️ Квантовый компьютер', price: 3000000000, icon: '⚛️', bonus: 60, type: 'Исправление ошибок', exclusive: true },
+    { id: 'lab_7', name: '☢️ Реактор слияния', price: 12000000000, icon: '☢️', bonus: 100, type: 'Исправление ошибок', exclusive: true }
+  ],
+  rest: [
+    { id: 'rest_1', name: '🚰 Кулер для воды', price: 1500, icon: '🚰', bonus: 1, type: 'Комфорт' },
+    { id: 'rest_2', name: '☕ Уголок для кофе', price: 3000, icon: '☕', bonus: 2, type: 'Комфорт' },
+    { id: 'rest_3', name: '📋 Доска', price: 4000, icon: '📋', bonus: 1, type: 'Комфорт' },
+    { id: 'rest_4', name: '🛋️ Диван', price: 6000, icon: '🛋️', bonus: 3, type: 'Комфорт' },
+    { id: 'rest_5', name: '📚 Книжный шкаф', price: 10000, icon: '📚', bonus: 2, type: 'Комфорт' },
+    { id: 'rest_6', name: '🎰 Игровой автомат', price: 80000, icon: '🎰', bonus: 4, type: 'Комфорт' },
+    { id: 'rest_7', name: '🥤 Автомат продажи', price: 150000, icon: '🥤', bonus: 3, type: 'Комфорт' },
+    { id: 'rest_8', name: '🎱 Настольный бильярд', price: 2000000, icon: '🎱', bonus: 6, type: 'Комфорт' },
+    { id: 'rest_9', name: '🍹 Бар для приготовления', price: 5000000, icon: '🍹', bonus: 6, type: 'Комфорт' },
+    { id: 'rest_10', name: '🐠 Аквариум', price: 12000000, icon: '🐠', bonus: 8, type: 'Комфорт' },
+    { id: 'rest_11', name: '🛋️ Неоновый салон', price: 60000000, icon: '🛋️', bonus: 10, type: 'Комфорт' }
+  ],
+  plants: [
+    { id: 'plant_1', name: '🪴 Растение в горшке', price: 500, icon: '🪴', bonus: 1, type: 'Комфорт' },
+    { id: 'plant_2', name: '🪴 Высокое растение', price: 2000, icon: '🪴', bonus: 2, type: 'Комфорт' },
+    { id: 'plant_3', name: '🌴 Пальмовое дерево', price: 15000, icon: '🌴', bonus: 3, type: 'Комфорт' },
+    { id: 'plant_4', name: '🌳 Бонсай', price: 250000, icon: '🌳', bonus: 4, type: 'Комфорт' },
+    { id: 'plant_5', name: '🌲 Внутреннее дерево', price: 3000000, icon: '🌲', bonus: 6, type: 'Комфорт' }
+  ],
+  lighting: [
+    { id: 'light_1', name: '💡 Напольная лампа', price: 1000, icon: '💡', bonus: 1, type: 'Комфорт' },
+    { id: 'light_2', name: '💡 Световая лампа', price: 20000, icon: '💡', bonus: 2, type: 'Комфорт' },
+    { id: 'light_3', name: '💡 Неоновая табличка', price: 400000, icon: '💡', bonus: 4, type: 'Комфорт' },
+    { id: 'light_4', name: '💡 Световой столб LED', price: 8000000, icon: '💡', bonus: 5, type: 'Комфорт' }
+  ],
+  decor: [
+    { id: 'decor_1', name: '🟫 Ковер', price: 2000, icon: '🟫', bonus: 1, type: 'Комфорт' },
+    { id: 'decor_2', name: '🟫 Роскошный ковер', price: 50000, icon: '🟫', bonus: 3, type: 'Комфорт' },
+    { id: 'decor_3', name: '🗄️ Шкаф для хранения', price: 3000, icon: '🗄️', bonus: 1, type: 'Комфорт' },
+    { id: 'decor_4', name: '🌍 Глобус', price: 50000, icon: '🌍', bonus: 2, type: 'Комфорт' },
+    { id: 'decor_5', name: '📺 Дисплей телефона', price: 1000000, icon: '📺', bonus: 4, type: 'Комфорт' },
+    { id: 'decor_6', name: '🗿 Современная статуя', price: 80000000, icon: '🗿', bonus: 8, type: 'Комфорт' }
+  ]
 };
+      // ==========================================
+  // 4. ИНИЦИАЛИЗАЦИЯ И СОХРАНЕНИЯ
+  // ==========================================
 
-function checkSave() {
-  const saved = localStorage.getItem(SAVE_KEY);
-  if (saved) {
-    document.getElementById('start-stats').style.display = 'block';
-    document.getElementById('start-save-info').innerText = 'Сохранение найдено. Готовы продолжить?';
-    document.getElementById('company-name-input').value = JSON.parse(saved).companyName || "Team of Red";
-  } else {
-    document.getElementById('start-stats').style.display = 'none';
-  }
-}
+  window.onload = () => {
+    generateResearchTree();
+    checkSave();
+  };
 
-function startGame() {
-  const saved = localStorage.getItem(SAVE_KEY);
-  if (saved) {
-    try {
-      let parsed = JSON.parse(saved);
-      state = { ...state, ...parsed };
-      if (parsed.research) {
-        RESEARCH_TREE.forEach(t => { if (parsed.research[t.id]) t.unlocked = true; });
-      }
-    } catch(e) { console.error(e); }
-  }
-  
-  state.companyName = document.getElementById('company-name-input').value;
-  document.getElementById('company-display-name').innerText = state.companyName;
-  
-  document.getElementById('start-screen').classList.remove('active');
-  updateUI();
-  renderShop('desks');
-  renderResearchTree();
-  startGameLoop();
-  
-  if (!saved) {
-    startTutorial();
-  }
-}
-
-function newCompany() {
-  if (confirm("Начать новую компанию? Старый прогресс будет удален.")) {
-    localStorage.removeItem(SAVE_KEY);
-    location.reload();
-  }
-}
-
-function save() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') save();
-});
-
-// ==========================================
-// 4. ЗВУКИ (WebAudio)
-// ==========================================
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playSound(type) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  
-  if (type === 'click') {
-    osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-  } else if (type === 'buy') {
-    osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
-  } else if (type === 'release') {
-    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-      const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-      o.connect(g); g.connect(audioCtx.destination);
-      o.type = 'triangle'; o.frequency.value = freq;
-      g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
-      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
-      o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
-    });
-  } else if (type === 'error') {
-    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-  }
+  function checkSave() {
+    const saved = localStorage.getItem(SAVE_KEY);
+    if (saved) {
+      document.getElementById('start-stats').style.display = 'block';
+      document.getElementById('start-save-info').innerText = 'Сохранение найдено. Готовы продолжить?';
+      document.getElementById('company-name-input').value = JSON.parse(saved).companyName || "Team of Red";
+    } else {
+      document.getElementById('start-stats').style.display = 'none';
     }
-    // ==========================================
-// 5. ГЕЙМПЛЕЙ (ВРЕМЯ И ЭКОНОМИКА)
-// ==========================================
-
-let currentDeviceMode = 'phone'; // 'phone' или 'pc'
-
-function toggleDeviceType() {
-  playSound('click');
-  currentDeviceMode = currentDeviceMode === 'phone' ? 'pc' : 'phone';
-  
-  let btn = document.getElementById('btn-device-type');
-  if (currentDeviceMode === 'phone') {
-    btn.innerText = '📱 Телефоны';
-    btn.style.background = 'var(--purple)';
-  } else {
-    btn.innerText = '💻 ПК и Ноутбуки';
-    btn.style.background = 'var(--blue)';
   }
-  
-  showToast(`Режим переключен на: ${currentDeviceMode === 'phone' ? 'Телефоны' : 'ПК'}`, 'blue');
-}
 
-function startGameLoop() {
-  setInterval(() => {
-    if (state.speed === 0) return;
-    
-    let daysPassed = state.speed * 0.5; 
-    state.day += daysPassed;
-    
-    if (state.day >= 30) {
-      state.day -= 30;
-      state.year++;
-      showToast(`Наступил ${state.year} год!`, 'gold');
-      processMonthlyFinances();
-      updateUI();
-      renderResearchTree(); 
+  function startGame() {
+    const saved = localStorage.getItem(SAVE_KEY);
+    if (saved) {
+      try {
+        let parsed = JSON.parse(saved);
+        state = { ...state, ...parsed };
+        if (parsed.research) {
+          RESEARCH_TREE.forEach(t => { if (parsed.research[t.id]) t.unlocked = true; });
+        }
+      } catch(e) { console.error(e); }
     }
-
-    // Ежедневный доход от проданных телефонов
-    let dailyIncome = 0;
-    state.releasedPhones.forEach(p => {
-      if (state.year - p.releaseYear < 5) {
-        let dailySales = p.weeklySales / 7;
-        dailyIncome += dailySales * p.profitPerUnit;
-        p.totalSold += dailySales;
-      }
-    });
     
-    dailyIncome += (state.empire.servicesIncome || 0) / 30;
-
-    // Зарплаты с инфляцией
-    let inflationMultiplier = 1 + ((state.year - 2007) * 0.05);
-    let dailyExpense = 0;
-    state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
+    state.companyName = document.getElementById('company-name-input').value;
+    document.getElementById('company-display-name').innerText = state.companyName;
     
-    state.money += (dailyIncome - dailyExpense) * daysPassed;
-
-    let rpPerDay = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
-    let labBonus = state.workstations.filter(w => w.lab).length * 5;
-    state.rp += (rpPerDay + labBonus) * daysPassed;
-
-    if (state.money < -5000000) {
-      triggerBankruptcy();
-    }
-
+    document.getElementById('start-screen').classList.remove('active');
     updateUI();
-  }, 1000);
-}
-
-function processMonthlyFinances() {
-  if (state.loan && state.loan.monthsLeft > 0) {
-    let payment = state.loan.amount / state.loan.monthsLeft;
-    state.money -= payment;
-    state.loan.monthsLeft--;
-    showToast(`Списание по кредиту: -$${Math.floor(payment).toLocaleString()}`, 'red');
-  }
-  save();
-}
-
-function setSpeed(spd) {
-  state.speed = spd;
-  document.querySelectorAll('.speed-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === spd));
-  playSound('click');
-}
-
-function updateUI() {
-  document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
-  document.getElementById('ui-money-2').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
-  document.getElementById('ui-rp').innerText = Math.floor(state.rp) + ' RP';
-  document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
-  document.getElementById('ui-rp-sidebar').innerText = Math.floor(state.rp).toLocaleString();
-  document.getElementById('ui-reputation').innerText = state.reputation.toFixed(2);
-  document.getElementById('bank-limit').innerText = '$' + (1000000 + (state.reputation * 500000)).toLocaleString();
-  
-  const office = OFFICES[state.officeLvl];
-  document.getElementById('ui-office-name').innerText = office.name;
-  document.getElementById('ui-slots').innerText = `${state.workstations.filter(w => w.desk).length} / ${office.slots}`;
-  
-  document.getElementById('team-slots').innerText = `${state.employees.length} / ${office.slots}`;
-  let totalSal = state.employees.reduce((acc, e) => acc + e.salary, 0);
-  document.getElementById('team-salary').innerText = '$' + totalSal.toLocaleString();
-  let totalRp = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
-  document.getElementById('team-rp').innerText = totalRp + ' / день';
-  let totalBugs = state.employees.filter(e => e.role === 'fixer').reduce((acc, e) => acc + (e.stars * 1.5), 0);
-  document.getElementById('team-bugs').innerText = totalBugs + ' / день';
-
-  let unlocked = RESEARCH_TREE.filter(t => t.unlocked).length;
-  let percent = RESEARCH_TREE.length > 0 ? (unlocked / RESEARCH_TREE.length) * 100 : 0;
-  document.getElementById('ui-research-progress').style.width = percent + '%';
-
-  document.getElementById('ui-devices').innerText = state.releasedPhones.length;
-  document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + Math.floor(p.totalSold), 0).toLocaleString();
-  let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
-  document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
-
-  // Плашка активного телефона
-  let activePhone = state.releasedPhones[state.releasedPhones.length - 1];
-  let phoneBadge = document.getElementById('active-phone-badge');
-  if (!phoneBadge) {
-    phoneBadge = document.createElement('div');
-    phoneBadge.id = 'active-phone-badge';
-    phoneBadge.style.cssText = 'position:fixed; top:65px; right:10px; background:var(--panel); border:1px solid var(--green); border-radius:10px; padding:10px; z-index:50; width:150px; box-shadow:0 4px 15px rgba(0,0,0,0.5);';
-    document.body.appendChild(phoneBadge);
-  }
-  
-  if (activePhone) {
-    phoneBadge.style.display = 'block';
-    let totalIncome = activePhone.totalSold * activePhone.price;
-    let totalProfit = activePhone.totalSold * activePhone.profitPerUnit;
+    renderShop('desks');
+    renderResearchTree();
+    startGameLoop();
     
-    phoneBadge.innerHTML = `
-      <div style="font-size:10px; color:#aaa;">Сейчас в продаже:</div>
-      <div style="font-weight:900; font-size:12px; color:#fff; margin-bottom:5px;">${activePhone.name}</div>
-      <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
-        <span>Доход:</span>
-        <span style="color:var(--green);">$${Math.floor(totalIncome).toLocaleString()}</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
-        <span>Прибыль:</span>
-        <span style="color:var(--gold);">$${Math.floor(totalProfit).toLocaleString()}</span>
-      </div>
-      <div style="margin-top:5px; background:#000; height:4px; border-radius:2px;">
-        <div style="background:var(--blue); height:100%; width:${Math.min(100, (state.year - activePhone.releaseYear) * 20)}%;"></div>
-      </div>
-    `;
-  } else {
-    phoneBadge.style.display = 'none';
-  }
-
-  renderOffice();
-  renderTeam();
-}
-
-function switchTab(tabId) {
-  playSound('click');
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-  
-  document.getElementById(`screen-${tabId}`).classList.add('active');
-  
-  const map = { overview: 0, empire: 1, markets: 2, office: 3, team: 4, shop: 5, research: 7, news: 8 };
-  const btns = document.querySelectorAll('.nav-btn');
-  if (map[tabId] !== undefined && btns[map[tabId]]) btns[map[tabId]].classList.add('active');
-  
-  if (tabId === 'news') renderNews();
-  if (tabId === 'empire') renderEmpire();
-  if (tabId === 'markets') renderMarkets();
-  if (tabId === 'overview') drawStockChart();
-}
-
-// ==========================================
-// 6. ОФИС И КОМАНДА
-// ==========================================
-
-function renderOffice() {
-  const area = document.getElementById('placed-area');
-  area.innerHTML = '';
-  
-  let totalComfort = 0;
-  state.workstations.forEach(ws => {
-    if (ws.chair) totalComfort += ws.chair.bonus;
-    if (ws.rest) totalComfort += ws.rest.bonus;
-    if (ws.plant) totalComfort += ws.plant.bonus;
-    if (ws.light) totalComfort += ws.light.bonus;
-    if (ws.decor) totalComfort += ws.decor.bonus;
-  });
-  
-  let comfortSpan = document.getElementById('ui-comfort');
-  if (comfortSpan) comfortSpan.innerText = `⭐ Комфорт: ${totalComfort.toFixed(1)}`;
-
-  state.workstations.forEach(ws => {
-    if (!ws.desk) return;
-    const el = document.createElement('div');
-    el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
-    
-    let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
-    let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
-    let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
-    let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
-    let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
-    
-    el.innerHTML = `
-      ${pcHtml}${labHtml}${restHtml}${plantHtml}
-      <div class="icon">${ws.desk.icon}</div>
-      ${chairHtml}
-      <div class="name">${ws.desk.name}</div>
-    `;
-    
-    el.onclick = () => {
-      playSound('click');
-      state.selectedDeskId = state.selectedDeskId === ws.id ? null : ws.id;
-      renderOffice();
-    };
-    area.appendChild(el);
-  });
-}
-
-function renderTeam() {
-  const list = document.getElementById('team-list');
-  list.innerHTML = '';
-  if (state.employees.length === 0) {
-    list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">В команде пока никого нет. Наймите кого-нибудь!</div>';
-    return;
-  }
-  state.employees.forEach(emp => {
-    const el = document.createElement('div');
-    el.className = 'emp-card';
-    let starsStr = '★'.repeat(emp.stars) + '☆'.repeat(5 - emp.stars);
-    el.innerHTML = `
-      <div class="emp-avatar ${emp.role}">${emp.name[0]}</div>
-      <div class="emp-info">
-        <div class="emp-name">${emp.name} <span style="font-size:10px; color:#666;">возраст ${emp.age}</span></div>
-        <div class="emp-role">${emp.role === 'researcher' ? 'Исследователь' : 'Исправитель ошибок'}</div>
-        <div class="emp-stars">${starsStr}</div>
-        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${emp.salary.toLocaleString()} / мес</div>
-      </div>
-      <div class="emp-actions">
-        <button class="btn btn-gold" onclick="upgradeEmployee(${emp.id})">Мастер</button>
-        <button class="btn btn-red" onclick="fireEmployee(${emp.id})">Огонь</button>
-      </div>
-    `;
-    list.appendChild(el);
-  });
-}
-
-function openHireModal() {
-  playSound('click');
-  document.getElementById('hire-candidates-list').innerHTML = '';
-  document.getElementById('modal-hire').classList.add('active');
-}
-
-function generateCandidates(role) {
-  if (state.employees.length >= OFFICES[state.officeLvl].slots) {
-    showToast("Офис переполнен! Купите новый.", 'red');
-    return;
-  }
-  playSound('click');
-  const list = document.getElementById('hire-candidates-list');
-  list.innerHTML = '';
-  
-  for (let i = 0; i < 3; i++) {
-    let name = NAMES[Math.floor(Math.random() * NAMES.length)];
-    let stars = Math.random() > 0.9 ? 5 : (Math.random() > 0.5 ? 2 : 1);
-    let baseSalary = stars === 5 ? 80000 : (stars === 2 ? 25000 : 12000);
-    let salary = baseSalary + Math.floor(Math.random() * 5000);
-    let age = Math.floor(Math.random() * 10) + 18;
-    
-    const el = document.createElement('div');
-    el.className = 'emp-card';
-    el.innerHTML = `
-      <div class="emp-avatar ${role}">${name[0]}</div>
-      <div class="emp-info">
-        <div class="emp-name">${name}</div>
-        <div class="emp-role">${role === 'researcher' ? 'Исследователь' : 'Исправитель'} • возраст ${age}</div>
-        <div class="emp-stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</div>
-        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${salary.toLocaleString()} / мес</div>
-      </div>
-      <div class="emp-actions">
-        <button class="btn" onclick="hireEmployee('${name}', '${role}', ${stars}, ${salary}, ${age})">Нанять</button>
-      </div>
-    `;
-    list.appendChild(el);
-  }
-}
-
-function hireEmployee(name, role, stars, salary, age) {
-  if (state.money < salary) { showToast("Не хватает на первый оклад!", 'red'); return; }
-  state.employees.push({ id: Date.now() + Math.random(), name, role, stars, salary, age });
-  playSound('buy');
-  updateUI(); save();
-  closeModal('modal-hire');
-  showToast(`${name} принят на работу!`, 'green');
-}
-
-function upgradeEmployee(id) {
-  let emp = state.employees.find(e => e.id === id);
-  if (!emp) return;
-  if (emp.stars >= 5) { showToast("Максимальный уровень!"); return; }
-  let cost = Math.pow(2, emp.stars) * 20000;
-  if (state.money < cost) { showToast(`Нужно $${cost.toLocaleString()} на обучение!`, 'red'); return; }
-  state.money -= cost;
-  emp.stars++;
-  emp.salary += 15000;
-  playSound('buy');
-  updateUI(); save();
-  showToast(`${emp.name} прокачан до ${emp.stars}★!`, 'green');
-}
-
-function fireEmployee(id) {
-  let idx = state.employees.findIndex(e => e.id === id);
-  if (idx === -1) return;
-  let emp = state.employees[idx];
-  state.money -= emp.salary; 
-  state.employees.splice(idx, 1);
-  playSound('click');
-  updateUI(); save();
-  showToast(`${emp.name} уволен.`, 'red');
+    if (!saved) {
+      startTutorial();
     }
-    // ==========================================
-// 7. ДИЗАЙН-СТУДИЯ (13 ШАГОВ)
-// ==========================================
+  }
 
-const designSteps = [
-  { 
-    title: "Шаг 1. Устройство", 
-    type: 'grid', 
-    options: [
+  function newCompany() {
+    if (confirm("Начать новую компанию? Старый прогресс будет удален.")) {
+      localStorage.removeItem(SAVE_KEY);
+      location.reload();
+    }
+  }
+
+  function save() {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') save();
+  });
+
+  // ==========================================
+  // 5. ЗВУКИ (WebAudio)
+  // ==========================================
+  
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    if (type === 'click') {
+      osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    } else if (type === 'buy') {
+      osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    } else if (type === 'release') {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.type = 'triangle'; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+        o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+      });
+    } else if (type === 'error') {
+      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+  }
+
+  // ==========================================
+  // 6. ГЕЙМПЛЕЙ (ВРЕМЯ И ЭКОНОМИКА)
+  // ==========================================
+
+  let currentDeviceMode = 'phone'; // 'phone' или 'pc'
+
+  function toggleDeviceType() {
+    playSound('click');
+    currentDeviceMode = currentDeviceMode === 'phone' ? 'pc' : 'phone';
+    
+    let btn = document.getElementById('btn-device-type');
+    if (currentDeviceMode === 'phone') {
+      btn.innerText = '📱 Телефоны';
+      btn.style.background = 'var(--purple)';
+    } else {
+      btn.innerText = '💻 ПК и Ноутбуки';
+      btn.style.background = 'var(--blue)';
+    }
+    
+    showToast(`Режим переключен на: ${currentDeviceMode === 'phone' ? 'Телефоны' : 'ПК'}`, 'blue');
+  }
+
+  function startGameLoop() {
+    setInterval(() => {
+      if (state.speed === 0) return;
+      
+      let daysPassed = state.speed * 0.5; 
+      state.day += daysPassed;
+      
+      if (state.day >= 30) {
+        state.day -= 30;
+        state.year++;
+        showToast(`Наступил ${state.year} год!`, 'gold');
+        processMonthlyFinances();
+        updateUI();
+        renderResearchTree(); 
+      }
+
+      // Ежедневный доход от проданных устройств
+      let dailyIncome = 0;
+      state.releasedPhones.forEach(p => {
+        if (state.year - p.releaseYear < 5) {
+          let dailySales = p.weeklySales / 7;
+          dailyIncome += dailySales * p.profitPerUnit;
+          p.totalSold += dailySales;
+        }
+      });
+      
+      dailyIncome += (state.empire.servicesIncome || 0) / 30;
+
+      // Зарплаты с инфляцией
+      let inflationMultiplier = 1 + ((state.year - 2007) * 0.05);
+      let dailyExpense = 0;
+      state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
+      
+      state.money += (dailyIncome - dailyExpense) * daysPassed;
+
+      // Исследования (RP)
+      let rpPerDay = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
+      let labBonus = state.workstations.filter(w => w.lab).length * 5;
+      state.rp += (rpPerDay + labBonus) * daysPassed;
+
+      if (state.money < -5000000) {
+        triggerBankruptcy();
+      }
+
+      updateUI();
+    }, 1000);
+  }
+
+  function processMonthlyFinances() {
+    if (state.loan && state.loan.monthsLeft > 0) {
+      let payment = state.loan.amount / state.loan.monthsLeft;
+      state.money -= payment;
+      state.loan.monthsLeft--;
+      showToast(`Списание по кредиту: -$${Math.floor(payment).toLocaleString()}`, 'red');
+    }
+    save();
+  }
+
+  function setSpeed(spd) {
+    state.speed = spd;
+    document.querySelectorAll('.speed-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === spd));
+    playSound('click');
+  }
+
+  function updateUI() {
+    document.getElementById('ui-money').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
+    document.getElementById('ui-money-2').innerText = '$' + Math.floor(state.money).toLocaleString('ru-RU');
+    document.getElementById('ui-rp').innerText = Math.floor(state.rp) + ' RP';
+    document.getElementById('ui-date').innerText = `${Math.floor(state.day)} дн. ${state.year}`;
+    document.getElementById('ui-rp-sidebar').innerText = Math.floor(state.rp).toLocaleString();
+    document.getElementById('ui-reputation').innerText = state.reputation.toFixed(2);
+    document.getElementById('bank-limit').innerText = '$' + (1000000 + (state.reputation * 500000)).toLocaleString();
+    
+    const office = OFFICES[state.officeLvl];
+    document.getElementById('ui-office-name').innerText = office.name;
+    document.getElementById('ui-slots').innerText = `${state.workstations.filter(w => w.desk).length} / ${office.slots}`;
+    
+    document.getElementById('team-slots').innerText = `${state.employees.length} / ${office.slots}`;
+    let totalSal = state.employees.reduce((acc, e) => acc + e.salary, 0);
+    document.getElementById('team-salary').innerText = '$' + totalSal.toLocaleString();
+    let totalRp = state.employees.filter(e => e.role === 'researcher').reduce((acc, e) => acc + (e.stars * 2), 0);
+    document.getElementById('team-rp').innerText = totalRp + ' / день';
+    let totalBugs = state.employees.filter(e => e.role === 'fixer').reduce((acc, e) => acc + (e.stars * 1.5), 0);
+    document.getElementById('team-bugs').innerText = totalBugs + ' / день';
+
+    let unlocked = RESEARCH_TREE.filter(t => t.unlocked).length;
+    let percent = RESEARCH_TREE.length > 0 ? (unlocked / RESEARCH_TREE.length) * 100 : 0;
+    document.getElementById('ui-research-progress').style.width = percent + '%';
+
+    document.getElementById('ui-devices').innerText = state.releasedPhones.length;
+    document.getElementById('ui-sold').innerText = state.releasedPhones.reduce((acc, p) => acc + Math.floor(p.totalSold), 0).toLocaleString();
+    let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
+    document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
+
+    // Плашка активного устройства
+    let activeDevice = state.releasedPhones[state.releasedPhones.length - 1];
+    let phoneBadge = document.getElementById('active-phone-badge');
+    if (!phoneBadge) {
+      phoneBadge = document.createElement('div');
+      phoneBadge.id = 'active-phone-badge';
+      phoneBadge.style.cssText = 'position:fixed; top:65px; right:10px; background:var(--panel); border:1px solid var(--green); border-radius:10px; padding:10px; z-index:50; width:150px; box-shadow:0 4px 15px rgba(0,0,0,0.5);';
+      document.body.appendChild(phoneBadge);
+    }
+    
+    if (activeDevice) {
+      phoneBadge.style.display = 'block';
+      let totalIncome = activeDevice.totalSold * activeDevice.price;
+      let totalProfit = activeDevice.totalSold * activeDevice.profitPerUnit;
+      
+      phoneBadge.innerHTML = `
+        <div style="font-size:10px; color:#aaa;">Сейчас в продаже:</div>
+        <div style="font-weight:900; font-size:12px; color:#fff; margin-bottom:5px;">${activeDevice.name}</div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
+          <span>Доход:</span>
+          <span style="color:var(--green);">$${Math.floor(totalIncome).toLocaleString()}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
+          <span>Прибыль:</span>
+          <span style="color:var(--gold);">$${Math.floor(totalProfit).toLocaleString()}</span>
+        </div>
+        <div style="margin-top:5px; background:#000; height:4px; border-radius:2px;">
+          <div style="background:var(--blue); height:100%; width:${Math.min(100, (state.year - activeDevice.releaseYear) * 20)}%;"></div>
+        </div>
+      `;
+    } else {
+      phoneBadge.style.display = 'none';
+    }
+
+    renderOffice();
+    renderTeam();
+  }
+
+  function switchTab(tabId) {
+    playSound('click');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(`screen-${tabId}`).classList.add('active');
+    
+    const map = { overview: 0, empire: 1, markets: 2, office: 3, team: 4, shop: 5, research: 7, news: 8 };
+    const btns = document.querySelectorAll('.nav-btn');
+    if (map[tabId] !== undefined && btns[map[tabId]]) btns[map[tabId]].classList.add('active');
+    
+    if (tabId === 'news') renderNews();
+    if (tabId === 'empire') renderEmpire();
+    if (tabId === 'markets') renderMarkets();
+    if (tabId === 'overview') drawStockChart();
+  }
+
+  // ==========================================
+  // 7. ОФИС И КОМАНДА
+  // ==========================================
+
+  function renderOffice() {
+    const area = document.getElementById('placed-area');
+    area.innerHTML = '';
+    
+    let totalComfort = 0;
+    state.workstations.forEach(ws => {
+      if (ws.chair) totalComfort += ws.chair.bonus;
+      if (ws.rest) totalComfort += ws.rest.bonus;
+      if (ws.plant) totalComfort += ws.plant.bonus;
+      if (ws.light) totalComfort += ws.light.bonus;
+      if (ws.decor) totalComfort += ws.decor.bonus;
+    });
+    
+    let comfortSpan = document.getElementById('ui-comfort');
+    if (comfortSpan) comfortSpan.innerText = `⭐ Комфорт: ${totalComfort.toFixed(1)}`;
+
+    state.workstations.forEach(ws => {
+      if (!ws.desk) return;
+      const el = document.createElement('div');
+      el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
+      
+      let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
+      let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
+      let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
+      let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
+      let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
+      
+      el.innerHTML = `
+        ${pcHtml}${labHtml}${restHtml}${plantHtml}
+        <div class="icon">${ws.desk.icon}</div>
+        ${chairHtml}
+        <div class="name">${ws.desk.name}</div>
+      `;
+      
+      el.onclick = () => {
+        playSound('click');
+        state.selectedDeskId = state.selectedDeskId === ws.id ? null : ws.id;
+        renderOffice();
+      };
+      area.appendChild(el);
+    });
+  }
+
+  function renderTeam() {
+    const list = document.getElementById('team-list');
+    list.innerHTML = '';
+    if (state.employees.length === 0) {
+      list.innerHTML = '<div style="text-align:center; color:#666; padding:20px;">В команде пока никого нет. Наймите кого-нибудь!</div>';
+      return;
+    }
+    state.employees.forEach(emp => {
+      const el = document.createElement('div');
+      el.className = 'emp-card';
+      let starsStr = '★'.repeat(emp.stars) + '☆'.repeat(5 - emp.stars);
+      el.innerHTML = `
+        <div class="emp-avatar ${emp.role}">${emp.name[0]}</div>
+        <div class="emp-info">
+          <div class="emp-name">${emp.name} <span style="font-size:10px; color:#666;">возраст ${emp.age}</span></div>
+          <div class="emp-role">${emp.role === 'researcher' ? 'Исследователь' : 'Исправитель ошибок'}</div>
+          <div class="emp-stars">${starsStr}</div>
+          <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${emp.salary.toLocaleString()} / мес</div>
+        </div>
+        <div class="emp-actions">
+          <button class="btn btn-gold" onclick="upgradeEmployee(${emp.id})">Мастер</button>
+          <button class="btn btn-red" onclick="fireEmployee(${emp.id})">Огонь</button>
+        </div>
+      `;
+      list.appendChild(el);
+    });
+  }
+
+  function openHireModal() {
+    playSound('click');
+    document.getElementById('hire-candidates-list').innerHTML = '';
+    document.getElementById('modal-hire').classList.add('active');
+  }
+
+  function generateCandidates(role) {
+    if (state.employees.length >= OFFICES[state.officeLvl].slots) {
+      showToast("Офис переполнен! Купите новый.", 'red');
+      return;
+    }
+    playSound('click');
+    const list = document.getElementById('hire-candidates-list');
+    list.innerHTML = '';
+    
+    // Кандидат 1
+    let name1 = NAMES[Math.floor(Math.random() * NAMES.length)];
+    let stars1 = Math.random() > 0.9 ? 5 : (Math.random() > 0.5 ? 2 : 1);
+    let baseSalary1 = stars1 === 5 ? 80000 : (stars1 === 2 ? 25000 : 12000);
+    let salary1 = baseSalary1 + Math.floor(Math.random() * 5000);
+    let age1 = Math.floor(Math.random() * 10) + 18;
+    let el1 = document.createElement('div');
+    el1.className = 'emp-card';
+    el1.innerHTML = `
+      <div class="emp-avatar ${role}">${name1[0]}</div>
+      <div class="emp-info">
+        <div class="emp-name">${name1}</div>
+        <div class="emp-role">${role === 'researcher' ? 'Исследователь' : 'Исправитель'} • возраст ${age1}</div>
+        <div class="emp-stars">${'★'.repeat(stars1)}${'☆'.repeat(5 - stars1)}</div>
+        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${salary1.toLocaleString()} / мес</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn" onclick="hireEmployee('${name1}', '${role}', ${stars1}, ${salary1}, ${age1})">Нанять</button>
+      </div>
+    `;
+    list.appendChild(el1);
+
+    // Кандидат 2
+    let name2 = NAMES[Math.floor(Math.random() * NAMES.length)];
+    let stars2 = Math.random() > 0.9 ? 5 : (Math.random() > 0.5 ? 2 : 1);
+    let baseSalary2 = stars2 === 5 ? 80000 : (stars2 === 2 ? 25000 : 12000);
+    let salary2 = baseSalary2 + Math.floor(Math.random() * 5000);
+    let age2 = Math.floor(Math.random() * 10) + 18;
+    let el2 = document.createElement('div');
+    el2.className = 'emp-card';
+    el2.innerHTML = `
+      <div class="emp-avatar ${role}">${name2[0]}</div>
+      <div class="emp-info">
+        <div class="emp-name">${name2}</div>
+        <div class="emp-role">${role === 'researcher' ? 'Исследователь' : 'Исправитель'} • возраст ${age2}</div>
+        <div class="emp-stars">${'★'.repeat(stars2)}${'☆'.repeat(5 - stars2)}</div>
+        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${salary2.toLocaleString()} / мес</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn" onclick="hireEmployee('${name2}', '${role}', ${stars2}, ${salary2}, ${age2})">Нанять</button>
+      </div>
+    `;
+    list.appendChild(el2);
+
+    // Кандидат 3
+    let name3 = NAMES[Math.floor(Math.random() * NAMES.length)];
+    let stars3 = Math.random() > 0.9 ? 5 : (Math.random() > 0.5 ? 2 : 1);
+    let baseSalary3 = stars3 === 5 ? 80000 : (stars3 === 2 ? 25000 : 12000);
+    let salary3 = baseSalary3 + Math.floor(Math.random() * 5000);
+    let age3 = Math.floor(Math.random() * 10) + 18;
+    let el3 = document.createElement('div');
+    el3.className = 'emp-card';
+    el3.innerHTML = `
+      <div class="emp-avatar ${role}">${name3[0]}</div>
+      <div class="emp-info">
+        <div class="emp-name">${name3}</div>
+        <div class="emp-role">${role === 'researcher' ? 'Исследователь' : 'Исправитель'} • возраст ${age3}</div>
+        <div class="emp-stars">${'★'.repeat(stars3)}${'☆'.repeat(5 - stars3)}</div>
+        <div style="font-size:10px; color:var(--gold); margin-top:3px;">$${salary3.toLocaleString()} / мес</div>
+      </div>
+      <div class="emp-actions">
+        <button class="btn" onclick="hireEmployee('${name3}', '${role}', ${stars3}, ${salary3}, ${age3})">Нанять</button>
+      </div>
+    `;
+    list.appendChild(el3);
+  }
+
+  function hireEmployee(name, role, stars, salary, age) {
+    if (state.money < salary) { showToast("Не хватает на первый оклад!", 'red'); return; }
+    state.employees.push({ id: Date.now() + Math.random(), name, role, stars, salary, age });
+    playSound('buy');
+    updateUI(); save();
+    closeModal('modal-hire');
+    showToast(`${name} принят на работу!`, 'green');
+  }
+
+  function upgradeEmployee(id) {
+    let emp = state.employees.find(e => e.id === id);
+    if (!emp) return;
+    if (emp.stars >= 5) { showToast("Максимальный уровень!"); return; }
+    let cost = Math.pow(2, emp.stars) * 20000;
+    if (state.money < cost) { showToast(`Нужно $${cost.toLocaleString()} на обучение!`, 'red'); return; }
+    state.money -= cost;
+    emp.stars++;
+    emp.salary += 15000;
+    playSound('buy');
+    updateUI(); save();
+    showToast(`${emp.name} прокачан до ${emp.stars}★!`, 'green');
+  }
+
+  function fireEmployee(id) {
+    let idx = state.employees.findIndex(e => e.id === id);
+    if (idx === -1) return;
+    let emp = state.employees[idx];
+    state.money -= emp.salary; 
+    state.employees.splice(idx, 1);
+    playSound('click');
+    updateUI(); save();
+    showToast(`${emp.name} уволен.`, 'red');
+  }
+
+  // ==========================================
+  // 8. МАГАЗИН
+  // ==========================================
+
+  function switchShopTab(tab) {
+    playSound('click');
+    document.querySelectorAll('#shop-tabs .btn').forEach(b => b.style.background = '#333');
+    if (event && event.target) event.target.style.background = 'var(--blue)';
+    renderShop(tab);
+  }
+
+  function renderShop(tab) {
+    const list = document.getElementById('shop-list');
+    list.innerHTML = '';
+    if (!SHOP_ITEMS[tab]) return;
+
+    list.style.display = 'flex';
+    list.style.gap = '10px';
+    list.style.overflowX = 'auto';
+    list.style.paddingBottom = '15px';
+    list.style.paddingTop = '5px';
+    list.style.scrollBehavior = 'smooth';
+    list.style.WebkitOverflowScrolling = 'touch'; 
+    
+    SHOP_ITEMS[tab].forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.style.flexDirection = 'column';
+      el.style.minWidth = '140px';
+      el.style.maxWidth = '140px';
+      el.style.padding = '10px';
+      el.style.margin = '0';
+      el.style.textAlign = 'center';
+      el.style.justifyContent = 'space-between';
+      if (item.exclusive) el.style.borderColor = 'var(--gold)';
+      
+      let bonusHtml = item.bonus > 0 ? `<div style="font-size:10px; color:var(--green); margin-bottom:5px;">${item.type} +${item.bonus}%</div>` : '';
+      let exclusiveHtml = item.exclusive ? `<div style="font-size:9px; color:var(--gold); position:absolute; top:-5px; background:var(--bg); padding:0 5px; border-radius:5px; border:1px solid var(--gold);">ЭКСКЛЮЗИВ</div>` : '';
+      
+      el.innerHTML = `
+        ${exclusiveHtml}
+        <div style="font-size:35px; margin-bottom:5px;">${item.icon}</div>
+        <div style="font-size:12px; font-weight:900; margin-bottom:5px; line-height:1.2;">${item.name}</div>
+        ${bonusHtml}
+        <div style="font-size:12px; color:var(--gold); font-weight:bold; margin-bottom:10px;">${item.price === 0 ? 'Бесплатно' : '$' + item.price.toLocaleString()}</div>
+        <button class="btn" style="width:100%; padding:8px 0; font-size:11px;" onclick="buyItem('${tab}', '${item.id}')">Купить</button>
+      `;
+      el.style.position = 'relative';
+      list.appendChild(el);
+    });
+  }
+
+  function buyItem(category, itemId) {
+    const item = SHOP_ITEMS[category].find(i => i.id === itemId);
+    if (!item) return;
+    
+    if (category === 'desks') {
+      if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места! Купите офис побольше.", 'red'); return; }
+      state.money -= item.price;
+      state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null, rest: null, plant: null, light: null, decor: null });
+    } else {
+      if (!state.selectedDeskId) { showToast("Сначала выбери стол в офисе!", 'red'); return; }
+      let desk = state.workstations.find(w => w.id === state.selectedDeskId);
+      if (!desk) return;
+      
+      if (category === 'chairs' && desk.chair) { showToast("Стул уже есть"); return; }
+      if (category === 'pcs' && desk.pc) { showToast("ПК уже есть"); return; }
+      if (category === 'lab' && desk.lab) { showToast("Лаборатория уже есть"); return; }
+      if (category === 'rest' && desk.rest) { showToast("Зона отдыха уже есть"); return; }
+      if (category === 'plants' && desk.plant) { showToast("Растение уже есть"); return; }
+      if (category === 'lighting' && desk.light) { showToast("Освещение уже есть"); return; }
+      if (category === 'decor' && desk.decor) { showToast("Украшение уже есть"); return; }
+      
+      if (category === 'chairs') desk.chair = item;
+      if (category === 'pcs') desk.pc = item;
+      if (category === 'lab') desk.lab = item;
+      if (category === 'rest') desk.rest = item;
+      if (category === 'plants') desk.plant = item;
+      if (category === 'lighting') desk.light = item;
+      if (category === 'decor') desk.decor = item;
+      
+      state.money -= item.price;
+    }
+    
+    playSound('buy');
+    updateUI(); save();
+    showToast("Куплено!");
+  }
+
+  function upgradeOffice() {
+    if (state.officeLvl >= OFFICES.length - 1) { showToast("Максимальный офис!"); return; }
+    const cost = OFFICES[state.officeLvl + 1].cost;
+    state.money -= cost; 
+    state.officeLvl++;
+    playSound('buy');
+    updateUI(); save(); 
+    showToast(`Переезд в: ${OFFICES[state.officeLvl].name}!`, 'green');
+  }
+
+  // ==========================================
+  // 9. ИССЛЕДОВАНИЯ
+  // ==========================================
+
+  function renderResearchTree() {
+    const timeline = document.getElementById('tree-timeline');
+    const body = document.getElementById('tree-body');
+    timeline.innerHTML = ''; body.innerHTML = '';
+    
+    let grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = `120px repeat(46, 100px)`;
+    grid.style.gap = '10px'; grid.style.alignItems = 'center';
+
+    grid.appendChild(document.createElement('div')); 
+    for (let y = 2007; y <= 2052; y++) {
+      let yearHeader = document.createElement('div');
+      yearHeader.innerText = y;
+      yearHeader.style.textAlign = 'center'; yearHeader.style.fontWeight = 'bold';
+      yearHeader.style.color = y === state.year ? 'var(--gold)' : '#666';
+      yearHeader.style.fontSize = '12px';
+      yearHeader.style.borderBottom = y === state.year ? '2px solid var(--gold)' : '1px solid #222';
+      yearHeader.style.paddingBottom = '5px';
+      grid.appendChild(yearHeader);
+    }
+
+    TECH_BRANCHES.forEach(branch => {
+      let branchName = document.createElement('div');
+      branchName.innerText = branch.name; branchName.style.color = branch.color;
+      branchName.style.fontWeight = 'bold'; branchName.style.fontSize = '14px';
+      branchName.style.borderLeft = `3px solid ${branch.color}`; branchName.style.paddingLeft = '10px';
+      grid.appendChild(branchName);
+
+      for (let y = 2007; y <= 2052; y++) {
+        let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === y);
+        let cell = document.createElement('div');
+        cell.style.display = 'flex'; cell.style.justifyContent = 'center'; cell.style.alignItems = 'center';
+        cell.style.height = '40px'; cell.style.position = 'relative';
+
+        if (tech) {
+          let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
+          let node = document.createElement('div');
+          node.className = 'tree-node';
+          node.style.width = '80px'; node.style.height = '40px'; node.style.margin = '0';
+          node.style.borderRadius = '6px'; node.style.fontSize = '9px';
+          node.style.cursor = tech.unlocked || isAvailable ? 'pointer' : 'not-allowed';
+          
+          if (tech.unlocked) {
+            node.style.background = `rgba(0, 255, 136, 0.1)`; node.style.border = `1px solid var(--green)`; node.style.color = 'var(--green)';
+          } else if (isAvailable) {
+            node.style.background = `rgba(255, 215, 0, 0.1)`; node.style.border = `1px solid var(--gold)`; node.style.color = 'var(--gold)';
+            node.style.animation = 'pulse 2s infinite';
+          } else {
+            node.style.background = `#111`; node.style.border = `1px solid ${branch.color}`; node.style.color = '#888'; node.style.opacity = '0.6';
+          }
+
+          node.innerHTML = `<div style="font-weight:bold; margin-bottom:2px;">${tech.name}</div><div>${tech.unlocked ? '✅' : (state.year >= tech.yearReq ? tech.cost + ' RP' : '???')}</div>`;
+          if (tech.unlocked || isAvailable) node.onclick = () => unlockTech(tech.id);
+          cell.appendChild(node);
+
+          if (y < 2052) {
+            let line = document.createElement('div');
+            line.style.position = 'absolute'; line.style.right = '-10px'; line.style.width = '10px'; line.style.height = '2px';
+            line.style.background = tech.unlocked ? 'var(--green)' : '#333';
+            cell.appendChild(line);
+          }
+        } else {
+          let dot = document.createElement('div');
+          dot.style.width = '2px'; dot.style.height = '2px'; dot.style.background = '#333';
+          cell.appendChild(dot);
+        }
+        grid.appendChild(cell);
+      }
+    });
+    body.appendChild(grid);
+  }
+
+  function unlockTech(id) {
+    let tech = RESEARCH_TREE.find(t => t.id === id);
+    if (!tech || tech.unlocked) return;
+    if (state.year < tech.yearReq) { showToast("Этот год еще не наступил!", 'red'); return; }
+    if (state.rp < tech.cost) { showToast("Не хватает RP!", 'red'); return; }
+    
+    state.rp -= tech.cost;
+    tech.unlocked = true;
+    state.research[tech.id] = true;
+    
+    // Если это кастомная ОС, открываем модалку ввода названия
+    if (tech.isCustomOS) {
+      document.getElementById('os-name-input').value = "MyOS " + (Object.keys(state.customOSNames).length + 1);
+      document.getElementById('modal-create-os').classList.add('active');
+    }
+
+    playSound('buy');
+    updateUI(); save();
+    renderResearchTree();
+    showToast(`Изучено: ${tech.name}`, 'green');
+  }
+
+  // ==========================================
+  // 10. ДИЗАЙН-СТУДИЯ (13 ШАГОВ)
+  // ==========================================
+
+  const designSteps = [
+    { title: "Шаг 1. Устройство", type: 'grid', options: [
       {name: "Телефон", cost: 0, q: 1, icon: '📱', desc: 'Классика. Самый большой рынок.'}, 
       {name: "Музыкальный плеер", cost: 2, q: 1, icon: '🎵', desc: 'Тысячи песен в кармане.'},
       {name: "Игровая консоль", cost: 50, q: 3, icon: '🎮', desc: 'Игры в гостиной.'},
       {name: "Планшет", cost: 15, q: 2, icon: '📟', desc: 'Большой экран, высокая цена.'}
-    ]
-  },
-  { 
-    title: "Шаг 2. Шасси", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 2. Шасси", type: 'list', options: [
       {name: "Пластик", cost: 0, q: 0, desc: 'Стандартный корпус'}, 
       {name: "Стекло", cost: 3, q: 1, desc: 'Гладкое стекло'}, 
       {name: "Титан", cost: 12, q: 3, desc: 'Премиальный титан', req: 'body'}
-    ]
-  },
-  { 
-    title: "Шаг 3. Размер", 
-    type: 'slider', 
-    min: 3.5, max: 7.5, step: 0.1, defaultVal: 5.5 
-  },
-  { 
-    title: "Шаг 4. Тип экрана", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 3. Размер", type: 'slider', min: 3.5, max: 7.5, step: 0.1, defaultVal: 5.5 },
+    { title: "Шаг 4. Тип экрана", type: 'list', options: [
       {name: "Дисплей IPS LCD", cost: 1, q: 0, req: 'screen'}, 
       {name: "OLED", cost: 3, q: 2, req: 'screen'}, 
       {name: "AMOLED", cost: 9, q: 3, req: 'screen'},
       {name: "LTPO-OLED", cost: 4, q: 4, req: 'screen'}
-    ]
-  },
-  { 
-    title: "Шаг 5. Камера для селфи", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 5. Камера для селфи", type: 'list', options: [
       {name: "Нет", cost: 0, q: 0}, 
       {name: "2 МП", cost: 2, q: 1, req: 'camera'}, 
       {name: "5 МП", cost: 3, q: 2, req: 'camera'},
       {name: "8 МП", cost: 5, q: 3, req: 'camera'},
       {name: "12 МП", cost: 7, q: 4, req: 'camera'}
-    ]
-  },
-  { 
-    title: "Шаг 6. Задние камеры", 
-    type: 'grid_camera', 
-    options: [
+    ]},
+    { title: "Шаг 6. Задние камеры", type: 'grid_camera', options: [
       {name: "Основная 12 МП", cost: 5, q: 2, req: 'camera'},
       {name: "Основная 24 МП", cost: 10, q: 3, req: 'camera'},
       {name: "Основная 48 МП", cost: 14, q: 4, req: 'camera'},
@@ -1117,251 +1490,156 @@ const designSteps = [
       {name: "Телеобъектив", cost: 5, q: 1, req: 'camera'},
       {name: "Сканер LiDAR", cost: 8, q: 2, req: 'camera'},
       {name: "Ночное видение ИИ", cost: 12, q: 3, req: 'camera'}
-    ]
-  },
-  { 
-    title: "Шаг 7. Углы и рамки", 
-    type: 'slider', 
-    min: 0, max: 100, defaultVal: 50 
-  },
-  { 
-    title: "Шаг 8. Боковые кнопки", 
-    type: 'slider', 
-    min: 0, max: 100, defaultVal: 50 
-  },
-  { 
-    title: "Шаг 9. Разъем для зарядки", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 7. Углы и рамки", type: 'slider', min: 0, max: 100, defaultVal: 50 },
+    { title: "Шаг 8. Боковые кнопки", type: 'slider', min: 0, max: 100, defaultVal: 50 },
+    { title: "Шаг 9. Разъем для зарядки", type: 'list', options: [
       {name: "Мини-USB", cost: 1, q: 0, req: 'ports'},
       {name: "Микро-USB", cost: 0, q: 1, req: 'ports'},
       {name: "USB-C", cost: 1, q: 2, req: 'ports'},
       {name: "USB-C 3.2", cost: 2, q: 3, req: 'ports'},
       {name: "Нет порта", cost: 1, q: 4, req: 'ports'}
-    ]
-  },
-  { 
-    title: "Шаг 10. Характеристики", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 10. Характеристики", type: 'list', options: [
       {name: "1 ядро 400 МГц", cost: 2, q: 1, req: 'cpu'},
       {name: "1 ядро 1 ГГц", cost: 3, q: 2, req: 'cpu'},
       {name: "2 ядра", cost: 6, q: 3, req: 'cpu'},
       {name: "4 ядра", cost: 9, q: 4, req: 'cpu'},
       {name: "8 ядер", cost: 13, q: 5, req: 'cpu'},
       {name: "Квантовый сопроцессор", cost: 63, q: 8, req: 'cpu'}
-    ]
-  },
-  { 
-    title: "Шаг 11. Функции", 
-    type: 'multiple', 
-    options: [
+    ]},
+    { title: "Шаг 11. Функции", type: 'multiple', options: [
       {name: "GPS", cost: 1, q: 1, req: 'features'}, 
       {name: "NFC", cost: 2, q: 1, req: 'features'}, 
       {name: "Влагозащита", cost: 3, q: 2, req: 'features'}, 
       {name: "Стереозвук", cost: 2, q: 1, req: 'features'},
       {name: "Сканер лица", cost: 4, q: 2, req: 'features'},
       {name: "Спутник", cost: 6, q: 3, req: 'features'}
-    ]
-  },
-  { 
-    title: "Шаг 12. Цвет и Брендинг", 
-    type: 'list', 
-    options: [
+    ]},
+    { title: "Шаг 12. Цвет и Брендинг", type: 'list', options: [
       {name: "Черный", cost: 0, q: 0}, 
       {name: "Белый", cost: 0, q: 0}, 
       {name: "Неоновый", cost: 2, q: 2}, 
       {name: "Радужный", cost: 5, q: 5}
-    ]
-  },
-  { 
-    title: "Шаг 13. Финальная проверка", 
-    type: 'final', 
-    options: [] 
-  }
-];
+    ]},
+    { title: "Шаг 13. Финальная проверка", type: 'final', options: [] }
+  ];
 
-let currentStep = 0;
-let currentDesign = { 
-  cost: 0, 
-  quality: 0, 
-  features: [], 
-  name: "iFon",
-  deviceType: "Телефон",
-  selectedOS: "Базовая ОС"
-};
+  let currentStep = 0;
+  let currentDesign = { cost: 0, quality: 0, features: [], name: "iFon", deviceType: "Телефон", selectedOS: "Базовая ОС" };
 
-function openDesignStudio() {
-  playSound('click');
-  document.getElementById('design-screen').classList.add('active');
-  currentStep = 0;
-  currentDesign = { cost: 0, quality: 0, features: [], name: "iFon", deviceType: "Телефон", selectedOS: "Базовая ОС" };
-  renderDesignStep();
-}
-
-function closeDesignStudio() {
-  playSound('click');
-  document.getElementById('design-screen').classList.remove('active');
-}
-
-function renderDesignStep() {
-  if (currentStep >= designSteps.length) return;
-  const step = designSteps[currentStep];
-  
-  document.getElementById('ds-title').innerText = step.title;
-  document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
-  document.getElementById('ds-est-price').innerText = `Себестоимость: $${currentDesign.cost.toLocaleString()}`;
-  document.getElementById('ds-phone-name').innerText = currentDesign.name + " " + (state.releasedPhones.length + 1);
-
-  const opts = document.getElementById('ds-options');
-  opts.innerHTML = '';
-
-  // 1. ПЛИТКИ (Устройства)
-  if (step.type === 'grid') {
-    opts.innerHTML = '<div class="ds-grid" id="ds-grid-container"></div>';
-    let grid = document.getElementById('ds-grid-container');
-    
-    step.options.forEach(o => {
-      let el = document.createElement('div');
-      let isSelected = currentDesign.deviceType === o.name;
-      el.className = `ds-tile ${isSelected ? 'selected' : ''}`;
-      
-      el.innerHTML = `
-        <div class="tile-icon">${o.icon}</div>
-        <div class="tile-name">${o.name}</div>
-        <div class="tile-desc">${o.desc}</div>
-        <div style="margin-top:10px; color:var(--gold); font-weight:bold;">${o.cost === 0 ? 'Бесплатно' : '$' + o.cost}</div>
-      `;
-      
-      el.onclick = () => {
-        playSound('click');
-        currentDesign.deviceType = o.name;
-        currentDesign.cost = 0;
-        currentDesign.quality = 1;
-        currentDesign.cost += o.cost;
-        currentDesign.quality += o.q;
-        currentStep++;
-        renderDesignStep();
-      };
-      grid.appendChild(el);
-    });
-    return;
+  function openDesignStudio() {
+    playSound('click');
+    document.getElementById('design-screen').classList.add('active');
+    currentStep = 0;
+    currentDesign = { cost: 0, quality: 0, features: [], name: "iFon", deviceType: "Телефон", selectedOS: "Базовая ОС" };
+    renderDesignStep();
   }
 
-  // 2. СЛАЙДЕР (Размер, Рамки)
-  if (step.type === 'slider') {
-    let val = step.defaultVal;
-    if (currentStep === 2) val = 5.5; 
-    
-    opts.innerHTML = `
-      <div class="ds-slider-container">
-        <div class="ds-slider-value" id="slider-val-display">${val}${currentStep === 2 ? '"' : '%'}</div>
-        <input type="range" class="ds-slider" min="${step.min}" max="${step.max}" step="${step.step}" value="${val}" 
-               oninput="updateSlider(this.value, ${step.min}, ${step.max})">
-        <div class="ds-slider-labels"><span>${step.min}</span><span>${step.max}</span></div>
-      </div>
-    `;
-    
-    window.updateSlider = function(v, min, max) {
-      let display = document.getElementById('slider-val-display');
-      display.innerText = currentStep === 2 ? v + '"' : v + '%';
-    };
-    
-    let nextBtn = document.createElement('button');
-    nextBtn.className = 'btn';
-    nextBtn.style.marginTop = '20px';
-    nextBtn.style.width = '100%';
-    nextBtn.style.padding = '12px';
-    nextBtn.innerText = 'Продолжить';
-    nextBtn.onclick = () => {
-      playSound('click');
-      currentStep++;
-      renderDesignStep();
-    };
-    opts.appendChild(nextBtn);
-    return;
+  function closeDesignStudio() {
+    playSound('click');
+    document.getElementById('design-screen').classList.remove('active');
   }
 
-  // 3. СЕТКА КАМЕР
-  if (step.type === 'grid_camera') {
-    opts.innerHTML = '<div class="ds-grid" id="ds-grid-container"></div>';
-    let grid = document.getElementById('ds-grid-container');
+  function renderDesignStep() {
+    if (currentStep >= designSteps.length) return;
+    const step = designSteps[currentStep];
     
-    step.options.forEach(o => {
-      let isLocked = false;
-      if (o.req) {
-        // Проверка года для камер (берем базовую технологию)
-        let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.yearReq === 2007);
-        if (state.year < 2007) isLocked = true; // Заглушка
-      }
+    document.getElementById('ds-title').innerText = step.title;
+    document.getElementById('ds-step-info').innerText = `Шаг ${currentStep + 1} из ${designSteps.length}`;
+    document.getElementById('ds-est-price').innerText = `Себестоимость: $${currentDesign.cost.toLocaleString()}`;
+    document.getElementById('ds-phone-name').innerText = currentDesign.name + " " + (state.releasedPhones.length + 1);
 
-      let el = document.createElement('div');
-      let isSelected = currentDesign.features.includes(o.name);
-      el.className = `ds-tile ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}`;
+    const opts = document.getElementById('ds-options');
+    opts.innerHTML = '';
+
+    // 1. ПЛИТКИ
+    if (step.type === 'grid') {
+      opts.innerHTML = '<div class="ds-grid" id="ds-grid-container"></div>';
+      let grid = document.getElementById('ds-grid-container');
       
-      el.innerHTML = `
-        <div class="tile-name">${o.name}</div>
-        <div style="margin-top:10px; color:var(--gold); font-weight:bold;">${isLocked ? '🔒' : '+$' + o.cost}</div>
-      `;
-      
-      if (!isLocked) {
+      step.options.forEach(o => {
+        let el = document.createElement('div');
+        let isSelected = currentDesign.deviceType === o.name;
+        el.className = `ds-tile ${isSelected ? 'selected' : ''}`;
+        
+        el.innerHTML = `
+          <div class="tile-icon">${o.icon}</div>
+          <div class="tile-name">${o.name}</div>
+          <div class="tile-desc">${o.desc}</div>
+          <div style="margin-top:10px; color:var(--gold); font-weight:bold;">${o.cost === 0 ? 'Бесплатно' : '$' + o.cost}</div>
+        `;
+        
         el.onclick = () => {
           playSound('click');
-          if (isSelected) {
-            currentDesign.features = currentDesign.features.filter(f => f !== o.name);
-            currentDesign.cost -= o.cost;
-            currentDesign.quality -= o.q;
-          } else {
-            currentDesign.features.push(o.name);
-            currentDesign.cost += o.cost;
-            currentDesign.quality += o.q;
-          }
+          currentDesign.deviceType = o.name;
+          currentDesign.cost = 0;
+          currentDesign.quality = 1;
+          currentDesign.cost += o.cost;
+          currentDesign.quality += o.q;
+          currentStep++;
           renderDesignStep();
         };
-      }
-      grid.appendChild(el);
-    });
-    
-    let nextBtn = document.createElement('button');
-    nextBtn.className = 'btn';
-    nextBtn.style.marginTop = '20px';
-    nextBtn.style.width = '100%';
-    nextBtn.style.padding = '12px';
-    nextBtn.innerText = 'Продолжить';
-    nextBtn.onclick = () => { playSound('click'); currentStep++; renderDesignStep(); };
-    opts.appendChild(nextBtn);
-    return;
-  }
+        grid.appendChild(el);
+      });
+      return;
+    }
 
-  // 4. СПИСОК
-  if (step.type === 'list' || step.type === 'multiple') {
-    step.options.forEach(o => {
-      let isLocked = false;
-      let lockText = '';
+    // 2. СЛАЙДЕР
+    if (step.type === 'slider') {
+      let val = step.defaultVal;
+      if (currentStep === 2) val = 5.5; 
       
-      if (o.req) {
-        // Умная проверка: ищем технологию в дереве, которая соответствует названию
-        let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
-        if (tech && !tech.unlocked) {
-          isLocked = true;
-          if (state.year < tech.yearReq) lockText = `🔒 Прибудет в ${tech.yearReq} г.`;
-          else if (state.rp < tech.cost) lockText = `🔒 RP ${tech.cost}`;
-          else lockText = `🔒 Нужны ранние иссл.`;
+      opts.innerHTML = `
+        <div class="ds-slider-container">
+          <div class="ds-slider-value" id="slider-val-display">${val}${currentStep === 2 ? '"' : '%'}</div>
+          <input type="range" class="ds-slider" min="${step.min}" max="${step.max}" step="${step.step}" value="${val}" 
+                 oninput="updateSlider(this.value, ${step.min}, ${step.max})">
+          <div class="ds-slider-labels"><span>${step.min}</span><span>${step.max}</span></div>
+        </div>
+      `;
+      
+      window.updateSlider = function(v, min, max) {
+        let display = document.getElementById('slider-val-display');
+        display.innerText = currentStep === 2 ? v + '"' : v + '%';
+      };
+      
+      let nextBtn = document.createElement('button');
+      nextBtn.className = 'btn';
+      nextBtn.style.marginTop = '20px';
+      nextBtn.style.width = '100%';
+      nextBtn.style.padding = '12px';
+      nextBtn.innerText = 'Продолжить';
+      nextBtn.onclick = () => { playSound('click'); currentStep++; renderDesignStep(); };
+      opts.appendChild(nextBtn);
+      return;
+    }
+
+    // 3. СЕТКА КАМЕР
+    if (step.type === 'grid_camera') {
+      opts.innerHTML = '<div class="ds-grid" id="ds-grid-container"></div>';
+      let grid = document.getElementById('ds-grid-container');
+      
+      step.options.forEach(o => {
+        let isLocked = false;
+        if (o.req) {
+          let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
+          if (tech && !tech.unlocked) isLocked = true;
         }
-      }
-      
-      let el = document.createElement('div');
-      el.className = `ds-opt ${isLocked ? 'locked' : ''}`;
-      let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
-      if (isLocked) priceStr = lockText;
-      
-      if (step.type === 'multiple') {
-        let isChecked = currentDesign.features.includes(o.name);
-        el.innerHTML = `<span>${isLocked ? '🔒' : (isChecked ? '✅' : '⬜')} ${o.name}</span><span>${priceStr}</span>`;
+
+        let el = document.createElement('div');
+        let isSelected = currentDesign.features.includes(o.name);
+        el.className = `ds-tile ${isSelected ? 'selected' : ''} ${isLocked ? 'locked' : ''}`;
+        
+        el.innerHTML = `
+          <div class="tile-name">${o.name}</div>
+          <div style="margin-top:10px; color:var(--gold); font-weight:bold;">${isLocked ? '🔒' : '+$' + o.cost}</div>
+        `;
+        
         if (!isLocked) {
           el.onclick = () => {
             playSound('click');
-            if (isChecked) {
+            if (isSelected) {
               currentDesign.features = currentDesign.features.filter(f => f !== o.name);
               currentDesign.cost -= o.cost;
               currentDesign.quality -= o.q;
@@ -1373,138 +1651,191 @@ function renderDesignStep() {
             renderDesignStep();
           };
         }
-      } else {
-        el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
-        if (!isLocked) {
-          el.onclick = () => {
-            playSound('click');
-            currentDesign.cost += o.cost;
-            currentDesign.quality += o.q;
-            currentStep++;
-            renderDesignStep();
-          };
-        }
-      }
-      opts.appendChild(el);
-    });
-    return;
-  }
-
-  // 5. ФИНАЛ
-  if (step.type === 'final') {
-    let score = Math.min(9.9, (5 + currentDesign.quality / 2));
-    let recommendedPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
-    
-    let baseDemand = Math.floor(500 + (score * 800));
-    
-    window.updatePriceSlider = function(val) {
-      let price = parseInt(val);
-      let profit = price - currentDesign.cost;
-      let priceFactor = recommendedPrice / price;
-      let actualDemand = Math.floor(baseDemand * (priceFactor * priceFactor)); 
-      if (profit <= 0) actualDemand = 0;
-
-      document.getElementById('slider-price-text').innerText = '$' + price.toLocaleString();
-      document.getElementById('slider-profit-text').innerText = '+$' + profit.toLocaleString() + ' / шт';
-      document.getElementById('slider-profit-text').style.color = profit > 0 ? 'var(--green)' : 'var(--red)';
-      document.getElementById('slider-demand-text').innerText = actualDemand.toLocaleString() + ' шт / нед.';
+        grid.appendChild(el);
+      });
       
-      let btn = document.getElementById('btn-launch-phone');
-      btn.onclick = () => {
-        let customName = document.getElementById('input-phone-name').value;
-        finishRelease(price, profit, actualDemand, customName);
-      };
-    };
-
-    opts.innerHTML = `
-      <div style="text-align:center; padding:10px;">
-        <div style="font-size:40px; margin-bottom:5px;">${currentDesign.deviceType === 'Планшет' ? '📟' : '📱'}</div>
-        
-        <div style="margin-bottom:15px; text-align:left;">
-          <label style="font-size:11px; color:#aaa; margin-bottom:5px; display:block;">Название устройства</label>
-          <input type="text" id="input-phone-name" value="iFon ${state.releasedPhones.length + 1}" style="width:100%; padding:10px; background:var(--panel-light); border:1px solid var(--border); border-radius:8px; color:#fff; font-size:14px; font-weight:bold; outline:none;">
-        </div>
-
-        <div style="font-size:14px; margin-bottom:5px;">Оценка критиков: <span style="color:var(--gold); font-weight:900;">${score.toFixed(1)} / 10</span></div>
-        <div style="font-size:14px; margin-bottom:15px;">Себестоимость: <span style="color:var(--red); font-weight:900;">$${currentDesign.cost.toLocaleString()}</span></div>
-        
-        <div style="background: var(--panel-light); border-radius: 10px; border: 1px solid var(--border); padding: 15px;">
-          <div style="font-size:12px; color:#aaa; margin-bottom:5px;">Установите цену продажи</div>
-          <div style="font-size:28px; color:#fff; font-weight:900; margin-bottom:15px;" id="slider-price-text">$${recommendedPrice.toLocaleString()}</div>
-          
-          <input type="range" min="${currentDesign.cost + 10}" max="${recommendedPrice * 3}" value="${recommendedPrice}" 
-                 style="width: 100%; height: 10px; border-radius: 5px; background: #333; outline: none; -webkit-appearance: none; margin-bottom: 15px;"
-                 oninput="updatePriceSlider(this.value)">
-          
-          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
-            <span style="color:var(--green);" id="slider-profit-text">+$${(recommendedPrice - currentDesign.cost).toLocaleString()} / шт</span>
-            <span style="color:var(--blue);" id="slider-demand-text">0 шт / нед.</span>
-          </div>
-        </div>
-        
-        <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" id="btn-launch-phone">Начать производство</button>
-      </div>
-    `;
-    
-    setTimeout(() => updatePriceSlider(recommendedPrice), 50);
-    return;
-  }
-}
-
-function prevDesignStep() {
-  if (currentStep > 0) { currentStep--; renderDesignStep(); } else { closeDesignStudio(); }
-}
-
-function skipDesignStep() {
-  playSound('click');
-  currentStep++;
-  renderDesignStep();
-}
-
-function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
-  let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
-  
-  let finalName = customName.trim() === '' ? "Безымянный " + (state.releasedPhones.length + 1) : customName;
-  
-  // Стоимость первой партии (2 недели продаж)
-  let batchSize = weeklyDemand * 2;
-  let totalCost = currentDesign.cost * batchSize;
-  
-  if (state.money < totalCost) {
-    showToast(`Не хватает $${(totalCost - state.money).toLocaleString()} на сборку партии! Вы ушли в долг.`, 'red');
-  }
-  state.money -= totalCost;
-  
-  state.releasedPhones.push({
-    id: Date.now(),
-    name: finalName,
-    type: currentDesign.deviceType,
-    score: score,
-    releaseYear: state.year,
-    price: finalPrice,
-    cost: currentDesign.cost,
-    profitPerUnit: profitPerUnit,
-    weeklySales: weeklyDemand,
-    totalSold: 0
-  });
-
-  state.reputation += score / 10;
-  
-  if (state.isPublic) {
-    state.stockPrice = Math.max(0.1, state.stockPrice + (score - 5) * 2);
-    state.stockHistory.push(state.stockPrice);
-    if (state.stockHistory.length > 30) state.stockHistory.shift();
-    drawStockChart();
-  }
-
-  closeDesignStudio();
-  updateUI(); save();
-  showToast(`Устройство "${finalName}" запущено!`, 'green');
-  startConfetti();
-  playSound('release');
+      let nextBtn = document.createElement('button');
+      nextBtn.className = 'btn';
+      nextBtn.style.marginTop = '20px';
+      nextBtn.style.width = '100%';
+      nextBtn.style.padding = '12px';
+      nextBtn.innerText = 'Продолжить';
+      nextBtn.onclick = () => { playSound('click'); currentStep++; renderDesignStep(); };
+      opts.appendChild(nextBtn);
+      return;
     }
-      // ==========================================
-  // 8. БАНК И АКЦИИ
+
+    // 4. СПИСОК
+    if (step.type === 'list' || step.type === 'multiple') {
+      step.options.forEach(o => {
+        let isLocked = false;
+        let lockText = '';
+        
+        if (o.req) {
+          let tech = RESEARCH_TREE.find(t => t.branch === o.req && t.name === o.name);
+          if (tech && !tech.unlocked) {
+            isLocked = true;
+            if (state.year < tech.yearReq) lockText = `🔒 Прибудет в ${tech.yearReq} г.`;
+            else if (state.rp < tech.cost) lockText = `🔒 RP ${tech.cost}`;
+            else lockText = `🔒 Нужны ранние иссл.`;
+          }
+        }
+        
+        let el = document.createElement('div');
+        el.className = `ds-opt ${isLocked ? 'locked' : ''}`;
+        let priceStr = o.cost === 0 ? 'Free' : '+$' + o.cost;
+        if (isLocked) priceStr = lockText;
+        
+        if (step.type === 'multiple') {
+          let isChecked = currentDesign.features.includes(o.name);
+          el.innerHTML = `<span>${isLocked ? '🔒' : (isChecked ? '✅' : '⬜')} ${o.name}</span><span>${priceStr}</span>`;
+          if (!isLocked) {
+            el.onclick = () => {
+              playSound('click');
+              if (isChecked) {
+                currentDesign.features = currentDesign.features.filter(f => f !== o.name);
+                currentDesign.cost -= o.cost;
+                currentDesign.quality -= o.q;
+              } else {
+                currentDesign.features.push(o.name);
+                currentDesign.cost += o.cost;
+                currentDesign.quality += o.q;
+              }
+              renderDesignStep();
+            };
+          }
+        } else {
+          el.innerHTML = `<span>${o.name}</span><span>${priceStr}</span>`;
+          if (!isLocked) {
+            el.onclick = () => {
+              playSound('click');
+              currentDesign.cost += o.cost;
+              currentDesign.quality += o.q;
+              currentStep++;
+              renderDesignStep();
+            };
+          }
+        }
+        opts.appendChild(el);
+      });
+      return;
+    }
+
+    // 5. ФИНАЛ
+    if (step.type === 'final') {
+      let score = Math.min(9.9, (5 + currentDesign.quality / 2));
+      let recommendedPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
+      
+      let baseDemand = Math.floor(500 + (score * 800));
+      
+      window.updatePriceSlider = function(val) {
+        let price = parseInt(val);
+        let profit = price - currentDesign.cost;
+        let priceFactor = recommendedPrice / price;
+        let actualDemand = Math.floor(baseDemand * (priceFactor * priceFactor)); 
+        if (profit <= 0) actualDemand = 0;
+
+        document.getElementById('slider-price-text').innerText = '$' + price.toLocaleString();
+        document.getElementById('slider-profit-text').innerText = '+$' + profit.toLocaleString() + ' / шт';
+        document.getElementById('slider-profit-text').style.color = profit > 0 ? 'var(--green)' : 'var(--red)';
+        document.getElementById('slider-demand-text').innerText = actualDemand.toLocaleString() + ' шт / нед.';
+        
+        let btn = document.getElementById('btn-launch-phone');
+        btn.onclick = () => {
+          let customName = document.getElementById('input-phone-name').value;
+          finishRelease(price, profit, actualDemand, customName);
+        };
+      };
+
+      opts.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+          <div style="font-size:40px; margin-bottom:5px;">${currentDesign.deviceType === 'Планшет' ? '📟' : '📱'}</div>
+          
+          <div style="margin-bottom:15px; text-align:left;">
+            <label style="font-size:11px; color:#aaa; margin-bottom:5px; display:block;">Название устройства</label>
+            <input type="text" id="input-phone-name" value="iFon ${state.releasedPhones.length + 1}" style="width:100%; padding:10px; background:var(--panel-light); border:1px solid var(--border); border-radius:8px; color:#fff; font-size:14px; font-weight:bold; outline:none;">
+          </div>
+
+          <div style="font-size:14px; margin-bottom:5px;">Оценка критиков: <span style="color:var(--gold); font-weight:900;">${score.toFixed(1)} / 10</span></div>
+          <div style="font-size:14px; margin-bottom:15px;">Себестоимость: <span style="color:var(--red); font-weight:900;">$${currentDesign.cost.toLocaleString()}</span></div>
+          
+          <div style="background: var(--panel-light); border-radius: 10px; border: 1px solid var(--border); padding: 15px;">
+            <div style="font-size:12px; color:#aaa; margin-bottom:5px;">Установите цену продажи</div>
+            <div style="font-size:28px; color:#fff; font-weight:900; margin-bottom:15px;" id="slider-price-text">$${recommendedPrice.toLocaleString()}</div>
+            
+            <input type="range" min="${currentDesign.cost + 10}" max="${recommendedPrice * 3}" value="${recommendedPrice}" 
+                   style="width: 100%; height: 10px; border-radius: 5px; background: #333; outline: none; -webkit-appearance: none; margin-bottom: 15px;"
+                   oninput="updatePriceSlider(this.value)">
+            
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:10px;">
+              <span style="color:var(--green);" id="slider-profit-text">+$${(recommendedPrice - currentDesign.cost).toLocaleString()} / шт</span>
+              <span style="color:var(--blue);" id="slider-demand-text">0 шт / нед.</span>
+            </div>
+          </div>
+          
+          <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" id="btn-launch-phone">Начать производство</button>
+        </div>
+      `;
+      
+      setTimeout(() => updatePriceSlider(recommendedPrice), 50);
+      return;
+    }
+  }
+
+  function prevDesignStep() {
+    if (currentStep > 0) { currentStep--; renderDesignStep(); } else { closeDesignStudio(); }
+  }
+
+  function skipDesignStep() {
+    playSound('click');
+    currentStep++;
+    renderDesignStep();
+  }
+
+  function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
+    let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
+    
+    let finalName = customName.trim() === '' ? "Безымянный " + (state.releasedPhones.length + 1) : customName;
+    
+    let batchSize = weeklyDemand * 2;
+    let totalCost = currentDesign.cost * batchSize;
+    
+    if (state.money < totalCost) {
+      showToast(`Не хватает $${(totalCost - state.money).toLocaleString()} на сборку партии! Вы ушли в долг.`, 'red');
+    }
+    state.money -= totalCost;
+    
+    state.releasedPhones.push({
+      id: Date.now(),
+      name: finalName,
+      type: currentDesign.deviceType,
+      score: score,
+      releaseYear: state.year,
+      price: finalPrice,
+      cost: currentDesign.cost,
+      profitPerUnit: profitPerUnit,
+      weeklySales: weeklyDemand,
+      totalSold: 0
+    });
+
+    state.reputation += score / 10;
+    
+    if (state.isPublic) {
+      state.stockPrice = Math.max(0.1, state.stockPrice + (score - 5) * 2);
+      state.stockHistory.push(state.stockPrice);
+      if (state.stockHistory.length > 30) state.stockHistory.shift();
+      drawStockChart();
+    }
+
+    closeDesignStudio();
+    updateUI(); save();
+    showToast(`Устройство "${finalName}" запущено!`, 'green');
+    startConfetti();
+    playSound('release');
+  }
+
+  // ==========================================
+  // 11. БАНК И АКЦИИ
   // ==========================================
 
   function takeLoan(months) {
@@ -1573,7 +1904,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }
 
   // ==========================================
-  // 9. ИМПЕРИЯ (Заводы, Услуги, Проекты)
+  // 12. ИМПЕРИЯ (Заводы, Услуги, Проекты)
   // ==========================================
 
   let currentEmpireTab = 'services';
@@ -1691,7 +2022,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }
 
   // ==========================================
-  // 10. РЫНКИ
+  // 13. РЫНКИ
   // ==========================================
 
   function renderMarkets() {
@@ -1728,7 +2059,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }
 
   // ==========================================
-  // 11. ИВЕНТЫ И БАНКРОТСТВО
+  // 14. ИВЕНТЫ И БАНКРОТСТВО
   // ==========================================
 
   function triggerRandomEvent() {
@@ -1763,7 +2094,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }
 
   // ==========================================
-  // 12. УТИЛИТЫ (Тосты, Конфетти, Новости)
+  // 15. УТИЛИТЫ (Тосты, Конфетти, Новости)
   // ==========================================
 
   function renderNews() {
@@ -1824,7 +2155,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
     else ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  // Запуск ивентов (раз в 60 секунд реального времени, если скорость > 0)
+  // Запуск ивентов (раз в 60 секунд реального времени)
   setInterval(() => {
     if (state.speed > 0 && Math.random() > 0.7) {
       triggerRandomEvent();
@@ -1832,14 +2163,14 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }, 60000);
 
   // ==========================================
-  // 13. МОДАЛКА СОЗДАНИЯ ОС
+  // 16. МОДАЛКА СОЗДАНИЯ ОС
   // ==========================================
 
   function createCustomOS() {
     let osName = document.getElementById('os-name-input').value.trim();
     if (osName === '') osName = "MyOS";
     
-    // Сохраняем в стейт (в реальной игре здесь была бы логика привязки к изученной технологии)
+    // Сохраняем в стейт
     state.customOSNames['custom_os'] = osName;
     
     closeModal('modal-create-os');
@@ -1848,7 +2179,7 @@ function finishRelease(finalPrice, profitPerUnit, weeklyDemand, customName) {
   }
 
   // ==========================================
-  // 14. ТУТОРИАЛ
+  // 17. ТУТОРИАЛ
   // ==========================================
 
   let tutStep = 0;
