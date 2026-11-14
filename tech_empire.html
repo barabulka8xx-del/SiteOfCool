@@ -88,17 +88,19 @@
     .emp-actions { display: flex; flex-direction: column; gap: 5px; }
     .emp-actions button { padding: 5px 10px; font-size: 10px; }
 
-    /* ДЕРЕВО */
-    .research-layout { display: flex; flex-direction: column; height: 100%; }
-    .research-sidebar { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); }
-    .research-tree-container { flex: 1; overflow: auto; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; padding: 20px; }
-    .tree-timeline { display: flex; color: #fff; font-weight: bold; font-size: 12px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-    .tree-year { width: 150px; flex-shrink: 0; text-align: center; border-right: 1px dashed #333; }
-    .tree-row { display: flex; align-items: center; margin-bottom: 10px; }
-    .tree-node { width: 120px; height: 50px; background: #222; border: 1px solid #555; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; text-align: center; margin: 0 15px; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
-    .tree-node.unlocked { border-color: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.3); }
-    .tree-node.available { border-color: var(--gold); animation: pulse 2s infinite; }
-    .tree-node.locked { opacity: 0.5; background: #111; }
+    /* НАУКА (CANVAS) */
+    .research-layout { display: flex; flex-direction: column; height: 100%; position: relative; }
+    .research-sidebar { background: var(--panel); padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border); z-index: 2; }
+    .research-canvas-wrapper { flex: 1; overflow: hidden; background: #000; border: 1px solid var(--border); border-radius: 10px; position: relative; touch-action: none; }
+    canvas#tree-canvas { display: block; width: 100%; height: 100%; }
+
+    /* МОДАЛКИ */
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: var(--panel); border: 2px solid var(--border); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px; color: var(--gold); }
 
     /* ДИЗАЙН */
     .design-screen { position: fixed; inset: 0; background: #060a0f; z-index: 100; display: none; flex-direction: column; }
@@ -129,14 +131,6 @@
     .ds-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--blue); cursor: pointer; box-shadow: 0 0 10px rgba(79,172,254,0.5); }
     .ds-slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: #888; margin-top: 10px; }
     .ds-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
-
-    /* МОДАЛКИ */
-    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-10px); background: #000; border: 1px solid var(--green); padding: 10px 20px; border-radius: 20px; font-size: 13px; color: var(--green); z-index: 300; opacity: 0; transition: 0.3s; pointer-events: none; text-align: center; width: 80%; max-width: 300px; font-weight: bold; }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
-    .modal-overlay.active { display: flex; }
-    .modal-content { background: var(--panel); border: 2px solid var(--border); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .modal-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px; color: var(--gold); }
 
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -288,9 +282,8 @@
           <div style="background:var(--blue); height:100%; width:0%;" id="ui-research-progress"></div>
         </div>
       </div>
-      <div class="research-tree-container">
-        <div class="tree-timeline" id="tree-timeline"></div>
-        <div id="tree-body"></div>
+      <div class="research-canvas-wrapper" id="research-wrapper">
+        <canvas id="tree-canvas"></canvas>
       </div>
     </div>
   </div>
@@ -391,7 +384,7 @@
   // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
   // ==========================================
   
-  const SAVE_KEY = 'tech_empire_v17_1';
+  const SAVE_KEY = 'tech_empire_v18_1';
   
   const OFFICES = [
     { name: "Гараж", slots: 3, cost: 0 },
@@ -439,6 +432,7 @@
 
   let RESEARCH_TREE = [];
   let currentDeviceMode = 'phone';
+  let currentEmpireTab = 'services';
 
   // ==========================================
   // 2. ГЕНЕРАЦИЯ ДЕРЕВА (ВРУЧНУЮ)
@@ -707,7 +701,7 @@
   };
 
   // ==========================================
-  // 4. ИНИЦИАЛИЗАЦИЯ И СОХРАНЕНИЯ
+  // 4. ИНИЦИАЛИЗАЦИЯ
   // ==========================================
 
   window.onload = () => {
@@ -744,7 +738,8 @@
     document.getElementById('start-screen').classList.remove('active');
     updateUI();
     renderShop('desks');
-    renderResearchTree();
+    // Дерево инициализируем после загрузки
+    setTimeout(initTreeCanvas, 100);
     startGameLoop();
     
     if (!saved) {
@@ -833,7 +828,8 @@
     setInterval(() => {
       if (state.speed === 0) return;
       
-      let daysPassed = state.speed * 0.5; 
+      // ЗАМЕДЛЕНИЕ ВРЕМЕНИ: 1 сек = 0.1 дня (было 0.5)
+      let daysPassed = state.speed * 0.1; 
       state.day += daysPassed;
       
       if (state.day >= 30) {
@@ -842,7 +838,10 @@
         showToast(`Наступил ${state.year} год!`, 'gold');
         processMonthlyFinances();
         updateUI();
-        renderResearchTree(); 
+        // Перерисовываем дерево при смене года
+        if (document.getElementById('screen-research').classList.contains('active')) {
+          drawTree();
+        }
       }
 
       // Доход от устройств
@@ -960,6 +959,11 @@
 
     renderOffice();
     renderTeam();
+    
+    // Перерисовка дерева, если вкладка открыта
+    if (document.getElementById('screen-research').classList.contains('active')) {
+      drawTree();
+    }
   }
 
   function switchTab(tabId) {
@@ -977,6 +981,14 @@
     if (tabId === 'empire') renderEmpire();
     if (tabId === 'markets') renderMarkets();
     if (tabId === 'overview') drawStockChart();
+    if (tabId === 'research') {
+        // При открытии вкладки Науки подгоняем размер канваса и рисуем
+        const wrapper = document.getElementById('research-wrapper');
+        const canvas = document.getElementById('tree-canvas');
+        canvas.width = wrapper.clientWidth;
+        canvas.height = wrapper.clientHeight;
+        drawTree();
+    }
   }
 
   // ==========================================
@@ -1004,14 +1016,25 @@
       const el = document.createElement('div');
       el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
       
+      // Отрисовка всех купленных предметов
       let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
       let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
       let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
+      
+      // Добавляем зону отдыха (левый нижний угол)
       let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
+      
+      // Добавляем растение (правый нижний угол)
       let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
       
+      // Добавляем освещение (по центру сверху)
+      let lightHtml = ws.light ? `<div class="attachment" style="left:50%; transform:translateX(-50%); top:-10px; font-size:14px;">${ws.light.icon}</div>` : '';
+      
+      // Добавляем украшение (по центру снизу)
+      let decorHtml = ws.decor ? `<div class="attachment" style="left:50%; transform:translateX(-50%); bottom:-5px; font-size:12px;">${ws.decor.icon}</div>` : '';
+      
       el.innerHTML = `
-        ${pcHtml}${labHtml}${restHtml}${plantHtml}
+        ${pcHtml}${labHtml}${restHtml}${plantHtml}${lightHtml}${decorHtml}
         <div class="icon">${ws.desk.icon}</div>
         ${chairHtml}
         <div class="name">${ws.desk.name}</div>
@@ -1189,7 +1212,6 @@
     const item = SHOP_ITEMS[category].find(i => i.id === itemId);
     if (!item) return;
     
-    // ИСПРАВЛЕНИЕ: Нельзя купить, если денег нет
     if (state.money < item.price) { showToast("Мало денег!", 'red'); return; }
     
     if (category === 'desks') {
@@ -1225,72 +1247,195 @@
   }
 
   // ==========================================
-  // 9. НАУКА
+  // 9. НАУКА (CANVAS)
   // ==========================================
 
-  function renderResearchTree() {
-    const timeline = document.getElementById('tree-timeline');
-    const body = document.getElementById('tree-body');
-    timeline.innerHTML = ''; body.innerHTML = '';
-    
-    let grid = document.createElement('div');
-    grid.style.cssText = 'display:grid; grid-template-columns: 120px repeat(46, 100px); gap:10px; align-items:center;';
+  let treeOffsetX = 0;
+  let treeOffsetY = 0;
+  let isDragging = false;
+  let startX, startY;
 
-    grid.appendChild(document.createElement('div')); 
-    for (let y = 2007; y <= 2052; y++) {
-      let yearHeader = document.createElement('div');
-      yearHeader.innerText = y;
-      yearHeader.style.cssText = `text-align:center; font-weight:bold; color:${y === state.year ? 'var(--gold)' : '#666'}; border-bottom:${y === state.year ? '2px solid var(--gold)' : '1px solid #222'}; padding-bottom:5px;`;
-      grid.appendChild(yearHeader);
+  function initTreeCanvas() {
+    const canvas = document.getElementById('tree-canvas');
+    if (!canvas) return;
+
+    // Обработка мыши
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - treeOffsetX;
+      startY = e.clientY - treeOffsetY;
+    });
+    canvas.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      treeOffsetX = e.clientX - startX;
+      treeOffsetY = e.clientY - startY;
+      drawTree();
+    });
+    canvas.addEventListener('mouseup', () => isDragging = false);
+    canvas.addEventListener('mouseleave', () => isDragging = false);
+
+    // Обработка касаний (мобилки)
+    canvas.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startX = e.touches[0].clientX - treeOffsetX;
+      startY = e.touches[0].clientY - treeOffsetY;
+    }, {passive: true});
+    canvas.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      treeOffsetX = e.touches[0].clientX - startX;
+      treeOffsetY = e.touches[0].clientY - startY;
+      drawTree();
+    }, {passive: false});
+    canvas.addEventListener('touchend', () => isDragging = false);
+
+    // Обработка клика по узлу
+    canvas.addEventListener('click', (e) => {
+      if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) return; // Игнорируем клик, если было перетаскивание
+      
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // Проверяем, попали ли мы в какую-то ноду
+      const colWidth = 120;
+      const rowHeight = 60;
+      const baseX = 150 + treeOffsetX;
+      const baseY = 50 + treeOffsetY;
+
+      TECH_BRANCHES.forEach((branch, rowIndex) => {
+        let rowY = baseY + rowIndex * rowHeight;
+        if (y < rowY || y > rowY + 40) return; // Не попали в строку
+
+        for (let year = 2007; year <= 2052; year++) {
+          let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === year);
+          if (!tech) continue;
+
+          let xPos = baseX + (year - 2007) * colWidth;
+          if (x >= xPos && x <= xPos + 80) {
+            // Попали в ноду!
+            if (tech.unlocked) {
+              showToast("Уже изучено!", 'gold');
+            } else if (state.year < tech.yearReq) {
+              showToast(`Доступно в ${tech.yearReq} году!`, 'red');
+            } else if (state.rp < tech.cost) {
+              showToast(`Нужно ${tech.cost} RP!`, 'red');
+            } else {
+              // Покупаем!
+              state.rp -= tech.cost;
+              tech.unlocked = true;
+              state.research[tech.id] = true;
+              
+              if (tech.isCustomOS) {
+                document.getElementById('os-name-input').value = "MyOS " + (Object.keys(state.customOSNames).length + 1);
+                document.getElementById('modal-create-os').classList.add('active');
+              }
+              
+              playSound('buy');
+              updateUI(); save(); drawTree();
+              showToast(`Изучено: ${tech.name}`, 'green');
+            }
+          }
+        }
+      });
+    });
+  }
+
+  function drawTree() {
+    const canvas = document.getElementById('tree-canvas');
+    const wrapper = document.getElementById('research-wrapper');
+    if (!canvas || !wrapper) return;
+
+    // Подгоняем размер
+    if (canvas.width !== wrapper.clientWidth || canvas.height !== wrapper.clientHeight) {
+      canvas.width = wrapper.clientWidth;
+      canvas.height = wrapper.clientHeight;
     }
 
-    TECH_BRANCHES.forEach(branch => {
-      let branchName = document.createElement('div');
-      branchName.innerText = branch.name; branchName.style.cssText = `color:${branch.color}; font-weight:bold; border-left:3px solid ${branch.color}; padding-left:10px;`;
-      grid.appendChild(branchName);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (let y = 2007; y <= 2052; y++) {
-        let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === y);
-        let cell = document.createElement('div');
-        cell.style.cssText = 'display:flex; justify-content:center; align-items:center; height:40px;';
+    const colWidth = 120;
+    const rowHeight = 60;
+    const startX = 150 + treeOffsetX;
+    const startY = 50 + treeOffsetY;
 
-        if (tech) {
-          let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
-          let node = document.createElement('div');
-          node.className = `tree-node ${tech.unlocked ? 'unlocked' : (isAvailable ? 'available' : 'locked')}`;
-          node.style.cssText = `width:80px; height:40px; margin:0; font-size:9px; display:flex; flex-direction:column; justify-content:center; align-items:center;`;
-          
-          if (tech.unlocked) node.style.borderColor = 'var(--green)';
-          else if (isAvailable) node.style.borderColor = 'var(--gold)';
-          else node.style.borderColor = branch.color;
+    // 1. Заголовки годов
+    for (let y = 2007; y <= 2052; y++) {
+      let x = startX + (y - 2007) * colWidth;
+      if (x + colWidth > 0 && x < canvas.width) {
+        ctx.fillStyle = (y === state.year) ? '#ffd700' : '#666';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(y, x + colWidth/2, 30);
+      }
+    }
 
-          node.innerHTML = `<div style="font-weight:bold; margin-bottom:2px;">${tech.name}</div><div>${tech.unlocked ? '✅' : (state.year >= tech.yearReq ? tech.cost + ' RP' : '???')}</div>`;
-          if (tech.unlocked || isAvailable) node.onclick = () => unlockTech(tech.id);
-          cell.appendChild(node);
+    // 2. Ветки и ноды
+    TECH_BRANCHES.forEach((branch, rowIndex) => {
+      let y = startY + rowIndex * rowHeight;
+      
+      // Название ветки слева
+      if (y > 0 && y < canvas.height) {
+        ctx.textAlign = 'left';
+        ctx.fillStyle = branch.color;
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(branch.name, 10 + treeOffsetX, y + 20);
+      }
+
+      for (let year = 2007; year <= 2052; year++) {
+        let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === year);
+        if (!tech) continue;
+
+        let x = startX + (year - 2007) * colWidth;
+        
+        // Отрисовка только видимых элементов
+        if (x + colWidth < 0 || x > canvas.width || y + rowHeight < 0 || y > canvas.height) continue;
+
+        // Линии связи
+        let prevTech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === year - 1);
+        if (prevTech) {
+          ctx.beginPath();
+          ctx.moveTo(x - colWidth + 80, y + 20);
+          ctx.lineTo(x, y + 20);
+          ctx.strokeStyle = tech.unlocked ? '#00ff88' : '#333';
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
-        grid.appendChild(cell);
+
+        // Сама нода
+        let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
+        
+        ctx.fillStyle = tech.unlocked ? 'rgba(0,255,136,0.1)' : (isAvailable ? 'rgba(255,215,0,0.1)' : '#111');
+        ctx.strokeStyle = tech.unlocked ? '#00ff88' : (isAvailable ? '#ffd700' : branch.color);
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.roundRect(x, y, 80, 40, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        // Текст
+        ctx.fillStyle = tech.unlocked ? '#00ff88' : (isAvailable ? '#ffd700' : '#888');
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(tech.name, x + 40, y + 17);
+        
+        ctx.fillStyle = tech.unlocked ? '#00ff88' : (state.year >= tech.yearReq ? (state.rp >= tech.cost ? '#ffd700' : '#ff0055') : '#666');
+        ctx.fillText(tech.unlocked ? '✅' : (state.year >= tech.yearReq ? tech.cost + ' RP' : '???'), x + 40, y + 32);
       }
     });
-    body.appendChild(grid);
+  }
+
+  function renderResearchTree() {
+    // Оставляем для совместимости, но теперь всё делает drawTree
+    if (document.getElementById('screen-research').classList.contains('active')) {
+      drawTree();
+    }
   }
 
   function unlockTech(id) {
-    let tech = RESEARCH_TREE.find(t => t.id === id);
-    if (!tech || tech.unlocked) return;
-    if (state.year < tech.yearReq) { showToast("Рано!", 'red'); return; }
-    if (state.rp < tech.cost) { showToast("Не хватает RP!", 'red'); return; }
-    
-    state.rp -= tech.cost;
-    tech.unlocked = true;
-    state.research[tech.id] = true;
-    
-    if (tech.isCustomOS) {
-      document.getElementById('os-name-input').value = "MyOS " + (Object.keys(state.customOSNames).length + 1);
-      document.getElementById('modal-create-os').classList.add('active');
-    }
-
-    playSound('buy'); updateUI(); save(); renderResearchTree();
-    showToast(`Изучено: ${tech.name}`, 'green');
+    // Логика перенесена в обработчик клика Canvas
   }
 
   function createCustomOS() {
@@ -1563,6 +1708,9 @@
 
   window.addEventListener('beforeunload', () => { save(); });
 
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
