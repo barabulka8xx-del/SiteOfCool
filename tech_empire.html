@@ -384,7 +384,7 @@
   // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
   // ==========================================
   
-  const SAVE_KEY = 'tech_empire_v20_1';
+  const SAVE_KEY = 'tech_empire_v21_1';
   
   const OFFICES = [
     { name: "Гараж", slots: 3, cost: 0 },
@@ -399,6 +399,7 @@
     money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
     companyName: "Team of Red",
     workstations: [], selectedDeskId: null,
+    interior: [], // Отдельный массив для кулеров, ковров и т.д.
     research: {}, 
     customOSNames: {}, 
     employees: [],
@@ -412,23 +413,23 @@
     loan: { amount: 0, monthsLeft: 0, interest: 0 },
     empire: { services: [], servicesIncome: 0, audience: 0, factories: [], projects: [] },
     markets: ['na'],
-    activeDevelopment: null // Текущая разработка (прототип)
+    activeDevelopment: null
   };
 
   const TECH_BRANCHES = [
-    { id: 'screen', name: 'Экран', color: '#4facfe', icon: '🖥️' },
-    { id: 'camera', name: 'Камера', color: '#ff8c00', icon: '📷' },
-    { id: 'cpu', name: 'Чипы', color: '#ff0055', icon: '⚙️' },
-    { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2', icon: '💾' },
-    { id: 'battery', name: 'Аккумулятор', color: '#00ff88', icon: '🔋' },
-    { id: 'network', name: 'Сеть', color: '#ffd700', icon: '📶' },
-    { id: 'os', name: 'Операционная система', color: '#ff00ff', icon: '💿' },
-    { id: 'ports', name: 'Порты', color: '#00ffff', icon: '🔌' },
-    { id: 'body', name: 'Материал тела', color: '#a52a2a', icon: '📱' },
-    { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500', icon: '🎨' },
-    { id: 'features', name: 'Функции', color: '#7fffd4', icon: '✨' },
-    { id: 'pc', name: 'Функции ПК', color: '#808080', icon: '💻' },
-    { id: 'devices', name: 'Новые устройства', color: '#32cd32', icon: '📟' }
+    { id: 'screen', name: 'Экран', color: '#4facfe' },
+    { id: 'camera', name: 'Камера', color: '#ff8c00' },
+    { id: 'cpu', name: 'Чипы', color: '#ff0055' },
+    { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2' },
+    { id: 'battery', name: 'Аккумулятор', color: '#00ff88' },
+    { id: 'network', name: 'Сеть', color: '#ffd700' },
+    { id: 'os', name: 'Операционная система', color: '#ff00ff' },
+    { id: 'ports', name: 'Порты', color: '#00ffff' },
+    { id: 'body', name: 'Материал тела', color: '#a52a2a' },
+    { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500' },
+    { id: 'features', name: 'Функции', color: '#7fffd4' },
+    { id: 'pc', name: 'Функции ПК', color: '#808080' },
+    { id: 'devices', name: 'Новые устройства', color: '#32cd32' }
   ];
 
   let RESEARCH_TREE = [];
@@ -828,7 +829,6 @@
     setInterval(() => {
       if (state.speed === 0) return;
       
-      // Время
       let daysPassed = state.speed * 0.1; 
       state.day += daysPassed;
       
@@ -1028,34 +1028,18 @@
     const area = document.getElementById('placed-area');
     area.innerHTML = '';
     
-    let totalComfort = 0;
-    state.workstations.forEach(ws => {
-      if (ws.chair) totalComfort += ws.chair.bonus;
-      if (ws.rest) totalComfort += ws.rest.bonus;
-      if (ws.plant) totalComfort += ws.plant.bonus;
-      if (ws.light) totalComfort += ws.light.bonus;
-      if (ws.decor) totalComfort += ws.decor.bonus;
-    });
-    
-    let comfortSpan = document.getElementById('ui-comfort');
-    if (comfortSpan) comfortSpan.innerText = `⭐ Комфорт: ${totalComfort.toFixed(1)}`;
-
+    // 1. Отрисовка Столов
     state.workstations.forEach(ws => {
       if (!ws.desk) return;
       const el = document.createElement('div');
       el.className = `workstation ${state.selectedDeskId === ws.id ? 'selected' : ''}`;
       
-      // Отрисовка всех купленных предметов
       let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
       let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
       let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
-      let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
-      let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
-      let lightHtml = ws.light ? `<div class="attachment" style="left:50%; transform:translateX(-50%); top:-10px; font-size:14px;">${ws.light.icon}</div>` : '';
-      let decorHtml = ws.decor ? `<div class="attachment" style="left:50%; transform:translateX(-50%); bottom:-5px; font-size:12px;">${ws.decor.icon}</div>` : '';
       
       el.innerHTML = `
-        ${pcHtml}${labHtml}${restHtml}${plantHtml}${lightHtml}${decorHtml}
+        ${pcHtml}${labHtml}
         <div class="icon">${ws.desk.icon}</div>
         ${chairHtml}
         <div class="name">${ws.desk.name}</div>
@@ -1068,6 +1052,26 @@
       };
       area.appendChild(el);
     });
+
+    // 2. Отрисовка Интерьера (если он есть)
+    if (state.interior && state.interior.length > 0) {
+      let interiorTitle = document.createElement('div');
+      interiorTitle.style.cssText = 'width:100%; text-align:center; color:#888; font-size:12px; margin-top:20px; margin-bottom:10px;';
+      interiorTitle.innerText = 'Интерьер офиса';
+      area.appendChild(interiorTitle);
+
+      state.interior.forEach(obj => {
+        const el = document.createElement('div');
+        el.className = 'workstation';
+        el.style.cssText = 'cursor:default; border-color:#444; height:80px;';
+        
+        el.innerHTML = `
+          <div class="icon" style="font-size:25px;">${obj.item.icon}</div>
+          <div class="name">${obj.item.name}</div>
+        `;
+        area.appendChild(el);
+      });
+    }
   }
 
   function renderTeam() {
@@ -1238,8 +1242,9 @@
     if (category === 'desks') {
       if (state.workstations.length >= OFFICES[state.officeLvl].slots) { showToast("Нет места! Купите офис.", 'red'); return; }
       state.money -= item.price;
-      state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null, rest: null, plant: null, light: null, decor: null });
-    } else {
+      state.workstations.push({ id: Date.now() + Math.random(), desk: item, chair: null, pc: null, lab: null });
+    } 
+    else if (category === 'chairs' || category === 'pcs' || category === 'lab') {
       if (!state.selectedDeskId) { showToast("Сначала выбери стол в офисе!", 'red'); return; }
       let desk = state.workstations.find(w => w.id === state.selectedDeskId);
       if (!desk) return;
@@ -1251,6 +1256,11 @@
       if (category === 'chairs') desk.chair = item;
       if (category === 'pcs') desk.pc = item;
       if (category === 'lab') desk.lab = item;
+      state.money -= item.price;
+    }
+    else {
+      // Покупка ИНТЕРЬЕРА
+      state.interior.push({ id: Date.now() + Math.random(), item: item, category: category });
       state.money -= item.price;
     }
     
@@ -1609,7 +1619,7 @@
     if (step.type === 'final') {
       let score = Math.min(9.9, (5 + currentDesign.quality / 2));
       let recPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
-      let dailyCost = Math.floor(currentDesign.cost * 10); // Ежедневный расход на разработку
+      let dailyCost = Math.floor(currentDesign.cost * 10);
 
       opts.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1634,14 +1644,13 @@
   function finishRelease(price, dailyCost) {
     let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
     
-    // Начинаем разработку! Деньги списываются каждый день. Дохода пока нет.
     state.activeDevelopment = {
       name: currentDesign.name + " " + (state.releasedPhones.length + 1),
       quality: currentDesign.quality,
       cost: currentDesign.cost,
       recommendedPrice: price,
       dailyCost: dailyCost,
-      daysLeft: 30 // Разработка длится 30 дней
+      daysLeft: 30
     };
 
     closeDesignStudio(); updateUI(); save();
@@ -1708,6 +1717,9 @@
 
   window.addEventListener('beforeunload', () => { save(); });
 
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
