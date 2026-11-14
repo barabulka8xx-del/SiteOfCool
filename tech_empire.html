@@ -384,7 +384,7 @@
   // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
   // ==========================================
   
-  const SAVE_KEY = 'tech_empire_v18_1';
+  const SAVE_KEY = 'tech_empire_v20_1';
   
   const OFFICES = [
     { name: "Гараж", slots: 3, cost: 0 },
@@ -411,23 +411,24 @@
     stockHistory: [],
     loan: { amount: 0, monthsLeft: 0, interest: 0 },
     empire: { services: [], servicesIncome: 0, audience: 0, factories: [], projects: [] },
-    markets: ['na']
+    markets: ['na'],
+    activeDevelopment: null // Текущая разработка (прототип)
   };
 
   const TECH_BRANCHES = [
-    { id: 'screen', name: 'Экран', color: '#4facfe' },
-    { id: 'camera', name: 'Камера', color: '#ff8c00' },
-    { id: 'cpu', name: 'Чипсы', color: '#ff0055' },
-    { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2' },
-    { id: 'battery', name: 'Аккумулятор', color: '#00ff88' },
-    { id: 'network', name: 'Сеть', color: '#ffd700' },
-    { id: 'os', name: 'Операционная система', color: '#ff00ff' },
-    { id: 'ports', name: 'Порты', color: '#00ffff' },
-    { id: 'body', name: 'Материал тела', color: '#a52a2a' },
-    { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500' },
-    { id: 'features', name: 'Функции', color: '#7fffd4' },
-    { id: 'pc', name: 'Функции ПК', color: '#808080' },
-    { id: 'devices', name: 'Новые устройства', color: '#32cd32' }
+    { id: 'screen', name: 'Экран', color: '#4facfe', icon: '🖥️' },
+    { id: 'camera', name: 'Камера', color: '#ff8c00', icon: '📷' },
+    { id: 'cpu', name: 'Чипы', color: '#ff0055', icon: '⚙️' },
+    { id: 'memory', name: 'Память (ОЗУ/ПЗУ)', color: '#8E2DE2', icon: '💾' },
+    { id: 'battery', name: 'Аккумулятор', color: '#00ff88', icon: '🔋' },
+    { id: 'network', name: 'Сеть', color: '#ffd700', icon: '📶' },
+    { id: 'os', name: 'Операционная система', color: '#ff00ff', icon: '💿' },
+    { id: 'ports', name: 'Порты', color: '#00ffff', icon: '🔌' },
+    { id: 'body', name: 'Материал тела', color: '#a52a2a', icon: '📱' },
+    { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500', icon: '🎨' },
+    { id: 'features', name: 'Функции', color: '#7fffd4', icon: '✨' },
+    { id: 'pc', name: 'Функции ПК', color: '#808080', icon: '💻' },
+    { id: 'devices', name: 'Новые устройства', color: '#32cd32', icon: '📟' }
   ];
 
   let RESEARCH_TREE = [];
@@ -738,7 +739,6 @@
     document.getElementById('start-screen').classList.remove('active');
     updateUI();
     renderShop('desks');
-    // Дерево инициализируем после загрузки
     setTimeout(initTreeCanvas, 100);
     startGameLoop();
     
@@ -828,7 +828,7 @@
     setInterval(() => {
       if (state.speed === 0) return;
       
-      // ЗАМЕДЛЕНИЕ ВРЕМЕНИ: 1 сек = 0.1 дня (было 0.5)
+      // Время
       let daysPassed = state.speed * 0.1; 
       state.day += daysPassed;
       
@@ -838,7 +838,6 @@
         showToast(`Наступил ${state.year} год!`, 'gold');
         processMonthlyFinances();
         updateUI();
-        // Перерисовываем дерево при смене года
         if (document.getElementById('screen-research').classList.contains('active')) {
           drawTree();
         }
@@ -861,6 +860,31 @@
       let dailyExpense = 0;
       state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
       
+      // РАСХОДЫ НА РАЗРАБОТКУ (если идет разработка)
+      if (state.activeDevelopment) {
+        dailyExpense += state.activeDevelopment.dailyCost;
+        state.activeDevelopment.daysLeft -= daysPassed;
+        
+        if (state.activeDevelopment.daysLeft <= 0) {
+          // РАЗРАБОТКА ЗАВЕРШЕНА!
+          let score = parseFloat(Math.min(9.9, (5 + state.activeDevelopment.quality / 2)).toFixed(1));
+          let profit = Math.floor(state.activeDevelopment.recommendedPrice * 0.4);
+          let demand = Math.floor(500 + (score * 800));
+          
+          state.releasedPhones.push({
+            name: state.activeDevelopment.name,
+            score: score, releaseYear: state.year, price: state.activeDevelopment.recommendedPrice,
+            cost: state.activeDevelopment.cost, profitPerUnit: profit, weeklySales: demand, totalSold: 0
+          });
+          
+          state.reputation += score / 10;
+          state.activeDevelopment = null;
+          playSound('release');
+          showToast(`Устройство запущено в продажу!`, 'green');
+          startConfetti();
+        }
+      }
+      
       state.money += (dailyIncome - dailyExpense) * daysPassed;
 
       // RP
@@ -868,7 +892,6 @@
       let labBonus = state.workstations.filter(w => w.lab).length * 5;
       state.rp += (rpPerDay + labBonus) * daysPassed;
 
-      // Проверка банкротства
       if (state.money < -5000000) {
         triggerBankruptcy();
       }
@@ -923,7 +946,7 @@
     let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
     document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
 
-    // Плашка активного устройства
+    // Плашка активного устройства (Сейчас в продаже)
     let activeDevice = state.releasedPhones[state.releasedPhones.length - 1];
     let phoneBadge = document.getElementById('active-phone-badge');
     if (!phoneBadge) {
@@ -953,6 +976,14 @@
           <div style="background:var(--blue); height:100%; width:${Math.min(100, (state.year - activeDevice.releaseYear) * 20)}%;"></div>
         </div>
       `;
+    } else if (state.activeDevelopment) {
+      phoneBadge.style.display = 'block';
+      phoneBadge.innerHTML = `
+        <div style="font-size:10px; color:#aaa;">Идет разработка:</div>
+        <div style="font-weight:900; font-size:12px; color:#fff; margin-bottom:5px;">${state.activeDevelopment.name}</div>
+        <div style="font-size:10px; color:var(--red);">Расход: $${state.activeDevelopment.dailyCost.toLocaleString()} / день</div>
+        <div style="font-size:10px; color:var(--blue); margin-top:3px;">Осталось дней: ${Math.ceil(state.activeDevelopment.daysLeft)}</div>
+      `;
     } else {
       phoneBadge.style.display = 'none';
     }
@@ -960,7 +991,6 @@
     renderOffice();
     renderTeam();
     
-    // Перерисовка дерева, если вкладка открыта
     if (document.getElementById('screen-research').classList.contains('active')) {
       drawTree();
     }
@@ -982,7 +1012,6 @@
     if (tabId === 'markets') renderMarkets();
     if (tabId === 'overview') drawStockChart();
     if (tabId === 'research') {
-        // При открытии вкладки Науки подгоняем размер канваса и рисуем
         const wrapper = document.getElementById('research-wrapper');
         const canvas = document.getElementById('tree-canvas');
         canvas.width = wrapper.clientWidth;
@@ -1020,17 +1049,9 @@
       let chairHtml = ws.chair ? `<div class="attachment chair">${ws.chair.icon}</div>` : '';
       let pcHtml = ws.pc ? `<div class="attachment pc">${ws.pc.icon}</div>` : '';
       let labHtml = ws.lab ? `<div class="attachment" style="left:auto; right:5px; color:var(--purple); font-size:14px; top:5px;">${ws.lab.icon}</div>` : '';
-      
-      // Добавляем зону отдыха (левый нижний угол)
       let restHtml = ws.rest ? `<div class="attachment" style="left:5px; bottom:25px; font-size:14px;">${ws.rest.icon}</div>` : '';
-      
-      // Добавляем растение (правый нижний угол)
       let plantHtml = ws.plant ? `<div class="attachment" style="right:5px; bottom:25px; font-size:14px;">${ws.plant.icon}</div>` : '';
-      
-      // Добавляем освещение (по центру сверху)
       let lightHtml = ws.light ? `<div class="attachment" style="left:50%; transform:translateX(-50%); top:-10px; font-size:14px;">${ws.light.icon}</div>` : '';
-      
-      // Добавляем украшение (по центру снизу)
       let decorHtml = ws.decor ? `<div class="attachment" style="left:50%; transform:translateX(-50%); bottom:-5px; font-size:12px;">${ws.decor.icon}</div>` : '';
       
       el.innerHTML = `
@@ -1259,7 +1280,6 @@
     const canvas = document.getElementById('tree-canvas');
     if (!canvas) return;
 
-    // Обработка мыши
     canvas.addEventListener('mousedown', (e) => {
       isDragging = true;
       startX = e.clientX - treeOffsetX;
@@ -1274,7 +1294,6 @@
     canvas.addEventListener('mouseup', () => isDragging = false);
     canvas.addEventListener('mouseleave', () => isDragging = false);
 
-    // Обработка касаний (мобилки)
     canvas.addEventListener('touchstart', (e) => {
       isDragging = true;
       startX = e.touches[0].clientX - treeOffsetX;
@@ -1289,15 +1308,13 @@
     }, {passive: false});
     canvas.addEventListener('touchend', () => isDragging = false);
 
-    // Обработка клика по узлу
     canvas.addEventListener('click', (e) => {
-      if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) return; // Игнорируем клик, если было перетаскивание
+      if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) return; 
       
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       
-      // Проверяем, попали ли мы в какую-то ноду
       const colWidth = 120;
       const rowHeight = 60;
       const baseX = 150 + treeOffsetX;
@@ -1305,7 +1322,7 @@
 
       TECH_BRANCHES.forEach((branch, rowIndex) => {
         let rowY = baseY + rowIndex * rowHeight;
-        if (y < rowY || y > rowY + 40) return; // Не попали в строку
+        if (y < rowY || y > rowY + 40) return;
 
         for (let year = 2007; year <= 2052; year++) {
           let tech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === year);
@@ -1313,7 +1330,6 @@
 
           let xPos = baseX + (year - 2007) * colWidth;
           if (x >= xPos && x <= xPos + 80) {
-            // Попали в ноду!
             if (tech.unlocked) {
               showToast("Уже изучено!", 'gold');
             } else if (state.year < tech.yearReq) {
@@ -1321,7 +1337,6 @@
             } else if (state.rp < tech.cost) {
               showToast(`Нужно ${tech.cost} RP!`, 'red');
             } else {
-              // Покупаем!
               state.rp -= tech.cost;
               tech.unlocked = true;
               state.research[tech.id] = true;
@@ -1346,7 +1361,6 @@
     const wrapper = document.getElementById('research-wrapper');
     if (!canvas || !wrapper) return;
 
-    // Подгоняем размер
     if (canvas.width !== wrapper.clientWidth || canvas.height !== wrapper.clientHeight) {
       canvas.width = wrapper.clientWidth;
       canvas.height = wrapper.clientHeight;
@@ -1360,7 +1374,6 @@
     const startX = 150 + treeOffsetX;
     const startY = 50 + treeOffsetY;
 
-    // 1. Заголовки годов
     for (let y = 2007; y <= 2052; y++) {
       let x = startX + (y - 2007) * colWidth;
       if (x + colWidth > 0 && x < canvas.width) {
@@ -1371,16 +1384,14 @@
       }
     }
 
-    // 2. Ветки и ноды
     TECH_BRANCHES.forEach((branch, rowIndex) => {
       let y = startY + rowIndex * rowHeight;
       
-      // Название ветки слева
       if (y > 0 && y < canvas.height) {
         ctx.textAlign = 'left';
         ctx.fillStyle = branch.color;
         ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(branch.name, 10 + treeOffsetX, y + 20);
+        ctx.fillText(branch.icon + ' ' + branch.name, 10 + treeOffsetX, y + 20);
       }
 
       for (let year = 2007; year <= 2052; year++) {
@@ -1389,10 +1400,8 @@
 
         let x = startX + (year - 2007) * colWidth;
         
-        // Отрисовка только видимых элементов
         if (x + colWidth < 0 || x > canvas.width || y + rowHeight < 0 || y > canvas.height) continue;
 
-        // Линии связи
         let prevTech = RESEARCH_TREE.find(t => t.branch === branch.id && t.yearReq === year - 1);
         if (prevTech) {
           ctx.beginPath();
@@ -1403,7 +1412,6 @@
           ctx.stroke();
         }
 
-        // Сама нода
         let isAvailable = state.rp >= tech.cost && state.year >= tech.yearReq && !tech.unlocked;
         
         ctx.fillStyle = tech.unlocked ? 'rgba(0,255,136,0.1)' : (isAvailable ? 'rgba(255,215,0,0.1)' : '#111');
@@ -1415,7 +1423,6 @@
         ctx.fill();
         ctx.stroke();
 
-        // Текст
         ctx.fillStyle = tech.unlocked ? '#00ff88' : (isAvailable ? '#ffd700' : '#888');
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
@@ -1425,17 +1432,6 @@
         ctx.fillText(tech.unlocked ? '✅' : (state.year >= tech.yearReq ? tech.cost + ' RP' : '???'), x + 40, y + 32);
       }
     });
-  }
-
-  function renderResearchTree() {
-    // Оставляем для совместимости, но теперь всё делает drawTree
-    if (document.getElementById('screen-research').classList.contains('active')) {
-      drawTree();
-    }
-  }
-
-  function unlockTech(id) {
-    // Логика перенесена в обработчик клика Canvas
   }
 
   function createCustomOS() {
@@ -1613,15 +1609,19 @@
     if (step.type === 'final') {
       let score = Math.min(9.9, (5 + currentDesign.quality / 2));
       let recPrice = Math.floor(currentDesign.cost * (1.5 + (score / 10))); 
+      let dailyCost = Math.floor(currentDesign.cost * 10); // Ежедневный расход на разработку
+
       opts.innerHTML = `
         <div style="text-align:center; padding:10px;">
           <div style="font-size:14px; margin-bottom:5px;">Оценка: <span style="color:var(--gold); font-weight:900;">${score.toFixed(1)} / 10</span></div>
-          <div style="font-size:14px; margin-bottom:15px;">Себестоимость: <span style="color:var(--red); font-weight:900;">$${currentDesign.cost.toLocaleString()}</span></div>
+          <div style="font-size:14px; margin-bottom:5px;">Себестоимость: <span style="color:var(--red); font-weight:900;">$${currentDesign.cost.toLocaleString()}</span></div>
+          <div style="font-size:12px; margin-bottom:15px; color:#aaa;">Расход на сборку: <span style="color:var(--red);">$${dailyCost.toLocaleString()} / день</span></div>
+          
           <div style="background: var(--panel-light); padding: 15px; border-radius: 10px;">
              <div style="font-size:12px; margin-bottom:5px;">Рекомендованная цена</div>
              <div style="font-size:24px; color:var(--green); font-weight:900;">$${recPrice.toLocaleString()}</div>
           </div>
-          <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" onclick="finishRelease(${recPrice})">Начать производство</button>
+          <button class="btn btn-gold" style="width:100%; padding:15px; margin-top:15px;" onclick="finishRelease(${recPrice}, ${dailyCost})">Начать разработку</button>
         </div>
       `;
       return;
@@ -1631,21 +1631,21 @@
   function prevDesignStep() { if (currentStep > 0) { currentStep--; renderDesignStep(); } else { closeDesignStudio(); } }
   function skipDesignStep() { currentStep++; renderDesignStep(); }
 
-  function finishRelease(price) {
+  function finishRelease(price, dailyCost) {
     let score = parseFloat(Math.min(9.9, (5 + currentDesign.quality / 2)).toFixed(1));
-    let profit = Math.floor(price * 0.4);
-    let demand = Math.floor(500 + (score * 800));
     
-    state.releasedPhones.push({
+    // Начинаем разработку! Деньги списываются каждый день. Дохода пока нет.
+    state.activeDevelopment = {
       name: currentDesign.name + " " + (state.releasedPhones.length + 1),
-      score: score, releaseYear: state.year, price: price,
-      cost: currentDesign.cost, profitPerUnit: profit, weeklySales: demand, totalSold: 0
-    });
+      quality: currentDesign.quality,
+      cost: currentDesign.cost,
+      recommendedPrice: price,
+      dailyCost: dailyCost,
+      daysLeft: 30 // Разработка длится 30 дней
+    };
 
-    state.reputation += score / 10;
     closeDesignStudio(); updateUI(); save();
-    showToast(`Устройство запущено!`, 'green');
-    startConfetti(); playSound('release');
+    showToast(`Начата разработка! Не забудьте про финансы.`, 'blue');
   }
 
   // ==========================================
@@ -1670,8 +1670,8 @@
   function showToast(msg, type = 'green') {
     const t = document.getElementById('toast');
     t.innerText = msg;
-    t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
-    t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : 'var(--green)');
+    t.style.borderColor = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : (type === 'blue' ? 'var(--blue)' : 'var(--green)'));
+    t.style.color = type === 'red' ? 'var(--red)' : (type === 'gold' ? 'var(--gold)' : (type === 'blue' ? 'var(--blue)' : 'var(--green)'));
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
@@ -1708,9 +1708,6 @@
 
   window.addEventListener('beforeunload', () => { save(); });
 
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
