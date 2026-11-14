@@ -380,11 +380,11 @@
   <div class="toast" id="toast">Уведомление</div>
 
   <script>
-    // ==========================================
+  // ==========================================
   // 1. КОНСТАНТЫ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
   // ==========================================
   
-  const SAVE_KEY = 'tech_empire_v21_1';
+  const SAVE_KEY = 'tech_empire_v22_1';
   
   const OFFICES = [
     { name: "Гараж", slots: 3, cost: 0 },
@@ -399,7 +399,7 @@
     money: 200000, rp: 0, year: 2007, day: 1, speed: 1, officeLvl: 0,
     companyName: "Team of Red",
     workstations: [], selectedDeskId: null,
-    interior: [], // Отдельный массив для кулеров, ковров и т.д.
+    interior: [], 
     research: {}, 
     customOSNames: {}, 
     employees: [],
@@ -413,7 +413,7 @@
     loan: { amount: 0, monthsLeft: 0, interest: 0 },
     empire: { services: [], servicesIncome: 0, audience: 0, factories: [], projects: [] },
     markets: ['na'],
-    activeDevelopment: null
+    activeDevelopment: null 
   };
 
   const TECH_BRANCHES = [
@@ -427,9 +427,7 @@
     { id: 'ports', name: 'Порты', color: '#00ffff' },
     { id: 'body', name: 'Материал тела', color: '#a52a2a' },
     { id: 'design', name: 'Дизайн (Окантовка)', color: '#ffa500' },
-    { id: 'features', name: 'Функции', color: '#7fffd4' },
-    { id: 'pc', name: 'Функции ПК', color: '#808080' },
-    { id: 'devices', name: 'Новые устройства', color: '#32cd32' }
+    { id: 'features', name: 'Функции', color: '#7fffd4' }
   ];
 
   let RESEARCH_TREE = [];
@@ -437,7 +435,7 @@
   let currentEmpireTab = 'services';
 
   // ==========================================
-  // 2. ГЕНЕРАЦИЯ ДЕРЕВА (ВРУЧНУЮ)
+  // 2. ГЕНЕРАЦИЯ ДЕРЕВА
   // ==========================================
   
   function generateResearchTree() {
@@ -608,24 +606,10 @@
 
     // --- 2052 ---
     RESEARCH_TREE.push({ id: 't_' + idCounter++, branch: 'os', name: 'Сингулярность', yearReq: 2052, cost: 1400, unlocked: false, isCustomOS: true });
-
-    // --- ПК и Ноутбуки ---
-    RESEARCH_TREE.push({ id: 't_pc1', branch: 'pc', name: 'Один монитор', yearReq: 2007, cost: 50, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_pc2', branch: 'pc', name: 'Два монитора', yearReq: 2010, cost: 100, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_pc3', branch: 'pc', name: 'Водяное охлаждение', yearReq: 2015, cost: 200, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_pc4', branch: 'pc', name: 'Модульный ПК', yearReq: 2020, cost: 400, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_pc5', branch: 'pc', name: 'ИИ-ассистент', yearReq: 2025, cost: 800, unlocked: false });
-
-    // --- Устройства ---
-    RESEARCH_TREE.push({ id: 't_dev1', branch: 'devices', name: 'Музыкальный плеер', yearReq: 2007, cost: 50, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_dev2', branch: 'devices', name: 'Игровая консоль', yearReq: 2010, cost: 100, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_dev3', branch: 'devices', name: 'Планшет', yearReq: 2015, cost: 200, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_dev4', branch: 'devices', name: 'Умные часы', yearReq: 2020, cost: 400, unlocked: false });
-    RESEARCH_TREE.push({ id: 't_dev5', branch: 'devices', name: 'Дрон', yearReq: 2025, cost: 800, unlocked: false });
   }
 
   // ==========================================
-  // 3. МАГАЗИН (ВРУЧНУЮ)
+  // 3. МАГАЗИН
   // ==========================================
 
   const SHOP_ITEMS = {
@@ -634,71 +618,43 @@
       { id: 'desk_2', name: '🪵 Деревянный стол', price: 12000, icon: '🪵', bonus: 3, type: 'Скорость работы' },
       { id: 'desk_3', name: '🪵 Рабочий стол', price: 50000, icon: '🪵', bonus: 6, type: 'Скорость работы' },
       { id: 'desk_4', name: '💎 Стеклянный стол', price: 160000, icon: '💎', bonus: 9, type: 'Скорость работы' },
-      { id: 'desk_5', name: '⚔️ Боевая станция', price: 1500000, icon: '⚔️', bonus: 10.5, type: 'Скорость работы' },
-      { id: 'desk_6', name: '👑 Золотой стол', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
-      { id: 'desk_7', name: '🚀 Стол Авроры', price: 2500000000, icon: '🚀', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+      { id: 'desk_5', name: '⚔️ Боевая станция', price: 1500000, icon: '⚔️', bonus: 10.5, type: 'Скорость работы' }
     ],
     chairs: [
       { id: 'chair_1', name: '🪑 Табурет', price: 0, icon: '🪑', bonus: 0, type: 'Скорость работы' },
       { id: 'chair_2', name: '💺 Кресло для офиса', price: 12000, icon: '💺', bonus: 3, type: 'Скорость работы' },
-      { id: 'chair_3', name: '💺 Эргономичный стул', price: 50000, icon: '💺', bonus: 6, type: 'Скорость работы' },
-      { id: 'chair_4', name: '💺 Деревянный стул', price: 150000, icon: '💺', bonus: 9, type: 'Скорость работы' },
-      { id: 'chair_5', name: '🏎️ Гоночный стул', price: 1500000, icon: '🏎️', bonus: 10.5, type: 'Скорость работы' },
-      { id: 'chair_6', name: '👑 Трон для массажа', price: 25000000, icon: '👑', bonus: 15, type: 'Скорость работы', exclusive: true },
-      { id: 'chair_7', name: '👑 Парящее кресло', price: 2000000000, icon: '👑', bonus: 22.5, type: 'Скорость работы', exclusive: true }
+      { id: 'chair_3', name: '💺 Эргономичный стул', price: 50000, icon: '💺', bonus: 6, type: 'Скорость работы' }
     ],
     pcs: [
       { id: 'pc_1', name: '📺 Бежевый ЭЛТ-монитор', price: 0, icon: '📺', bonus: 0, type: 'Исследования' },
       { id: 'pc_2', name: '🖥️ Плоский монитор', price: 15000, icon: '🖥️', bonus: 15, type: 'Исследования' },
-      { id: 'pc_3', name: '🖥️ Широкий экран', price: 50000, icon: '🖥️', bonus: 30, type: 'Исследования' },
-      { id: 'pc_4', name: '🖥️ Два монитора', price: 150000, icon: '🖥️', bonus: 45, type: 'Исследования' },
-      { id: 'pc_5', name: '🖥️ Тройная установка', price: 1500000, icon: '🖥️', bonus: 60, type: 'Исследования' },
-      { id: 'pc_6', name: '🌌 Голографический экран', price: 25000000, icon: '🌌', bonus: 75, type: 'Исследования', exclusive: true },
-      { id: 'pc_7', name: '⚛️ Квантовая рабочая станция', price: 1500000000, icon: '⚛️', bonus: 90, type: 'Исследования', exclusive: true },
-      { id: 'pc_8', name: '🧠 Нейронный интерфейс', price: 4000000000, icon: '🧠', bonus: 135, type: 'Исследования', exclusive: true }
+      { id: 'pc_3', name: '🖥️ Широкий экран', price: 50000, icon: '🖥️', bonus: 30, type: 'Исследования' }
     ],
     lab: [
       { id: 'lab_1', name: '🧪 Тестовая платформа', price: 50000, icon: '🧪', bonus: 20, type: 'Исправление ошибок' },
       { id: 'lab_2', name: '🗄️ Серверные стойки', price: 240000, icon: '🗄️', bonus: 20, type: 'Исправление ошибок' },
-      { id: 'lab_3', name: '🔬 Лаборатория', price: 800000, icon: '🔬', bonus: 20, type: 'Исправление ошибок' },
-      { id: 'lab_4', name: '🦾 Рука робота', price: 30000000, icon: '🦾', bonus: 20, type: 'Исправление ошибок' },
-      { id: 'lab_5', name: '💻 Суперкомпьютер', price: 400000000, icon: '💻', bonus: 60, type: 'Исправление ошибок' },
-      { id: 'lab_6', name: '⚛️ Квантовый компьютер', price: 3000000000, icon: '⚛️', bonus: 60, type: 'Исправление ошибок', exclusive: true },
-      { id: 'lab_7', name: '☢️ Реактор слияния', price: 12000000000, icon: '☢️', bonus: 100, type: 'Исправление ошибок', exclusive: true }
+      { id: 'lab_3', name: '🔬 Лаборатория', price: 800000, icon: '🔬', bonus: 20, type: 'Исправление ошибок' }
     ],
     rest: [
       { id: 'rest_1', name: '🚰 Кулер для воды', price: 1500, icon: '🚰', bonus: 1, type: 'Комфорт' },
       { id: 'rest_2', name: '☕ Уголок для кофе', price: 3000, icon: '☕', bonus: 2, type: 'Комфорт' },
       { id: 'rest_3', name: '📋 Доска', price: 4000, icon: '📋', bonus: 1, type: 'Комфорт' },
-      { id: 'rest_4', name: '🛋️ Диван', price: 6000, icon: '🛋️', bonus: 3, type: 'Комфорт' },
-      { id: 'rest_5', name: '📚 Книжный шкаф', price: 10000, icon: '📚', bonus: 2, type: 'Комфорт' },
-      { id: 'rest_6', name: '🎰 Игровой автомат', price: 80000, icon: '🎰', bonus: 4, type: 'Комфорт' },
-      { id: 'rest_7', name: '🥤 Автомат продажи', price: 150000, icon: '🥤', bonus: 3, type: 'Комфорт' },
-      { id: 'rest_8', name: '🎱 Настольный бильярд', price: 2000000, icon: '🎱', bonus: 6, type: 'Комфорт' },
-      { id: 'rest_9', name: '🍹 Бар для приготовления', price: 5000000, icon: '🍹', bonus: 6, type: 'Комфорт' },
-      { id: 'rest_10', name: '🐠 Аквариум', price: 12000000, icon: '🐠', bonus: 8, type: 'Комфорт' },
-      { id: 'rest_11', name: '🛋️ Неоновый салон', price: 60000000, icon: '🛋️', bonus: 10, type: 'Комфорт' }
+      { id: 'rest_4', name: '🛋️ Диван', price: 6000, icon: '🛋️', bonus: 3, type: 'Комфорт' }
     ],
     plants: [
       { id: 'plant_1', name: '🪴 Растение в горшке', price: 500, icon: '🪴', bonus: 1, type: 'Комфорт' },
       { id: 'plant_2', name: '🪴 Высокое растение', price: 2000, icon: '🪴', bonus: 2, type: 'Комфорт' },
-      { id: 'plant_3', name: '🌴 Пальмовое дерево', price: 15000, icon: '🌴', bonus: 3, type: 'Комфорт' },
-      { id: 'plant_4', name: '🌳 Бонсай', price: 250000, icon: '🌳', bonus: 4, type: 'Комфорт' },
-      { id: 'plant_5', name: '🌲 Внутреннее дерево', price: 3000000, icon: '🌲', bonus: 6, type: 'Комфорт' }
+      { id: 'plant_3', name: '🌴 Пальмовое дерево', price: 15000, icon: '🌴', bonus: 3, type: 'Комфорт' }
     ],
     lighting: [
       { id: 'light_1', name: '💡 Напольная лампа', price: 1000, icon: '💡', bonus: 1, type: 'Комфорт' },
       { id: 'light_2', name: '💡 Световая лампа', price: 20000, icon: '💡', bonus: 2, type: 'Комфорт' },
-      { id: 'light_3', name: '💡 Неоновая табличка', price: 400000, icon: '💡', bonus: 4, type: 'Комфорт' },
-      { id: 'light_4', name: '💡 Световой столб LED', price: 8000000, icon: '💡', bonus: 5, type: 'Комфорт' }
+      { id: 'light_3', name: '💡 Неоновая табличка', price: 400000, icon: '💡', bonus: 4, type: 'Комфорт' }
     ],
     decor: [
       { id: 'decor_1', name: '🟫 Ковер', price: 2000, icon: '🟫', bonus: 1, type: 'Комфорт' },
       { id: 'decor_2', name: '🟫 Роскошный ковер', price: 50000, icon: '🟫', bonus: 3, type: 'Комфорт' },
-      { id: 'decor_3', name: '🗄️ Шкаф для хранения', price: 3000, icon: '🗄️', bonus: 1, type: 'Комфорт' },
-      { id: 'decor_4', name: '🌍 Глобус', price: 50000, icon: '🌍', bonus: 2, type: 'Комфорт' },
-      { id: 'decor_5', name: '📺 Дисплей телефона', price: 1000000, icon: '📺', bonus: 4, type: 'Комфорт' },
-      { id: 'decor_6', name: '🗿 Современная статуя', price: 80000000, icon: '🗿', bonus: 8, type: 'Комфорт' }
+      { id: 'decor_3', name: '🗄️ Шкаф для хранения', price: 3000, icon: '🗄️', bonus: 1, type: 'Комфорт' }
     ]
   };
 
@@ -797,11 +753,6 @@
         g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
         o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.3);
       });
-    } else if (type === 'error') {
-      osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
     }
   }
 
@@ -860,13 +811,12 @@
       let dailyExpense = 0;
       state.employees.forEach(e => dailyExpense += (e.salary * inflationMultiplier) / 30);
       
-      // РАСХОДЫ НА РАЗРАБОТКУ (если идет разработка)
+      // РАСХОДЫ НА РАЗРАБОТКУ
       if (state.activeDevelopment) {
         dailyExpense += state.activeDevelopment.dailyCost;
         state.activeDevelopment.daysLeft -= daysPassed;
         
         if (state.activeDevelopment.daysLeft <= 0) {
-          // РАЗРАБОТКА ЗАВЕРШЕНА!
           let score = parseFloat(Math.min(9.9, (5 + state.activeDevelopment.quality / 2)).toFixed(1));
           let profit = Math.floor(state.activeDevelopment.recommendedPrice * 0.4);
           let demand = Math.floor(500 + (score * 800));
@@ -946,7 +896,7 @@
     let bestScore = state.releasedPhones.length > 0 ? Math.max(...state.releasedPhones.map(p => p.score)) : 0;
     document.getElementById('ui-best-score').innerText = bestScore.toFixed(1) + ' / 10';
 
-    // Плашка активного устройства (Сейчас в продаже)
+    // Плашка активного устройства
     let activeDevice = state.releasedPhones[state.releasedPhones.length - 1];
     let phoneBadge = document.getElementById('active-phone-badge');
     if (!phoneBadge) {
@@ -1053,7 +1003,7 @@
       area.appendChild(el);
     });
 
-    // 2. Отрисовка Интерьера (если он есть)
+    // 2. Отрисовка Интерьера
     if (state.interior && state.interior.length > 0) {
       let interiorTitle = document.createElement('div');
       interiorTitle.style.cssText = 'width:100%; text-align:center; color:#888; font-size:12px; margin-top:20px; margin-bottom:10px;';
@@ -1401,7 +1351,7 @@
         ctx.textAlign = 'left';
         ctx.fillStyle = branch.color;
         ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(branch.icon + ' ' + branch.name, 10 + treeOffsetX, y + 20);
+        ctx.fillText(branch.name, 10 + treeOffsetX, y + 20);
       }
 
       for (let year = 2007; year <= 2052; year++) {
@@ -1428,8 +1378,9 @@
         ctx.strokeStyle = tech.unlocked ? '#00ff88' : (isAvailable ? '#ffd700' : branch.color);
         ctx.lineWidth = 2;
         
+        // Отрисовка прямоугольника (без roundRect для старых браузеров)
         ctx.beginPath();
-        ctx.roundRect(x, y, 80, 40, 6);
+        ctx.rect(x, y, 80, 40);
         ctx.fill();
         ctx.stroke();
 
@@ -1717,9 +1668,6 @@
 
   window.addEventListener('beforeunload', () => { save(); });
 
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
